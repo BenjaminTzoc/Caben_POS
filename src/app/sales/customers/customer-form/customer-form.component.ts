@@ -17,6 +17,7 @@ import { switchMap } from 'rxjs/operators';
 import { CustomerProductPricesComponent } from '../customer-product-prices/customer-product-prices.component';
 import { ConfirmationModalComponent } from '../../../shared/components/confirmation-modal/confirmation-modal.component';
 import { StatusBadgeComponent } from '../../../shared/components/status-badge/status-badge.component';
+import { CustomerCategoriesModalComponent } from '../../customer-categories/customer-categories-modal/customer-categories-modal.component';
 
 @Component({
   selector: 'app-customer-form',
@@ -35,6 +36,7 @@ import { StatusBadgeComponent } from '../../../shared/components/status-badge/st
     CustomerProductPricesComponent,
     ConfirmationModalComponent,
     StatusBadgeComponent,
+    CustomerCategoriesModalComponent,
   ],
   templateUrl: './customer-form.component.html',
 })
@@ -56,6 +58,7 @@ export class CustomerFormComponent implements OnInit {
   categories: ICustomerCategory[] = [];
   selectedCategory: ICustomerCategory | undefined;
   showCancelModal = false;
+  showCategoriesModal = false;
 
   ngOnInit(): void {
     this.customerId = this.route.snapshot.paramMap.get('id');
@@ -147,6 +150,7 @@ export class CustomerFormComponent implements OnInit {
       next: (res) => {
         if (res.statusCode === 200) {
           this.categories = res.data;
+          this.syncSelectedCategory();
         }
       },
       error: (err) => {
@@ -157,6 +161,30 @@ export class CustomerFormComponent implements OnInit {
         });
       },
     });
+  }
+
+  openCategoriesModal(): void {
+    this.showCategoriesModal = true;
+  }
+
+  onCategoriesUpdated(categories: ICustomerCategory[]): void {
+    this.categories = categories ?? [];
+    this.syncSelectedCategory();
+  }
+
+  private syncSelectedCategory(): void {
+    const id = this.customerForm?.get('categoryId')?.value;
+    if (!id) {
+      this.selectedCategory = undefined;
+      return;
+    }
+    const found = this.categories.find((c) => c.id === id);
+    if (!found) {
+      this.customerForm.get('categoryId')?.setValue('');
+      this.selectedCategory = undefined;
+      return;
+    }
+    this.selectedCategory = found;
   }
 
   onSaveCustomer(): void {

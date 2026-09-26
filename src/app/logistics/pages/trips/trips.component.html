@@ -149,7 +149,7 @@
                 }
                 @if (pendingReturnsCount(trip) > 0) {
                   <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-semibold bg-amber-50 text-amber-800 border border-amber-200">
-                    {{ pendingReturnsCount(trip) }} merma
+                    {{ pendingReturnsCount(trip) }} {{ pendingReturnsCount(trip) === 1 ? 'devolución' : 'devoluciones' }}
                   </span>
                 }
                 @if (openIncidentsCount(trip) > 0) {

@@ -242,6 +242,16 @@
   color: #48021c;
 }
 
+.otp:placeholder-shown {
+  letter-spacing: 0.12em;
+}
+
+.otp::placeholder {
+  color: #c4a0b0;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+}
+
 textarea {
   width: 100%;
   border-radius: 0.85rem;
@@ -285,6 +295,13 @@ textarea {
   margin-bottom: 0.45rem;
 }
 
+.qty-name {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+}
+
 .qty-head strong {
   min-width: 0;
   font-size: 0.9rem;
@@ -292,20 +309,29 @@ textarea {
   color: #3b141e;
 }
 
-.qty-head span {
-  flex-shrink: 0;
-  font-size: 0.75rem;
+.qty-name small {
+  font-size: 0.68rem;
   font-weight: 700;
   color: #9f6587;
 }
 
+.qty-ordered {
+  flex-shrink: 0;
+  font-size: 0.72rem;
+  font-weight: 800;
+  color: #6e3757;
+  white-space: nowrap;
+}
+
 .qty-fields {
   display: flex;
+  flex-wrap: wrap;
   gap: 0.65rem;
 }
 
 .qty-fields label {
   display: flex;
+  flex: 1 1 8.5rem;
   flex-direction: column;
   gap: 0.25rem;
   font-size: 0.65rem;
@@ -318,7 +344,8 @@ textarea {
 .qty-control {
   display: flex;
   align-items: stretch;
-  width: 9rem;
+  width: 100%;
+  min-width: 8.5rem;
   min-height: 2.75rem;
   border-radius: 0.85rem;
   border: 1px solid rgb(72 2 28 / 0.2);
@@ -354,4 +381,88 @@ textarea {
   letter-spacing: 0.02em;
   text-transform: none;
   color: #48021c;
+}
+
+.thumbs {
+  list-style: none;
+  margin: 0.55rem 0 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+}
+
+.thumbs li {
+  position: relative;
+  width: 4.5rem;
+  height: 4.5rem;
+}
+
+.thumbs img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 0.7rem;
+  border: 1px solid rgb(72 2 28 / 0.16);
+}
+
+.thumb-remove {
+  position: absolute;
+  right: 0.15rem;
+  bottom: 0.15rem;
+  border: 0;
+  border-radius: 0.4rem;
+  background: rgb(72 2 28 / 0.85);
+  color: #fff;
+  font-size: 0.58rem;
+  font-weight: 800;
+  padding: 0.12rem 0.28rem;
+  cursor: pointer;
+}
+
+.photo-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.5rem;
+  margin: 0.15rem 0 0.7rem;
+}
+
+.photo-picker {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.2rem;
+  width: 100%;
+  min-height: 4.5rem;
+  margin: 0;
+  overflow: hidden;
+  border-radius: 0.9rem;
+  border: 1.5px dashed rgb(72 2 28 / 0.28);
+  background: #faf7f8;
+  cursor: pointer;
+}
+
+.photo-picker-input {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  opacity: 0;
+  cursor: pointer;
+  font-size: 4rem;
+}
+
+.photo-picker-btn {
+  font-size: 0.88rem;
+  font-weight: 800;
+  color: #48021c;
+}
+
+.photo-picker-hint {
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: #9f6587;
 }

@@ -6,6 +6,7 @@ import { MessageService } from 'primeng/api';
 import { filter } from 'rxjs';
 import { PilotoTripsService } from '../../services/piloto-trips.service';
 import { TripsRealtimeService } from '../../../logistics/services/trips-realtime.service';
+import { prepareIncidentPhoto } from '../../utils/incident-photo';
 import {
   PilotoIncident,
   PilotoReturn,
@@ -41,6 +42,7 @@ export class ViajeDetalleComponent {
   incidentOpen = signal(false);
   incidentDraft = signal('');
   incidentStopId = signal('');
+  incidentAttachments = signal<{ file: File; url: string }[]>([]);
   trip = signal<PilotoTrip | null>(null);
 
   stops = computed(() => {
@@ -79,7 +81,7 @@ export class ViajeDetalleComponent {
       return 'Hay una parada fallida. Planta debe resolver la incidencia.';
     }
     if ((current.returns ?? []).some((item) => item.status === 'pending_receipt')) {
-      return 'Hay merma o devolución pendiente de recibir en planta.';
+      return 'Hay una devolución pendiente de recibir en planta.';
     }
     if ((current.incidents ?? []).some((item) => item.status === 'open')) {
       return 'Hay incidencias abiertas. Planta las resuelve.';
@@ -178,12 +180,50 @@ export class ViajeDetalleComponent {
     this.completeOpen.set(false);
     this.incidentDraft.set('');
     this.incidentStopId.set('');
+    this.clearIncidentAttachments();
   }
 
   cancelIncident(): void {
     this.incidentOpen.set(false);
     this.incidentDraft.set('');
     this.incidentStopId.set('');
+    this.clearIncidentAttachments();
+  }
+
+  async onIncidentFiles(event: Event): Promise<void> {
+    const input = event.target as HTMLInputElement;
+    const selected = Array.from(input.files ?? []);
+    input.value = '';
+    const next = [...this.incidentAttachments()];
+    for (const file of selected) {
+      if (next.length >= 5) {
+        this.messages.add({ severity: 'warn', summary: 'Anexo', detail: 'Puede adjuntar hasta 5 fotos.' });
+        break;
+      }
+      try {
+        const prepared = await prepareIncidentPhoto(file);
+        next.push({ file: prepared, url: URL.createObjectURL(prepared) });
+      } catch {
+        this.messages.add({
+          severity: 'warn',
+          summary: 'Anexo',
+          detail: 'No se pudo usar esa foto. Pruebe otra o baje la calidad de la cámara.',
+        });
+      }
+    }
+    this.incidentAttachments.set(next);
+  }
+
+  removeIncidentAttachment(index: number): void {
+    const next = [...this.incidentAttachments()];
+    const [removed] = next.splice(index, 1);
+    if (removed) URL.revokeObjectURL(removed.url);
+    this.incidentAttachments.set(next);
+  }
+
+  private clearIncidentAttachments(): void {
+    for (const item of this.incidentAttachments()) URL.revokeObjectURL(item.url);
+    this.incidentAttachments.set([]);
   }
 
   submitIncident(): void {
@@ -199,7 +239,11 @@ export class ViajeDetalleComponent {
     }
     this.reporting.set(true);
     const tripItemId = this.incidentStopId().trim() || undefined;
-    this.trips.createIncident(this.tripId, { description, tripItemId }).subscribe({
+    this.trips.createIncident(this.tripId, {
+      description,
+      tripItemId,
+      files: this.incidentAttachments().map((item) => item.file),
+    }).subscribe({
       next: (res) => {
         this.reporting.set(false);
         this.cancelIncident();
@@ -261,7 +305,7 @@ export class ViajeDetalleComponent {
 
   stopOptionLabel(stop: PilotoStop): string {
     const seq = stop.sequence ? `${stop.sequence}. ` : '';
-    if (stop.type === 'sale_order') return `${seq}${this.customerName(stop.sale)}`;
+    if (stop.type === 'sale_order') return `${seq}${this.invoiceLabel(stop.sale)}`;
     return `${seq}${this.destBranch(stop)}`;
   }
 
@@ -328,6 +372,11 @@ export class ViajeDetalleComponent {
       stop.transfer?.toBranch?.address?.trim() ||
       ''
     );
+  }
+
+  returnOrderLabel(ret: PilotoReturn): string {
+    const order = ret.sale?.invoiceNumber || ret.sale?.orderNumber;
+    return order ? `Orden ${order}` : 'Sin número de orden';
   }
 
   returnSummary(ret: PilotoReturn): string {

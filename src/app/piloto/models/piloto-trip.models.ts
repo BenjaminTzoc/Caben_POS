@@ -106,12 +106,15 @@ export interface PilotoReturn {
   id: string;
   status: 'pending_receipt' | 'received_in_warehouse' | 'cancelled';
   reason?: string;
+  tripItemId?: string | null;
+  sale?: Pick<PilotoSale, 'id' | 'invoiceNumber' | 'orderNumber'> | null;
   items?: PilotoReturnItem[];
 }
 
 export interface PilotoCreateIncidentPayload {
   description: string;
   tripItemId?: string;
+  files?: File[];
 }
 
 export interface PilotoIncident {
@@ -119,6 +122,7 @@ export interface PilotoIncident {
   description: string;
   status: 'open' | 'resolved';
   tripItemId?: string;
+  attachmentUrls?: string[];
 }
 
 export interface PilotoTrip {

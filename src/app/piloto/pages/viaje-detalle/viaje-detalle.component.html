@@ -77,7 +77,7 @@
     <ul class="side-list">
       @for (ret of pendingReturns(); track ret.id) {
         <li>
-          <strong>Pendiente de recibir</strong>
+          <strong>{{ returnOrderLabel(ret) }}</strong>
           <span>{{ returnSummary(ret) }}</span>
           @if (ret.reason) {
             <small>{{ ret.reason }}</small>
@@ -96,6 +96,15 @@
           <span>{{ incidentText(incident) }}</span>
           @if (incidentStopLabel(incident)) {
             <small>{{ incidentStopLabel(incident) }}</small>
+          }
+          @if (incident.attachmentUrls?.length) {
+            <div class="thumbs">
+              @for (url of incident.attachmentUrls; track url) {
+                <a [href]="url" target="_blank" rel="noopener">
+                  <img [src]="url" alt="Anexo de incidencia" />
+                </a>
+              }
+            </div>
           }
         </li>
       }
@@ -124,6 +133,42 @@
             <option [value]="stop.id">{{ stopOptionLabel(stop) }}</option>
           }
         </select>
+        <label class="field-label">Fotos (opcional)</label>
+        <p class="help tight">Prueba de entrega o del producto. Hasta 5 imágenes.</p>
+        <div class="photo-actions">
+          <label class="photo-picker">
+            <input
+              class="photo-picker-input"
+              type="file"
+              accept="image/*"
+              capture="environment"
+              (change)="onIncidentFiles($event)"
+            />
+            <span class="photo-picker-btn">Tomar foto</span>
+            <span class="photo-picker-hint">Cámara</span>
+          </label>
+          <label class="photo-picker">
+            <input
+              class="photo-picker-input"
+              type="file"
+              accept="image/*"
+              multiple
+              (change)="onIncidentFiles($event)"
+            />
+            <span class="photo-picker-btn">Galería</span>
+            <span class="photo-picker-hint">Elegir fotos</span>
+          </label>
+        </div>
+        @if (incidentAttachments().length) {
+          <ul class="thumbs">
+            @for (item of incidentAttachments(); track item.url; let i = $index) {
+              <li>
+                <img [src]="item.url" alt="" />
+                <button type="button" class="thumb-remove" (click)="removeIncidentAttachment(i)">Quitar</button>
+              </li>
+            }
+          </ul>
+        }
         <div class="confirm-actions">
           <button type="button" class="ghost" (click)="cancelIncident()" [disabled]="reporting()">Cancelar</button>
           <button type="button" class="depart compact" (click)="submitIncident()" [disabled]="reporting()">

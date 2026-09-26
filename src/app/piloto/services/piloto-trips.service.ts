@@ -45,7 +45,13 @@ export class PilotoTripsService {
     tripId: string,
     payload: PilotoCreateIncidentPayload,
   ): Observable<ApiResponse<PilotoTrip>> {
-    return this.http.post<ApiResponse<PilotoTrip>>(`${this.baseUrl}/${tripId}/incidents`, payload);
+    const form = new FormData();
+    form.append('description', payload.description);
+    if (payload.tripItemId) form.append('tripItemId', payload.tripItemId);
+    for (const file of payload.files ?? []) {
+      form.append('attachments', file);
+    }
+    return this.http.post<ApiResponse<PilotoTrip>>(`${this.baseUrl}/${tripId}/incidents`, form);
   }
 
   completeTrip(tripId: string): Observable<ApiResponse<PilotoTrip>> {

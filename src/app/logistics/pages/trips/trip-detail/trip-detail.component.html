@@ -53,7 +53,7 @@
                 }
               }
             </div>
-            <p class="text-xs text-slate-500 mt-1">Monitoreo, merma de bodega e incidencias para poder cerrar el viaje.</p>
+            <p class="text-xs text-slate-500 mt-1">Monitoreo, devoluciones a bodega e incidencias para poder cerrar el viaje.</p>
           </div>
         </div>
 
@@ -160,7 +160,7 @@
         </p>
         <p class="text-xs text-amber-800 m-0">
           @if (hasPendingReturns()) {
-            Hay merma pendiente de recibir.
+            Hay devolución pendiente de recibir.
           }
           @if (hasOpenIncidents()) {
             Hay incidencias abiertas.
@@ -323,7 +323,7 @@
         <div class="py-3 px-4 md:px-6 flex items-center justify-between border-b border-slate-100 bg-amber-50/30">
           <div class="flex items-center gap-2">
             <svg lucideRotateCcw class="w-4 h-4 text-amber-600 stroke-[2.2]"></svg>
-            <h2 class="text-sm font-bold text-slate-800 uppercase tracking-wider">Merma en retorno ({{ trip()?.returns?.length }})</h2>
+            <h2 class="text-sm font-bold text-slate-800 uppercase tracking-wider">Devoluciones a planta ({{ trip()?.returns?.length }})</h2>
           </div>
         </div>
 
@@ -332,14 +332,14 @@
             <div class="p-3.5 rounded-xl border border-amber-200 bg-amber-50/20 flex flex-col md:flex-row md:items-center justify-between gap-3">
               <div class="min-w-0">
                 <div class="flex items-center gap-2 mb-1">
-                  <span class="text-xs font-bold text-slate-800">Devolución #{{ ret.id | slice:0:8 }}</span>
+                  <span class="text-xs font-bold text-slate-800">{{ returnOrderLabel(ret) }}</span>
                   @if (ret.status === 'pending_receipt') {
                     <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold bg-amber-100 text-amber-800 border border-amber-300">
                       Pendiente en bodega
                     </span>
                   } @else {
                     <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-300">
-                    Recibida en bodega
+                      Recibida en bodega
                     </span>
                   }
                 </div>
@@ -363,12 +363,12 @@
                     styleClass="!text-xs !py-1.5 !px-3 !rounded-lg font-semibold shadow-none !bg-amber-600 !border-amber-600 !text-white hover:!bg-amber-700 inline-flex items-center gap-1.5"
                   >
                     <svg lucidePackage class="w-3.5 h-3.5 stroke-[2.2]"></svg>
-                    <span>Recibir merma</span>
+                    <span>Recibir en bodega</span>
                   </p-button>
                 } @else {
                   <span class="text-xs text-emerald-600 font-semibold flex items-center gap-1">
                     <svg lucideCheck class="w-3.5 h-3.5 stroke-[2.5]"></svg>
-                    Merma recibida
+                    Recibida en bodega
                   </span>
                 }
               </div>
@@ -404,6 +404,15 @@
                   }
                 </div>
                 <p class="text-xs text-slate-800 font-medium">{{ inc.description }}</p>
+                @if (inc.attachmentUrls?.length) {
+                  <div class="mt-2 flex flex-wrap gap-2">
+                    @for (url of inc.attachmentUrls; track url) {
+                      <a [href]="url" target="_blank" rel="noopener" class="block w-14 h-14 rounded-lg overflow-hidden border border-rose-200 bg-white">
+                        <img [src]="url" alt="Anexo" class="w-full h-full object-cover" />
+                      </a>
+                    }
+                  </div>
+                }
                 @if (inc.resolutionNotes) {
                   <p class="text-[11px] text-slate-500 mt-1">
                     Resolución: <span class="italic text-slate-700">{{ inc.resolutionNotes }}</span>
@@ -702,14 +711,12 @@
   </ng-template>
 </p-dialog>
 
-<!-- ========================================== -->
-<!-- MODAL: Recepción de merma en bodega        -->
-<!-- ========================================== -->
+<!-- MODAL: Recepción de devolución en bodega -->
 <p-dialog 
-  [header]="returnStep === 'review' ? 'Confirmar merma' : 'Recibir merma'" 
+  [header]="returnStep === 'review' ? 'Confirmar recepción' : 'Recibir devolución'" 
   [(visible)]="returnModalVisible" 
   [modal]="true" 
-  [style]="{ width: '90vw', maxWidth: '720px' }"
+  [style]="{ width: '92vw', maxWidth: '880px' }"
   [draggable]="false"
   [resizable]="false"
   (onHide)="closeReturnModal()"
@@ -718,24 +725,46 @@
   <div class="p-1 space-y-4">
     @if (returnStep === 'quantities') {
       <p class="text-xs text-slate-500">
-        Cuenta lo que volvió a planta. No se puede recibir de más. Si falta algo, se abre una incidencia. La reserva se libera; no entra stock.
+        Cuenta lo que volvió a planta (producto que el cliente no se quedó). No se puede recibir de más. Si falta algo, márcalo como merma para darlo de baja en kárdex, o déjalo como incidencia si aún no sabes la causa.
       </p>
     } @else {
       <p class="text-xs text-slate-500">
-        Revisa las cantidades. Esta lista ya no se edita. Al confirmar, bodega cierra la merma.
+        Lo recibido es devolución. El faltante marcado como merma sale en kárdex y cierra el aviso del piloto (no se abre otra incidencia).
       </p>
     }
 
-    <div class="hidden sm:grid grid-cols-[minmax(0,1fr)_6.5rem_8.5rem_6.5rem] gap-2 px-1 text-[10px] font-bold uppercase tracking-wide text-slate-500">
+    @if (relatedPilotIncidents().length) {
+      <div class="p-3 rounded-xl border border-rose-200 bg-rose-50/50 space-y-2">
+        <p class="text-[10px] font-bold uppercase tracking-wide text-rose-800 m-0">Aviso del piloto en esta parada</p>
+        <p class="text-[11px] text-rose-700 m-0">
+          No se genera una incidencia nueva. Si das de baja el faltante como merma, se cierra este aviso.
+        </p>
+        @for (inc of relatedPilotIncidents(); track inc.id) {
+          <p class="text-xs text-slate-800 m-0">{{ inc.description }}</p>
+          @if (inc.attachmentUrls?.length) {
+            <div class="flex flex-wrap gap-2">
+              @for (url of inc.attachmentUrls; track url) {
+                <a [href]="url" target="_blank" rel="noopener" class="block w-12 h-12 rounded-lg overflow-hidden border border-rose-200 bg-white">
+                  <img [src]="url" alt="Anexo" class="w-full h-full object-cover" />
+                </a>
+              }
+            </div>
+          }
+        }
+      </div>
+    }
+
+    <div class="hidden sm:grid grid-cols-[minmax(0,1fr)_6.5rem_8.5rem_6.5rem_7rem] gap-2 px-1 text-[10px] font-bold uppercase tracking-wide text-slate-500">
       <span>Producto</span>
       <span class="text-center">Debía volver</span>
       <span class="text-center">Recibido</span>
       <span class="text-center">Faltante</span>
+      <span class="text-center">Merma</span>
     </div>
 
     <div class="space-y-2 max-h-72 overflow-y-auto">
       @for (item of returnInspectionItems; track item.productId + item.sku) {
-        <div class="p-3 bg-slate-50 rounded-xl border border-slate-200 grid grid-cols-1 sm:grid-cols-[minmax(0,1fr)_6.5rem_8.5rem_6.5rem] gap-2 items-center">
+        <div class="p-3 bg-slate-50 rounded-xl border border-slate-200 grid grid-cols-1 sm:grid-cols-[minmax(0,1fr)_6.5rem_8.5rem_6.5rem_7rem] gap-2 items-center">
           <div class="min-w-0">
             <span class="text-xs font-bold text-slate-800 block truncate">{{ item.name }}</span>
             <span class="text-[10px] text-slate-500 font-mono">SKU: {{ item.sku }}</span>
@@ -749,7 +778,8 @@
               <label class="sm:hidden text-[10px] font-bold uppercase text-slate-400">Recibido</label>
               <div class="flex items-stretch rounded-lg border border-slate-300 bg-white overflow-hidden">
                 <p-inputNumber 
-                  [(ngModel)]="item.receivedQuantity" 
+                  [(ngModel)]="item.receivedQuantity"
+                  (ngModelChange)="onReturnReceivedChange(item, $event)"
                   [min]="0"
                   [max]="item.returnedQuantity"
                   [step]="item.allowsDecimals ? 0.01 : 1"
@@ -779,6 +809,22 @@
               {{ qtyLabel(missingReturnQty(item), item.unit) }}
             </p>
           </div>
+          <div class="text-left sm:text-center">
+            <span class="sm:hidden text-[10px] font-bold uppercase text-slate-400">Merma</span>
+            @if (missingReturnQty(item) > 0) {
+              <label class="inline-flex items-center gap-1.5 cursor-pointer">
+                <input
+                  type="checkbox"
+                  class="rounded border-slate-300"
+                  [(ngModel)]="item.registerAsWaste"
+                  [disabled]="returnStep === 'review'"
+                />
+                <span class="text-[11px] font-semibold text-slate-700">Dar de baja como merma</span>
+              </label>
+            } @else {
+              <span class="text-[11px] text-slate-400">—</span>
+            }
+          </div>
         </div>
       }
     </div>
@@ -790,7 +836,7 @@
           pTextarea 
           [(ngModel)]="returnNotes" 
           rows="2" 
-          [placeholder]="hasReturnShortage() ? 'Indica qué faltó' : 'Opcional'"
+          [placeholder]="hasUnmarkedReturnShortage() ? 'Indica qué faltó (no marcado como merma)' : hasWasteMarked() ? 'Opcional. El faltante marcado sale como merma' : 'Opcional'"
           class="!w-full !rounded-xl !border-slate-300 text-xs"
         ></textarea>
       </div>

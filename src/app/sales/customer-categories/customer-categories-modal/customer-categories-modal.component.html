@@ -1,0 +1,213 @@
+<app-standard-modal
+  [visible]="visible"
+  (visibleChange)="onVisibleChange($event)"
+  [title]="modalTitle"
+  [badge]="modalBadge"
+  width="92vw"
+  maxWidth="960px"
+  maxHeight="90vh"
+>
+  <ng-container actions>
+    @if (view === 'list') {
+      <app-search-input
+        widthClass="w-full sm:w-64"
+        placeholder="Buscar categoría..."
+        [(ngModel)]="searchTerm"
+        (searchChange)="onSearch($event)"
+      />
+      <app-primary-button label="Nueva categoría" (clicked)="openCreate()" />
+    }
+  </ng-container>
+
+  @if (view === 'list') {
+    <app-standard-table
+      [value]="filtered"
+      [loading]="loading"
+      [paginator]="true"
+      [rows]="8"
+      [rowsPerPageOptions]="[8, 15, 25]"
+      [scrollable]="true"
+      scrollHeight="22rem"
+      dataKey="id"
+      emptyIcon="pi pi-id-card"
+      emptyMessage="No hay categorías de cliente."
+      colorScheme="burgundy"
+    >
+      <ng-template #header>
+        <tr class="h-11 text-xs bg-[#eddde1] border-b border-[#762f41]/40 text-[#3b141e] font-bold sticky top-0 z-10">
+          <th class="!text-left !pl-4 border-r border-[#762f41]/35 w-[120px]">Estado</th>
+          <th class="!text-left !pl-3 border-r border-[#762f41]/35">Nombre</th>
+          <th class="!text-center border-r border-[#762f41]/35 w-[100px]">Descuento</th>
+          <th class="!text-right !pr-3 border-r border-[#762f41]/35 w-[120px]">Venta mín.</th>
+          <th class="!text-right !pr-3 border-r border-[#762f41]/35 w-[130px]">Crédito</th>
+          <th class="!text-right !pr-3 w-[100px]">Acciones</th>
+        </tr>
+      </ng-template>
+      <ng-template #body let-category>
+        <tr class="hover:!bg-[#eddde1]/45 transition-colors duration-150 border-b border-[#762f41]/18 last:border-0 text-xs">
+          <td class="!py-2.5 !pl-4 border-r border-[#762f41]/18">
+            <div class="flex items-center gap-2">
+              <p-toggleSwitch
+                [ngModel]="category.isActive"
+                [ngModelOptions]="{standalone: true}"
+                (ngModelChange)="onToggleActive(category, $event)"
+              />
+              <app-status-badge
+                [value]="category.isActive ? 'Activo' : 'Inactivo'"
+                [severity]="category.isActive ? 'success' : 'slate'"
+                size="xs"
+              />
+            </div>
+          </td>
+          <td class="!py-2.5 !pl-3 border-r border-[#762f41]/18">
+            <p class="font-semibold text-slate-800 truncate">{{ category.name }}</p>
+            <p class="text-[10px] text-slate-500 truncate">{{ category.description || 'Sin descripción' }}</p>
+          </td>
+          <td class="!py-2.5 border-r border-[#762f41]/18 text-center font-bold text-[#48021C] tabular-nums">
+            {{ category.discountPercentage | number:'1.2-2' }}%
+          </td>
+          <td class="!py-2.5 !pr-3 border-r border-[#762f41]/18 text-right font-semibold text-slate-700 tabular-nums">
+            {{ category.minPurchaseAmount | currency:'Q ' }}
+          </td>
+          <td class="!py-2.5 !pr-3 border-r border-[#762f41]/18 text-right font-semibold text-slate-700 tabular-nums">
+            {{ category.defaultCreditLimit | currency:'Q ' }}
+          </td>
+          <td class="!py-2.5 !pr-3 text-right">
+            <div class="flex justify-end gap-1">
+              <button
+                type="button"
+                (click)="openEdit(category)"
+                class="w-7 h-7 rounded-lg inline-flex items-center justify-center border border-amber-500/40 bg-amber-500/[0.08] text-amber-700 hover:bg-amber-500/[0.2] transition-all cursor-pointer"
+                pTooltip="Editar"
+                tooltipPosition="top"
+              >
+                <i class="pi pi-pencil text-[11px]"></i>
+              </button>
+              <button
+                type="button"
+                (click)="askDelete(category)"
+                class="w-7 h-7 rounded-lg inline-flex items-center justify-center border border-rose-500/40 bg-rose-500/[0.08] text-rose-600 hover:bg-rose-500/[0.2] transition-all cursor-pointer"
+                pTooltip="Eliminar"
+                tooltipPosition="top"
+              >
+                <i class="pi pi-trash text-[11px]"></i>
+              </button>
+            </div>
+          </td>
+        </tr>
+      </ng-template>
+    </app-standard-table>
+  } @else {
+    <form [formGroup]="categoryForm" class="flex flex-col gap-4 overflow-y-auto min-h-0 pr-0.5">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div class="flex flex-col gap-1.5 md:col-span-2">
+          <label class="text-xs font-semibold text-[#48021C]" for="categoryName">
+            Nombre <span class="text-red-700">*</span>
+          </label>
+          <input
+            pInputText
+            id="categoryName"
+            formControlName="name"
+            class="w-full !rounded-lg h-[40px] font-medium"
+            placeholder="Ej. VIP, Mayorista, Regular..."
+            autocomplete="off"
+          />
+          @if (categoryForm.get('name')?.invalid && categoryForm.get('name')?.touched) {
+            <small class="text-rose-500 text-[10px] font-medium">El nombre es obligatorio.</small>
+          }
+        </div>
+
+        <div class="flex flex-col gap-1.5 md:col-span-2">
+          <label class="text-xs font-semibold text-[#48021C]" for="categoryDescription">Descripción</label>
+          <textarea
+            pTextarea
+            id="categoryDescription"
+            formControlName="description"
+            rows="3"
+            class="w-full !rounded-lg font-medium text-sm resize-none"
+            placeholder="Beneficios o requisitos de este nivel..."
+          ></textarea>
+        </div>
+
+        <div class="flex flex-col gap-1.5">
+          <label class="text-xs font-semibold text-[#48021C]" for="discountPercentage">Descuento (%)</label>
+          <p-inputnumber
+            id="discountPercentage"
+            formControlName="discountPercentage"
+            suffix=" %"
+            [min]="0"
+            [max]="100"
+            [minFractionDigits]="2"
+            [maxFractionDigits]="2"
+            [fluid]="true"
+            inputStyleClass="!rounded-lg h-[40px] font-bold text-[#48021C]"
+          />
+        </div>
+
+        <div class="flex flex-col gap-1.5">
+          <label class="text-xs font-semibold text-[#48021C]" for="minPurchaseAmount">Venta mínima</label>
+          <p-inputnumber
+            id="minPurchaseAmount"
+            formControlName="minPurchaseAmount"
+            mode="currency"
+            currency="GTQ"
+            locale="es-GT"
+            [min]="0"
+            [fluid]="true"
+            inputStyleClass="!rounded-lg h-[40px] font-bold text-[#48021C]"
+          />
+        </div>
+
+        <div class="flex flex-col gap-1.5">
+          <label class="text-xs font-semibold text-[#48021C]" for="defaultCreditLimit">Límite de crédito</label>
+          <p-inputnumber
+            id="defaultCreditLimit"
+            formControlName="defaultCreditLimit"
+            mode="currency"
+            currency="GTQ"
+            locale="es-GT"
+            [min]="0"
+            [fluid]="true"
+            inputStyleClass="!rounded-lg h-[40px] font-bold text-[#48021C]"
+          />
+        </div>
+
+        <div class="flex items-center justify-between px-3 h-[40px] rounded-lg border border-[#48021C]/20 bg-[#48021C]/[0.04] mt-auto">
+          <span class="text-xs font-semibold text-[#48021C]">Activa</span>
+          <p-toggleSwitch formControlName="isActive" />
+        </div>
+      </div>
+    </form>
+  }
+
+  <ng-container footer>
+    @if (view === 'form') {
+      <p-button
+        type="button"
+        label="Volver"
+        [outlined]="true"
+        icon="pi pi-arrow-left"
+        (onClick)="backToList()"
+        styleClass="!rounded-lg !px-3.5 font-semibold h-9! !bg-white hover:!bg-slate-50 !border !border-[#9f6587]/40 !text-[#6e3757] shadow-2xs text-xs cursor-pointer"
+      />
+      <app-primary-button
+        [label]="editingId ? 'Guardar cambios' : 'Crear categoría'"
+        icon="pi pi-check"
+        [loading]="isSaving"
+        (clicked)="onSave()"
+      />
+    }
+  </ng-container>
+</app-standard-modal>
+
+<app-confirmation-modal
+  [(visible)]="showDeleteModal"
+  type="danger"
+  header="Eliminar categoría"
+  title="¿Eliminar esta categoría?"
+  [message]="deleteMessage"
+  confirmLabel="Eliminar"
+  cancelLabel="Cancelar"
+  [loading]="deleting"
+  (onConfirm)="confirmDelete()"
+/>

@@ -133,6 +133,7 @@ export class TripDetailComponent implements OnInit, OnDestroy {
     sku: string;
     returnedQuantity: number;
     receivedQuantity: number;
+    registerAsWaste: boolean;
     unit: string;
     allowsDecimals: boolean;
   }[] = [];
@@ -242,7 +243,7 @@ export class TripDetailComponent implements OnInit, OnDestroy {
   completeTrip(): void {
     if (!this.tripId) return;
     this.confirmationService.confirm({
-      message: '¿Desea dar por finalizado este viaje? No debe haber merma pendiente de bodega ni incidencias abiertas.',
+      message: '¿Desea dar por finalizado este viaje? No debe haber devoluciones pendientes de bodega ni incidencias abiertas.',
       header: 'Finalizar Viaje',
       icon: 'pi pi-check-circle',
       acceptLabel: 'Sí, Finalizar Viaje',
@@ -267,7 +268,7 @@ export class TripDetailComponent implements OnInit, OnDestroy {
             this.messageService.add({
               severity: 'error',
               summary: 'No se puede finalizar',
-              detail: err.error?.message || 'Hay merma pendiente o incidencias abiertas.',
+              detail: err.error?.message || 'Hay devoluciones pendientes o incidencias abiertas.',
             });
           },
         });
@@ -507,6 +508,7 @@ export class TripDetailComponent implements OnInit, OnDestroy {
         sku: ri.product?.sku || 'N/A',
         returnedQuantity: returned,
         receivedQuantity: returned,
+        registerAsWaste: false,
         ...this.unitFields(ri.product?.unit),
       };
     });
@@ -543,6 +545,34 @@ export class TripDetailComponent implements OnInit, OnDestroy {
     return this.returnInspectionItems.some((item) => this.missingReturnQty(item) > 0);
   }
 
+  hasUnmarkedReturnShortage(): boolean {
+    return this.returnInspectionItems.some(
+      (item) => this.missingReturnQty(item) > 0 && !item.registerAsWaste,
+    );
+  }
+
+  hasWasteMarked(): boolean {
+    return this.returnInspectionItems.some(
+      (item) => this.missingReturnQty(item) > 0 && item.registerAsWaste,
+    );
+  }
+
+  relatedPilotIncidents(): TripIncident[] {
+    const stopId = this.selectedReturn?.tripItemId;
+    if (!stopId) return [];
+    return (this.trip()?.incidents ?? []).filter(
+      (incident) => incident.status === 'open' && incident.tripItemId === stopId,
+    );
+  }
+
+  onReturnReceivedChange(
+    item: { receivedQuantity: number; registerAsWaste: boolean; returnedQuantity: number; allowsDecimals: boolean },
+    value: number | null,
+  ): void {
+    item.receivedQuantity = Number(value) || 0;
+    if (this.missingReturnQty(item) === 0) item.registerAsWaste = false;
+  }
+
   submitReturnReception(): void {
     if (!this.tripId || !this.selectedReturn) return;
     if (this.returnStep !== 'review') return;
@@ -554,15 +584,18 @@ export class TripDetailComponent implements OnInit, OnDestroy {
     const shortage = this.hasReturnShortage();
     const payload: ReceiveTripReturnPayload = {
       notes: this.returnNotes.trim() || undefined,
+      discrepancyReason: this.hasWasteMarked() ? 'road_waste' : shortage ? 'unknown' : undefined,
     };
     if (shortage) {
       payload.items = this.returnInspectionItems.map((i) => {
         const received = Number(i.receivedQuantity);
+        const missing = this.missingReturnQty(i);
         return {
           productId: i.productId,
           receivedQuantity: Number.isFinite(received)
             ? this.roundTransferQty(received, i.allowsDecimals)
             : 0,
+          registerAsWaste: missing > 0 && i.registerAsWaste,
         };
       });
     }
@@ -573,19 +606,23 @@ export class TripDetailComponent implements OnInit, OnDestroy {
         this.actionLoading.set(false);
         this.closeReturnModal();
         this.trip.set(res.data);
+        const unmarked = this.hasUnmarkedReturnShortage();
+        const waste = this.hasWasteMarked();
         this.messageService.add({
-          severity: shortage ? 'warn' : 'success',
-          summary: shortage ? 'Merma con faltante' : 'Merma recibida',
-          detail: shortage
-            ? 'Se recibió lo que sí llegó y se abrió una incidencia. La reserva se libera; no entra stock.'
-            : 'Bodega confirmó la merma. La reserva se libera; no hay entrada de stock.',
+          severity: unmarked ? 'warn' : 'success',
+          summary: unmarked ? 'Retorno con incidencia' : waste ? 'Merma registrada' : 'Retorno recibido',
+          detail: unmarked
+            ? 'Se recibió lo que sí llegó. El aviso del piloto (o la incidencia de faltante) sigue abierto.'
+            : waste
+              ? 'El faltante marcado como merma salió en kárdex y se cerró el aviso de esta parada.'
+              : 'Bodega confirmó el retorno. La reserva se libera; no hay entrada de stock.',
         });
       },
       error: (err) => {
         this.actionLoading.set(false);
         this.messageService.add({
           severity: 'error',
-          summary: 'Error al recibir merma',
+          summary: 'Error al recibir devolución',
           detail: err.error?.message || 'No se pudo procesar la recepción en bodega.',
         });
       },
@@ -606,11 +643,11 @@ export class TripDetailComponent implements OnInit, OnDestroy {
       });
       return false;
     }
-    if (this.hasReturnShortage() && !this.returnNotes.trim()) {
+    if (this.hasUnmarkedReturnShortage() && !this.returnNotes.trim()) {
       this.messageService.add({
         severity: 'warn',
         summary: 'Notas',
-        detail: 'Indica qué faltó. Se abrirá una incidencia.',
+        detail: 'Indica qué faltó. Ese faltante abre una incidencia si no lo marcas como merma.',
       });
       return false;
     }
@@ -680,6 +717,11 @@ export class TripDetailComponent implements OnInit, OnDestroy {
     }
   }
 
+  returnOrderLabel(ret: { sale?: { invoiceNumber?: string; orderNumber?: string } | null }): string {
+    const number = ret.sale?.invoiceNumber || ret.sale?.orderNumber;
+    return number ? `Orden ${number}` : 'Orden sin número';
+  }
+
   getReturnStatusLabel(status?: string): string {
     switch (status) {
       case 'pending_receipt': return 'En Tránsito / Pendiente en Bodega';
@@ -717,7 +759,7 @@ export class TripDetailComponent implements OnInit, OnDestroy {
   completeBlockHint(): string {
     if (this.canCompleteTrip()) return 'Finalizar y cerrar viaje';
     if (this.hasPendingStops()) return 'Aún hay paradas pendientes o fallidas';
-    if (this.hasPendingReturns()) return 'Hay merma pendiente de recibir en bodega';
+    if (this.hasPendingReturns()) return 'Hay devolución pendiente de recibir en bodega';
     if (this.hasOpenIncidents()) return 'Hay incidencias abiertas por resolver';
     return 'El viaje aún no se puede completar';
   }

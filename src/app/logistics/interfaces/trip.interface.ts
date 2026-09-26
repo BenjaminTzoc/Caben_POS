@@ -28,6 +28,12 @@ export interface TripReturn {
   reason?: string;
   receptionNotes?: string;
   receivedAt?: string;
+  tripItemId?: string | null;
+  sale?: {
+    id: string;
+    invoiceNumber?: string;
+    orderNumber?: string;
+  } | null;
   receivedBy?: {
     id: string;
     name: string;
@@ -41,6 +47,8 @@ export interface TripIncident {
   status: TripIncidentStatus;
   resolutionNotes?: string;
   resolvedAt?: string;
+  tripItemId?: string | null;
+  attachmentUrls?: string[];
   resolvedBy?: {
     id: string;
     name: string;
@@ -133,8 +141,10 @@ export interface DeliverTransferPayload {
 
 export interface ReceiveTripReturnPayload {
   notes?: string;
+  discrepancyReason?: 'load_error' | 'road_waste' | 'unknown';
   items?: {
     productId: string;
     receivedQuantity: number;
+    registerAsWaste?: boolean;
   }[];
 }

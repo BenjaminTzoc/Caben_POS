@@ -60,6 +60,9 @@ export class ProductRibbonComponent {
   /** Mostrar atajo de cantidad (solo aplica en ventas/cotizaciones) */
   @Input() showQuickQuantity = true;
 
+  /** Tarjetas más estrechas (p. ej. precios por cliente) */
+  @Input() compactCards = false;
+
   /** Tooltip del clic en la tarjeta */
   @Input() selectTooltip = 'Clic para agregar a la lista';
 
@@ -134,6 +137,16 @@ export class ProductRibbonComponent {
   isProductSelected(productId: string): boolean {
     if (this.isSelectedFn) return this.isSelectedFn(productId);
     return false;
+  }
+
+  cardClasses(product: Product): string {
+    const selected = this.isProductSelected(product.id)
+      ? 'border-[#48021C] bg-[#48021C]/5 shadow-xs ring-1 ring-[#48021C]/30'
+      : 'border-[#48021C]/20 bg-rose-50/20 hover:bg-white hover:border-[#48021C]/50 hover:shadow-xs';
+    const size = this.compactCards
+      ? 'w-[calc((100%-2.25rem)/4)] min-w-[192px] max-w-[250px]'
+      : 'w-[calc((100%-1.5rem)/3)] min-w-[210px] max-w-[320px]';
+    return `${selected} ${size}`;
   }
 
   getSelectedQuantity(productId: string): number | undefined {

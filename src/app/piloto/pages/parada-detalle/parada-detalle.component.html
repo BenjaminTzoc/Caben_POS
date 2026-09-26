@@ -104,8 +104,13 @@
             @for (line of saleDeliverLines(); track line.key) {
               <li>
                 <div class="qty-head">
-                  <strong>{{ line.name }}</strong>
-                  <span>{{ formatQty(line.ordered, line.allowsDecimals) }}{{ line.unit ? ' ' + line.unit : '' }}</span>
+                  <div class="qty-name">
+                    <strong>{{ line.name }}</strong>
+                    @if (line.sku) {
+                      <small>{{ line.sku }}</small>
+                    }
+                  </div>
+                  <span class="qty-ordered">Pedido {{ formatQty(line.ordered, line.allowsDecimals) }}{{ line.unit ? ' ' + line.unit : '' }}</span>
                 </div>
                 <div class="qty-fields">
                   <label>
@@ -125,7 +130,7 @@
                     </span>
                   </label>
                   <label>
-                    Devuelto
+                    Devuelto a planta
                     <span class="qty-control">
                       <input
                         type="text"
@@ -160,7 +165,7 @@
           inputmode="numeric"
           autocomplete="one-time-code"
           maxlength="6"
-          placeholder="000000"
+          placeholder="OTP"
           [value]="otp()"
           (focus)="selectAll($event)"
           (mouseup)="$event.preventDefault()"
@@ -201,6 +206,42 @@
           (input)="incidentDraft.set($any($event.target).value)"
           placeholder="Ej. Cliente agresivo"
         ></textarea>
+        <label class="field-label">Fotos (opcional)</label>
+        <p class="help tight">Prueba de entrega o del producto. Hasta 5 imágenes.</p>
+        <div class="photo-actions">
+          <label class="photo-picker">
+            <input
+              class="photo-picker-input"
+              type="file"
+              accept="image/*"
+              capture="environment"
+              (change)="onIncidentFiles($event)"
+            />
+            <span class="photo-picker-btn">Tomar foto</span>
+            <span class="photo-picker-hint">Cámara</span>
+          </label>
+          <label class="photo-picker">
+            <input
+              class="photo-picker-input"
+              type="file"
+              accept="image/*"
+              multiple
+              (change)="onIncidentFiles($event)"
+            />
+            <span class="photo-picker-btn">Galería</span>
+            <span class="photo-picker-hint">Elegir fotos</span>
+          </label>
+        </div>
+        @if (incidentAttachments().length) {
+          <ul class="thumbs">
+            @for (item of incidentAttachments(); track item.url; let i = $index) {
+              <li>
+                <img [src]="item.url" alt="" />
+                <button type="button" class="thumb-remove" (click)="removeIncidentAttachment(i)">Quitar</button>
+              </li>
+            }
+          </ul>
+        }
         <div class="confirm-actions">
           <button type="button" class="ghost" (click)="cancelIncident()" [disabled]="reporting()">Cancelar</button>
           <button type="button" class="depart compact" (click)="submitIncident()" [disabled]="reporting()">

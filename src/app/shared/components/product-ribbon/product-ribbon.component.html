@@ -61,8 +61,8 @@
         >
           <div 
             *ngFor="let p of filteredProducts" 
-            [class]="isProductSelected(p.id) ? 'border-[#48021C] bg-[#48021C]/5 shadow-xs ring-1 ring-[#48021C]/30' : 'border-[#48021C]/20 bg-rose-50/20 hover:bg-white hover:border-[#48021C]/50 hover:shadow-xs'"
-            class="w-[calc((100%-1.5rem)/3)] min-w-[210px] max-w-[320px] flex-shrink-0 flex flex-col gap-2 p-2.5 rounded-xl border transition-all text-xs group"
+            [class]="cardClasses(p)"
+            class="flex-shrink-0 flex flex-col gap-2 p-2.5 rounded-xl border transition-all text-xs group"
           >
             <!-- Fila Superior: Info + Precio (Clicable) -->
             <div 

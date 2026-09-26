@@ -6,6 +6,7 @@ import { MessageService } from 'primeng/api';
 import { filter } from 'rxjs';
 import { PilotoTripsService } from '../../services/piloto-trips.service';
 import { TripsRealtimeService } from '../../../logistics/services/trips-realtime.service';
+import { prepareIncidentPhoto } from '../../utils/incident-photo';
 import {
   PilotoDeliverLine,
   PilotoDeliverOutcome,
@@ -47,6 +48,7 @@ export class ParadaDetalleComponent {
   incidentOpen = signal(false);
   incidentDraft = signal('');
   reporting = signal(false);
+  incidentAttachments = signal<{ file: File; url: string }[]>([]);
   deliveredByProduct = signal<Record<string, number>>({});
   deliveredDraft = signal<Record<string, string>>({});
   returnedDraft = signal<Record<string, string>>({});
@@ -164,11 +166,49 @@ export class ParadaDetalleComponent {
     if (this.trip()?.status !== 'on_route') return;
     this.incidentOpen.set(true);
     this.incidentDraft.set('');
+    this.clearIncidentAttachments();
   }
 
   cancelIncident(): void {
     this.incidentOpen.set(false);
     this.incidentDraft.set('');
+    this.clearIncidentAttachments();
+  }
+
+  async onIncidentFiles(event: Event): Promise<void> {
+    const input = event.target as HTMLInputElement;
+    const selected = Array.from(input.files ?? []);
+    input.value = '';
+    const next = [...this.incidentAttachments()];
+    for (const file of selected) {
+      if (next.length >= 5) {
+        this.messages.add({ severity: 'warn', summary: 'Anexo', detail: 'Puede adjuntar hasta 5 fotos.' });
+        break;
+      }
+      try {
+        const prepared = await prepareIncidentPhoto(file);
+        next.push({ file: prepared, url: URL.createObjectURL(prepared) });
+      } catch {
+        this.messages.add({
+          severity: 'warn',
+          summary: 'Anexo',
+          detail: 'No se pudo usar esa foto. Pruebe otra o baje la calidad de la cámara.',
+        });
+      }
+    }
+    this.incidentAttachments.set(next);
+  }
+
+  removeIncidentAttachment(index: number): void {
+    const next = [...this.incidentAttachments()];
+    const [removed] = next.splice(index, 1);
+    if (removed) URL.revokeObjectURL(removed.url);
+    this.incidentAttachments.set(next);
+  }
+
+  private clearIncidentAttachments(): void {
+    for (const item of this.incidentAttachments()) URL.revokeObjectURL(item.url);
+    this.incidentAttachments.set([]);
   }
 
   submitIncident(): void {
@@ -183,7 +223,11 @@ export class ParadaDetalleComponent {
       return;
     }
     this.reporting.set(true);
-    this.trips.createIncident(this.tripId, { description, tripItemId: this.stopId }).subscribe({
+    this.trips.createIncident(this.tripId, {
+      description,
+      tripItemId: this.stopId,
+      files: this.incidentAttachments().map((item) => item.file),
+    }).subscribe({
       next: (res) => {
         this.reporting.set(false);
         this.cancelIncident();
