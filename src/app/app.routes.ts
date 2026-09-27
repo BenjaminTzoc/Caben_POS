@@ -11,10 +11,12 @@ export const routes: Routes = [
   },
   {
     path: 'auth',
+    data: { preload: false },
     loadChildren: () => import('./auth/auth.routes').then((m) => m.AUTH_ROUTES),
   },
   {
     path: 'piloto',
+    data: { preload: false },
     canActivate: [authGuard, pilotoGuard],
     loadChildren: () => import('./piloto/piloto.routes').then((m) => m.PILOTO_ROUTES),
   },

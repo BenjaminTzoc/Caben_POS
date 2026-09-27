@@ -9,7 +9,7 @@ import localeEsGt from '@angular/common/locales/es-GT';
 import { registerLocaleData } from '@angular/common';
 
 registerLocaleData(localeEsGt);
-import { provideRouter } from '@angular/router';
+import { provideRouter, withPreloading } from '@angular/router';
 import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
 import { providePrimeNG } from 'primeng/config';
 import { routes } from './app.routes';
@@ -18,6 +18,7 @@ import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import { authInterceptor } from './auth/auth.interceptor';
 import { provideSocketIo } from 'ngx-socket-io';
 import { environment } from '../environments/environment';
+import { IdlePreloadStrategy } from './core/idle-preload.strategy';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -25,7 +26,7 @@ export const appConfig: ApplicationConfig = {
     { provide: DEFAULT_CURRENCY_CODE, useValue: 'GTQ' },
     provideBrowserGlobalErrorListeners(),
     provideZoneChangeDetection({ eventCoalescing: true }),
-    provideRouter(routes),
+    provideRouter(routes, withPreloading(IdlePreloadStrategy)),
     provideAnimationsAsync(),
     providePrimeNG({
       theme: {

@@ -1,41 +1,53 @@
 import { Routes } from '@angular/router';
-import { CustomersComponent } from './customers/customers.component';
-import { CustomerFormComponent } from './customers/customer-form/customer-form.component';
-import { SaleOrdersComponent } from './sale-orders/sale-orders.component';
-import { SaleOrderFormComponent } from './sale-orders/sale-order-form/sale-order-form.component';
 
 export const SALES_ROUTES: Routes = [
   {
     path: 'customers',
-    component: CustomersComponent,
+    loadComponent: () =>
+      import('./customers/customers.component').then((m) => m.CustomersComponent),
   },
   {
     path: 'new-customer',
-    component: CustomerFormComponent,
+    loadComponent: () =>
+      import('./customers/customer-form/customer-form.component').then((m) => m.CustomerFormComponent),
   },
   {
     path: 'edit-customer/:id',
-    component: CustomerFormComponent,
+    loadComponent: () =>
+      import('./customers/customer-form/customer-form.component').then((m) => m.CustomerFormComponent),
   },
   {
     path: 'customer-categories',
-    loadComponent: () => import('./customer-categories/customer-categories.component').then(m => m.CustomerCategoriesComponent),
+    loadComponent: () =>
+      import('./customer-categories/customer-categories.component').then(
+        (m) => m.CustomerCategoriesComponent,
+      ),
   },
   {
     path: 'customer-categories/new',
-    loadComponent: () => import('./customer-categories/customer-category-form/customer-category-form.component').then(m => m.CustomerCategoryFormComponent),
+    loadComponent: () =>
+      import('./customer-categories/customer-category-form/customer-category-form.component').then(
+        (m) => m.CustomerCategoryFormComponent,
+      ),
   },
   {
     path: 'customer-categories/edit/:id',
-    loadComponent: () => import('./customer-categories/customer-category-form/customer-category-form.component').then(m => m.CustomerCategoryFormComponent),
+    loadComponent: () =>
+      import('./customer-categories/customer-category-form/customer-category-form.component').then(
+        (m) => m.CustomerCategoryFormComponent,
+      ),
   },
   {
     path: 'orders',
-    component: SaleOrdersComponent,
+    loadComponent: () =>
+      import('./sale-orders/sale-orders.component').then((m) => m.SaleOrdersComponent),
   },
   {
     path: 'new-order',
-    component: SaleOrderFormComponent,
+    loadComponent: () =>
+      import('./sale-orders/sale-order-form/sale-order-form.component').then(
+        (m) => m.SaleOrderFormComponent,
+      ),
   },
   {
     path: 'cash-register',
@@ -76,24 +88,30 @@ export const SALES_ROUTES: Routes = [
   {
     path: 'quick-sale',
     loadComponent: () =>
-      import('./quick-sales/quick-sales.component').then(
-        (m) => m.QuickSaleComponent,
-      ),
+      import('./quick-sales/quick-sales.component').then((m) => m.QuickSaleComponent),
   },
   {
     path: 'payment-methods',
-    loadComponent: () => import('./payment-methods/payment-methods.component').then(m => m.PaymentMethodsComponent),
+    loadComponent: () =>
+      import('./payment-methods/payment-methods.component').then((m) => m.PaymentMethodsComponent),
   },
   {
     path: 'payment-methods/new',
-    loadComponent: () => import('./payment-methods/payment-method-form/payment-method-form.component').then(m => m.PaymentMethodFormComponent),
+    loadComponent: () =>
+      import('./payment-methods/payment-method-form/payment-method-form.component').then(
+        (m) => m.PaymentMethodFormComponent,
+      ),
   },
   {
     path: 'payment-methods/edit/:id',
-    loadComponent: () => import('./payment-methods/payment-method-form/payment-method-form.component').then(m => m.PaymentMethodFormComponent),
+    loadComponent: () =>
+      import('./payment-methods/payment-method-form/payment-method-form.component').then(
+        (m) => m.PaymentMethodFormComponent,
+      ),
   },
   {
     path: 'bank-accounts',
-    loadComponent: () => import('./bank-accounts/bank-accounts.component').then(m => m.BankAccountsComponent),
+    loadComponent: () =>
+      import('./bank-accounts/bank-accounts.component').then((m) => m.BankAccountsComponent),
   },
 ];

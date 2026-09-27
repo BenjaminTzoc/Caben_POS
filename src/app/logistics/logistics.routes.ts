@@ -1,5 +1,4 @@
 import { Routes } from '@angular/router';
-import { AreasComponent } from './pages/areas/areas.component';
 
 export const LOGISTICS_ROUTES: Routes = [
   {
@@ -20,7 +19,7 @@ export const LOGISTICS_ROUTES: Routes = [
   },
   {
     path: 'areas',
-    component: AreasComponent,
+    loadComponent: () => import('./pages/areas/areas.component').then(m => m.AreasComponent),
   },
   {
     path: 'new-area',

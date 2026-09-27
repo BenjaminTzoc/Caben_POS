@@ -1,33 +1,35 @@
-import { Routes } from "@angular/router";
-import { PurchasesComponent } from "./purchases.component";
-import { SuppliersComponent } from "./suppliers/suppliers.component";
-import { SupplierFormComponent } from "./suppliers/supplier-form/supplier-form.component";
-import { PurchaseOrdersComponent } from "./purchase-orders/purchase-orders.component";
-import { PurchaseOrderFormComponent } from "./purchase-orders/purchase-order-form/purchase-order-form.component";
+import { Routes } from '@angular/router';
 
 export const PURCHASES_ROUTES: Routes = [
   {
     path: '',
-    component: PurchasesComponent
+    loadComponent: () => import('./purchases.component').then((m) => m.PurchasesComponent),
   },
   {
     path: 'suppliers',
-    component: SuppliersComponent
+    loadComponent: () =>
+      import('./suppliers/suppliers.component').then((m) => m.SuppliersComponent),
   },
   {
     path: 'new-supplier',
-    component: SupplierFormComponent
+    loadComponent: () =>
+      import('./suppliers/supplier-form/supplier-form.component').then((m) => m.SupplierFormComponent),
   },
   {
     path: 'edit-supplier/:id',
-    component: SupplierFormComponent
+    loadComponent: () =>
+      import('./suppliers/supplier-form/supplier-form.component').then((m) => m.SupplierFormComponent),
   },
   {
     path: 'orders',
-    component: PurchaseOrdersComponent
+    loadComponent: () =>
+      import('./purchase-orders/purchase-orders.component').then((m) => m.PurchaseOrdersComponent),
   },
   {
     path: 'new-order',
-    component: PurchaseOrderFormComponent
-  }
-]
+    loadComponent: () =>
+      import('./purchase-orders/purchase-order-form/purchase-order-form.component').then(
+        (m) => m.PurchaseOrderFormComponent,
+      ),
+  },
+];

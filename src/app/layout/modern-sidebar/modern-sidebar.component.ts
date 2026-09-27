@@ -19,11 +19,11 @@ import { CashSessionDialogComponent } from '../../shared/components/cash-session
     trigger('submenuAnimation', [
       transition(':enter', [
         style({ height: '0', opacity: 0, overflow: 'hidden' }),
-        animate('300ms cubic-bezier(0.4, 0, 0.2, 1)', style({ height: '*', opacity: 1 }))
+        animate('140ms ease-out', style({ height: '*', opacity: 1 }))
       ]),
       transition(':leave', [
         style({ height: '*', opacity: 1, overflow: 'hidden' }),
-        animate('250ms cubic-bezier(0.4, 0, 0.2, 1)', style({ height: '0', opacity: 0 }))
+        animate('100ms ease-in', style({ height: '0', opacity: 0 }))
       ])
     ])
   ]

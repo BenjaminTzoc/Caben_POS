@@ -1,0 +1,28 @@
+.nav-progress {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  z-index: 40;
+  overflow: hidden;
+  background: rgba(72, 2, 28, 0.12);
+}
+
+.nav-progress::after {
+  content: '';
+  display: block;
+  height: 100%;
+  width: 40%;
+  background: #48021c;
+  animation: nav-progress-slide 0.7s ease-in-out infinite;
+}
+
+@keyframes nav-progress-slide {
+  0% {
+    transform: translateX(-120%);
+  }
+  100% {
+    transform: translateX(350%);
+  }
+}
