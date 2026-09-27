@@ -7,7 +7,7 @@
   >
     <!-- Botones Superiores de Acción -->
     <ng-container actions>
-      <app-refresh-button [loading]="loading" (refresh)="loadProducts()" />
+      <app-refresh-button [loading]="loading" (refresh)="onToggleDeleted()" />
 
       <app-primary-button 
         label="Nuevo Producto" 
@@ -31,7 +31,7 @@
           </label>
           <p-toggleSwitch
             [(ngModel)]="showDeleted"
-            (onChange)="loadProducts()"
+            (onChange)="onToggleDeleted()"
             inputId="showDeleted"
             styleClass="burgundy-switch"
           />
@@ -50,8 +50,13 @@
         [value]="filteredProducts"
         [loading]="loading"
         [paginator]="true"
-        [rows]="10"
-        [rowsPerPageOptions]="[10, 20, 30]"
+        [lazy]="true"
+        [rows]="limit"
+        [first]="first"
+        [totalRecords]="totalRecords"
+        [rowsPerPageOptions]="[10, 20, 25, 50, 100]"
+        [showRowsPerPageDropdown]="true"
+        (onLazyLoad)="onPageChange($event)"
         [globalFilterFields]="['name', 'sku', 'barcode']"
         dataKey="id"
         emptyIcon="pi pi-box"
@@ -338,7 +343,12 @@
         [value]="filteredProducts"
         [loading]="loading"
         [paginator]="true"
-        [rows]="10"
+        [lazy]="true"
+        [rows]="limit"
+        [first]="first"
+        [totalRecords]="totalRecords"
+        [rowsPerPageOptions]="[10, 20, 25, 50]"
+        (onLazyLoad)="onPageChange($event)"
         [globalFilterFields]="['name', 'sku', 'barcode']"
         dataKey="id"
         [rowExpandMode]="'single'"

@@ -1,7 +1,8 @@
 import { Component, inject, OnInit, signal, Input, ViewChild, Output, EventEmitter, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
-import { MessageService, ConfirmationService } from 'primeng/api';
+import { MessageService } from 'primeng/api';
+import { ConfirmService } from '../../shared/services/confirm.service';
 
 // PrimeNG
 import { Table, TableModule } from 'primeng/table';
@@ -45,7 +46,7 @@ import { AuthService } from '../../auth/auth.service';
 export class BankAccountsComponent implements OnInit {
   private bankService = inject(BankAccountsService);
   private messageService = inject(MessageService);
-  private confirmationService = inject(ConfirmationService);
+  private confirmService = inject(ConfirmService);
   private authService = inject(AuthService);
   private fb = inject(FormBuilder);
 
@@ -251,14 +252,13 @@ export class BankAccountsComponent implements OnInit {
   }
 
   onDeleteAccount(account: IBankAccount): void {
-    this.confirmationService.confirm({
+    this.confirmService.confirm({
       message: `¿Está seguro de eliminar la cuenta: ${account.alias} (${account.bankName})?`,
       header: 'Confirmar eliminación',
       icon: 'pi pi-exclamation-triangle',
-      acceptLabel: 'Eliminar',
-      rejectLabel: 'Cancelar',
-      acceptButtonStyleClass: 'p-button-danger !rounded-xl',
-      rejectButtonStyleClass: 'p-button-secondary p-button-text !rounded-xl',
+      confirmLabel: 'Eliminar',
+      cancelLabel: 'Cancelar',
+      type: 'danger',
       accept: () => {
         this.bankService.deleteBankAccount(account.id).subscribe({
           next: () => {

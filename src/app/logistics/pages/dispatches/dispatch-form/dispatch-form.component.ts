@@ -2,7 +2,8 @@ import { Component, ElementRef, inject, OnInit, signal, ViewChild, computed } fr
 import { CommonModule, CurrencyPipe } from '@angular/common';
 import { FormArray, FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
-import { ConfirmationService, MessageService } from 'primeng/api';
+import { MessageService } from 'primeng/api';
+import { ConfirmService } from '../../../../shared/services/confirm.service';
 import { SelectModule } from 'primeng/select';
 import { ButtonModule } from 'primeng/button';
 import { InputTextModule } from 'primeng/inputtext';
@@ -14,7 +15,6 @@ import { DrawerModule } from 'primeng/drawer';
 import { IconFieldModule } from 'primeng/iconfield';
 import { InputIconModule } from 'primeng/inputicon';
 import { TooltipModule } from 'primeng/tooltip';
-import { ConfirmDialogModule } from 'primeng/confirmdialog';
 
 import { LogisticsService } from '../../../services/logistics.service';
 import { RouteDispatch } from '../../../interfaces/route-dispatch.interface';
@@ -44,10 +44,8 @@ import { environment } from '../../../../../environments/environment';
     IconFieldModule,
     InputIconModule,
     TooltipModule,
-    ConfirmDialogModule,
     ConfirmationModalComponent
   ],
-  providers: [ConfirmationService],
   templateUrl: './dispatch-form.component.html',
 })
 export class DispatchFormComponent implements OnInit {
@@ -57,7 +55,7 @@ export class DispatchFormComponent implements OnInit {
   private branchesService = inject(BranchesService);
   private productsService = inject(ProductsService);
   private messageService = inject(MessageService);
-  private confirmationService = inject(ConfirmationService);
+  private confirmService = inject(ConfirmService);
   private quickQuantityService = inject(QuickQuantityService);
 
   @ViewChild('catalogContainer') catalogContainer!: ElementRef<HTMLDivElement>;
@@ -175,12 +173,12 @@ export class DispatchFormComponent implements OnInit {
     const newBranchId = event.value;
 
     if (this.items.length > 0) {
-      this.confirmationService.confirm({
+      this.confirmService.confirm({
         message: 'Si cambia la planta origen, se limpiarán los productos agregados al despacho. ¿Desea continuar?',
         header: 'Confirmar cambio de planta origen',
         icon: 'pi pi-exclamation-triangle',
-        acceptLabel: 'Sí, cambiar',
-        rejectLabel: 'Cancelar',
+        confirmLabel: 'Sí, cambiar',
+        cancelLabel: 'Cancelar',
         accept: () => {
           this.items.clear();
           this.previousOriginBranchId = newBranchId;

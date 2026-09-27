@@ -7,11 +7,10 @@ import { SelectModule } from 'primeng/select';
 import { InputNumberModule } from 'primeng/inputnumber';
 import { InputTextModule } from 'primeng/inputtext';
 import { TableModule } from 'primeng/table';
-import { MessageService, ConfirmationService } from 'primeng/api';
+import { MessageService } from 'primeng/api';
 import { DividerModule } from 'primeng/divider';
 import { TagModule } from 'primeng/tag';
 import { TooltipModule } from 'primeng/tooltip';
-import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { DialogModule } from 'primeng/dialog';
 
 import { RecipeService } from '../../services/recipe.service';
@@ -35,11 +34,9 @@ import { environment } from '../../../../environments/environment';
     DividerModule,
     TagModule,
     TooltipModule,
-    ConfirmDialogModule,
     DialogModule,
     DecimalPipe
   ],
-  providers: [ConfirmationService],
   templateUrl: './recipe-detail.component.html'
 })
 export class RecipeDetailComponent implements OnInit {
@@ -49,7 +46,6 @@ export class RecipeDetailComponent implements OnInit {
   private recipeService = inject(RecipeService);
   private productsService = inject(ProductsService);
   private messageService = inject(MessageService);
-  private confirmationService = inject(ConfirmationService);
 
   productId: string = '';
   product = signal<Product | null>(null);

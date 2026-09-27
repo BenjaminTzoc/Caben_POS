@@ -61,4 +61,16 @@ export const LOGISTICS_ROUTES: Routes = [
     path: 'settlements',
     loadComponent: () => import('./pages/settlements/settlements.component').then(m => m.SettlementsComponent),
   },
+  {
+    path: 'settlements/today',
+    loadComponent: () => import('./pages/settlements/settlement-form.component').then(m => m.SettlementFormComponent),
+  },
+  {
+    path: 'settlements/:id/edit',
+    loadComponent: () => import('./pages/settlements/settlement-form.component').then(m => m.SettlementFormComponent),
+  },
+  {
+    path: 'settlements/:id',
+    loadComponent: () => import('./pages/settlements/settlement-detail.component').then(m => m.SettlementDetailComponent),
+  },
 ];

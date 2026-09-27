@@ -15,7 +15,8 @@ import { MenuItem } from './menu-items';
 import { filter, Subscription } from 'rxjs';
 import { AuthService } from '../../auth/auth.service';
 import { User } from '../../core/models/user.model';
-import { ConfirmationService, MessageService } from 'primeng/api';
+import { MessageService } from 'primeng/api';
+import { ConfirmService } from '../../shared/services/confirm.service';
 import { ButtonModule } from 'primeng/button';
 import { CashRegisterService } from '../../inventory/services/cash-register.service';
 import { CashSession } from '../../inventory/interfaces/cash-register.interface';
@@ -45,7 +46,7 @@ export class SidebarComponent implements OnInit, OnDestroy {
     private router: Router,
     private authService: AuthService,
     private messageService: MessageService,
-    private confirmationService: ConfirmationService,
+    private confirmService: ConfirmService,
   ) {}
 
   currentCashSession = signal<CashSession | null>(null);
@@ -153,14 +154,13 @@ export class SidebarComponent implements OnInit, OnDestroy {
   }
 
   confirmLogout(): void {
-    this.confirmationService.confirm({
+    this.confirmService.confirm({
       message: '¿Estás seguro de que deseas cerrar sesión?',
       header: 'Confirmar cierre de sesión',
       icon: 'pi pi-exclamation-triangle',
-      acceptLabel: 'Sí, salir',
-      rejectLabel: 'Cancelar',
-      acceptButtonStyleClass: 'p-button-danger',
-      rejectButtonStyleClass: 'p-button-text',
+      confirmLabel: 'Sí, salir',
+      cancelLabel: 'Cancelar',
+      type: 'danger',
       accept: () => {
         this.performLogout();
       },

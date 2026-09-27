@@ -3,7 +3,7 @@ import { ButtonModule } from 'primeng/button';
 import { TableModule } from 'primeng/table';
 import { IPurchaseOrderResponse } from '../interfaces/purchase-order.interface';
 import { OrdersService } from '../services/orders.service';
-import { ConfirmationService, MessageService } from 'primeng/api';
+import { MessageService } from 'primeng/api';
 import { CurrencyPipe, DatePipe } from '@angular/common';
 import { Router } from '@angular/router';
 import { PurchaseStatusPipe } from '../../shared/pipes/purchase-status.pipe';
@@ -41,7 +41,6 @@ import { TagModule } from 'primeng/tag';
 export class PurchaseOrdersComponent implements OnInit {
   private ordersService = inject(OrdersService);
   private messageService = inject(MessageService);
-  private confirmationService = inject(ConfirmationService);
   private router = inject(Router);
   private branchesService = inject(BranchesService);
   private authService = inject(AuthService);

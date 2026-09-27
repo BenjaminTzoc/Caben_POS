@@ -5,8 +5,8 @@ import { AbstractControl, FormBuilder, FormGroup, FormsModule, ReactiveFormsModu
 import { ButtonModule } from 'primeng/button';
 import { WebsocketService } from '../../services/websocket.service';
 import { Subject, distinctUntilChanged, takeUntil } from 'rxjs';
-import { ConfirmationService, MessageService } from 'primeng/api';
-import { ConfirmDialogModule } from 'primeng/confirmdialog';
+import { MessageService } from 'primeng/api';
+import { ConfirmService } from '../../../shared/services/confirm.service';
 import { OrdersService } from '../../services/orders.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { DatePickerModule } from 'primeng/datepicker';
@@ -64,11 +64,11 @@ import { StatusBadgeComponent } from '../../../shared/components/status-badge/st
 @Component({
   selector: 'app-sale-order-form',
   //prettier-ignore
-  imports: [ReactiveFormsModule, FormsModule, RadioButtonModule, FloatLabelModule, InputTextModule, CurrencyPipe, ButtonModule, DatePickerModule, TableModule, DialogModule, SelectModule, ToggleSwitchModule, InputNumberModule, TextareaModule, CommonModule, AutoCompleteModule, SaleDiscountsComponent, SaleStatusPipe, PaymentStatusPipe, TooltipModule, ConfirmDialogModule, TagModule, TicketPreviewComponent, CashSessionDialogComponent, BankAccountsComponent, ConfirmationModalComponent, PageHeaderComponent, ProductsTableComponent, ProductRibbonComponent, StandardModalComponent, StandardTableComponent, PrimaryButtonComponent, SecondaryButtonComponent, StatusBadgeComponent],
+  imports: [ReactiveFormsModule, FormsModule, RadioButtonModule, FloatLabelModule, InputTextModule, CurrencyPipe, ButtonModule, DatePickerModule, TableModule, DialogModule, SelectModule, ToggleSwitchModule, InputNumberModule, TextareaModule, CommonModule, AutoCompleteModule, SaleDiscountsComponent, SaleStatusPipe, PaymentStatusPipe, TooltipModule,
+    TagModule, TicketPreviewComponent, CashSessionDialogComponent, BankAccountsComponent, ConfirmationModalComponent, PageHeaderComponent, ProductsTableComponent, ProductRibbonComponent, StandardModalComponent, StandardTableComponent, PrimaryButtonComponent, SecondaryButtonComponent, StatusBadgeComponent],
   templateUrl: './sale-order-form.component.html',
   styleUrl: './sale-order-form.component.css',
-  providers: [ConfirmationService],
-})
+  })
 export class SaleOrderFormComponent implements OnInit, OnDestroy {
   // Confirmation Modals
   showCancelConfirmModal = false;
@@ -104,7 +104,7 @@ export class SaleOrderFormComponent implements OnInit, OnDestroy {
   private route = inject(ActivatedRoute);
   private branchesService = inject(BranchesService);
   private authService = inject(AuthService);
-  private confirmationService = inject(ConfirmationService);
+  private confirmService = inject(ConfirmService);
   private cashService = inject(CashRegisterService);
   private productsService = inject(ProductsService);
   private quickQuantityService = inject(QuickQuantityService);
@@ -366,12 +366,12 @@ export class SaleOrderFormComponent implements OnInit, OnDestroy {
     const newBranchId = event.value;
 
     if (this.details.length > 0) {
-      this.confirmationService.confirm({
+      this.confirmService.confirm({
         message: 'Al cambiar de sucursal se eliminarán los productos agregados. ¿Desea continuar?',
         header: 'Confirmación',
         icon: 'pi pi-exclamation-triangle',
-        acceptLabel: 'Sí, cambiar y limpiar',
-        rejectLabel: 'No, mantener',
+        confirmLabel: 'Sí, cambiar y limpiar',
+        cancelLabel: 'No, mantener',
         accept: () => {
           this.detailManager.clear();
           this.tableItems = [];
@@ -828,20 +828,14 @@ export class SaleOrderFormComponent implements OnInit, OnDestroy {
   }
 
   deleteCustomer(customerId: string, event: Event): void {
-    this.confirmationService.confirm({
-      target: event.target as HTMLElement,
+    this.confirmService.confirm({
       message: '¿Estás seguro de eliminar este cliente?',
       header: 'Confirmar eliminación',
       icon: 'pi pi-exclamation-triangle',
-      rejectLabel: 'No',
-      acceptLabel: 'Sí',
-      rejectButtonProps: {
-        severity: 'secondary',
-        outlined: true,
-      },
-      acceptButtonProps: {
-        severity: 'danger',
-      },
+      cancelLabel: 'No',
+      confirmLabel: 'Sí',
+      
+      type: 'danger',
       accept: () => {
         this.customersService.deleteCustomer(customerId).subscribe({
           next: (res) => {
@@ -938,20 +932,14 @@ export class SaleOrderFormComponent implements OnInit, OnDestroy {
   }
 
   deleteCustomerCategory(id: string, event: Event): void {
-    this.confirmationService.confirm({
-      target: event.target as HTMLElement,
+    this.confirmService.confirm({
       message: '¿Estás seguro de eliminar esta categoría de cliente?',
       header: 'Confirmar eliminación',
       icon: 'pi pi-exclamation-triangle',
-      rejectLabel: 'No',
-      acceptLabel: 'Sí',
-      rejectButtonProps: {
-        severity: 'secondary',
-        outlined: true,
-      },
-      acceptButtonProps: {
-        severity: 'danger',
-      },
+      cancelLabel: 'No',
+      confirmLabel: 'Sí',
+      
+      type: 'danger',
       accept: () => {
         this.customerCategoriesService.deleteCategory(id).subscribe({
           next: (res) => {

@@ -1,6 +1,7 @@
 import { Component, inject, OnInit, ViewChild } from '@angular/core';
-import { ConfirmationService, MessageService } from 'primeng/api';
-import { Table, TableModule } from 'primeng/table';
+import { MessageService } from 'primeng/api';
+import { ConfirmService } from '../../shared/services/confirm.service';
+import { Table, TableLazyLoadEvent, TableModule } from 'primeng/table';
 import { CurrencyPipe } from '@angular/common';
 import { ButtonModule } from 'primeng/button';
 import { IconFieldModule } from 'primeng/iconfield';
@@ -53,7 +54,7 @@ export class ProductsComponent implements OnInit {
 
   private productsService = inject(ProductsService);
   private messageService = inject(MessageService);
-  private confirmationService = inject(ConfirmationService);
+  private confirmService = inject(ConfirmService);
   private router = inject(Router);
   private authService = inject(AuthService);
 
@@ -62,6 +63,11 @@ export class ProductsComponent implements OnInit {
   loading = false;
   searchTerm = '';
   showDeleted = false;
+  totalRecords = 0;
+  page = 1;
+  limit = 20;
+  first = 0;
+  private lastLoadKey = '';
 
   get canViewDeleted(): boolean {
     const user = this.authService.currentUser;
@@ -69,9 +75,7 @@ export class ProductsComponent implements OnInit {
     return user.roles?.some((r) => r.isSuperAdmin || r.name === 'Admin') ?? false;
   }
 
-  ngOnInit(): void {
-    this.loadProducts();
-  }
+  ngOnInit(): void {}
 
   expandedRows: { [key: string]: boolean } = {};
 
@@ -89,19 +93,45 @@ export class ProductsComponent implements OnInit {
 
   onSearch(query: string): void {
     this.searchTerm = query;
-    this.productsDesktopTable?.filterGlobal(query, 'contains');
-    this.productsMobileTable?.filterGlobal(query, 'contains');
+    this.page = 1;
+    this.first = 0;
+    this.lastLoadKey = '';
+    this.loadProducts();
+  }
+
+  onPageChange(event: TableLazyLoadEvent): void {
+    const rows = event.rows ?? this.limit;
+    const first = event.first ?? 0;
+    this.limit = rows;
+    this.first = first;
+    this.page = Math.floor(first / rows) + 1;
+    this.loadProducts();
+  }
+
+  onToggleDeleted(): void {
+    this.page = 1;
+    this.first = 0;
+    this.lastLoadKey = '';
+    this.loadProducts();
   }
 
   loadProducts(branchId?: string): void {
+    const key = `${this.page}|${this.limit}|${this.searchTerm}|${this.showDeleted}|${branchId || ''}`;
+    if (key === this.lastLoadKey && this.loading) return;
+    this.lastLoadKey = key;
     this.loading = true;
-    // Excluimos materias primas e insumos de la vista comercial
-    this.productsService.getProducts(branchId, this.showDeleted, undefined, undefined).subscribe({
-      next: (response) => {
-        // En la lista principal solo mostramos productos que NO son variantes
-        // ya que las variantes se mostrarán dentro de cada maestro desplegable
-        this.filteredProducts = response.data.filter(p => !p.isVariant);
-      },
+    this.productsService
+      .getProductsPage(
+        { page: this.page, limit: this.limit, search: this.searchTerm },
+        { branchId, includeDeleted: this.showDeleted },
+      )
+      .subscribe({
+        next: (response) => {
+          const page = response.data;
+          this.filteredProducts = (page.items || []).filter((p) => !p.isVariant);
+          this.totalRecords = page.total ?? this.filteredProducts.length;
+          this.page = page.page ?? this.page;
+        },
       error: (error) => {
         this.messageService.add({
           severity: 'error',
@@ -120,13 +150,12 @@ export class ProductsComponent implements OnInit {
   }
 
   onRestoreProduct(product: Product): void {
-    this.confirmationService.confirm({
+    this.confirmService.confirm({
       message: `¿Está seguro de restaurar el producto: ${product.name}?`,
       header: 'Confirmar restauración',
-      acceptLabel: 'Restaurar',
-      rejectLabel: 'Cancelar',
-      acceptButtonStyleClass: 'p-button-success !rounded-2xl',
-      rejectButtonStyleClass: 'p-button-secondary p-button-text !rounded-2xl',
+      confirmLabel: 'Restaurar',
+      cancelLabel: 'Cancelar',
+      type: 'success',
       accept: () => {
         this.productsService.restoreProduct(product.id).subscribe({
           next: () => {
@@ -171,15 +200,13 @@ export class ProductsComponent implements OnInit {
   }
 
   onDeleteProduct(product: Product) {
-    this.confirmationService.confirm({
+    this.confirmService.confirm({
       message: `¿Estás seguro de eliminar el producto: ${product.name}?`,
       header: 'Confirmar eliminación',
       icon: 'pi pi-info-circle',
-      acceptLabel: 'Eliminar',
-      rejectLabel: 'Cancelar',
-      acceptButtonStyleClass: 'p-button-danger !rounded-2xl',
-      rejectButtonStyleClass: 'p-button-secondary p-button-text !rounded-2xl',
-
+      confirmLabel: 'Eliminar',
+      cancelLabel: 'Cancelar',
+      type: 'danger',
       accept: () => {
         this.productsService.deleteProduct(product.id).subscribe({
           next: (response) => {

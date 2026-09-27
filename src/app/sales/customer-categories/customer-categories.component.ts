@@ -11,7 +11,8 @@ import { FormsModule } from '@angular/forms';
 import { ToggleSwitchModule } from 'primeng/toggleswitch';
 import { TagModule } from 'primeng/tag';
 import { CustomerCategoriesService } from '../services/customer-categories.service';
-import { ConfirmationService, MessageService } from 'primeng/api';
+import { MessageService } from 'primeng/api';
+import { ConfirmService } from '../../shared/services/confirm.service';
 import { AuthService } from '../../auth/auth.service';
 
 @Component({
@@ -36,7 +37,7 @@ export class CustomerCategoriesComponent implements OnInit {
   private router = inject(Router);
   private categoriesService = inject(CustomerCategoriesService);
   private messageService = inject(MessageService);
-  private confirmationService = inject(ConfirmationService);
+  private confirmService = inject(ConfirmService);
   private authService = inject(AuthService);
 
   categories: ICustomerCategory[] = [];
@@ -82,14 +83,13 @@ export class CustomerCategoriesComponent implements OnInit {
   }
 
   onDeleteCategory(category: ICustomerCategory) {
-    this.confirmationService.confirm({
+    this.confirmService.confirm({
       message: `¿Está seguro de eliminar la categoría: ${category.name}?`,
       header: 'Confirmar eliminación',
       icon: 'pi pi-info-circle',
-      acceptLabel: 'Eliminar',
-      rejectLabel: 'Cancelar',
-      acceptButtonStyleClass: 'p-button-danger !rounded-2xl',
-      rejectButtonStyleClass: 'p-button-secondary p-button-text !rounded-2xl',
+      confirmLabel: 'Eliminar',
+      cancelLabel: 'Cancelar',
+      type: 'danger',
       accept: () => {
         this.categoriesService.deleteCategory(category.id).subscribe({
           next: () => {
@@ -117,14 +117,13 @@ export class CustomerCategoriesComponent implements OnInit {
   }
 
   restoreCategory(category: ICustomerCategory): void {
-    this.confirmationService.confirm({
+    this.confirmService.confirm({
       message: `¿Está seguro de restaurar la categoría: ${category.name}?`,
       header: 'Confirmar restauración',
       icon: 'pi pi-refresh',
-      acceptLabel: 'Restaurar',
-      rejectLabel: 'Cancelar',
-      acceptButtonStyleClass: 'p-button-success !rounded-2xl',
-      rejectButtonStyleClass: 'p-button-secondary p-button-text !rounded-2xl',
+      confirmLabel: 'Restaurar',
+      cancelLabel: 'Cancelar',
+      type: 'success',
       accept: () => {
         this.categoriesService.restoreCategory(category.id).subscribe({
           next: () => {

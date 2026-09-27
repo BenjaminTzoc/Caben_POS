@@ -8,7 +8,8 @@ import { TextareaModule } from 'primeng/textarea';
 import { CardModule } from 'primeng/card';
 import { ToggleSwitchModule } from 'primeng/toggleswitch';
 import { InputMaskModule } from 'primeng/inputmask';
-import { ConfirmationService, MessageService } from 'primeng/api';
+import { MessageService } from 'primeng/api';
+import { ConfirmService } from '../../../shared/services/confirm.service';
 import { BranchesService } from '../../services/branches.service';
 
 @Component({
@@ -33,7 +34,7 @@ export class BranchFormComponent implements OnInit {
   private route = inject(ActivatedRoute);
   private branchesService = inject(BranchesService);
   private messageService = inject(MessageService);
-  private confirmationService = inject(ConfirmationService);
+  private confirmService = inject(ConfirmService);
 
   branchForm!: FormGroup;
   isEdit: boolean = false;
@@ -118,12 +119,12 @@ export class BranchFormComponent implements OnInit {
 
   onCancel(): void {
     if (this.branchForm.dirty) {
-      this.confirmationService.confirm({
+      this.confirmService.confirm({
         message: '¿Estás seguro de cancelar? Los cambios no guardados se perderán.',
         header: 'Confirmar cancelación',
         icon: 'pi pi-exclamation-triangle',
-        acceptLabel: 'Sí, salir',
-        rejectLabel: 'Continuar editando',
+        confirmLabel: 'Sí, salir',
+        cancelLabel: 'Continuar editando',
         accept: () => {
           this.router.navigate(['/inventory/branches']);
         },

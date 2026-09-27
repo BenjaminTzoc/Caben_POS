@@ -1,6 +1,6 @@
 import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 import { ButtonModule } from 'primeng/button';
-import { TableModule } from 'primeng/table';
+import { TableModule, TableLazyLoadEvent } from 'primeng/table';
 import { InventoryMovement } from '../interfaces/inventory-movement.interface';
 import { InventoryMovementsService } from '../services/inventory-movements.service';
 import { DatePipe, DecimalPipe, Location } from '@angular/common';
@@ -10,8 +10,7 @@ import { environment } from '../../../environments/environment';
 import { InventoryMovementConceptPipe } from '../../shared/pipes/inventory-movement-concept.pipe';
 import { InventoryMovementStatusPipe } from '../../shared/pipes/inventory-movement-status.pipe';
 import { TooltipModule } from 'primeng/tooltip';
-import { Router } from '@angular/router';
-import { ConfirmationService, MessageService } from 'primeng/api';
+import { MessageService } from 'primeng/api';
 import { Dialog } from 'primeng/dialog';
 import { FormsModule } from '@angular/forms';
 import { TextareaModule } from 'primeng/textarea';
@@ -45,7 +44,7 @@ import { MovementFormComponent } from './movement-form/movement-form.component';
     StatusBadgeComponent,
     MovementFormComponent,
   ],
-  providers: [ConfirmationService, MessageService],
+  providers: [MessageService],
   templateUrl: './inventory-movements.component.html',
   styleUrl: './inventory-movements.component.css',
 })
@@ -59,7 +58,7 @@ export class InventoryMovementsComponent implements OnInit {
   loading: boolean = false;
   totalRecords: number = 0;
   page: number = 1;
-  limit: number = 10;
+  limit: number = 20;
   first: number = 0;
   stats: any = null;
   showNewMovementModal = false;
@@ -83,12 +82,10 @@ export class InventoryMovementsComponent implements OnInit {
   constructor(
     private inventoryMovementsService: InventoryMovementsService,
     private messageService: MessageService,
-    private router: Router,
     private location: Location
   ) {}
 
   ngOnInit(): void {
-    this.loadInventoryMovements();
     this.loadStats();
   }
 
@@ -108,7 +105,7 @@ export class InventoryMovementsComponent implements OnInit {
       this.first = 0;
     }
     this.loading = true;
-    const filters: any = {
+    const filters: { page: number; limit: number; branchId?: string } = {
       page: this.page,
       limit: this.limit,
     };
@@ -137,20 +134,17 @@ export class InventoryMovementsComponent implements OnInit {
     });
   }
 
-  onPageChange(event: any): void {
-    const pageIndex = Math.floor(event.first / event.rows) + 1;
-    this.page = pageIndex;
-    this.limit = event.rows || 10;
-    this.first = event.first;
+  onPageChange(event: TableLazyLoadEvent): void {
+    const rows = event.rows ?? this.limit;
+    const first = event.first ?? 0;
+    this.limit = rows;
+    this.first = first;
+    this.page = Math.floor(first / rows) + 1;
     this.loadInventoryMovements();
   }
 
   recordMovement(): void {
-    if (this.isModal) {
-      this.showNewMovementModal = true;
-    } else {
-      this.router.navigate(['/inventory/new-movement']);
-    }
+    this.showNewMovementModal = true;
   }
 
   onMovementSaved() {

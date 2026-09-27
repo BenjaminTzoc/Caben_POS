@@ -9,7 +9,8 @@ import {
 } from '@angular/forms';
 import { InputText } from 'primeng/inputtext';
 import { Select } from 'primeng/select';
-import { ConfirmationService, MessageService } from 'primeng/api';
+import { MessageService } from 'primeng/api';
+import { ConfirmService } from '../../../shared/services/confirm.service';
 import { TextareaModule } from 'primeng/textarea';
 import { RadioButton } from 'primeng/radiobutton';
 import { ButtonModule } from 'primeng/button';
@@ -22,7 +23,6 @@ import { TooltipModule } from 'primeng/tooltip';
 import { ToggleSwitchModule } from 'primeng/toggleswitch';
 import { DialogModule } from 'primeng/dialog';
 import { ProgressSpinner } from 'primeng/progressspinner';
-import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { Category, Product, ProductType } from '../../interfaces/product.interface';
 import { Branch } from '../../interfaces/branch.interface';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -30,6 +30,7 @@ import { UnitMeasure } from '../../interfaces/unit.interface';
 import { ProductsService } from '../../services/products.service';
 import { BranchesService } from '../../services/branches.service';
 import { UnitsService } from '../../services/units.service';
+import { ConfirmationModalComponent } from '../../../shared/components/confirmation-modal/confirmation-modal.component';
 
 @Component({
   selector: 'app-product-form',
@@ -49,7 +50,7 @@ import { UnitsService } from '../../services/units.service';
     TooltipModule,
     DialogModule,
     ProgressSpinner,
-    ConfirmDialogModule,
+    ConfirmationModalComponent,
   ],
   templateUrl: './product-form.component.html',
   styleUrl: './product-form.component.css',
@@ -62,7 +63,7 @@ export class ProductFormComponent implements OnInit {
   private messageService = inject(MessageService);
   private fb = inject(FormBuilder);
   private router = inject(Router);
-  private confirmationService = inject(ConfirmationService);
+  private confirmService = inject(ConfirmService);
   private route = inject(ActivatedRoute);
 
   @ViewChild('nameInput') nameInput!: ElementRef;
@@ -881,20 +882,14 @@ export class ProductFormComponent implements OnInit {
 
   deleteCategory(categoryId: string, event: Event) {
     event.stopPropagation();
-    this.confirmationService.confirm({
+    this.confirmService.confirm({
       message: '¿Estás seguro de que deseas eliminar esta categoría?',
       header: 'Confirmar eliminación',
       icon: 'pi pi-exclamation-triangle',
-      rejectLabel: 'Cancelar',
-      rejectButtonProps: {
-        label: 'Cancelar',
-        severity: 'secondary',
-        outlined: true,
-      },
-      acceptButtonProps: {
-        label: 'Eliminar',
-        severity: 'danger',
-      },
+      cancelLabel: 'Cancelar',
+      
+      confirmLabel: 'Eliminar',
+      type: 'danger',
       accept: () => {
         this.productsService.deleteCategory(categoryId).subscribe({
           next: () => {
@@ -978,20 +973,14 @@ export class ProductFormComponent implements OnInit {
 
   deleteUnit(unitId: string, event: Event) {
     event.stopPropagation();
-    this.confirmationService.confirm({
+    this.confirmService.confirm({
       message: '¿Estás seguro de que deseas eliminar esta unidad de medida?',
       header: 'Confirmar eliminación',
       icon: 'pi pi-exclamation-triangle',
-      rejectLabel: 'Cancelar',
-      rejectButtonProps: {
-        label: 'Cancelar',
-        severity: 'secondary',
-        outlined: true,
-      },
-      acceptButtonProps: {
-        label: 'Eliminar',
-        severity: 'danger',
-      },
+      cancelLabel: 'Cancelar',
+      
+      confirmLabel: 'Eliminar',
+      type: 'danger',
       accept: () => {
         this.unitsService.deleteUnit(unitId).subscribe({
           next: () => {

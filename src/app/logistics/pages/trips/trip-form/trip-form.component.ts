@@ -1,7 +1,7 @@
 import { Component, OnInit, inject, signal, computed } from '@angular/core';
 import { CommonModule, CurrencyPipe, DatePipe } from '@angular/common';
 import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { SelectModule } from 'primeng/select';
 import { DatePickerModule } from 'primeng/datepicker';
 import { TextareaModule } from 'primeng/textarea';
@@ -42,6 +42,7 @@ import { StandardTableComponent } from '../../../../shared/components/standard-t
 export class TripFormComponent implements OnInit {
   private fb = inject(FormBuilder);
   private router = inject(Router);
+  private route = inject(ActivatedRoute);
   private tripsService = inject(TripsService);
   private trucksService = inject(TrucksService);
   private branchesService = inject(BranchesService);
@@ -65,6 +66,7 @@ export class TripFormComponent implements OnInit {
   selectedSales = signal<any[]>([]);
 
   activeTab: 'transfers' | 'sales' = 'sales';
+  private presetTransferId: string | null = null;
 
   // Resumen
   totalSelectedStops = computed(
@@ -82,6 +84,8 @@ export class TripFormComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.presetTransferId = this.route.snapshot.queryParamMap.get('transferId');
+    if (this.presetTransferId) this.activeTab = 'transfers';
     this.loadCatalogData();
   }
 
@@ -91,8 +95,11 @@ export class TripFormComponent implements OnInit {
       next: (res) => {
         const plants = res.data || [];
         this.branches.set(plants);
-        if (plants.length > 0 && !this.tripForm.get('originBranchId')?.value) {
-          this.tripForm.patchValue({ originBranchId: plants[0].id });
+        const preferredOrigin = this.route.snapshot.queryParamMap.get('originBranchId');
+        const current = this.tripForm.get('originBranchId')?.value;
+        const originId = preferredOrigin || current || plants[0]?.id || null;
+        if (originId) {
+          this.tripForm.patchValue({ originBranchId: originId });
           this.onOriginBranchChange();
         }
       },
@@ -161,6 +168,10 @@ export class TripFormComponent implements OnInit {
         this.loadingOperations.set(false);
         this.pendingTransfers.set(res.data?.transfers || []);
         this.pendingSales.set(res.data?.sales || []);
+        if (this.presetTransferId) {
+          const match = (res.data?.transfers || []).find((t: any) => t.id === this.presetTransferId);
+          if (match && !this.isTransferSelected(match)) this.toggleTransfer(match);
+        }
       },
       error: (err) => {
         this.loadingOperations.set(false);

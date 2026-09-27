@@ -16,7 +16,8 @@ import { Supplier } from '../../interfaces/supplier.interface';
 import { SelectModule } from 'primeng/select';
 import { CreatePurchase, IPurchaseOrderResponse } from '../../interfaces/purchase-order.interface';
 import { OrdersService } from '../../services/orders.service';
-import { ConfirmationService, MessageService } from 'primeng/api';
+import { MessageService } from 'primeng/api';
+import { ConfirmService } from '../../../shared/services/confirm.service';
 import { Router } from '@angular/router';
 import { CurrencyPipe, DatePipe } from '@angular/common';
 import { SuppliersService } from '../../services/suppliers.service';
@@ -65,7 +66,7 @@ export class PurchaseOrderFormComponent implements OnInit, OnDestroy {
   private ordersService = inject(OrdersService);
   private suppliersService = inject(SuppliersService);
   private messageService = inject(MessageService);
-  private confirmationService = inject(ConfirmationService);
+  private confirmService = inject(ConfirmService);
   private router = inject(Router);
   private productsService = inject(ProductsService);
   private websocketService = inject(WebsocketService);
@@ -429,20 +430,14 @@ export class PurchaseOrderFormComponent implements OnInit, OnDestroy {
   }
 
   onCancelProccess() {
-    this.confirmationService.confirm({
+    this.confirmService.confirm({
       message: '¿Estás seguro de cancelar este proceso?',
       header: 'Confirmar cancelación',
       icon: 'pi pi-info-circle',
-      rejectLabel: 'Regresar',
-      rejectButtonProps: {
-        label: 'Regresar',
-        severity: 'secondary',
-        outlined: true,
-      },
-      acceptButtonProps: {
-        label: 'Cancelar proceso',
-        severity: 'danger',
-      },
+      cancelLabel: 'Regresar',
+      
+      confirmLabel: 'Cancelar proceso',
+      type: 'danger',
 
       accept: () => {
         this.onBack();

@@ -4,7 +4,8 @@ import { SuppliersService } from '../services/suppliers.service';
 import { TableModule } from 'primeng/table';
 import { Supplier } from '../interfaces/supplier.interface';
 import { Router } from '@angular/router';
-import { ConfirmationService, MessageService } from 'primeng/api';
+import { MessageService } from 'primeng/api';
+import { ConfirmService } from '../../shared/services/confirm.service';
 import { ToggleSwitchModule } from 'primeng/toggleswitch';
 import { FormsModule } from '@angular/forms';
 import { InputTextModule } from 'primeng/inputtext';
@@ -35,7 +36,7 @@ import { TooltipModule } from 'primeng/tooltip';
 export class SuppliersComponent {
   private suppliersService = inject(SuppliersService);
   private router = inject(Router);
-  private confirmationService = inject(ConfirmationService);
+  private confirmService = inject(ConfirmService);
   private messageService = inject(MessageService);
 
   loading = signal<boolean>(false);
@@ -91,20 +92,14 @@ export class SuppliersComponent {
   }
 
   deleteSupplier(supplier: Supplier): void {
-    this.confirmationService.confirm({
+    this.confirmService.confirm({
       message: `¿Estás seguro de eliminar el proveedor: '${supplier.name}'?`,
       header: 'Confirmar eliminación',
       icon: 'pi pi-info-circle',
-      rejectLabel: 'Cancelar',
-      rejectButtonProps: {
-        label: 'Cancelar',
-        severity: 'secondary',
-        outlined: true,
-      },
-      acceptButtonProps: {
-        label: 'Eliminar',
-        severity: 'danger',
-      },
+      cancelLabel: 'Cancelar',
+      
+      confirmLabel: 'Eliminar',
+      type: 'danger',
 
       accept: () => {
         this.suppliersService.deleteSupplier(supplier.id).subscribe({
@@ -131,20 +126,14 @@ export class SuppliersComponent {
   }
 
   restoreSupplier(supplier: Supplier): void {
-    this.confirmationService.confirm({
+    this.confirmService.confirm({
       message: `¿Estás seguro de restaurar el proveedor: '${supplier.name}'?`,
       header: 'Confirmar restauración',
       icon: 'pi pi-refresh',
-      rejectLabel: 'Cancelar',
-      rejectButtonProps: {
-        label: 'Cancelar',
-        severity: 'secondary',
-        outlined: true,
-      },
-      acceptButtonProps: {
-        label: 'Restaurar',
-        severity: 'success',
-      },
+      cancelLabel: 'Cancelar',
+      
+      confirmLabel: 'Restaurar',
+      type: 'success',
       accept: () => {
         this.suppliersService.restoreSupplier(supplier.id).subscribe({
           next: (res) => {

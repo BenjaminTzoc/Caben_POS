@@ -2,7 +2,8 @@ import { Component, inject, OnInit, Input, Output, EventEmitter, ViewChild, Elem
 import { CommonModule } from '@angular/common';
 import { InputTextModule } from 'primeng/inputtext';
 import { InputNumber } from 'primeng/inputnumber';
-import { ConfirmationService, MessageService } from 'primeng/api';
+import { MessageService } from 'primeng/api';
+import { ConfirmService } from '../../../shared/services/confirm.service';
 import { ButtonModule } from 'primeng/button';
 import { InputGroup } from 'primeng/inputgroup';
 import { InputGroupAddon } from 'primeng/inputgroupaddon';
@@ -63,7 +64,7 @@ export class InventoryFormComponent implements OnInit {
   private branchesService = inject(BranchesService);
   private inventoryService = inject(InventoryService);
   private messageService = inject(MessageService);
-  private confirmationService = inject(ConfirmationService);
+  private confirmService = inject(ConfirmService);
   private authService = inject(AuthService);
   private fb = inject(FormBuilder);
   private router = inject(Router);
@@ -396,20 +397,14 @@ export class InventoryFormComponent implements OnInit {
       return;
     }
 
-    this.confirmationService.confirm({
+    this.confirmService.confirm({
       message: '¿Estás seguro de cancelar este proceso?',
       header: 'Confirmar cancelación',
       icon: 'pi pi-info-circle',
-      rejectLabel: 'Regresar',
-      rejectButtonProps: {
-        label: 'Regresar',
-        severity: 'secondary',
-        outlined: true,
-      },
-      acceptButtonProps: {
-        label: 'Cancelar proceso',
-        severity: 'danger',
-      },
+      cancelLabel: 'Regresar',
+      
+      confirmLabel: 'Cancelar proceso',
+      type: 'danger',
 
       accept: () => {
         this.router.navigate(['inventory/inventories']);

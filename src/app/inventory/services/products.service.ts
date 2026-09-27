@@ -5,6 +5,14 @@ import { Observable } from 'rxjs';
 import { ApiResponse } from '../../core/models/api-response.model';
 import { Category, Product } from '../interfaces/product.interface';
 
+export interface PaginatedProducts {
+  items: Product[];
+  total: number;
+  page: number;
+  limit: number;
+  totalPages: number;
+}
+
 @Injectable({
   providedIn: 'root',
 })
@@ -20,35 +28,87 @@ export class ProductsService {
     isMaster?: boolean,
     excludeTypes?: string,
     manageStock?: boolean,
-    minimal?: boolean
+    minimal?: boolean,
   ): Observable<ApiResponse<Product[]>> {
+    return this.requestProducts({
+      branchId,
+      includeDeleted,
+      type,
+      hasRecipe,
+      isMaster,
+      excludeTypes,
+      manageStock,
+      minimal,
+    }) as Observable<ApiResponse<Product[]>>;
+  }
+
+  getProductsPage(
+    paging: { page: number; limit: number; search?: string },
+    options?: {
+      branchId?: string;
+      includeDeleted?: boolean;
+      type?: string;
+      hasRecipe?: boolean;
+      isMaster?: boolean;
+      excludeTypes?: string;
+      manageStock?: boolean;
+      minimal?: boolean;
+    },
+  ): Observable<ApiResponse<PaginatedProducts>> {
+    return this.requestProducts({
+      ...options,
+      includeDeleted: options?.includeDeleted ?? false,
+      paging,
+    }) as Observable<ApiResponse<PaginatedProducts>>;
+  }
+
+  private requestProducts(args: {
+    branchId?: string;
+    includeDeleted?: boolean;
+    type?: string;
+    hasRecipe?: boolean;
+    isMaster?: boolean;
+    excludeTypes?: string;
+    manageStock?: boolean;
+    minimal?: boolean;
+    paging?: { page?: number; limit?: number; search?: string };
+  }): Observable<ApiResponse<Product[] | PaginatedProducts>> {
     let params = new HttpParams();
-    if (includeDeleted === true) {
-      params = params.set('includeDeleted', includeDeleted.toString());
+    if (args.includeDeleted === true) {
+      params = params.set('includeDeleted', 'true');
     }
-    if (branchId) {
-      params = params.set('branchId', branchId);
+    if (args.branchId) {
+      params = params.set('branchId', args.branchId);
     }
-    if (type) {
-      params = params.set('type', type);
+    if (args.type) {
+      params = params.set('type', args.type);
     }
-    if (hasRecipe !== undefined) {
-      params = params.set('hasRecipe', hasRecipe.toString());
+    if (args.hasRecipe !== undefined) {
+      params = params.set('hasRecipe', args.hasRecipe.toString());
     }
-    if (isMaster !== undefined) {
-      params = params.set('isMaster', isMaster.toString());
+    if (args.isMaster !== undefined) {
+      params = params.set('isMaster', args.isMaster.toString());
     }
-    if (excludeTypes) {
-      params = params.set('excludeTypes', excludeTypes);
+    if (args.excludeTypes) {
+      params = params.set('excludeTypes', args.excludeTypes);
     }
-    if (manageStock !== undefined) {
-      params = params.set('manageStock', manageStock.toString());
+    if (args.manageStock !== undefined) {
+      params = params.set('manageStock', args.manageStock.toString());
     }
-    if (minimal !== undefined) {
-      params = params.set('minimal', minimal.toString());
+    if (args.minimal !== undefined) {
+      params = params.set('minimal', args.minimal.toString());
+    }
+    if (args.paging?.page != null) {
+      params = params.set('page', String(args.paging.page));
+    }
+    if (args.paging?.limit != null) {
+      params = params.set('limit', String(args.paging.limit));
+    }
+    if (args.paging?.search?.trim()) {
+      params = params.set('search', args.paging.search.trim());
     }
 
-    return this.http.get<ApiResponse<Product[]>>(`${this.API_URL}`, { params });
+    return this.http.get<ApiResponse<Product[] | PaginatedProducts>>(`${this.API_URL}`, { params });
   }
 
   getProduct(productId: string, includeDeleted: boolean = false): Observable<ApiResponse<Product>> {

@@ -8,8 +8,8 @@ import { DialogModule } from 'primeng/dialog';
 import { InputNumberModule } from 'primeng/inputnumber';
 import { TextareaModule } from 'primeng/textarea';
 import { Router } from '@angular/router';
-import { ConfirmationService, MessageService } from 'primeng/api';
-import { ConfirmDialog } from 'primeng/confirmdialog';
+import { MessageService } from 'primeng/api';
+import { ConfirmService } from '../../shared/services/confirm.service';
 import { RippleModule } from 'primeng/ripple';
 import { forkJoin, map, of, switchMap } from 'rxjs';
 import { InventoryTransfersService } from '../services/inventory-transfers.service';
@@ -40,7 +40,6 @@ import { StatusBadgeComponent } from '../../shared/components/status-badge/statu
     TableModule,
     TagModule,
     TooltipModule,
-    ConfirmDialog,
     DialogModule,
     InputNumberModule,
     TextareaModule,
@@ -58,14 +57,14 @@ import { StatusBadgeComponent } from '../../shared/components/status-badge/statu
     StandardTableComponent,
     StatusBadgeComponent,
   ],
-  providers: [ConfirmationService, MessageService],
+  providers: [MessageService],
   templateUrl: './inventory-transfers.component.html',
   styleUrl: './inventory-transfers.component.css',
 })
 export class InventoryTransfersComponent implements OnInit {
   private transfersService = inject(InventoryTransfersService);
   private tripsService = inject(TripsService);
-  private confirmationService = inject(ConfirmationService);
+  private confirmService = inject(ConfirmService);
   private messageService = inject(MessageService);
   private router = inject(Router);
 
@@ -423,30 +422,28 @@ export class InventoryTransfersComponent implements OnInit {
     let header = 'Confirmar Cambio';
     let message = `¿Estás seguro de que deseas cambiar el estado a ${newStatus}?`;
     let icon = 'pi pi-exclamation-triangle';
-    let acceptLabel = 'Sí, cambiar';
-    let severity: 'success' | 'info' | 'warn' | 'danger' | 'secondary' | 'contrast' | undefined =
-      'info';
+    let confirmLabel = 'Sí, cambiar';
+    let type: 'success' | 'danger' | 'info' = 'info';
 
     if (newStatus === 'RECEIVED') {
       header = 'Confirmar Recepción';
       message =
         'Al marcar como RECIBIDO, el stock se sumará en la sucursal de destino. Esta acción no se puede deshacer.';
-      severity = 'success';
+      type = 'success';
     } else if (newStatus === 'CANCELLED') {
       header = 'Confirmar Cancelación';
       message =
         'Al CANCELAR, el stock regresará a la sucursal de origen. Esta acción no se puede deshacer.';
-      severity = 'danger';
+      type = 'danger';
     }
 
-    this.confirmationService.confirm({
+    this.confirmService.confirm({
       header,
       message,
       icon,
-      acceptLabel,
-      acceptButtonStyleClass: `p-button-${severity}`,
-      rejectLabel: 'Cerrar',
-      rejectButtonStyleClass: 'p-button-text p-button-secondary',
+      confirmLabel,
+      type,
+      cancelLabel: 'Cerrar',
       accept: () => {
         this.updateStatus(transfer.id, newStatus);
       },

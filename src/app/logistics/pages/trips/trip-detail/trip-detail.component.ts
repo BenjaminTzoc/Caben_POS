@@ -9,8 +9,8 @@ import { InputTextModule } from 'primeng/inputtext';
 import { TextareaModule } from 'primeng/textarea';
 import { InputNumberModule } from 'primeng/inputnumber';
 import { TooltipModule } from 'primeng/tooltip';
-import { MessageService, ConfirmationService } from 'primeng/api';
-import { ConfirmDialogModule } from 'primeng/confirmdialog';
+import { MessageService } from 'primeng/api';
+import { ConfirmService } from '../../../../shared/services/confirm.service';
 import { ToastModule } from 'primeng/toast';
 import { filter, Subscription } from 'rxjs';
 import {
@@ -55,7 +55,6 @@ import {
     TextareaModule,
     InputNumberModule,
     TooltipModule,
-    ConfirmDialogModule,
     ToastModule,
     LucideArrowLeft,
     LucideTruck,
@@ -72,7 +71,7 @@ import {
     LucideShieldCheck,
     LucideRefreshCw,
   ],
-  providers: [ConfirmationService, MessageService],
+  providers: [MessageService],
   templateUrl: './trip-detail.component.html',
 })
 export class TripDetailComponent implements OnInit, OnDestroy {
@@ -81,7 +80,7 @@ export class TripDetailComponent implements OnInit, OnDestroy {
   private tripsService = inject(TripsService);
   private tripsRealtime = inject(TripsRealtimeService);
   private messageService = inject(MessageService);
-  private confirmationService = inject(ConfirmationService);
+  private confirmService = inject(ConfirmService);
   private tripUpdatedSub?: Subscription;
 
   tripId: string | null = null;
@@ -206,14 +205,13 @@ export class TripDetailComponent implements OnInit, OnDestroy {
   // --- Confirmar Salida ---
   confirmDeparture(): void {
     if (!this.tripId) return;
-    this.confirmationService.confirm({
+    this.confirmService.confirm({
       message: '¿Está seguro de confirmar la salida del vehículo a ruta? El estado pasará a "En Ruta" y se habilitará la atención de paradas.',
       header: 'Confirmar Salida a Ruta',
       icon: 'pi pi-exclamation-triangle',
-      acceptLabel: 'Sí, Confirmar Salida',
-      rejectLabel: 'Cancelar',
-      acceptButtonStyleClass: '!bg-[#1e3a5f] !border-[#1e3a5f] !text-white !rounded-lg text-xs font-semibold',
-      rejectButtonStyleClass: '!bg-slate-100 !border-slate-300 !text-slate-700 !rounded-lg text-xs font-semibold',
+      confirmLabel: 'Sí, Confirmar Salida',
+      cancelLabel: 'Cancelar',
+      type: 'primary',
       accept: () => {
         this.actionLoading.set(true);
         this.tripsService.confirmDeparture(this.tripId!).subscribe({
@@ -242,14 +240,13 @@ export class TripDetailComponent implements OnInit, OnDestroy {
   // --- Finalizar Viaje ---
   completeTrip(): void {
     if (!this.tripId) return;
-    this.confirmationService.confirm({
+    this.confirmService.confirm({
       message: '¿Desea dar por finalizado este viaje? No debe haber devoluciones pendientes de bodega ni incidencias abiertas.',
       header: 'Finalizar Viaje',
       icon: 'pi pi-check-circle',
-      acceptLabel: 'Sí, Finalizar Viaje',
-      rejectLabel: 'Cancelar',
-      acceptButtonStyleClass: '!bg-emerald-600 !border-emerald-600 !text-white !rounded-lg text-xs font-semibold',
-      rejectButtonStyleClass: '!bg-slate-100 !border-slate-300 !text-slate-700 !rounded-lg text-xs font-semibold',
+      confirmLabel: 'Sí, Finalizar Viaje',
+      cancelLabel: 'Cancelar',
+      type: 'primary',
       accept: () => {
         this.actionLoading.set(true);
         this.tripsService.completeTrip(this.tripId!).subscribe({

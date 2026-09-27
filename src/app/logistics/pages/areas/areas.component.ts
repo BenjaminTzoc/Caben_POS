@@ -5,7 +5,8 @@ import { TableModule } from 'primeng/table';
 import { ButtonModule } from 'primeng/button';
 import { DialogModule } from 'primeng/dialog';
 import { InputTextModule } from 'primeng/inputtext';
-import { ConfirmationService, MessageService } from 'primeng/api';
+import { MessageService } from 'primeng/api';
+import { ConfirmService } from '../../../shared/services/confirm.service';
 import { AreasService } from '../../services/areas.service';
 import { Area } from '../../interfaces/area.interface';
 import { BranchesService } from '../../../inventory/services/branches.service';
@@ -43,7 +44,7 @@ export class AreasComponent implements OnInit {
   private areasService = inject(AreasService);
   private branchesService = inject(BranchesService);
   private messageService = inject(MessageService);
-  private confirmationService = inject(ConfirmationService);
+  private confirmService = inject(ConfirmService);
   private authService = inject(AuthService);
   private router = inject(Router);
 
@@ -87,13 +88,13 @@ export class AreasComponent implements OnInit {
   }
 
   deleteArea(area: Area): void {
-    this.confirmationService.confirm({
+    this.confirmService.confirm({
       message: `¿Estás seguro de eliminar el área: ${area.name}?`,
       header: 'Confirmar eliminación',
       icon: 'pi pi-exclamation-triangle',
-      acceptLabel: 'Eliminar',
-      rejectLabel: 'Cancelar',
-      acceptButtonStyleClass: 'p-button-danger',
+      confirmLabel: 'Eliminar',
+      cancelLabel: 'Cancelar',
+      type: 'danger',
       accept: () => {
         this.areasService.deleteArea(area.id).subscribe({
           next: () => {
@@ -117,13 +118,13 @@ export class AreasComponent implements OnInit {
   }
 
   restoreArea(area: Area): void {
-    this.confirmationService.confirm({
+    this.confirmService.confirm({
       message: `¿Estás seguro de que deseas restaurar el área: ${area.name}?`,
       header: 'Confirmar restauración',
       icon: 'pi pi-refresh',
-      acceptLabel: 'Restaurar',
-      rejectLabel: 'Cancelar',
-      acceptButtonStyleClass: 'p-button-success',
+      confirmLabel: 'Restaurar',
+      cancelLabel: 'Cancelar',
+      type: 'success',
       accept: () => {
         this.areasService.restoreArea(area.id).subscribe({
           next: () => {

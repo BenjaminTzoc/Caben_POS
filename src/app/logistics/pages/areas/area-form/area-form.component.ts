@@ -12,7 +12,8 @@ import { ButtonModule } from 'primeng/button';
 import { InputTextModule } from 'primeng/inputtext';
 import { TextareaModule } from 'primeng/textarea';
 import { SelectModule } from 'primeng/select';
-import { ConfirmationService, MessageService } from 'primeng/api';
+import { MessageService } from 'primeng/api';
+import { ConfirmService } from '../../../../shared/services/confirm.service';
 import { AreasService } from '../../../services/areas.service';
 import { Area } from '../../../interfaces/area.interface';
 
@@ -35,7 +36,7 @@ import { Area } from '../../../interfaces/area.interface';
 export class AreaFormComponent implements OnInit {
   private areasService = inject(AreasService);
   private messageService = inject(MessageService);
-  private confirmationService = inject(ConfirmationService);
+  private confirmService = inject(ConfirmService);
   private fb = inject(FormBuilder);
   private router = inject(Router);
   private route = inject(ActivatedRoute);
@@ -153,14 +154,14 @@ export class AreaFormComponent implements OnInit {
 
   onCancel(): void {
     if (this.areaForm.dirty) {
-      this.confirmationService.confirm({
+      this.confirmService.confirm({
         message: '¿Estás seguro de cancelar? Los cambios no guardados se perderán.',
         header: 'Confirmar cancelación',
         icon: 'pi pi-exclamation-triangle',
-        acceptLabel: 'Sí, cancelar',
-        rejectLabel: 'No, volver',
-        acceptButtonStyleClass: 'p-button-danger',
-        accept: () => {
+        confirmLabel: 'Sí, cancelar',
+        cancelLabel: 'No, volver',
+      type: 'danger',
+      accept: () => {
           this.router.navigate(['/logistics/areas']);
         },
       });

@@ -6,7 +6,8 @@ import { ButtonModule } from 'primeng/button';
 import { TableModule } from 'primeng/table';
 import { ToggleSwitchModule } from 'primeng/toggleswitch';
 import { TooltipModule } from 'primeng/tooltip';
-import { ConfirmationService, MessageService } from 'primeng/api';
+import { MessageService } from 'primeng/api';
+import { ConfirmService } from '../../shared/services/confirm.service';
 import { BranchesService } from '../services/branches.service';
 import { Branch } from '../interfaces/branch.interface';
 import { AuthService } from '../../auth/auth.service';
@@ -37,7 +38,7 @@ export class BranchesComponent implements OnInit {
   private router = inject(Router);
   private branchesService = inject(BranchesService);
   private messageService = inject(MessageService);
-  private confirmationService = inject(ConfirmationService);
+  private confirmService = inject(ConfirmService);
   private authService = inject(AuthService);
 
   branches: Branch[] = [];
@@ -88,13 +89,13 @@ export class BranchesComponent implements OnInit {
   }
 
   onDeleteBranch(branch: Branch): void {
-    this.confirmationService.confirm({
+    this.confirmService.confirm({
       message: `¿Estás seguro de eliminar la sucursal: ${branch.name}?`,
       header: 'Confirmar eliminación',
       icon: 'pi pi-exclamation-triangle',
-      acceptLabel: 'Eliminar',
-      rejectLabel: 'Cancelar',
-      acceptButtonStyleClass: 'p-button-danger',
+      confirmLabel: 'Eliminar',
+      cancelLabel: 'Cancelar',
+      type: 'danger',
       accept: () => {
         this.branchesService.deleteBranch(branch.id).subscribe({
           next: () => {
@@ -118,13 +119,13 @@ export class BranchesComponent implements OnInit {
   }
 
   onRestoreBranch(branch: Branch): void {
-    this.confirmationService.confirm({
+    this.confirmService.confirm({
       message: `¿Estás seguro de restaurar la sucursal: ${branch.name}?`,
       header: 'Confirmar restauración',
       icon: 'pi pi-refresh',
-      acceptLabel: 'Restaurar',
-      rejectLabel: 'Cancelar',
-      acceptButtonStyleClass: 'p-button-success',
+      confirmLabel: 'Restaurar',
+      cancelLabel: 'Cancelar',
+      type: 'success',
       accept: () => {
         this.branchesService.restoreBranch(branch.id).subscribe({
           next: () => {

@@ -7,6 +7,7 @@ import {
   ReactiveFormsModule,
   Validators,
 } from '@angular/forms';
+import { Router } from '@angular/router';
 import { ButtonModule } from 'primeng/button';
 import { CardModule } from 'primeng/card';
 import { InputTextModule } from 'primeng/inputtext';
@@ -49,6 +50,7 @@ export class CashRegisterComponent implements OnInit {
   private messageService = inject(MessageService);
   private fb = inject(FormBuilder);
   private authService = inject(AuthService);
+  private router = inject(Router);
 
   get user() {
     return this.authService.currentUser;
@@ -197,6 +199,7 @@ export class CashRegisterComponent implements OnInit {
         });
         this.isLoading = false;
         this.openForm.reset({ openingBalance: 0, branchId: '', notes: '' });
+        this.router.navigate(['/logistics/settlements/today']);
       },
       error: (err) => {
         this.messageService.add({

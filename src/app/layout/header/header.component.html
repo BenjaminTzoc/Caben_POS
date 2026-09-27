@@ -76,6 +76,15 @@
             <p class="text-[10px] text-slate-500 truncate">{{ currentUser?.email || 'usuario@caben.gt' }}</p>
           </div>
 
+          <button
+            type="button"
+            (click)="openCompanySettings()"
+            class="w-[calc(100%-0.5rem)] mx-1 flex items-center gap-2.5 px-3.5 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-50 cursor-pointer transition-colors rounded-lg border-none bg-transparent text-left"
+          >
+            <i class="pi pi-building text-[#48021C] text-xs"></i>
+            <span>Datos de la empresa</span>
+          </button>
+
           <a (click)="logout()" class="flex items-center gap-2.5 px-3.5 py-2 text-xs font-semibold text-rose-600 hover:bg-rose-50 cursor-pointer transition-colors rounded-lg mx-1">
             <i class="pi pi-sign-out text-rose-500 text-xs"></i>
             <span>Cerrar Sesión</span>
@@ -252,3 +261,8 @@
 </p-drawer>
 
 <app-cash-session-dialog [(visible)]="showCashDialog"></app-cash-session-dialog>
+<app-company-settings
+  [asModal]="true"
+  [visible]="showCompanySettings()"
+  (visibleChange)="showCompanySettings.set($event)"
+/>

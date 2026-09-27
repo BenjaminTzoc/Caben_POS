@@ -1,7 +1,7 @@
 import { Component, inject, OnInit } from '@angular/core';
 import { ButtonModule } from 'primeng/button';
 import { TableModule } from 'primeng/table';
-import { ConfirmationService, MessageService } from 'primeng/api';
+import { MessageService } from 'primeng/api';
 import { CommonModule, CurrencyPipe, DatePipe } from '@angular/common';
 import { Router } from '@angular/router';
 import { environment } from '../../../environments/environment';
@@ -60,7 +60,6 @@ export class InventoriesComponent implements OnInit {
   private branchesService = inject(BranchesService);
   private authService = inject(AuthService);
   private messageService = inject(MessageService);
-  private confirmationService = inject(ConfirmationService);
   private router = inject(Router);
 
   inventories: Inventory[] = [];

@@ -6,7 +6,8 @@ import { InputNumberModule } from 'primeng/inputnumber';
 import { ButtonModule } from 'primeng/button';
 import { ToggleSwitchModule } from 'primeng/toggleswitch';
 import { ActivatedRoute, Router } from '@angular/router';
-import { ConfirmationService, MessageService } from 'primeng/api';
+import { MessageService } from 'primeng/api';
+import { ConfirmService } from '../../../shared/services/confirm.service';
 import { CustomerCategoriesService } from '../../services/customer-categories.service';
 import { ICustomerCategory } from '../../interfaces/customer.interface';
 import { CommonModule } from '@angular/common';
@@ -31,7 +32,7 @@ export class CustomerCategoryFormComponent implements OnInit {
   private route = inject(ActivatedRoute);
   private categoriesService = inject(CustomerCategoriesService);
   private messageService = inject(MessageService);
-  private confirmationService = inject(ConfirmationService);
+  private confirmService = inject(ConfirmService);
 
   categoryForm!: FormGroup;
   isEditMode = false;
@@ -124,12 +125,12 @@ export class CustomerCategoryFormComponent implements OnInit {
 
   onCancel(): void {
     if (this.categoryForm.dirty) {
-      this.confirmationService.confirm({
+      this.confirmService.confirm({
         message: 'Tiene cambios sin guardar. ¿Desea salir?',
         header: 'Confirmar salida',
         icon: 'pi pi-exclamation-triangle',
-        acceptLabel: 'Si, salir',
-        rejectLabel: 'No, quedar',
+        confirmLabel: 'Si, salir',
+        cancelLabel: 'No, quedar',
         accept: () => this.router.navigate(['/sales/customer-categories']),
       });
     } else {

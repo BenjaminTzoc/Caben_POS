@@ -12,7 +12,8 @@ import { FormsModule } from '@angular/forms';
 import { ToggleSwitchModule } from 'primeng/toggleswitch';
 import { TagModule } from 'primeng/tag';
 import { ProductsService } from '../services/products.service';
-import { ConfirmationService, MessageService } from 'primeng/api';
+import { MessageService } from 'primeng/api';
+import { ConfirmService } from '../../shared/services/confirm.service';
 import { AuthService } from '../../auth/auth.service';
 
 @Component({
@@ -37,7 +38,7 @@ export class ProductCategoriesComponent implements OnInit {
   private router = inject(Router);
   private productsService = inject(ProductsService);
   private messageService = inject(MessageService);
-  private confirmationService = inject(ConfirmationService);
+  private confirmService = inject(ConfirmService);
   private authService = inject(AuthService);
 
   categories: Category[] = [];
@@ -85,14 +86,13 @@ export class ProductCategoriesComponent implements OnInit {
   }
 
   onDeleteCategory(category: Category) {
-    this.confirmationService.confirm({
+    this.confirmService.confirm({
       message: `¿Está seguro de eliminar la categoría: ${category.name}?`,
       header: 'Confirmar eliminación',
       icon: 'pi pi-info-circle',
-      acceptLabel: 'Eliminar',
-      rejectLabel: 'Cancelar',
-      acceptButtonStyleClass: 'p-button-danger !rounded-2xl',
-      rejectButtonStyleClass: 'p-button-secondary p-button-text !rounded-2xl',
+      confirmLabel: 'Eliminar',
+      cancelLabel: 'Cancelar',
+      type: 'danger',
       accept: () => {
         this.productsService.deleteCategory(category.id).subscribe({
           next: (response) => {
@@ -130,14 +130,13 @@ export class ProductCategoriesComponent implements OnInit {
   }
 
   restoreCategory(category: Category): void {
-    this.confirmationService.confirm({
+    this.confirmService.confirm({
       message: `¿Está seguro de restaurar la categoría: ${category.name}?`,
       header: 'Confirmar restauración',
       icon: 'pi pi-refresh',
-      acceptLabel: 'Restaurar',
-      rejectLabel: 'Cancelar',
-      acceptButtonStyleClass: 'p-button-success !rounded-2xl',
-      rejectButtonStyleClass: 'p-button-secondary p-button-text !rounded-2xl',
+      confirmLabel: 'Restaurar',
+      cancelLabel: 'Cancelar',
+      type: 'success',
       accept: () => {
         this.productsService.restoreCategory(category.id).subscribe({
           next: () => {

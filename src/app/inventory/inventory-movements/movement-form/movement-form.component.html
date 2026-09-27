@@ -1,85 +1,141 @@
-<div [class]="isModal ? 'p-0 bg-slate-100/60 flex flex-col h-full overflow-hidden' : 'py-6 px-4 md:px-12 bg-slate-100/50 min-h-screen'">
-  <!-- Top Bar / Modal Header -->
-  <div class="flex items-center justify-between py-3.5 px-5 md:px-6 bg-white border-b border-slate-200 rounded-t-2xl gap-3 flex-shrink-0">
-    <div class="flex items-center gap-2.5">
-      <p-button 
-        [icon]="isModal ? 'pi pi-times' : 'pi pi-arrow-left'" 
-        [outlined]="true" 
-        severity="secondary" 
-        size="small" 
-        (onClick)="goBack()" 
-        styleClass="!w-7 !h-7 !p-0 text-slate-500 hover:text-[#48021C] bg-slate-50 hover:bg-slate-100 border border-slate-300! !rounded-md shadow-2xs hover:scale-105 active:scale-95 transition-all cursor-pointer [&_.p-button-icon]:!text-xs"
-      />
-      <div class="flex items-center gap-2">
-        <h1 class="text-base font-semibold text-gray-900 tracking-tight leading-none m-0">
-          Registrar movimiento
-        </h1>
-        <span class="text-[11px] font-semibold px-2.5 py-0.5 rounded-full bg-[#48021C]/10 text-[#48021C] border border-[#48021C]/20">
-          Inventario
-        </span>
+@if (isModal) {
+  <div class="p-0 bg-white flex flex-col h-full overflow-hidden">
+    <div class="flex items-center justify-between py-2.5 px-4 bg-gradient-to-r from-[#9f6587]/15 via-[#9f6587]/8 to-[#9f6587]/15 border-b border-[#9f6587]/25 gap-3 flex-shrink-0">
+      <div class="flex items-center gap-2.5 min-w-0">
+        <p-button
+          icon="pi pi-times"
+          [outlined]="true"
+          severity="secondary"
+          size="small"
+          (onClick)="goBack()"
+          styleClass="!w-7 !h-7 !p-0 text-[#6e3757] hover:text-[#48021C] bg-white hover:bg-[#9f6587]/15 border border-[#9f6587]/35! !rounded-md shadow-2xs cursor-pointer [&_.p-button-icon]:!text-xs"
+        />
+        <div class="min-w-0">
+          <h1 class="text-base font-semibold text-[#48021C] tracking-tight leading-none m-0 truncate">
+            Registrar movimiento
+          </h1>
+          <p class="text-[11px] text-[#9f6587] font-medium mt-1 m-0">Ajuste de stock con trazabilidad</p>
+        </div>
       </div>
     </div>
+
+    <div class="p-4 overflow-y-auto flex-1 min-h-0">
+      <ng-container *ngTemplateOutlet="formBody" />
+    </div>
+
+    <div class="flex items-center justify-end gap-2 py-3 px-4 border-t border-[#9f6587]/25 bg-[#9f6587]/8 shrink-0">
+      <ng-container *ngTemplateOutlet="formActions" />
+    </div>
   </div>
+} @else {
+  <div class="py-4 px-0 md:px-6 bg-[#9f6587]/[0.06] min-h-screen">
+    <div class="max-w-[1700px] mx-auto px-4 md:px-0 mb-5">
+      <div class="bg-white rounded-xl border border-[#9f6587]/35 shadow-xs overflow-hidden">
+        <div class="py-3 px-4 md:px-6 flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-gradient-to-r from-[#9f6587]/15 via-[#9f6587]/8 to-[#9f6587]/15 border-b border-[#9f6587]/25">
+          <div class="flex items-center gap-2.5 min-w-0">
+            <p-button
+              icon="pi pi-arrow-left"
+              [outlined]="true"
+              severity="secondary"
+              size="small"
+              (onClick)="goBack()"
+              styleClass="!w-7 !h-7 !p-0 text-[#6e3757] hover:text-[#48021C] bg-white hover:bg-[#9f6587]/15 border border-[#9f6587]/35! !rounded-md shadow-2xs hover:scale-105 active:scale-95 transition-all cursor-pointer [&_.p-button-icon]:!text-xs"
+            />
+            <div class="min-w-0">
+              <h1 class="text-base md:text-lg font-semibold text-[#48021C] tracking-tight leading-none m-0 truncate">
+                Registrar movimiento de inventario
+              </h1>
+              <p class="text-[11px] text-[#9f6587] font-medium mt-1 m-0">
+                Entrada o salida de stock con registro de trazabilidad
+              </p>
+            </div>
+          </div>
+          <div class="flex items-center gap-2">
+            <ng-container *ngTemplateOutlet="formActions" />
+          </div>
+        </div>
+      </div>
+    </div>
 
-  <!-- Form Body -->
-  <div class="p-4 md:p-6 overflow-y-auto max-h-[calc(85vh-130px)] flex-1">
-    <form class="grid grid-cols-12 gap-5" [formGroup]="movementForm">
-      
-      <!-- Left Column: Form Fields -->
-      <div class="col-span-12 lg:col-span-7 xl:col-span-8 flex flex-col gap-4">
-        <div class="bg-white rounded-xl border border-slate-200 shadow-xs p-4 md:p-5 flex flex-col gap-4">
+    <div class="max-w-[1700px] mx-auto px-4 md:px-0 pb-8">
+      <ng-container *ngTemplateOutlet="formBody" />
+    </div>
+  </div>
+}
 
-          <!-- Product & Branch -->
+<ng-template #formActions>
+  <p-button
+    label="Cancelar"
+    (onClick)="onCancel()"
+    variant="outlined"
+    severity="secondary"
+    size="small"
+    styleClass="!rounded-lg text-xs md:text-sm font-semibold !px-4 !py-2 cursor-pointer border-[#9f6587]/35 text-slate-700 hover:bg-white"
+  />
+  <p-button
+    label="Guardar"
+    icon="pi pi-check"
+    size="small"
+    [loading]="submitting"
+    [disabled]="!canSubmit"
+    (onClick)="onSave()"
+    styleClass="!rounded-lg text-xs md:text-sm! font-semibold !bg-[#48021C] !text-white !border-[#48021C] hover:!bg-[#350114] inline-flex items-center gap-1.5 shadow-sm transition-all cursor-pointer !px-4 !py-2"
+  />
+</ng-template>
+
+<ng-template #formBody>
+  <form class="grid grid-cols-12 gap-5" [formGroup]="movementForm">
+    <div class="col-span-12 lg:col-span-7 xl:col-span-8 flex flex-col gap-4">
+      <div class="bg-white rounded-xl border border-[#9f6587]/35 shadow-xs overflow-hidden flex flex-col">
+        <div class="py-2.5 px-4 bg-[#9f6587]/10 border-b border-[#9f6587]/20">
+          <span class="text-xs font-bold text-[#48021C]">Datos del movimiento</span>
+        </div>
+
+        <div class="p-4 md:p-5 flex flex-col gap-4">
           <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <!-- Producto -->
             <div class="flex flex-col gap-1.5">
-              <label class="text-xs font-medium text-slate-700" for="product">
+              <label class="text-xs font-semibold text-[#48021C]" for="product">
                 Producto <span class="text-rose-500">*</span>
               </label>
               <p-select
+                inputId="product"
                 [options]="products"
                 [filter]="true"
                 [filterFields]="['name', 'sku']"
                 [showClear]="true"
+                [loading]="loadingCatalog"
                 (onChange)="onProductChange($event)"
                 formControlName="productId"
                 optionLabel="name"
                 optionValue="id"
                 placeholder="Seleccionar producto"
                 size="small"
+                appendTo="body"
+                [fluid]="true"
                 class="w-full"
-                styleClass="w-full !rounded-md border-slate-300 text-xs"
+                styleClass="w-full !rounded-lg !border-[#9f6587]/35 text-xs"
               >
                 <ng-template #selectedItem let-selectedOption>
                   @if (selectedOption) {
-                    <div class="flex items-center gap-2 py-0.5">
-                      <div class="w-6 h-6 rounded-md bg-slate-100 overflow-hidden border border-slate-200 flex-shrink-0 flex items-center justify-center">
-                        <img
-                          class="w-full h-full object-cover"
-                          [src]="getProductImageUrl(selectedOption.imageUrl)"
-                          [alt]="selectedOption.name"
-                        />
+                    <div class="flex items-center gap-2 py-0.5 min-w-0">
+                      <div class="w-6 h-6 rounded-md bg-rose-50 overflow-hidden border border-[#9f6587]/30 shrink-0 flex items-center justify-center">
+                        <img class="w-full h-full object-cover" [src]="getProductImageUrl(selectedOption.imageUrl)" [alt]="selectedOption.name" />
                       </div>
                       <div class="flex flex-col min-w-0">
                         <span class="text-xs font-medium text-slate-800 truncate leading-tight">{{ selectedOption.name }}</span>
-                        <span class="text-[10px] text-indigo-600 font-medium leading-none">{{ selectedOption.sku }}</span>
+                        <span class="text-[10px] text-[#6e3757] font-medium leading-none">{{ selectedOption.sku }}</span>
                       </div>
                     </div>
                   }
                 </ng-template>
-
                 <ng-template let-product #item>
                   <div class="flex items-center gap-2.5 py-1">
-                    <div class="w-7 h-7 rounded-md bg-slate-100 overflow-hidden border border-slate-200 flex-shrink-0 flex items-center justify-center">
-                      <img
-                        class="w-full h-full object-cover"
-                        [src]="getProductImageUrl(product.imageUrl)"
-                        [alt]="product.name"
-                      />
+                    <div class="w-7 h-7 rounded-md bg-rose-50 overflow-hidden border border-[#9f6587]/30 shrink-0 flex items-center justify-center">
+                      <img class="w-full h-full object-cover" [src]="getProductImageUrl(product.imageUrl)" [alt]="product.name" />
                     </div>
                     <div class="flex flex-col min-w-0">
                       <span class="text-xs font-medium text-slate-800 truncate">{{ product.name }}</span>
-                      <span class="text-[10px] text-indigo-600 font-medium">SKU: {{ product.sku }}</span>
+                      <span class="text-[10px] text-[#6e3757] font-medium">SKU: {{ product.sku }}</span>
                     </div>
                   </div>
                 </ng-template>
@@ -91,21 +147,18 @@
               }
             </div>
 
-            <!-- Sucursal -->
             <div class="flex flex-col gap-1.5">
-              <label class="text-xs font-medium text-slate-700" for="branch">
+              <label class="text-xs font-semibold text-[#48021C]" for="branch">
                 Sucursal <span class="text-rose-500">*</span>
               </label>
-              <p-select
-                [options]="availableBranches"
-                [showClear]="true"
+              <app-branch-select
+                [branches]="availableBranches"
                 formControlName="branchId"
-                optionLabel="name"
-                optionValue="id"
+                [showClear]="isSuperAdmin"
+                [disabled]="!isSuperAdmin || loadingCatalog"
                 placeholder="Seleccionar sucursal"
+                widthClass="w-full"
                 size="small"
-                class="w-full"
-                styleClass="w-full !rounded-md border-slate-300 text-xs"
               />
               @if (movementForm.get('branchId')?.invalid && movementForm.get('branchId')?.touched) {
                 <small class="text-rose-500 text-[11px] font-medium flex items-center gap-1">
@@ -115,29 +168,29 @@
             </div>
           </div>
 
-          <!-- Tipo, Concepto & Cantidad -->
           <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-            
-            <!-- Tipo -->
             <div class="flex flex-col gap-1.5">
-              <label class="text-xs font-medium text-slate-700" for="type">
+              <label class="text-xs font-semibold text-[#48021C]" for="type">
                 Tipo <span class="text-rose-500">*</span>
               </label>
               <p-select
+                inputId="type"
                 [options]="movementTypes"
                 formControlName="type"
                 optionLabel="label"
                 optionValue="value"
                 placeholder="Tipo"
                 size="small"
+                appendTo="body"
+                [fluid]="true"
                 class="w-full"
-                styleClass="w-full !rounded-md border-slate-300 text-xs"
+                styleClass="w-full !rounded-lg !border-[#9f6587]/35 text-xs"
               >
                 <ng-template let-option #item>
                   <div class="flex items-center gap-2 py-0.5">
-                    <span 
-                      class="w-2 h-2 rounded-full flex-shrink-0" 
-                      [ngClass]="option.value === 'in' ? 'bg-emerald-500' : 'bg-rose-500'"
+                    <span
+                      class="w-2 h-2 rounded-full shrink-0"
+                      [class]="option.value === 'in' ? 'bg-emerald-500' : 'bg-rose-500'"
                     ></span>
                     <div class="flex flex-col">
                       <span class="text-xs font-medium text-slate-700">{{ option.label }}</span>
@@ -146,43 +199,34 @@
                   </div>
                 </ng-template>
               </p-select>
-              @if (movementForm.get('type')?.invalid && movementForm.get('type')?.touched) {
-                <small class="text-rose-500 text-[11px] font-medium flex items-center gap-1">
-                  <i class="pi pi-exclamation-circle text-[10px]"></i> Selecciona el tipo.
-                </small>
-              }
             </div>
 
-            <!-- Concepto -->
             <div class="flex flex-col gap-1.5">
-              <label class="text-xs font-medium text-slate-700" for="concept">
+              <label class="text-xs font-semibold text-[#48021C]" for="concept">
                 Concepto <span class="text-rose-500">*</span>
               </label>
               <p-select
+                inputId="concept"
                 [options]="filteredConcepts"
                 formControlName="concept"
                 optionLabel="label"
                 optionValue="value"
                 placeholder="Concepto"
                 size="small"
+                appendTo="body"
+                [fluid]="true"
                 class="w-full"
-                [disabled]="!movementForm.get('type')?.value"
-                styleClass="w-full !rounded-md border-slate-300 text-xs {{ !movementForm.get('type')?.value ? 'bg-slate-50' : '' }}"
+                styleClass="w-full !rounded-lg !border-[#9f6587]/35 text-xs"
               />
-              @if (movementForm.get('concept')?.invalid && movementForm.get('concept')?.touched) {
-                <small class="text-rose-500 text-[11px] font-medium flex items-center gap-1">
-                  <i class="pi pi-exclamation-circle text-[10px]"></i> Selecciona el concepto.
-                </small>
-              }
             </div>
 
-            <!-- Cantidad con Unidad aparte como input addon -->
             <div class="flex flex-col gap-1.5">
-              <label class="text-xs font-medium text-slate-700" for="quantity">
+              <label class="text-xs font-semibold text-[#48021C]" for="quantity">
                 Cantidad <span class="text-rose-500">*</span>
               </label>
               <div class="flex w-full">
                 <p-inputnumber
+                  inputId="quantity"
                   formControlName="quantity"
                   mode="decimal"
                   size="small"
@@ -190,13 +234,14 @@
                   [minFractionDigits]="selectedProduct?.unit?.allowsDecimals ? 2 : 0"
                   [maxFractionDigits]="selectedProduct?.unit?.allowsDecimals ? 2 : 0"
                   placeholder="0.00"
+                  (onInput)="onQuantityInput($event)"
                   class="flex-1 min-w-0"
-                  styleClass="w-full !rounded-r-none !rounded-l-md text-xs"
-                  inputStyleClass="w-full !rounded-r-none !rounded-l-md border-slate-300 text-xs"
+                  styleClass="w-full !rounded-r-none !rounded-l-lg text-xs"
+                  inputStyleClass="w-full !rounded-r-none !rounded-l-lg !border-[#9f6587]/35 text-xs"
                   fluid
                 />
-                <span class="inline-flex items-center px-3 rounded-r-md border border-l-0 border-slate-300 bg-indigo-50/70 text-indigo-700 text-xs font-semibold select-none flex-shrink-0">
-                  {{ selectedProduct?.unit?.abbreviation || 'U' }}
+                <span class="inline-flex items-center px-3 rounded-r-lg border border-l-0 border-[#9f6587]/35 bg-[#48021C]/10 text-[#48021C] text-xs font-bold select-none shrink-0">
+                  {{ unitAbbr }}
                 </span>
               </div>
               @if (movementForm.get('quantity')?.invalid && movementForm.get('quantity')?.touched) {
@@ -207,144 +252,98 @@
             </div>
           </div>
 
-          <!-- Motivo / Notas -->
           <div class="flex flex-col gap-1.5">
-            <label class="text-xs font-medium text-slate-700" for="notes">
-              Motivo / Observaciones
-            </label>
+            <label class="text-xs font-semibold text-[#48021C]" for="notes">Motivo / Observaciones</label>
             <textarea
               pTextarea
+              id="notes"
               formControlName="notes"
               rows="3"
               placeholder="Describa el motivo o justificación del movimiento..."
-              class="w-full !rounded-md border-slate-300 text-xs p-2.5"
+              class="w-full !rounded-lg !border-[#9f6587]/35 text-xs p-2.5"
             ></textarea>
           </div>
-
         </div>
       </div>
+    </div>
 
-      <!-- Right Column: Live Summary & Stock Impact -->
-      <div class="col-span-12 lg:col-span-5 xl:col-span-4 flex flex-col gap-4">
-        
-        <!-- Summary Card -->
-        <div class="bg-white rounded-xl border border-slate-200 shadow-xs p-4 md:p-5 flex flex-col gap-3.5">
+    <div class="col-span-12 lg:col-span-5 xl:col-span-4 flex flex-col gap-4">
+      <div class="bg-white rounded-xl border border-[#9f6587]/35 shadow-xs overflow-hidden flex flex-col">
+        <div class="py-2.5 px-4 bg-[#9f6587]/10 border-b border-[#9f6587]/20">
+          <span class="text-xs font-bold text-[#48021C]">Impacto en inventario</span>
+        </div>
+
+        <div class="p-4 md:p-5 flex flex-col gap-3.5">
           @if (selectedProduct) {
-            <!-- Product Preview -->
-            <div class="flex items-center gap-3 p-3 rounded-lg bg-gradient-to-r from-slate-50 via-indigo-50/30 to-slate-50 border border-indigo-100 shadow-2xs">
-              <div class="w-10 h-10 rounded-md bg-white overflow-hidden border border-indigo-200/80 flex-shrink-0 flex items-center justify-center shadow-2xs">
-                <img
-                  class="w-full h-full object-cover"
-                  [src]="getProductImageUrl(selectedProduct.imageUrl)"
-                  [alt]="selectedProduct.name"
-                />
+            <div class="flex items-center gap-3 p-3 rounded-lg bg-[#9f6587]/8 border border-[#9f6587]/20">
+              <div class="w-10 h-10 rounded-md bg-white overflow-hidden border border-[#9f6587]/30 shrink-0 flex items-center justify-center">
+                <img class="w-full h-full object-cover" [src]="getProductImageUrl(selectedProduct.imageUrl)" [alt]="selectedProduct.name" />
               </div>
               <div class="flex flex-col min-w-0">
                 <span class="text-xs font-semibold text-slate-800 truncate leading-tight">{{ selectedProduct.name }}</span>
-                <span class="text-[10px] text-indigo-700 font-semibold mt-0.5">SKU: {{ selectedProduct.sku }}</span>
+                <span class="text-[10px] text-[#6e3757] font-semibold mt-0.5">SKU: {{ selectedProduct.sku }}</span>
                 @if (selectedBranchName) {
                   <span class="text-[10px] text-slate-500 font-medium truncate mt-0.5 flex items-center gap-1">
-                    <i class="pi pi-map-marker text-[10px] text-rose-500"></i> {{ selectedBranchName }}
+                    <i class="pi pi-map-marker text-[10px] text-[#48021C]"></i> {{ selectedBranchName }}
                   </span>
                 }
               </div>
             </div>
 
-            <!-- Stock Impact Calculation Card -->
-            <div class="bg-gradient-to-br from-slate-50 to-indigo-50/20 rounded-xl p-3 border border-slate-200 flex flex-col gap-2">
+            <div class="rounded-xl p-3 border border-[#9f6587]/20 bg-[#9f6587]/[0.04] flex flex-col gap-2">
               <div class="grid grid-cols-3 gap-2 text-center">
-                <!-- Stock Actual -->
-                <div class="flex flex-col p-2.5 bg-sky-50/70 rounded-lg border border-sky-200/80 shadow-2xs">
-                  <span class="text-[9px] uppercase font-bold text-sky-700 tracking-wider">Actual</span>
-                  <span class="text-xs md:text-sm font-semibold text-sky-900 tabular-nums truncate">
-                    {{ currentStock !== null ? currentStock : '---' }} {{ selectedProduct.unit.abbreviation || '' }}
+                <div class="flex flex-col p-2.5 bg-white rounded-lg border border-[#9f6587]/20">
+                  <span class="text-[9px] uppercase font-bold text-[#6e3757] tracking-wider">Actual</span>
+                  <span class="text-xs md:text-sm font-semibold text-slate-800 tabular-nums truncate">
+                    {{ currentStock !== null ? currentStock : '---' }} {{ unitAbbr }}
                   </span>
                 </div>
-
-                <!-- Movimiento -->
-                <div 
-                  class="flex flex-col p-2.5 rounded-lg border shadow-2xs"
-                  [ngClass]="movementForm.get('type')?.value === 'in' ? 'bg-emerald-50/80 border-emerald-200/90' : 'bg-rose-50/80 border-rose-200/90'"
+                <div
+                  class="flex flex-col p-2.5 rounded-lg border"
+                  [class]="isEntry ? 'bg-emerald-50 border-emerald-200' : 'bg-rose-50 border-rose-200'"
                 >
-                  <span 
+                  <span
                     class="text-[9px] uppercase font-bold tracking-wider"
-                    [ngClass]="movementForm.get('type')?.value === 'in' ? 'text-emerald-700' : 'text-rose-700'"
+                    [class]="isEntry ? 'text-emerald-700' : 'text-rose-700'"
                   >
                     Cambio
                   </span>
-                  <span 
+                  <span
                     class="text-xs md:text-sm font-bold tabular-nums truncate"
-                    [ngClass]="movementForm.get('type')?.value === 'in' ? 'text-emerald-800' : 'text-rose-800'"
+                    [class]="isEntry ? 'text-emerald-800' : 'text-rose-800'"
                   >
-                    {{ movementForm.get('type')?.value === 'in' ? '+' : '-' }}{{ movementForm.get('quantity')?.value || 0 }} {{ selectedProduct.unit.abbreviation || '' }}
+                    {{ isEntry ? '+' : '-' }}{{ movementForm.get('quantity')?.value || 0 }} {{ unitAbbr }}
                   </span>
                 </div>
-
-                <!-- Stock Resultante -->
-                <div 
-                  class="flex flex-col p-2.5 rounded-lg border shadow-2xs"
-                  [ngClass]="movementForm.get('type')?.value === 'in' ? 'bg-teal-50 border-teal-200/90' : 'bg-indigo-50/80 border-indigo-200/90'"
+                <div
+                  class="flex flex-col p-2.5 rounded-lg border"
+                  [class]="isEntry ? 'bg-teal-50 border-teal-200' : 'bg-white border-[#9f6587]/25'"
                 >
-                  <span 
-                    class="text-[9px] uppercase font-bold tracking-wider" 
-                    [ngClass]="movementForm.get('type')?.value === 'in' ? 'text-teal-700' : 'text-indigo-700'"
-                  >
-                    Resultante
-                  </span>
-                  <span 
-                    class="text-xs md:text-sm font-bold tabular-nums truncate"
-                    [ngClass]="movementForm.get('type')?.value === 'in' ? 'text-teal-900' : 'text-indigo-950'"
-                  >
-                    {{ predictedStock !== null ? predictedStock : '---' }} {{ selectedProduct.unit.abbreviation || '' }}
+                  <span class="text-[9px] uppercase font-bold tracking-wider text-[#48021C]">Resultante</span>
+                  <span class="text-xs md:text-sm font-bold tabular-nums truncate text-[#48021C]">
+                    {{ predictedStock !== null ? predictedStock : '---' }} {{ unitAbbr }}
                   </span>
                 </div>
               </div>
             </div>
           } @else {
-            <!-- Empty state placeholder -->
-            <div class="flex flex-col items-center justify-center py-8 px-4 rounded-xl border border-dashed border-indigo-200 bg-indigo-50/30 text-center gap-2">
-              <div class="w-9 h-9 rounded-full bg-indigo-100 text-indigo-600 flex items-center justify-center">
+            <div class="flex flex-col items-center justify-center py-8 px-4 rounded-xl border border-dashed border-[#9f6587]/35 bg-[#9f6587]/5 text-center gap-2">
+              <div class="w-9 h-9 rounded-full bg-[#48021C]/10 text-[#48021C] flex items-center justify-center">
                 <i class="pi pi-box text-base"></i>
               </div>
-              <p class="text-xs font-semibold text-slate-700 m-0">Selecciona un producto</p>
-              <p class="text-[11px] text-slate-400 m-0 leading-relaxed">Para calcular el impacto en inventario y ver las existencias actuales.</p>
+              <p class="text-xs font-semibold text-[#48021C] m-0">Selecciona un producto</p>
+              <p class="text-[11px] text-slate-500 m-0 leading-relaxed">Para calcular el impacto en inventario y ver las existencias actuales.</p>
             </div>
           }
 
-          <!-- Transaction Notice -->
-          <div class="bg-amber-50/90 border border-amber-200 rounded-xl p-3 flex items-start gap-2.5 shadow-2xs">
-            <i class="pi pi-info-circle text-amber-600 text-xs mt-0.5 flex-shrink-0"></i>
+          <div class="bg-amber-50/90 border border-amber-200 rounded-xl p-3 flex items-start gap-2.5">
+            <i class="pi pi-info-circle text-amber-600 text-xs mt-0.5 shrink-0"></i>
             <p class="text-[11px] text-amber-900 leading-snug m-0">
-              Esta operación creará un registro de trazabilidad y afectará inmediatamente el stock de la sucursal seleccionada.
+              Esta operación crea un registro de trazabilidad y afecta el stock de la sucursal seleccionada.
             </p>
           </div>
         </div>
-
       </div>
-
-    </form>
-  </div>
-
-  <!-- Bottom Action Bar / Footer -->
-  <div class="flex items-center justify-end gap-2.5 py-3.5 px-5 md:px-6 bg-slate-50/90 border-t border-slate-200 rounded-b-2xl flex-shrink-0">
-    <p-button 
-      label="Cancelar" 
-      icon="pi pi-times"
-      [outlined]="true" 
-      severity="secondary" 
-      size="small"
-      (onClick)="onCancel()" 
-      styleClass="!rounded-lg text-xs md:text-sm! font-semibold !text-slate-600 !border-slate-300 hover:!bg-slate-100 inline-flex items-center justify-center gap-1.5 cursor-pointer"
-    />
-    <p-button
-      label="Guardar"
-      icon="pi pi-check"
-      severity="primary"
-      size="small"
-      [loading]="submitting"
-      (onClick)="onSave()"
-      styleClass="!rounded-lg text-xs md:text-sm! font-semibold !bg-[#48021C] !text-white !border-[#48021C] hover:!bg-[#350114] inline-flex items-center justify-center gap-1.5 shadow-sm transition-all cursor-pointer"
-    />
-  </div>
-</div>
-
+    </div>
+  </form>
+</ng-template>

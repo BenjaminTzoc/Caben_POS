@@ -1,3 +1,18 @@
 <router-outlet />
 <p-toast />
-<p-confirmdialog />
+<app-confirmation-modal
+  [visible]="confirm.visible()"
+  (visibleChange)="confirm.visible.set($event)"
+  [header]="confirm.header()"
+  [title]="confirm.title()"
+  [message]="confirm.message()"
+  [note]="confirm.note()"
+  [type]="confirm.type()"
+  [icon]="confirm.icon()"
+  [confirmLabel]="confirm.confirmLabel()"
+  [cancelLabel]="confirm.cancelLabel()"
+  [confirmIcon]="confirm.confirmIcon()"
+  [loading]="confirm.loading()"
+  (onConfirm)="confirm.onConfirm()"
+  (onCancel)="confirm.onCancel()"
+/>

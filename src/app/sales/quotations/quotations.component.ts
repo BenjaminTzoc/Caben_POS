@@ -5,8 +5,7 @@ import { TableModule } from 'primeng/table';
 import { TagModule } from 'primeng/tag';
 import { TooltipModule } from 'primeng/tooltip';
 import { Router } from '@angular/router';
-import { ConfirmationService, MessageService } from 'primeng/api';
-import { ConfirmDialog } from 'primeng/confirmdialog';
+import { MessageService } from 'primeng/api';
 import { FormsModule } from '@angular/forms';
 import { InputTextModule } from 'primeng/inputtext';
 import { IconFieldModule } from 'primeng/iconfield';
@@ -44,7 +43,6 @@ import { StatusBadgeComponent } from '../../shared/components/status-badge/statu
     TableModule,
     TagModule,
     TooltipModule,
-    ConfirmDialog,
     FormsModule,
     InputTextModule,
     IconFieldModule,
@@ -64,13 +62,12 @@ import { StatusBadgeComponent } from '../../shared/components/status-badge/statu
     StandardTableComponent,
     StatusBadgeComponent,
   ],
-  providers: [ConfirmationService, MessageService],
+  providers: [MessageService],
   templateUrl: './quotations.component.html',
   styleUrl: './quotations.component.css',
 })
 export class QuotationsComponent implements OnInit {
   private quotationsService = inject(QuotationsService);
-  private confirmationService = inject(ConfirmationService);
   private messageService = inject(MessageService);
   private router = inject(Router);
   private authService = inject(AuthService);

@@ -48,7 +48,8 @@
       [totalRecords]="totalRecords"
       [lazy]="true"
       (onLazyLoad)="onPageChange($event)"
-      [showRowsPerPageDropdown]="false"
+      [showRowsPerPageDropdown]="true"
+      [rowsPerPageOptions]="[10, 20, 25, 50, 100]"
       [globalFilterFields]="['name', 'sku', 'barcode']"
       dataKey="id"
       [scrollable]="true"
@@ -364,7 +365,7 @@
     (onCancel)="closeDeleteDialog()"
   />
 
-  <!-- Modal: Registrar Nuevo Movimiento (Sub-modal) -->
+  @if (showNewMovementModal) {
   <p-dialog
     [(visible)]="showNewMovementModal"
     [modal]="true"
@@ -376,6 +377,7 @@
     contentStyleClass="!p-0"
     appendTo="body"
     styleClass="rounded-2xl overflow-hidden shadow-2xl bg-white border border-slate-200"
+    (onHide)="showNewMovementModal = false"
   >
     <app-movement-form 
       [isModal]="true" 
@@ -383,4 +385,5 @@
       (onSaved)="onMovementSaved()"
     ></app-movement-form>
   </p-dialog>
+  }
 </section>

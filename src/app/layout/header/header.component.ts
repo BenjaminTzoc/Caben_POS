@@ -15,6 +15,7 @@ import { InputIconModule } from 'primeng/inputicon';
 import { InputTextModule } from 'primeng/inputtext';
 import { trigger, style, transition, animate } from '@angular/animations';
 import { CashSessionDialogComponent } from '../../shared/components/cash-session-dialog/cash-session-dialog.component';
+import { CompanySettingsComponent } from '../../pages/company-settings/company-settings.component';
 
 export interface CommandItem {
   label: string;
@@ -39,7 +40,8 @@ export interface CommandItem {
     InputIconModule,
     InputTextModule,
     RouterModule, 
-    CashSessionDialogComponent
+    CashSessionDialogComponent,
+    CompanySettingsComponent,
   ],
   templateUrl: './header.component.html',
   styleUrl: './header.component.css',
@@ -71,6 +73,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
   searchQuery = signal('');
   notificationsOpen = signal(false);
   userMenuOpen = signal(false);
+  showCompanySettings = signal(false);
   
   // Live Clock
   currentTime = signal(new Date());
@@ -141,7 +144,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
     if (url.startsWith('/sales/quick-sale') || url.startsWith('/sales/pos')) return { title: 'Punto de Venta (POS)', module: 'Ventas', icon: 'pi pi-bolt' };
     if (url.startsWith('/sales/quotations')) return { title: 'Cotizaciones', module: 'Ventas', icon: 'pi pi-file-edit' };
     if (url.startsWith('/sales/customers')) return { title: 'Clientes', module: 'Ventas', icon: 'pi pi-users' };
-    if (url.startsWith('/sales/cash-history')) return { title: 'Historial de Cajas', module: 'Caja', icon: 'pi pi-history' };
+    if (url.startsWith('/logistics/settlements')) return { title: 'Liquidación Diaria', module: 'Administración', icon: 'pi pi-calculator' };
     if (url.startsWith('/inventory/products')) return { title: 'Catálogo de Productos', module: 'Inventario', icon: 'pi pi-shopping-bag' };
     if (url.startsWith('/inventory/inventories')) return { title: 'Inventario de Stock', module: 'Inventario', icon: 'pi pi-box' };
     if (url.startsWith('/inventory/inventory-movements')) return { title: 'Movimientos de Stock', module: 'Inventario', icon: 'pi pi-arrows-alt' };
@@ -273,14 +276,9 @@ export class HeaderComponent implements OnInit, OnDestroy {
     this.toggleSidebar.emit(!this.sidebarCollapsed);
   }
 
-  goToProfile(): void {
+  openCompanySettings(): void {
     this.userMenuOpen.set(false);
-    this.router.navigate(['/dashboard/profile']);
-  }
-
-  goToSettings(): void {
-    this.userMenuOpen.set(false);
-    this.router.navigate(['/dashboard/settings']);
+    this.showCompanySettings.set(true);
   }
 
   logout(): void {

@@ -7,9 +7,8 @@ import { TagModule } from 'primeng/tag';
 import { DividerModule } from 'primeng/divider';
 import { InputNumberModule } from 'primeng/inputnumber';
 import { FormsModule } from '@angular/forms';
-import { MessageService, ConfirmationService } from 'primeng/api';
+import { MessageService } from 'primeng/api';
 import { DialogModule } from 'primeng/dialog';
-import { ConfirmDialogModule } from 'primeng/confirmdialog';
 
 import { ProductionOrderService } from '../../services/production-order.service';
 import { IProductionOrder, ProductionOrderStatus } from '../../interfaces/production-order.interface';
@@ -31,11 +30,9 @@ import { TextareaModule } from 'primeng/textarea';
     DialogModule,
     DatePipe,
     CurrencyPipe,
-    ConfirmDialogModule,
     TableModule,
     TextareaModule
   ],
-  providers: [ConfirmationService],
   templateUrl: './order-detail.component.html'
 })
 export class ProductionOrderDetailComponent implements OnInit {
@@ -43,7 +40,6 @@ export class ProductionOrderDetailComponent implements OnInit {
   private router = inject(Router);
   private productionService = inject(ProductionOrderService);
   private messageService = inject(MessageService);
-  private confirmationService = inject(ConfirmationService);
 
   order = signal<IProductionOrder | null>(null);
   loading = signal<boolean>(true);

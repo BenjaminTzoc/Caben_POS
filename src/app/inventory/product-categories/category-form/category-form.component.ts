@@ -7,7 +7,8 @@ import { SelectModule } from 'primeng/select';
 import { TextareaModule } from 'primeng/textarea';
 import { UnitMeasure } from '../../interfaces/unit.interface';
 import { UnitsService } from '../../services/units.service';
-import { ConfirmationService, MessageService } from 'primeng/api';
+import { MessageService } from 'primeng/api';
+import { ConfirmService } from '../../../shared/services/confirm.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ProductsService } from '../../services/products.service';
 import { Category } from '../../interfaces/product.interface';
@@ -28,7 +29,7 @@ import { Category } from '../../interfaces/product.interface';
 export class CategoryFormComponent implements OnInit {
   private fb = inject(FormBuilder);
   private messageService = inject(MessageService);
-  private confirmationService = inject(ConfirmationService);
+  private confirmService = inject(ConfirmService);
   private router = inject(Router);
   private unitsService = inject(UnitsService);
   private productsService = inject(ProductsService);
@@ -134,20 +135,14 @@ export class CategoryFormComponent implements OnInit {
   }
 
   onCancelProccess() {
-    this.confirmationService.confirm({
+    this.confirmService.confirm({
       message: '¿Estás seguro de cancelar este proceso?',
       header: 'Confirmar cancelación',
       icon: 'pi pi-info-circle',
-      rejectLabel: 'Regresar',
-      rejectButtonProps: {
-        label: 'Regresar',
-        severity: 'secondary',
-        outlined: true,
-      },
-      acceptButtonProps: {
-        label: 'Cancelar proceso',
-        severity: 'danger',
-      },
+      cancelLabel: 'Regresar',
+      
+      confirmLabel: 'Cancelar proceso',
+      type: 'danger',
 
       accept: () => {
         this.router.navigate(['inventory/product-categories']);

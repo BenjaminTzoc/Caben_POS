@@ -29,6 +29,16 @@
   </app-page-header>
 
   <div class="max-w-[1700px] mx-auto">
+    <div class="mb-3.5 px-4 py-2.5 rounded-xl bg-amber-50 border border-amber-300 flex items-center gap-2.5 text-xs text-amber-950 shadow-2xs">
+      <i class="pi pi-info-circle text-sm text-amber-600 shrink-0"></i>
+      <div class="leading-relaxed">
+        <span class="font-bold text-amber-800">Precios especiales:</span>
+        Los precios por producto se pueden personalizar al
+        <span class="font-semibold text-amber-900">editar un cliente</span>.
+        En la ficha se pactan precios distintos al de lista; el resto de productos sigue el precio estándar.
+      </div>
+    </div>
+
     <div class="hidden lg:block">
       <app-standard-table
         [value]="filteredCustomers"

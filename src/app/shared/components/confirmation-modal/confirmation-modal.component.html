@@ -5,48 +5,73 @@
   [draggable]="false"
   [resizable]="false"
   [dismissableMask]="true"
+  [closeOnEscape]="true"
+  [showHeader]="false"
+  [closable]="false"
   appendTo="body"
   [baseZIndex]="10000"
-  [header]="header"
-  styleClass="!rounded-2xl overflow-hidden"
-  (onHide)="handleClose()"
+  contentStyleClass="!p-0 !overflow-hidden flex flex-col w-full"
+  styleClass="confirm-modal-dialog !rounded-2xl !overflow-hidden shadow-2xl !bg-white !border-2 !border-[#48021C]/25"
+  (onHide)="onDialogHide()"
 >
-  <div class="flex flex-col items-center justify-center text-center pt-2 pb-1 px-3">
-    <!-- Icono central en círculo suave -->
-    <div 
-      class="w-16 h-16 rounded-full border flex items-center justify-center mb-5 shadow-xs transition-transform transform duration-200 hover:scale-105"
-      [ngClass]="iconContainerClasses"
+  <div class="p-0 flex flex-col w-full overflow-hidden bg-white">
+    <div
+      class="flex items-center gap-2.5 py-2.5 px-4 border-b rounded-t-2xl flex-shrink-0"
+      [ngClass]="chromeClasses"
     >
-      <i [class]="computedIcon + ' text-2xl!'"></i>
+      <button
+        type="button"
+        (click)="handleClose()"
+        class="w-8 h-8 rounded-lg border flex items-center justify-center shadow-xs transition-all active:scale-95 cursor-pointer shrink-0"
+        [ngClass]="closeButtonClasses"
+        title="Cerrar"
+      >
+        <i class="pi pi-times text-xs font-semibold"></i>
+      </button>
+      <h2 class="text-base md:text-lg font-semibold text-slate-900 tracking-tight leading-none m-0 truncate">
+        {{ header }}
+      </h2>
     </div>
 
-    <!-- Título principal -->
-    <h3 *ngIf="title" class="text-base md:text-lg font-bold text-slate-800 mb-2.5 tracking-tight leading-snug">
-      {{ title }}
-    </h3>
+    <div class="flex flex-col items-center justify-center text-center px-5 py-5 md:px-6">
+      <div
+        class="w-16 h-16 rounded-full border flex items-center justify-center mb-4 shadow-xs"
+        [ngClass]="iconContainerClasses"
+      >
+        <i [class]="computedIcon + ' confirm-modal-icon'"></i>
+      </div>
 
-    <!-- Mensaje / Descripción -->
-    <p *ngIf="message" class="text-xs md:text-sm text-slate-600 font-medium mb-3 leading-relaxed max-w-md">
-      {{ message }}
-    </p>
+      @if (title) {
+        <h3 class="text-base md:text-lg font-bold text-slate-800 mb-2 tracking-tight leading-snug">
+          {{ title }}
+        </h3>
+      }
 
-    <!-- Slot para contenido personalizado adicional -->
-    <ng-content></ng-content>
+      @if (message) {
+        <p class="text-xs md:text-sm text-slate-600 font-medium mb-2 leading-relaxed max-w-md">
+          {{ message }}
+        </p>
+      }
 
-    <!-- Nota aclaratoria -->
-    <p *ngIf="note" class="text-[11px] text-slate-400 font-normal mt-2 leading-relaxed">
-      {{ note }}
-    </p>
-  </div>
+      <ng-content></ng-content>
 
-  <ng-template pTemplate="footer">
-    <div class="flex items-center justify-end gap-2.5 w-full pt-3 pb-1 border-t border-slate-100">
+      @if (note) {
+        <p class="text-[11px] text-slate-400 font-normal mt-2 leading-relaxed">
+          {{ note }}
+        </p>
+      }
+    </div>
+
+    <div
+      class="flex items-center justify-end gap-2.5 py-3 px-4 md:px-5 border-t flex-shrink-0"
+      [ngClass]="chromeClasses"
+    >
       <button
         pButton
         type="button"
         [label]="cancelLabel"
         (click)="handleClose()"
-        class="p-button-text p-button-secondary font-semibold text-xs whitespace-nowrap !px-4 !h-[38px] hover:!bg-slate-100 !rounded-lg cursor-pointer"
+        class="p-button-text p-button-secondary font-semibold text-xs whitespace-nowrap !px-4 !h-[38px] hover:!bg-white/80 !rounded-lg cursor-pointer"
       ></button>
       <button
         pButton
@@ -59,5 +84,5 @@
         class="font-semibold text-xs whitespace-nowrap !px-4 !h-[38px] !rounded-lg shadow-sm cursor-pointer"
       ></button>
     </div>
-  </ng-template>
+  </div>
 </p-dialog>

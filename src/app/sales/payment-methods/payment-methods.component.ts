@@ -2,7 +2,8 @@ import { Component, inject, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
-import { MessageService, ConfirmationService } from 'primeng/api';
+import { MessageService } from 'primeng/api';
+import { ConfirmService } from '../../shared/services/confirm.service';
 
 // PrimeNG
 import { TableModule } from 'primeng/table';
@@ -38,7 +39,7 @@ import { AuthService } from '../../auth/auth.service';
 export class PaymentMethodsComponent implements OnInit {
   private paymentService = inject(PaymentMethodsService);
   private messageService = inject(MessageService);
-  private confirmationService = inject(ConfirmationService);
+  private confirmService = inject(ConfirmService);
   private router = inject(Router);
   private authService = inject(AuthService);
 
@@ -83,14 +84,13 @@ export class PaymentMethodsComponent implements OnInit {
 
 
   onDeleteMethod(method: any): void {
-    this.confirmationService.confirm({
+    this.confirmService.confirm({
       message: `¿Está seguro de eliminar el método de pago: ${method.name}?`,
       header: 'Confirmar eliminación',
       icon: 'pi pi-exclamation-triangle',
-      acceptLabel: 'Eliminar',
-      rejectLabel: 'Cancelar',
-      acceptButtonStyleClass: 'p-button-danger !rounded-xl',
-      rejectButtonStyleClass: 'p-button-secondary p-button-text !rounded-xl',
+      confirmLabel: 'Eliminar',
+      cancelLabel: 'Cancelar',
+      type: 'danger',
       accept: () => {
         this.paymentService.deletePaymentMethod(method.id).subscribe({
           next: () => {

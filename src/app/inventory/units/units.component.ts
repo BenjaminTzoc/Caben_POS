@@ -8,7 +8,8 @@ import { InputTextModule } from 'primeng/inputtext';
 import { CardModule } from 'primeng/card';
 import { ToggleSwitchModule } from 'primeng/toggleswitch';
 import { TagModule } from 'primeng/tag';
-import { ConfirmationService, MessageService } from 'primeng/api';
+import { MessageService } from 'primeng/api';
+import { ConfirmService } from '../../shared/services/confirm.service';
 import { UnitsService } from '../services/units.service';
 import { UnitMeasure } from '../interfaces/unit.interface';
 import { AuthService } from '../../auth/auth.service';
@@ -36,7 +37,7 @@ import { InputIconModule } from 'primeng/inputicon';
 })
 export class UnitsComponent implements OnInit {
   private unitsService = inject(UnitsService);
-  private confirmationService = inject(ConfirmationService);
+  private confirmService = inject(ConfirmService);
   private messageService = inject(MessageService);
   private authService = inject(AuthService);
 
@@ -84,13 +85,13 @@ export class UnitsComponent implements OnInit {
   }
 
   deleteUnit(id: string): void {
-    this.confirmationService.confirm({
+    this.confirmService.confirm({
       message: '¿Estás seguro de que deseas eliminar esta unidad de medida?',
       header: 'Confirmar eliminación',
       icon: 'pi pi-exclamation-triangle',
-      acceptLabel: 'Eliminar',
-      rejectLabel: 'Cancelar',
-      acceptButtonStyleClass: 'p-button-danger',
+      confirmLabel: 'Eliminar',
+      cancelLabel: 'Cancelar',
+      type: 'danger',
       accept: () => {
         this.unitsService.deleteUnit(id).subscribe({
           next: () => {
@@ -114,13 +115,13 @@ export class UnitsComponent implements OnInit {
   }
 
   restoreUnit(id: string): void {
-    this.confirmationService.confirm({
+    this.confirmService.confirm({
       message: '¿Estás seguro de que deseas restaurar esta unidad de medida?',
       header: 'Confirmar restauración',
       icon: 'pi pi-refresh',
-      acceptLabel: 'Restaurar',
-      rejectLabel: 'Cancelar',
-      acceptButtonStyleClass: 'p-button-success',
+      confirmLabel: 'Restaurar',
+      cancelLabel: 'Cancelar',
+      type: 'success',
       accept: () => {
         this.unitsService.restoreUnit(id).subscribe({
           next: () => {

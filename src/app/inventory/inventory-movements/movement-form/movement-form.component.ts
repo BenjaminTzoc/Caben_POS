@@ -1,22 +1,22 @@
-import { Component, inject, OnInit, Input, Output, EventEmitter } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output, inject } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { CommonModule, Location } from '@angular/common';
-import { ProductsService } from '../../services/products.service';
-import { BranchesService } from '../../services/branches.service';
+import { forkJoin } from 'rxjs';
 import { MessageService } from 'primeng/api';
-import { AuthService } from '../../../auth/auth.service';
-import { Router } from '@angular/router';
-import { Product } from '../../interfaces/product.interface';
-import { Branch } from '../../interfaces/branch.interface';
-import { environment } from '../../../../environments/environment';
-import { InventoryMovementsService } from '../../services/inventory-movements.service';
 import { Select } from 'primeng/select';
 import { ButtonModule } from 'primeng/button';
 import { InputTextModule } from 'primeng/inputtext';
 import { InputNumberModule } from 'primeng/inputnumber';
 import { TextareaModule } from 'primeng/textarea';
-import { TagModule } from 'primeng/tag';
-import { TooltipModule } from 'primeng/tooltip';
+import { ProductsService } from '../../services/products.service';
+import { BranchesService } from '../../services/branches.service';
+import { InventoryMovementsService } from '../../services/inventory-movements.service';
+import { AuthService } from '../../../auth/auth.service';
+import { Router } from '@angular/router';
+import { Product } from '../../interfaces/product.interface';
+import { Branch } from '../../interfaces/branch.interface';
+import { environment } from '../../../../environments/environment';
+import { BranchSelectComponent } from '../../../shared/components/branch-select/branch-select.component';
 
 @Component({
   selector: 'app-movement-form',
@@ -28,11 +28,9 @@ import { TooltipModule } from 'primeng/tooltip';
     InputTextModule,
     InputNumberModule,
     TextareaModule,
-    TagModule,
-    TooltipModule,
+    BranchSelectComponent,
   ],
   templateUrl: './movement-form.component.html',
-  styleUrl: './movement-form.component.css',
 })
 export class MovementFormComponent implements OnInit {
   private readonly productsService = inject(ProductsService);
@@ -53,9 +51,10 @@ export class MovementFormComponent implements OnInit {
   branches: Branch[] = [];
   availableBranches: Branch[] = [];
   selectedProduct: Product | undefined;
-  isSuperAdmin: boolean = false;
+  isSuperAdmin = false;
   currentStock: number | null = null;
-  submitting: boolean = false;
+  submitting = false;
+  loadingCatalog = false;
 
   movementTypes = [
     { label: 'Entrada', value: 'in', description: 'El stock disponible aumenta (+)' },
@@ -73,7 +72,7 @@ export class MovementFormComponent implements OnInit {
   constructor() {
     this.movementForm = this.fb.group({
       productId: [null, [Validators.required]],
-      branchId: [{ value: null, disabled: true }, [Validators.required]],
+      branchId: [null, [Validators.required]],
       quantity: [null, [Validators.required, Validators.min(0.01)]],
       type: ['in', [Validators.required]],
       concept: ['adjustment', [Validators.required]],
@@ -84,27 +83,35 @@ export class MovementFormComponent implements OnInit {
 
   ngOnInit(): void {
     this.checkUserRole();
-    this.loadProducts();
-    this.loadBranches();
     this.setupFormSubscriptions();
     this.updateFilteredConcepts('in');
+    this.loadCatalog();
   }
 
   setupFormSubscriptions() {
-    // Listen to type changes to filter concepts
     this.movementForm.get('type')?.valueChanges.subscribe((type) => {
       this.updateFilteredConcepts(type);
+      this.refreshAvailableBranches();
+      this.updateCurrentStock(this.movementForm.get('branchId')?.value);
     });
 
-    // Listen to branch changes to update current stock display
     this.movementForm.get('branchId')?.valueChanges.subscribe((branchId) => {
       this.updateCurrentStock(branchId);
     });
   }
 
+  get isEntry(): boolean {
+    return this.normalizedType(this.movementForm.get('type')?.value) === 'in';
+  }
+
+  get canSubmit(): boolean {
+    return this.movementForm.valid && !this.loadingCatalog && !this.submitting;
+  }
+
   updateFilteredConcepts(type: string) {
+    const normalized = this.normalizedType(type);
     this.filteredConcepts = this.concepts
-      .filter((c) => c.types.includes(type))
+      .filter((c) => c.types.includes(normalized))
       .map((c) => ({ label: c.label, value: c.value }));
 
     const currentConcept = this.movementForm.get('concept')?.value;
@@ -117,129 +124,147 @@ export class MovementFormComponent implements OnInit {
     if (this.currentStock === null) return null;
     const qty = this.movementForm.get('quantity')?.value;
     if (qty === null || qty === undefined || qty <= 0) return this.currentStock;
-    const type = this.movementForm.get('type')?.value;
-    if (type === 'in') {
-      return Number((this.currentStock + qty).toFixed(2));
-    } else if (type === 'out') {
-      return Number((this.currentStock - qty).toFixed(2));
-    }
+    const type = this.normalizedType(this.movementForm.get('type')?.value);
+    if (type === 'in') return Number((this.currentStock + qty).toFixed(2));
+    if (type === 'out') return Number((this.currentStock - qty).toFixed(2));
     return this.currentStock;
   }
 
   get selectedBranchName(): string {
     const branchId = this.movementForm.get('branchId')?.value;
     if (!branchId) return '';
-    const branch = this.branches.find((b) => b.id === branchId);
-    return branch?.name || '';
+    return this.branches.find((b) => b.id === branchId)?.name || '';
+  }
+
+  get unitAbbr(): string {
+    return this.selectedProduct?.unit?.abbreviation || 'un';
   }
 
   updateCurrentStock(branchId: string | null) {
-    if (!branchId || !this.selectedProduct?.inventories) {
+    if (!branchId || !this.selectedProduct) {
       this.currentStock = null;
       return;
     }
 
-    const inventory = this.selectedProduct.inventories.find((i) => (i.branch?.id || i.branchId) === branchId);
-    this.currentStock = inventory ? inventory.stock : 0;
+    const inventory = this.selectedProduct.inventories?.find(
+      (i) => (i.branch?.id || i.branchId) === branchId,
+    );
+    this.currentStock = inventory ? Number(inventory.stock) || 0 : 0;
   }
 
   checkUserRole() {
-    this.isSuperAdmin = this.authService.hasPermission('products.manage_global_stock');
     const user = this.authService.currentUser;
-
-    if (user?.roles?.some((r) => r.isSuperAdmin)) {
-      this.isSuperAdmin = true;
-    }
+    this.isSuperAdmin =
+      this.authService.hasPermission('products.manage_global_stock') ||
+      !!user?.roles?.some((r) => r.isSuperAdmin);
 
     if (!this.isSuperAdmin) {
-      const userAny = user as any;
-      let userBranchId: string | undefined;
-
-      if (userAny.branchId) {
-        userBranchId = userAny.branchId;
-      } else if (userAny.branch?.id) {
-        userBranchId = userAny.branch.id;
-      }
-
-      if (userBranchId) {
-        this.movementForm.get('branchId')?.setValue(userBranchId);
-      }
+      this.movementForm.get('branchId')?.disable({ emitEvent: false });
     }
   }
 
-  loadProducts() {
-    this.productsService
-      .getProducts(undefined, false, undefined, undefined, false, undefined, true)
-      .subscribe({
-        next: (response) => {
-          this.products = response.data;
-        },
-        error: (error) => {
-          this.messageService.add({
-            severity: 'error',
-            summary: 'Error',
-            detail: `Error cargando los productos: ${error.error.message}`,
-          });
-        },
-      });
+  private userBranchId(): string | null {
+    const user = this.authService.currentUser as { branchId?: string; branch?: { id?: string } } | null;
+    return user?.branchId || user?.branch?.id || null;
   }
 
-  loadBranches(): void {
-    this.branchesService.getBranches().subscribe({
-      next: (response) => {
-        this.branches = response.data;
+  private applyUserBranch(): void {
+    if (this.isSuperAdmin) return;
+    const branchId = this.userBranchId();
+    if (branchId) {
+      this.movementForm.get('branchId')?.setValue(branchId, { emitEvent: true });
+    }
+  }
+
+  loadCatalog(): void {
+    this.loadingCatalog = true;
+    forkJoin({
+      products: this.productsService.getProducts(
+        undefined,
+        false,
+        undefined,
+        undefined,
+        false,
+        undefined,
+        true,
+      ),
+      branches: this.branchesService.getBranches({ minimal: true }),
+    }).subscribe({
+      next: ({ products, branches }) => {
+        this.products = products.data ?? [];
+        this.branches = branches.data ?? [];
+        this.applyUserBranch();
+        this.refreshAvailableBranches();
+        this.loadingCatalog = false;
       },
       error: (error) => {
+        this.loadingCatalog = false;
         this.messageService.add({
           severity: 'error',
           summary: 'Error',
-          detail: `Error cargando las sucursales: ${error.error.message}`,
+          detail: this.errorMessage(error, 'No se pudieron cargar productos o sucursales.'),
         });
       },
     });
   }
 
-  onProductChange(event: any) {
-    const selectedProductId = event.value;
+  refreshAvailableBranches(): void {
+    const type = this.movementForm.get('type')?.value;
+    const branchControl = this.movementForm.get('branchId');
+    const currentId = branchControl?.value as string | null;
+
+    if (!this.isSuperAdmin) {
+      const ownId = this.userBranchId();
+      this.availableBranches = this.branches.filter((b) => b.id === ownId);
+      branchControl?.disable({ emitEvent: false });
+      this.updateCurrentStock(ownId);
+      return;
+    }
+
+    if (this.normalizedType(type) === 'out' && this.selectedProduct?.inventories?.length) {
+      const ids = new Set(
+        this.selectedProduct.inventories
+          .map((i) => i.branch?.id || i.branchId)
+          .filter((id): id is string => !!id),
+      );
+      this.availableBranches = this.branches.filter((b) => ids.has(b.id));
+    } else {
+      this.availableBranches = [...this.branches];
+    }
+
+    branchControl?.enable({ emitEvent: false });
+    if (currentId && !this.availableBranches.some((b) => b.id === currentId)) {
+      branchControl?.setValue(null);
+    }
+  }
+
+  onProductChange(event: { value?: string | null }): void {
+    const selectedProductId = event?.value || this.movementForm.get('productId')?.value;
 
     if (!selectedProductId) {
       this.selectedProduct = undefined;
-      this.availableBranches = [];
-      this.movementForm.get('branchId')?.disable();
-      this.movementForm.get('branchId')?.setValue(null);
       this.currentStock = null;
+      this.refreshAvailableBranches();
       return;
     }
+
+    this.selectedProduct = this.products.find((p) => p.id === selectedProductId);
+    this.refreshAvailableBranches();
+    this.updateCurrentStock(this.movementForm.get('branchId')?.value);
 
     this.productsService.getProduct(selectedProductId).subscribe({
       next: (response) => {
         if (response.statusCode === 200) {
           this.selectedProduct = response.data;
-
-          const branchesWithStockIds =
-            this.selectedProduct.inventories
-              ?.filter((i) => i.stock >= 0)
-              .map((i) => i.branch?.id || i.branchId)
-              .filter((id): id is string => !!id) || [];
-
-          this.availableBranches = this.branches.filter((b) => branchesWithStockIds.includes(b.id));
-
-          const branchControl = this.movementForm.get('branchId');
-
-          if (this.isSuperAdmin) {
-            branchControl?.enable();
-            branchControl?.setValue(null);
-          } else {
-            const currentBranchId = branchControl?.value;
-            this.updateCurrentStock(currentBranchId);
-          }
+          this.refreshAvailableBranches();
+          this.updateCurrentStock(this.movementForm.get('branchId')?.value);
         }
       },
       error: (error) => {
         this.messageService.add({
           severity: 'error',
           summary: 'Error',
-          detail: `Error cargando el producto: ${error.error.message}`,
+          detail: this.errorMessage(error, 'No se pudo cargar el detalle del producto.'),
         });
       },
     });
@@ -249,11 +274,7 @@ export class MovementFormComponent implements OnInit {
     if (!imageUrl) {
       return `${environment.baseUrl}/uploads/products/default-product.png`;
     }
-
-    if (imageUrl.startsWith('http')) {
-      return imageUrl;
-    }
-
+    if (imageUrl.startsWith('http')) return imageUrl;
     return `${environment.baseUrl}${imageUrl}`;
   }
 
@@ -273,6 +294,23 @@ export class MovementFormComponent implements OnInit {
     }
   }
 
+  onQuantityInput(event: { value?: string | number | null }): void {
+    const raw = event?.value;
+    const value = raw === null || raw === undefined || raw === '' ? null : Number(raw);
+    this.movementForm.get('quantity')?.setValue(Number.isFinite(value as number) ? value : null, { emitEvent: true });
+    this.movementForm.get('quantity')?.markAsDirty();
+  }
+
+  private normalizedType(type: string | null | undefined): 'in' | 'out' {
+    return String(type || '').toLowerCase() === 'out' ? 'out' : 'in';
+  }
+
+  private errorMessage(error: { error?: { message?: string | string[] } }, fallback: string): string {
+    const message = error?.error?.message;
+    if (Array.isArray(message)) return message.join(', ');
+    return message || fallback;
+  }
+
   onSave() {
     if (this.movementForm.invalid) {
       this.movementForm.markAllAsTouched();
@@ -285,12 +323,22 @@ export class MovementFormComponent implements OnInit {
     }
 
     this.submitting = true;
-    const body = this.movementForm.getRawValue();
+    const raw = this.movementForm.getRawValue();
+    const body = {
+      productId: raw.productId,
+      branchId: raw.branchId,
+      quantity: Number(raw.quantity),
+      type: this.normalizedType(raw.type),
+      concept: String(raw.concept || 'adjustment').toLowerCase(),
+      notes: raw.notes || undefined,
+      movementDate: raw.movementDate instanceof Date ? raw.movementDate.toISOString() : raw.movementDate,
+    };
 
     this.inventoryMovementsService.createInventoryMovement(body).subscribe({
       next: (response) => {
         this.submitting = false;
-        if (response.statusCode === 201 || response.statusCode === 200) {
+        const status = Number(response.statusCode);
+        if (status === 201 || status === 200 || !!response.data) {
           this.messageService.add({
             severity: 'success',
             summary: 'Movimiento registrado',
@@ -308,7 +356,7 @@ export class MovementFormComponent implements OnInit {
         this.messageService.add({
           severity: 'error',
           summary: 'Error',
-          detail: `No se pudo registrar el movimiento: ${error.error?.message || 'Error del servidor'}`,
+          detail: this.errorMessage(error, 'No se pudo registrar el movimiento.'),
         });
       },
     });

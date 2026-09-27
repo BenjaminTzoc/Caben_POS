@@ -1,7 +1,8 @@
 import { Component, inject, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
-import { ConfirmationService, MessageService } from 'primeng/api';
+import { MessageService } from 'primeng/api';
+import { ConfirmService } from '../../../shared/services/confirm.service';
 import { ButtonModule } from 'primeng/button';
 import { InputTextModule } from 'primeng/inputtext';
 import { SuppliersService } from '../../services/suppliers.service';
@@ -26,7 +27,7 @@ import { CommonModule } from '@angular/common';
 })
 export class SupplierFormComponent implements OnInit {
   private fb = inject(FormBuilder);
-  private confirmationService = inject(ConfirmationService);
+  private confirmService = inject(ConfirmService);
   private router = inject(Router);
   private messageService = inject(MessageService);
   private supplierService = inject(SuppliersService);
@@ -79,20 +80,14 @@ export class SupplierFormComponent implements OnInit {
   }
 
   onCancelProccess(): void {
-    this.confirmationService.confirm({
+    this.confirmService.confirm({
       message: '¿Estás seguro de cancelar este proceso?',
       header: 'Confirmar cancelación',
       icon: 'pi pi-info-circle',
-      rejectLabel: 'Regresar',
-      rejectButtonProps: {
-        label: 'Regresar',
-        severity: 'secondary',
-        outlined: true,
-      },
-      acceptButtonProps: {
-        label: 'Cancelar proceso',
-        severity: 'danger',
-      },
+      cancelLabel: 'Regresar',
+      
+      confirmLabel: 'Cancelar proceso',
+      type: 'danger',
 
       accept: () => {
         this.router.navigate(['purchases/suppliers']);

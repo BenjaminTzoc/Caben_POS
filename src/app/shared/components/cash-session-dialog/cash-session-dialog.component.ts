@@ -204,6 +204,7 @@ export class CashSessionDialogComponent implements OnInit {
           this.openForm.get('branchId')?.setValue(userBranchId);
         }
         this.closeDialog();
+        this.router.navigate(['/logistics/settlements/today']);
       },
       error: (err) => {
         this.messageService.add({

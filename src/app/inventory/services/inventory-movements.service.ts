@@ -12,8 +12,15 @@ export class InventoryMovementsService {
   private http = inject(HttpClient);
   private readonly API_URL = `${environment.apiUrl}/inventory-movements`;
 
-  getInventoryMovements(filters?: any): Observable<ApiResponse<PaginatedResponse<InventoryMovement>>> {
-    return this.http.get<ApiResponse<PaginatedResponse<InventoryMovement>>>(`${this.API_URL}`, { params: filters });
+  getInventoryMovements(filters?: Record<string, string | number | null | undefined>): Observable<ApiResponse<PaginatedResponse<InventoryMovement>>> {
+    let params = new HttpParams();
+    if (filters) {
+      for (const [key, value] of Object.entries(filters)) {
+        if (value === undefined || value === null || value === '') continue;
+        params = params.set(key, String(value));
+      }
+    }
+    return this.http.get<ApiResponse<PaginatedResponse<InventoryMovement>>>(`${this.API_URL}`, { params });
   }
 
   getMovementById(id: string): Observable<ApiResponse<InventoryMovement>> {

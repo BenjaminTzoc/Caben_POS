@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Component, EventEmitter, Input, Output, ViewEncapsulation } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { DialogModule } from 'primeng/dialog';
 import { ButtonModule } from 'primeng/button';
@@ -10,27 +10,30 @@ export type ConfirmationType = 'warning' | 'danger' | 'success' | 'info' | 'prim
   standalone: true,
   imports: [CommonModule, DialogModule, ButtonModule],
   templateUrl: './confirmation-modal.component.html',
-  styleUrl: './confirmation-modal.component.css'
+  styleUrl: './confirmation-modal.component.css',
+  encapsulation: ViewEncapsulation.None,
 })
 export class ConfirmationModalComponent {
-  @Input() visible: boolean = false;
+  @Input() visible = false;
   @Output() visibleChange = new EventEmitter<boolean>();
 
-  @Input() header: string = 'Confirmación';
-  @Input() title: string = '¿Estás seguro de continuar?';
-  @Input() message: string = '';
+  @Input() header = 'Confirmación';
+  @Input() title = '¿Estás seguro de continuar?';
+  @Input() message = '';
   @Input() note?: string = '';
   @Input() type: ConfirmationType = 'warning';
   @Input() icon?: string;
 
-  @Input() confirmLabel: string = 'Confirmar';
-  @Input() cancelLabel: string = 'Cancelar';
-  @Input() confirmIcon: string = 'pi pi-check';
-  @Input() loading: boolean = false;
-  @Input() width: string = '460px';
+  @Input() confirmLabel = 'Confirmar';
+  @Input() cancelLabel = 'Cancelar';
+  @Input() confirmIcon = 'pi pi-check';
+  @Input() loading = false;
+  @Input() width = '460px';
 
   @Output() onConfirm = new EventEmitter<void>();
   @Output() onCancel = new EventEmitter<void>();
+
+  private confirmed = false;
 
   get computedIcon(): string {
     if (this.icon) return this.icon;
@@ -81,13 +84,57 @@ export class ConfirmationModalComponent {
     }
   }
 
+  get chromeClasses(): string {
+    switch (this.type) {
+      case 'danger':
+        return 'bg-rose-50/70 border-rose-200';
+      case 'success':
+        return 'bg-emerald-50/70 border-emerald-200';
+      case 'info':
+        return 'bg-blue-50/70 border-blue-200';
+      case 'primary':
+        return 'bg-rose-50/60 border-[#48021C]/15';
+      case 'warning':
+      default:
+        return 'bg-amber-50/70 border-amber-200';
+    }
+  }
+
+  get closeButtonClasses(): string {
+    switch (this.type) {
+      case 'danger':
+        return 'bg-rose-100/80 hover:bg-rose-200 text-rose-700 border-rose-200 hover:border-rose-300';
+      case 'success':
+        return 'bg-emerald-100/80 hover:bg-emerald-200 text-emerald-700 border-emerald-200 hover:border-emerald-300';
+      case 'info':
+        return 'bg-blue-100/80 hover:bg-blue-200 text-blue-700 border-blue-200 hover:border-blue-300';
+      case 'primary':
+        return 'bg-[#48021C]/10 hover:bg-[#48021C]/20 text-[#48021C] border-[#48021C]/20 hover:border-[#48021C]/40';
+      case 'warning':
+      default:
+        return 'bg-amber-100/80 hover:bg-amber-200 text-amber-700 border-amber-200 hover:border-amber-300';
+    }
+  }
+
   handleClose(): void {
     this.visible = false;
     this.visibleChange.emit(false);
-    this.onCancel.emit();
   }
 
   handleConfirm(): void {
+    this.confirmed = true;
     this.onConfirm.emit();
+  }
+
+  onDialogHide(): void {
+    const wasConfirm = this.confirmed;
+    this.confirmed = false;
+    if (this.visible) {
+      this.visible = false;
+      this.visibleChange.emit(false);
+    }
+    if (!wasConfirm) {
+      this.onCancel.emit();
+    }
   }
 }

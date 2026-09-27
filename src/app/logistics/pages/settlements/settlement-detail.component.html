@@ -1,0 +1,213 @@
+<div class="py-4 px-0 md:px-6 bg-slate-50/50 min-h-screen">
+  <app-page-header
+    title="Detalle de liquidación"
+    [subtitle]="settlement()?.branchName || ' '"
+    colorScheme="burgundy"
+    [showBackButton]="true"
+    backTooltip="Volver a liquidaciones"
+    (onBack)="goBack()"
+    [badge]="settlement()?.settlementNumber"
+  />
+
+  <div class="max-w-[1700px] mx-auto px-4 md:px-0 space-y-4 pb-10">
+    @if (loading() && !settlement()) {
+      <div class="bg-white rounded-2xl border-2 border-[#48021C]/25 p-12 flex flex-col items-center gap-2 text-sm text-slate-400">
+        <i class="pi pi-spin pi-spinner text-2xl text-[#48021C]"></i>
+        Cargando liquidación…
+      </div>
+    }
+
+    @if (settlement(); as doc) {
+      <section class="bg-white rounded-2xl border-2 border-[#48021C]/25 shadow-xs overflow-hidden">
+        <div class="py-2.5 px-4 md:px-5 border-b border-[#48021C]/15 bg-[#eddde1]/70 flex flex-wrap items-center gap-2 justify-between">
+          <h2 class="text-sm font-bold text-[#3b141e] m-0">Resumen</h2>
+          <app-status-badge [value]="statusLabel(doc.status)" [severity]="statusSeverity(doc.status)" size="xs" />
+        </div>
+        <div class="p-4 md:p-5 grid grid-cols-2 md:grid-cols-4 gap-4 text-xs">
+          <div>
+            <p class="text-[10px] font-bold uppercase tracking-wider text-[#9f6587] m-0">Fecha</p>
+            <p class="font-semibold text-slate-800 mt-0.5 m-0">{{ doc.businessDate | date: 'dd/MM/yyyy' }}</p>
+          </div>
+          <div>
+            <p class="text-[10px] font-bold uppercase tracking-wider text-[#9f6587] m-0">Sucursal</p>
+            <p class="font-semibold text-slate-800 mt-0.5 m-0">{{ doc.branchName }}</p>
+          </div>
+          <div>
+            <p class="text-[10px] font-bold uppercase tracking-wider text-[#9f6587] m-0">Traslado</p>
+            <p class="font-semibold text-slate-800 mt-0.5 m-0">{{ doc.transferNumber || '—' }}</p>
+          </div>
+          <div>
+            <p class="text-[10px] font-bold uppercase tracking-wider text-[#9f6587] m-0">Enviada</p>
+            <p class="font-semibold text-slate-800 mt-0.5 m-0">
+              {{ doc.submittedAt ? (doc.submittedAt | date: 'dd/MM/yyyy hh:mm a') : '—' }}
+            </p>
+          </div>
+        </div>
+      </section>
+
+      @if (doc.cashSessions?.length) {
+        <section class="bg-white rounded-2xl border-2 border-[#48021C]/25 shadow-xs overflow-hidden">
+          <div class="py-2.5 px-4 md:px-5 border-b border-[#48021C]/15 bg-[#eddde1]/70">
+            <h2 class="text-sm font-bold text-[#3b141e] m-0">Cajas del día</h2>
+          </div>
+          <div class="p-4 md:p-5 grid gap-3 md:grid-cols-2">
+            @for (session of doc.cashSessions; track session.id) {
+              <div class="rounded-xl border border-[#48021C]/15 px-3.5 py-3">
+                <div class="flex items-center justify-between gap-2 mb-1.5">
+                  <p class="font-semibold text-slate-800 text-xs truncate m-0">{{ session.userName }}</p>
+                  <app-status-badge
+                    [value]="cashStatusLabel(session.status)"
+                    [severity]="cashStatusSeverity(session.status)"
+                    size="xs"
+                  />
+                </div>
+                <p class="text-[11px] text-slate-500 tabular-nums m-0">
+                  Esperado {{ session.expectedBalance | currency: 'Q ' }}
+                  · Contado {{ session.closingBalance | currency: 'Q ' }}
+                </p>
+              </div>
+            }
+          </div>
+        </section>
+      }
+
+      <section class="bg-white rounded-2xl border-2 border-[#48021C]/25 shadow-xs overflow-hidden">
+        <div class="py-2.5 px-4 md:px-5 border-b border-[#48021C]/15 bg-[#eddde1]/70">
+          <h2 class="text-sm font-bold text-[#3b141e] m-0">Productos</h2>
+        </div>
+        <div class="overflow-x-auto">
+          <table class="w-full text-xs border-collapse min-w-[720px]">
+            <thead class="bg-[#eddde1] text-[#3b141e]">
+              <tr class="h-11 font-bold">
+                <th class="!text-left !pl-4 border-r border-[#762f41]/35">Producto</th>
+                <th class="!text-right !pr-3 border-r border-[#762f41]/35 w-[130px]">Sistema</th>
+                <th class="!text-right !pr-3 border-r border-[#762f41]/35 w-[130px]">Se queda</th>
+                <th class="!text-right !pr-3 border-r border-[#762f41]/35 w-[130px]">A planta</th>
+                <th class="!text-right !pr-3 border-r border-[#762f41]/35 w-[130px]">Merma</th>
+                @if (canReceive()) {
+                  <th class="!text-right !pr-4 w-[180px]">Recibido</th>
+                }
+              </tr>
+            </thead>
+            <tbody>
+              @for (item of doc.items; track item.id) {
+                <tr class="border-b border-[#762f41]/18 last:border-0">
+                  <td class="!py-2.5 !pl-4 border-r border-[#762f41]/18">
+                    <p class="font-semibold text-slate-800 m-0">{{ item.productName }}</p>
+                    <p class="text-[10px] text-slate-500 m-0">{{ item.sku }}</p>
+                  </td>
+                  <td class="!py-2.5 !pr-3 border-r border-[#762f41]/18 !text-right tabular-nums font-semibold whitespace-nowrap">
+                    {{ item.systemQty | number: qtyDigits(item) }}
+                    <span class="text-[10px] font-bold text-[#48021C] ml-0.5">{{ unitOf(item) }}</span>
+                  </td>
+                  <td class="!py-2.5 !pr-3 border-r border-[#762f41]/18 !text-right tabular-nums font-semibold whitespace-nowrap">
+                    {{ item.keepQty | number: qtyDigits(item) }}
+                    <span class="text-[10px] font-bold text-[#48021C] ml-0.5">{{ unitOf(item) }}</span>
+                  </td>
+                  <td class="!py-2.5 !pr-3 border-r border-[#762f41]/18 !text-right tabular-nums font-semibold whitespace-nowrap">
+                    {{ item.returnQty | number: qtyDigits(item) }}
+                    <span class="text-[10px] font-bold text-[#48021C] ml-0.5">{{ unitOf(item) }}</span>
+                  </td>
+                  <td class="!py-2.5 !pr-3 border-r border-[#762f41]/18 !text-right tabular-nums font-semibold whitespace-nowrap"
+                    [class.text-amber-700]="item.wasteQty > 0"
+                  >
+                    {{ item.wasteQty | number: qtyDigits(item) }}
+                    <span class="text-[10px] font-bold text-[#48021C] ml-0.5">{{ unitOf(item) }}</span>
+                  </td>
+                  @if (canReceive() && item.returnQty > 0) {
+                    <td class="!py-2 !pr-4">
+                      <div class="flex w-full justify-end">
+                        <p-inputnumber
+                          [(ngModel)]="received[item.productId]"
+                          mode="decimal"
+                          size="small"
+                          [min]="0"
+                          [minFractionDigits]="item.allowsDecimals ? 2 : 0"
+                          [maxFractionDigits]="item.allowsDecimals ? 2 : 0"
+                          class="flex-1 min-w-0 max-w-[7.5rem]"
+                          styleClass="w-full !rounded-r-none !rounded-l-lg text-xs"
+                          inputStyleClass="w-full !rounded-r-none !rounded-l-lg !border-[#9f6587]/35 text-xs !text-right"
+                          fluid
+                        />
+                        <span class="inline-flex items-center px-2 rounded-r-lg border border-l-0 border-[#9f6587]/35 bg-[#48021C]/10 text-[#48021C] text-[10px] font-bold select-none shrink-0 uppercase">
+                          {{ unitOf(item) }}
+                        </span>
+                      </div>
+                    </td>
+                  } @else if (canReceive()) {
+                    <td class="!pr-4"></td>
+                  }
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      @if (doc.incidents?.length) {
+        <section class="bg-white rounded-2xl border-2 border-[#48021C]/25 shadow-xs overflow-hidden">
+          <div class="py-2.5 px-4 md:px-5 border-b border-[#48021C]/15 bg-[#eddde1]/70">
+            <h2 class="text-sm font-bold text-[#3b141e] m-0">Incidencias</h2>
+          </div>
+          <div class="p-4 md:p-5 space-y-3">
+            @for (inc of doc.incidents; track inc.id) {
+              <div class="rounded-xl border px-3.5 py-2.5 text-xs space-y-2" [class.border-rose-200]="inc.status === 'open'" [class.bg-rose-50]="inc.status === 'open'" [class.border-[#48021C]/15]="inc.status !== 'open'">
+                <div class="flex items-center justify-between gap-2">
+                  <p class="font-bold text-slate-800 m-0">
+                    {{ inc.productName }} · {{ inc.quantity | number: '1.0-2' }}
+                  </p>
+                  <app-status-badge
+                    [value]="inc.status === 'open' ? 'Abierta' : 'Resuelta'"
+                    [severity]="inc.status === 'open' ? 'danger' : 'success'"
+                    size="xs"
+                  />
+                </div>
+                <p class="text-slate-600 m-0">{{ inc.description }}</p>
+                @if (inc.attachmentUrls?.length) {
+                  <div class="flex gap-1">
+                    @for (url of inc.attachmentUrls; track url) {
+                      <a [href]="url" target="_blank" rel="noopener">
+                        <img [src]="url" class="w-12 h-12 rounded object-cover border border-[#48021C]/20" alt="Anexo" />
+                      </a>
+                    }
+                  </div>
+                }
+                @if (inc.status === 'open' && canResolveIncident()) {
+                  <textarea
+                    pTextarea
+                    rows="2"
+                    class="w-full text-xs font-medium !bg-rose-50/40 !border-[#48021C]/25 !rounded-xl p-2.5"
+                    [(ngModel)]="resolutionNotes[inc.id]"
+                    placeholder="Notas de resolución"
+                  ></textarea>
+                  <app-primary-button label="Resolver" icon="pi pi-check" [loading]="saving()" (clicked)="resolve(inc.id)" />
+                } @else if (inc.resolutionNotes) {
+                  <p class="text-slate-500 m-0">Resolución: {{ inc.resolutionNotes }}</p>
+                }
+              </div>
+            }
+          </div>
+        </section>
+      }
+
+      @if (doc.notes) {
+        <section class="bg-white rounded-2xl border-2 border-[#48021C]/25 shadow-xs overflow-hidden">
+          <div class="py-2.5 px-4 md:px-5 border-b border-[#48021C]/15 bg-[#eddde1]/70">
+            <h2 class="text-sm font-bold text-[#3b141e] m-0">Notas</h2>
+          </div>
+          <p class="p-4 md:p-5 text-sm text-slate-700 m-0">{{ doc.notes }}</p>
+        </section>
+      }
+
+      @if (canReceive()) {
+        <section class="bg-white rounded-2xl border-2 border-[#48021C]/25 shadow-xs p-4 md:p-5 space-y-3">
+          <label class="flex items-center gap-2 text-sm text-slate-700 font-medium cursor-pointer">
+            <p-checkbox [(ngModel)]="registerAsWaste" [binary]="true" />
+            El faltante en tránsito se da por merma (cierra sin dejar incidencia)
+          </label>
+          <app-primary-button label="Recibir en planta" icon="pi pi-inbox" [loading]="saving()" (clicked)="receive()" />
+        </section>
+      }
+    }
+  </div>
+</div>

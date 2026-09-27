@@ -183,36 +183,36 @@
   </div>
 </div>
 
-<!-- Modal: Movimientos de Inventario (Reutilizable Standard Modal) -->
+@if (showMovementsModal) {
 <app-standard-modal
   [(visible)]="showMovementsModal"
   title="Movimientos de Inventario"
-  [badge]="movementsComp.totalRecords + ' registros'"
+  [badge]="(movementsComp?.totalRecords || 0) === 1 ? '1 registro' : (movementsComp?.totalRecords || 0) + ' registros'"
   maxWidth="1400px"
   maxHeight="90vh"
   (closed)="showMovementsModal = false"
 >
-  <!-- Slot de Acciones Superiores del Modal -->
   <ng-container actions>
     <app-refresh-button 
-      [loading]="movementsComp.loading" 
-      (refresh)="movementsComp.loadInventoryMovements()" 
+      [loading]="!!movementsComp?.loading" 
+      (refresh)="movementsComp?.loadInventoryMovements()" 
     />
 
     <app-primary-button
       label="Registrar Nuevo Movimiento"
-      (clicked)="movementsComp.recordMovement()"
+      (clicked)="movementsComp?.recordMovement()"
     />
   </ng-container>
 
-  <!-- Contenido Interior: Tabla de Movimientos -->
   <app-inventory-movements 
     #movementsComp
-    [isModal]="true" 
+    [isModal]="true"
+    [selectedBranchId]="selectedBranchId || null"
     (onClose)="showMovementsModal = false"
     (onMovementChange)="loadInventories()"
   />
 </app-standard-modal>
+}
 
 <!-- Modal: Generar Nuevo Inventario (Reutilizable Standard Modal) -->
 <app-standard-modal

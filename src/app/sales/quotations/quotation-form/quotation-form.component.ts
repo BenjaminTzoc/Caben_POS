@@ -1,7 +1,8 @@
 import { Component, OnInit, inject, ViewChild, ElementRef } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, FormArray, ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
-import { MessageService, ConfirmationService } from 'primeng/api';
+import { MessageService } from 'primeng/api';
+import { ConfirmService } from '../../../shared/services/confirm.service';
 import { CommonModule, CurrencyPipe } from '@angular/common';
 
 // PrimeNG
@@ -12,7 +13,6 @@ import { InputNumberModule } from 'primeng/inputnumber';
 import { ToggleSwitchModule } from 'primeng/toggleswitch';
 import { TableModule } from 'primeng/table';
 import { TextareaModule } from 'primeng/textarea';
-import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { DrawerModule } from 'primeng/drawer';
 import { IconFieldModule } from 'primeng/iconfield';
 import { InputIconModule } from 'primeng/inputicon';
@@ -50,7 +50,6 @@ import { ConfirmationModalComponent } from '../../../shared/components/confirmat
     ToggleSwitchModule,
     TableModule,
     TextareaModule,
-    ConfirmDialogModule,
     DrawerModule,
     IconFieldModule,
     InputIconModule,
@@ -72,7 +71,7 @@ export class QuotationFormComponent implements OnInit {
   private appliedPrices = inject(CustomerAppliedPricesService);
   private saleCalculator = inject(SaleCalculatorService);
   private messageService = inject(MessageService);
-  private confirmationService = inject(ConfirmationService);
+  private confirmService = inject(ConfirmService);
   private router = inject(Router);
   private route = inject(ActivatedRoute);
   private authService = inject(AuthService);
@@ -254,12 +253,12 @@ export class QuotationFormComponent implements OnInit {
     const newBranchId = event.value;
     
     if (this.items.length > 0) {
-      this.confirmationService.confirm({
+      this.confirmService.confirm({
         message: 'Si cambia la sucursal, se limpiarán los productos agregados. ¿Desea continuar?',
         header: 'Confirmar cambio de sucursal',
         icon: 'pi pi-exclamation-triangle',
-        acceptLabel: 'Sí, cambiar',
-        rejectLabel: 'Cancelar',
+        confirmLabel: 'Sí, cambiar',
+        cancelLabel: 'Cancelar',
         accept: () => {
           this.items.clear();
           this.calculateTotals();
