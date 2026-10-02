@@ -169,4 +169,22 @@ export class ReportsService {
       params,
     });
   }
+
+  generateWeeklyConsolidatedPdf(
+    customerId?: string,
+    startDate?: string,
+    endDate?: string,
+    branchId?: string
+  ): Observable<Blob> {
+    let params = new HttpParams();
+    if (customerId) params = params.set('customerId', customerId);
+    if (startDate) params = params.set('startDate', startDate);
+    if (endDate) params = params.set('endDate', endDate);
+    if (branchId) params = params.set('branchId', branchId);
+
+    return this.http.get(`${this.apiUrl}/weekly-consolidated/pdf`, {
+      params,
+      responseType: 'blob',
+    });
+  }
 }

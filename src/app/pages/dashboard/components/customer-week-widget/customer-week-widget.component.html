@@ -257,14 +257,25 @@
             }
           </div>
         </div>
-        <button
-          type="button"
-          class="inline-flex items-center gap-1.5 shrink-0 rounded-xl border border-[#9f6587]/35 bg-white px-2.5 py-1.5 text-[11px] font-bold text-[#48021C] hover:bg-[#9f6587]/15 cursor-pointer"
-          (click)="closeDetail()"
-        >
-          <i class="pi pi-chevron-left text-[10px]"></i>
-          Volver
-        </button>
+        <div class="flex items-center gap-1.5 shrink-0">
+          <button
+            type="button"
+            class="inline-flex items-center gap-1.5 rounded-xl border border-[#9f6587]/35 bg-white px-2.5 py-1.5 text-[11px] font-bold text-[#48021C] hover:bg-[#9f6587]/15 cursor-pointer"
+            (click)="openPreview(c)"
+            pTooltip="Ver documento consolidado semanal"
+          >
+            <i class="pi pi-file-pdf text-[11px] text-rose-600"></i>
+            Ver Documento
+          </button>
+          <button
+            type="button"
+            class="inline-flex items-center gap-1.5 rounded-xl border border-[#9f6587]/35 bg-white px-2.5 py-1.5 text-[11px] font-bold text-[#48021C] hover:bg-[#9f6587]/15 cursor-pointer"
+            (click)="closeDetail()"
+          >
+            <i class="pi pi-chevron-left text-[10px]"></i>
+            Volver
+          </button>
+        </div>
       </div>
 
       <div class="customer-week-detail-body">
@@ -360,4 +371,11 @@
       </div>
     </aside>
   }
+
+  <app-weekly-consolidated-preview
+    [customer]="previewCustomer()"
+    [period]="activePeriod()"
+    [branchId]="dashboardFilter.branchId() || undefined"
+    [(visible)]="previewModalVisible"
+  />
 </div>

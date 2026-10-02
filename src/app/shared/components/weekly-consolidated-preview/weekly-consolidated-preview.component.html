@@ -1,0 +1,198 @@
+<p-dialog
+  [(visible)]="visible"
+  [modal]="true"
+  [showHeader]="false"
+  [dismissableMask]="true"
+  [style]="{ width: '850px', 'max-width': '95vw', 'max-height': '94vh' }"
+  contentStyleClass="!p-4 sm:!p-5 !overflow-hidden flex flex-col"
+  [draggable]="false"
+  [resizable]="false"
+  appendTo="body"
+  styleClass="rounded-2xl overflow-hidden shadow-2xl bg-white"
+  (onHide)="onClose()"
+>
+  <div class="preview-content flex flex-col h-full min-h-0 max-h-[88vh]" *ngIf="customer">
+    <!-- Header with Title and Close Button -->
+    <div class="flex items-center justify-between pb-2 mb-2 border-b border-slate-100 flex-shrink-0">
+      <h3 class="text-sm font-semibold text-slate-800 tracking-tight leading-none m-0">
+        Consolidado Semanal <span class="text-slate-500 text-xs font-normal">· {{ customer.name }}</span>
+      </h3>
+      <button 
+        type="button" 
+        (click)="onClose()"
+        class="w-7 h-7 -mr-1 rounded-lg flex items-center justify-center text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition-colors border-none bg-transparent cursor-pointer"
+        pTooltip="Cerrar vista previa"
+      >
+        <i class="pi pi-times text-xs"></i>
+      </button>
+    </div>
+
+    <!-- DOCUMENT WRAPPER WITH SCROLL -->
+    <div class="ticket-wrapper flex-1 min-h-0 overflow-y-auto">
+      <div id="weekly-consolidated-doc" class="ticket-container">
+        
+        <!-- HEADER BANNER CELESTE (IDENTICO A LA MUESTRA) -->
+        <div class="header">
+          <div class="logo-container">
+            <img [src]="companyInfo.logo" class="logo" alt="Logo" />
+            <div class="company-details">
+              <p class="company-info">{{ companyInfo.address }}</p>
+              <p class="company-info" *ngIf="companyInfo.phone">Tel: {{ companyInfo.phone }}</p>
+              <p class="company-info" *ngIf="companyInfo.nit">NIT: {{ companyInfo.nit }}</p>
+            </div>
+          </div>
+          <div class="document-badge">
+            <h2 class="ticket-title">CONSOLIDADO SEMANAL</h2>
+            <div class="document-number">{{ periodLabel() }}</div>
+          </div>
+        </div>
+
+        <!-- INFORMACIÓN DEL CLIENTE Y DETALLES DE LA EMISIÓN (FORMATO FORMAL EXACTO) -->
+        <div class="info-section">
+          <div class="info-block">
+            <h3>Información del Cliente</h3>
+            <p><strong>Nombre:</strong> {{ customerDetails()?.name || customer.name }}</p>
+            <p><strong>NIT:</strong> {{ customerDetails()?.nit || 'C/F' }}</p>
+            <p *ngIf="customerDetails()?.phone"><strong>Teléfono:</strong> {{ customerDetails()?.phone }}</p>
+            <p><strong>Categoría:</strong> {{ customer.category.name || 'General' }}</p>
+            <p *ngIf="customerDetails()?.address"><strong>Dirección:</strong> {{ customerDetails()?.address }}</p>
+          </div>
+          <div class="info-block">
+            <h3>Detalles de la Emisión</h3>
+            <p><strong>Fecha de Emisión:</strong> {{ today | date: 'dd/MM/yyyy HH:mm' }}</p>
+            <p><strong>Periodo:</strong> {{ periodLabel() }}</p>
+            <p><strong>Sucursal:</strong> {{ branchName() }}</p>
+            <p><strong>Tipo:</strong> Consolidado por Cliente</p>
+          </div>
+        </div>
+
+        <!-- 3 KPI BOXES FORMALES (Gastó, Pedidos, Prom. x pedido) -->
+        <div class="kpi-boxes-grid">
+          <div class="kpi-box">
+            <span class="kpi-box-label">Gastó</span>
+            <span class="kpi-box-value">{{ customer.total | currency:'Q':'symbol':'1.0-0' }}</span>
+          </div>
+          <div class="kpi-box">
+            <span class="kpi-box-label">Pedidos</span>
+            <span class="kpi-box-value">{{ customer.orderCount }}</span>
+          </div>
+          <div class="kpi-box">
+            <span class="kpi-box-label">Prom. x pedido</span>
+            <span class="kpi-box-value">{{ customer.averageTicket | currency:'Q':'symbol':'1.0-0' }}</span>
+          </div>
+        </div>
+
+        <!-- GASTOS POR DIA (HISTOGRAMA LIMPIO FORMAL) -->
+        <div class="chart-section">
+          <h4 class="section-heading">Gastos por día</h4>
+          <div class="days-chart-container">
+            <div *ngFor="let d of customer.days" class="day-col">
+              <div class="day-bar-wrapper">
+                <div 
+                  class="day-bar" 
+                  [class.is-empty]="d.total === 0"
+                  [style.height.%]="d.total === 0 ? 2 : barHeight(d.total)"
+                ></div>
+              </div>
+              <span class="day-amount" [class.empty-amount]="d.total === 0">{{ dayAmountLabel(d.total) }}</span>
+              <span class="day-name">{{ d.day }}</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- 2 BOXES FORMALES (Cobrado/Saldo y Crédito) -->
+        <div class="balances-grid">
+          <div class="balance-box">
+            <span class="balance-box-title">Cobrado / saldo</span>
+            <p class="balance-paid-text">{{ customer.paidAmount | currency:'Q':'symbol':'1.2-2' }}</p>
+            <p class="balance-pending-text">Pendiente {{ customer.pendingAmount | currency:'Q':'symbol':'1.2-2' }}</p>
+          </div>
+          <div class="balance-box">
+            <span class="balance-box-title">Crédito</span>
+            <ng-container *ngIf="customer.creditLimit > 0; else noCreditBlock">
+              <p class="balance-credit-main">{{ creditPercent() }}% usado</p>
+              <p class="balance-credit-sub">{{ customer.creditUsed | currency:'Q':'symbol':'1.2-2' }} de {{ customer.creditLimit | currency:'Q':'symbol':'1.2-2' }}</p>
+            </ng-container>
+            <ng-template #noCreditBlock>
+              <p class="balance-credit-main">Sin línea de crédito</p>
+              <p class="balance-credit-sub">Modalidad contado</p>
+            </ng-template>
+          </div>
+        </div>
+
+        <!-- PRODUCTOS MÁS CONSUMIDOS (DISEÑO FORMAL DE LÍNEAS PROPORCIONALES) -->
+        <div class="mix-section">
+          <h4 class="section-heading">Productos más consumidos</h4>
+          
+          <div *ngIf="customer.mix.length === 0" class="empty-mix-text">
+            Sin compras en este periodo.
+          </div>
+
+          <div *ngIf="customer.mix.length > 0" class="mix-list">
+            <div *ngFor="let item of customer.mix" class="mix-row">
+              <div class="mix-header-line">
+                <span class="mix-product-name">{{ item.productName }}</span>
+                <span class="mix-product-total">{{ item.revenue | currency:'Q':'symbol':'1.0-0' }} · {{ item.share }}%</span>
+              </div>
+              <div class="mix-bar-track">
+                <div class="mix-bar-fill" [style.width.%]="item.share"></div>
+              </div>
+              <span *ngIf="item.quantity > 0" class="mix-qty-text">{{ item.quantity }} {{ item.unit }}</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- PIE FORMAL -->
+        <div class="footer-meta">
+          <p *ngIf="customer.lastPurchaseDate">
+            Última compra: {{ formatIsoDate(customer.lastPurchaseDate) }}
+          </p>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ACTIONS FOOTER -->
+    <div class="actions-grid mt-2.5 pt-2.5 border-t border-slate-100 flex-shrink-0">
+      <p-button
+        label="Imprimir"
+        icon="pi pi-print"
+        severity="primary"
+        [loading]="isPrinting()"
+        (click)="onPrint()"
+        styleClass="w-full"
+      >
+      </p-button>
+
+      <p-button
+        label="Descargar"
+        icon="pi pi-download"
+        severity="secondary"
+        [loading]="isDownloading()"
+        (click)="onDownload()"
+        styleClass="w-full"
+      >
+      </p-button>
+
+      <p-button
+        label="Enviar Email"
+        icon="pi pi-envelope"
+        severity="info"
+        [loading]="isSendingEmail()"
+        (click)="onSendEmail()"
+        styleClass="w-full"
+      >
+      </p-button>
+
+      <p-button
+        label="WhatsApp"
+        icon="pi pi-whatsapp"
+        severity="success"
+        [loading]="isSendingWhatsApp()"
+        (click)="onSendWhatsApp()"
+        styleClass="w-full"
+      >
+      </p-button>
+    </div>
+  </div>
+</p-dialog>

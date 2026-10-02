@@ -1,0 +1,391 @@
+.preview-content {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  padding-top: 0;
+}
+
+.ticket-wrapper {
+  background-color: #f1f5f9;
+  padding: 1.5rem 1rem;
+  border-radius: 8px;
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.06);
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+}
+
+.ticket-wrapper::-webkit-scrollbar {
+  width: 6px;
+}
+
+.ticket-wrapper::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.ticket-wrapper::-webkit-scrollbar-thumb {
+  background: #ccc;
+  border-radius: 10px;
+}
+
+.ticket-wrapper::-webkit-scrollbar-thumb:hover {
+  background: #bbb;
+}
+
+.actions-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0.75rem;
+  width: 100%;
+}
+
+@media (max-width: 640px) {
+  .actions-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+/* ===================================================
+   DOCUMENT CONTAINER (EXACT TO TICKET/RECIBO/FACTURA)
+   =================================================== */
+.ticket-container {
+  width: 190mm;
+  max-width: 100%;
+  padding: 8mm 10mm;
+  background-color: #ffffff;
+  color: #1e293b;
+  font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+  font-size: 9.5pt;
+  line-height: 1.5;
+  box-sizing: border-box;
+  border-radius: 8px;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+}
+
+/* HEADER BANNER CELESTE */
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 5mm;
+  background-color: #c9eafc;
+  border-radius: 10px;
+  padding: 3.5mm 5mm;
+}
+
+.logo-container {
+  display: flex;
+  align-items: center;
+  gap: 5mm;
+  flex: 1;
+}
+
+.logo {
+  max-width: 24mm;
+  max-height: 22mm;
+  object-fit: contain;
+}
+
+.company-details {
+  display: flex;
+  flex-direction: column;
+}
+
+.company-info {
+  margin: 0.5mm 0;
+  font-size: 8pt;
+  color: #334155;
+  line-height: 1.35;
+}
+
+.document-badge {
+  text-align: right;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+}
+
+.ticket-title {
+  font-size: 13pt;
+  font-weight: 700;
+  color: #1e3a8a;
+  letter-spacing: 0.5px;
+  margin: 0 0 1.5mm 0;
+}
+
+.document-number {
+  background-color: #ffffff;
+  border: 1px solid #bfdbfe;
+  color: #1e40af;
+  font-weight: 600;
+  padding: 1mm 3.5mm;
+  border-radius: 6px;
+  display: inline-block;
+  font-size: 8.5pt;
+}
+
+/* INFORMACIÓN DEL CLIENTE Y DETALLES DE EMISIÓN */
+.info-section {
+  display: grid;
+  grid-template-columns: 1.1fr 0.9fr;
+  gap: 5mm;
+  margin-bottom: 5mm;
+  background-color: #f8fafc;
+  padding: 3.5mm 4mm;
+  border-radius: 6px;
+  border: 1px solid #e2e8f0;
+}
+
+.info-block h3 {
+  margin: 0 0 1.5mm 0;
+  font-size: 8pt;
+  text-transform: uppercase;
+  color: #64748b;
+  letter-spacing: 0.5px;
+  font-weight: 700;
+}
+
+.info-block p {
+  margin: 1mm 0;
+  font-size: 9pt;
+  color: #334155;
+  line-height: 1.4;
+}
+
+.info-block p strong {
+  font-weight: 600;
+  color: #1e293b;
+}
+
+/* 3 KPI BOXES FORMALES */
+.kpi-boxes-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 3.5mm;
+  margin-bottom: 5mm;
+}
+
+.kpi-box {
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
+  padding: 3mm 4mm;
+  background: #ffffff;
+  display: flex;
+  flex-direction: column;
+  gap: 1mm;
+}
+
+.kpi-box-label {
+  font-size: 8pt;
+  font-weight: 600;
+  color: #64748b;
+  margin: 0;
+}
+
+.kpi-box-value {
+  font-size: 13pt;
+  font-weight: 700;
+  color: #0f172a;
+  margin: 0;
+  line-height: 1.2;
+}
+
+/* SECTION HEADINGS FORMALES */
+.section-heading {
+  text-align: center;
+  font-size: 9.5pt;
+  font-weight: 700;
+  color: #0f172a;
+  margin: 0 0 3mm 0;
+}
+
+.chart-section {
+  margin-bottom: 5mm;
+}
+
+/* HISTOGRAMA DE DÍAS (LIMPIO, ELEGANTE) */
+.days-chart-container {
+  display: flex;
+  align-items: flex-end;
+  gap: 2mm;
+  height: 28mm;
+  padding-bottom: 1mm;
+}
+
+.day-col {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  height: 100%;
+  justify-content: flex-end;
+}
+
+.day-bar-wrapper {
+  width: 100%;
+  height: 20mm;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+}
+
+.day-bar {
+  width: 75%;
+  max-width: 14mm;
+  background-color: #48021c;
+  border-radius: 3px 3px 0 0;
+  min-height: 2px;
+}
+
+.day-bar.is-empty {
+  background-color: #e2e8f0;
+  height: 2px !important;
+}
+
+.day-amount {
+  font-size: 7.5pt;
+  font-weight: 600;
+  color: #0f172a;
+  margin-top: 1.5mm;
+  line-height: 1;
+}
+
+.day-amount.empty-amount {
+  color: #cbd5e1;
+}
+
+.day-name {
+  font-size: 8pt;
+  font-weight: 600;
+  color: #475569;
+  margin-top: 1mm;
+  line-height: 1;
+}
+
+/* 2 BALANCES BOXES */
+.balances-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4mm;
+  margin-bottom: 5mm;
+}
+
+.balance-box {
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
+  padding: 3.5mm 4mm;
+  background: #ffffff;
+  display: flex;
+  flex-direction: column;
+  gap: 1mm;
+}
+
+.balance-box-title {
+  font-size: 8pt;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.balance-paid-text {
+  font-size: 11pt;
+  font-weight: 700;
+  color: #047857;
+  margin: 0;
+  line-height: 1.2;
+}
+
+.balance-pending-text {
+  font-size: 8.5pt;
+  font-weight: 600;
+  color: #e11d48;
+  margin: 0;
+}
+
+.balance-credit-main {
+  font-size: 11pt;
+  font-weight: 700;
+  color: #0f172a;
+  margin: 0;
+  line-height: 1.2;
+}
+
+.balance-credit-sub {
+  font-size: 8.5pt;
+  font-weight: 500;
+  color: #475569;
+  margin: 0;
+}
+
+/* PRODUCTOS MÁS CONSUMIDOS (LÍNEAS) */
+.mix-section {
+  margin-bottom: 4mm;
+}
+
+.empty-mix-text {
+  text-align: center;
+  color: #64748b;
+  font-size: 8.5pt;
+  padding: 3mm 0;
+}
+
+.mix-list {
+  display: flex;
+  flex-direction: column;
+  gap: 3mm;
+}
+
+.mix-row {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8mm;
+}
+
+.mix-header-line {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 8.5pt;
+}
+
+.mix-product-name {
+  font-weight: 600;
+  color: #0f172a;
+}
+
+.mix-product-total {
+  font-weight: 600;
+  color: #0f172a;
+}
+
+.mix-bar-track {
+  height: 4px;
+  background-color: #f1f5f9;
+  border-radius: 9999px;
+  overflow: hidden;
+}
+
+.mix-bar-fill {
+  height: 100%;
+  background-color: #48021c;
+  border-radius: 9999px;
+}
+
+.mix-qty-text {
+  font-size: 7.5pt;
+  font-weight: 600;
+  color: #64748b;
+}
+
+/* FOOTER META */
+.footer-meta {
+  font-size: 8.5pt;
+  font-weight: 600;
+  color: #1e293b;
+  margin-top: 2mm;
+}
+
+.footer-meta p {
+  margin: 0;
+}

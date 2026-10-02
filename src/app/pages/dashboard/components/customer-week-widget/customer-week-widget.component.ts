@@ -5,7 +5,9 @@ import { TooltipModule } from 'primeng/tooltip';
 import { DatePickerModule } from 'primeng/datepicker';
 import { SearchInputComponent } from '../../../../shared/components/search-input/search-input.component';
 import { StatusBadgeComponent } from '../../../../shared/components/status-badge/status-badge.component';
+import { WeeklyConsolidatedPreviewComponent } from '../../../../shared/components/weekly-consolidated-preview/weekly-consolidated-preview.component';
 import { ReportsService } from '../../../../core/services/reports.service';
+import { PrintService } from '../../../../shared/services/print.service';
 import { DashboardFilterService } from '../../dashboard-filter.service';
 import {
   CustomerWeeklyItemDto,
@@ -27,13 +29,15 @@ const GUEST_KEY = '__guest__';
     DatePickerModule,
     SearchInputComponent,
     StatusBadgeComponent,
+    WeeklyConsolidatedPreviewComponent,
   ],
   templateUrl: './customer-week-widget.component.html',
   styleUrl: './customer-week-widget.component.css',
 })
 export class CustomerWeekWidgetComponent {
   private reportsService = inject(ReportsService);
-  private dashboardFilter = inject(DashboardFilterService);
+  private printService = inject(PrintService);
+  dashboardFilter = inject(DashboardFilterService);
   private host = inject(ElementRef<HTMLElement>);
 
   weekStart = signal<Date>(this.toMonday(new Date()));
@@ -45,6 +49,9 @@ export class CustomerWeekWidgetComponent {
   period = signal<{ start: string; end: string } | null>(null);
   serverKpis = signal<CustomerWeeklyKpisDto | null>(null);
   isLoading = signal(false);
+  downloadingPdf = signal(false);
+  previewModalVisible = signal(false);
+  previewCustomer = signal<CustomerWeeklyItemDto | null>(null);
   errorMessage = signal<string | null>(null);
 
   weekNumber = computed(() => {
@@ -218,6 +225,66 @@ export class CustomerWeekWidgetComponent {
 
   setAudience(value: AudienceFilter) {
     this.audience.set(value);
+  }
+
+  openPreview(customer: CustomerWeeklyItemDto, event?: Event): void {
+    if (event) {
+      event.stopPropagation();
+    }
+    this.previewCustomer.set(customer);
+    this.previewModalVisible.set(true);
+  }
+
+  activePeriod = computed<{ start: string; end: string }>(() => {
+    const period = this.period();
+    if (period) {
+      return period;
+    }
+    const start = this.toIsoDate(this.weekStart());
+    const end = new Date(this.weekStart());
+    end.setDate(end.getDate() + 6);
+    return {
+      start,
+      end: this.toIsoDate(end),
+    };
+  });
+
+  downloadWeeklyPdf(customer?: CustomerWeeklyItemDto, event?: Event): void {
+    if (event) {
+      event.stopPropagation();
+    }
+
+    const period = this.period();
+    let startDate: string;
+    let endDate: string;
+
+    if (period) {
+      startDate = period.start;
+      endDate = period.end;
+    } else {
+      startDate = this.toIsoDate(this.weekStart());
+      const end = new Date(this.weekStart());
+      end.setDate(end.getDate() + 6);
+      endDate = this.toIsoDate(end);
+    }
+
+    const customerId = customer?.id && customer.id !== GUEST_KEY ? customer.id : undefined;
+    const branchId = this.dashboardFilter.branchId() || undefined;
+
+    this.downloadingPdf.set(true);
+
+    this.reportsService.generateWeeklyConsolidatedPdf(customerId, startDate, endDate, branchId).subscribe({
+      next: (blob: Blob) => {
+        const safeName = customer?.name ? customer.name.replace(/[^a-zA-Z0-9_-]/g, '_') : 'General';
+        const fileName = `Consolidado_Semanal_${safeName}_${startDate}_${endDate}`;
+        this.printService.downloadPDF(blob, fileName);
+        this.downloadingPdf.set(false);
+      },
+      error: (err) => {
+        this.errorMessage.set(this.readError(err) || 'Error al descargar el PDF consolidado semanal');
+        this.downloadingPdf.set(false);
+      },
+    });
   }
 
   formatIsoDate(value: string): string {
