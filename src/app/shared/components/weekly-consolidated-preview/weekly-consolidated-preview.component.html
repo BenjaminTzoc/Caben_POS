@@ -184,15 +184,22 @@
       >
       </p-button>
 
-      <p-button
-        label="WhatsApp"
-        icon="pi pi-whatsapp"
-        severity="success"
-        [loading]="isSendingWhatsApp()"
-        (click)="onSendWhatsApp()"
-        styleClass="w-full"
+      <span 
+        class="w-full inline-block" 
+        pTooltip="La plantilla de WhatsApp para este envío aún no ha sido habilitada" 
+        tooltipPosition="top"
       >
-      </p-button>
+        <p-button
+          label="WhatsApp"
+          icon="pi pi-whatsapp"
+          severity="success"
+          [disabled]="true"
+          [loading]="isSendingWhatsApp()"
+          (click)="onSendWhatsApp()"
+          styleClass="w-full"
+        >
+        </p-button>
+      </span>
     </div>
   </div>
 </p-dialog>
