@@ -1,95 +1,108 @@
-import { Component, EventEmitter, inject, Input, Output, OnInit, OnDestroy, HostListener, signal, computed } from '@angular/core';
-import { AuthService } from '../../auth/auth.service';
+import { Component, EventEmitter, inject, Input, Output, signal, computed, HostListener, OnInit, OnDestroy } from '@angular/core';
+import { CommonModule } from '@angular/common';
 import { Router, NavigationEnd, RouterModule } from '@angular/router';
-import { MenuItem } from '../sidebar/menu-items';
-import { Subscription, filter } from 'rxjs';
-import { CashRegisterService } from '../../inventory/services/cash-register.service';
-import { CommonModule, DatePipe, CurrencyPipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { TooltipModule } from 'primeng/tooltip';
-import { ButtonModule } from 'primeng/button';
-import { DrawerModule } from 'primeng/drawer';
-import { DialogModule } from 'primeng/dialog';
-import { IconFieldModule } from 'primeng/iconfield';
-import { InputIconModule } from 'primeng/inputicon';
-import { InputTextModule } from 'primeng/inputtext';
-import { trigger, style, transition, animate } from '@angular/animations';
+import { trigger, state, style, transition, animate } from '@angular/animations';
+import { filter, Subscription } from 'rxjs';
+
+import { AuthService } from '../../auth/auth.service';
+import { CashRegisterService } from '../../inventory/services/cash-register.service';
+import { BranchContextService } from '../../core/services/branch-context.service';
+import { ThemeService } from '../../core/services/theme.service';
 import { CashSessionDialogComponent } from '../../shared/components/cash-session-dialog/cash-session-dialog.component';
+import { MenuItem } from '../sidebar/menu-items';
 import { CompanySettingsComponent } from '../../pages/company-settings/company-settings.component';
 
-export interface CommandItem {
+import { TooltipModule } from 'primeng/tooltip';
+import { DialogModule } from 'primeng/dialog';
+import { DrawerModule } from 'primeng/drawer';
+
+interface CommandItem {
   label: string;
   category: string;
   icon: string;
   route: string;
   description?: string;
-  badge?: string;
 }
 
 @Component({
   selector: 'app-header',
   standalone: true,
   imports: [
-    CommonModule, 
+    CommonModule,
+    RouterModule,
     FormsModule,
-    TooltipModule, 
-    ButtonModule, 
-    DrawerModule, 
-    DialogModule,
-    IconFieldModule,
-    InputIconModule,
-    InputTextModule,
-    RouterModule, 
     CashSessionDialogComponent,
     CompanySettingsComponent,
+    TooltipModule,
+    DialogModule,
+    DrawerModule,
   ],
   templateUrl: './header.component.html',
-  styleUrl: './header.component.css',
+  styleUrls: ['./header.component.css'],
   animations: [
     trigger('submenuAnimation', [
       transition(':enter', [
-        style({ height: '0', opacity: 0, overflow: 'hidden' }),
-        animate('140ms ease-out', style({ height: '*', opacity: 1 }))
+        style({ height: '0', opacity: 0 }),
+        animate('200ms ease-out', style({ height: '*', opacity: 1 }))
       ]),
       transition(':leave', [
-        style({ height: '*', opacity: 1, overflow: 'hidden' }),
-        animate('100ms ease-in', style({ height: '0', opacity: 0 }))
+        style({ height: '*', opacity: 1 }),
+        animate('150ms ease-in', style({ height: '0', opacity: 0 }))
       ])
     ])
   ]
 })
 export class HeaderComponent implements OnInit, OnDestroy {
-  private authService = inject(AuthService);
-  private router = inject(Router);
-  private cashService = inject(CashRegisterService);
-
   @Input() sidebarCollapsed = false;
   @Output() toggleSidebar = new EventEmitter<boolean>();
-  
-  // UI State Signals
-  mobileMenuVisible = signal(false);
+
+  private authService = inject(AuthService);
+  private cashService = inject(CashRegisterService);
+  private branchContext = inject(BranchContextService);
+  public themeService = inject(ThemeService);
+  private router = inject(Router);
+
+  // Modals & Drawers
   showCashDialog = signal(false);
+  mobileMenuVisible = signal(false);
   searchModalVisible = signal(false);
   searchQuery = signal('');
   notificationsOpen = signal(false);
   userMenuOpen = signal(false);
+  branchMenuOpen = signal(false);
   showCompanySettings = signal(false);
   
   // Live Clock
   currentTime = signal(new Date());
   private clockInterval?: any;
 
-  menuItems = computed(() => this.authService.mainMenuSignal());
+  // Active Branch Context
+  currentBranch = computed(() => this.branchContext.currentBranch());
+  isSuperAdmin = computed(() => this.authService.isSuperAdmin);
+
+  menuItems = computed(() => {
+    const items = this.authService.mainMenuSignal();
+    if (!this.branchContext.isGlobalView) {
+      return items.filter(
+        (item) =>
+          item.label.toLowerCase() !== 'catálogos' &&
+          item.label.toLowerCase() !== 'catalogos' &&
+          item.route !== '/catalogs'
+      );
+    }
+    return items;
+  });
   expandedItem: string | null = null;
   activeRoute = '';
   private routerSub?: Subscription;
 
-  // Dynamic Command Palette Items generated from current authenticated menu
+  // Dynamic Command Palette Items
   commandList = computed<CommandItem[]>(() => {
     const items: CommandItem[] = [];
     const addedRoutes = new Set<string>();
 
-    const main = this.authService.mainMenuSignal() || [];
+    const main = this.menuItems() || [];
     const recurrent = this.authService.recurrentMenuSignal() || [];
 
     const processItem = (item: MenuItem, categoryName?: string) => {
@@ -137,7 +150,6 @@ export class HeaderComponent implements OnInit, OnDestroy {
     });
   });
 
-  // Dynamic Breadcrumb based on active route
   currentSectionInfo = computed(() => {
     const url = this.activeRoute;
     if (url.startsWith('/sales/orders')) return { title: 'Órdenes de Venta', module: 'Ventas', icon: 'pi pi-shopping-cart' };
@@ -156,7 +168,6 @@ export class HeaderComponent implements OnInit, OnDestroy {
     return { title: 'Panel de Control', module: 'Dashboard', icon: 'pi pi-home' };
   });
 
-  // Notifications
   notifications = [
     { id: 1, title: 'Caja Principal', text: 'Turno de caja activo y sincronizado', time: 'En vivo', icon: 'pi pi-wallet', type: 'success' },
     { id: 2, title: 'Órdenes de Hoy', text: 'Tienes órdenes pendientes de despacho', time: 'Hace 10 min', icon: 'pi pi-shopping-cart', type: 'info' },
@@ -186,7 +197,6 @@ export class HeaderComponent implements OnInit, OnDestroy {
     this.activeRoute = this.router.url;
     this.autoExpandActiveRoute();
     
-    // Live Clock Interval
     this.clockInterval = setInterval(() => {
       this.currentTime.set(new Date());
     }, 1000);
@@ -198,6 +208,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
       this.autoExpandActiveRoute();
       this.notificationsOpen.set(false);
       this.userMenuOpen.set(false);
+      this.branchMenuOpen.set(false);
     });
   }
 
@@ -208,7 +219,6 @@ export class HeaderComponent implements OnInit, OnDestroy {
     }
   }
 
-  // Keyboard shortcut Ctrl+K / Cmd+K
   @HostListener('window:keydown', ['$event'])
   handleKeyboardEvent(event: KeyboardEvent) {
     if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === 'k') {
@@ -217,7 +227,6 @@ export class HeaderComponent implements OnInit, OnDestroy {
     }
   }
 
-  // Spotlight Actions
   openSpotlight() {
     this.searchQuery.set('');
     this.searchModalVisible.set(true);
@@ -281,20 +290,30 @@ export class HeaderComponent implements OnInit, OnDestroy {
     this.showCompanySettings.set(true);
   }
 
+  goToSelectBranch(): void {
+    this.userMenuOpen.set(false);
+    this.branchMenuOpen.set(false);
+    this.router.navigate(['/select-branch']);
+  }
+
   logout(): void {
     this.userMenuOpen.set(false);
+    this.branchMenuOpen.set(false);
+    this.branchContext.clear();
     this.authService.logout();
   }
 
   toggleNotifications(event?: Event) {
     if (event) event.stopPropagation();
     this.userMenuOpen.set(false);
+    this.branchMenuOpen.set(false);
     this.notificationsOpen.set(!this.notificationsOpen());
   }
 
   toggleUserMenu(event?: Event) {
     if (event) event.stopPropagation();
     this.notificationsOpen.set(false);
+    this.branchMenuOpen.set(false);
     this.userMenuOpen.set(!this.userMenuOpen());
   }
 
@@ -302,5 +321,6 @@ export class HeaderComponent implements OnInit, OnDestroy {
   onDocumentClick() {
     this.notificationsOpen.set(false);
     this.userMenuOpen.set(false);
+    this.branchMenuOpen.set(false);
   }
 }

@@ -21,6 +21,11 @@ import { DecompositionService } from '../../services/decomposition.service';
 import { Product, ProductType } from '../../../inventory/interfaces/product.interface';
 import { Branch } from '../../../inventory/interfaces/branch.interface';
 import { ICreateDecomposition } from '../../interfaces/decomposition.interface';
+import { ThemeService } from '../../../core/services/theme.service';
+import { PageHeaderComponent } from '../../../shared/components/page-header/page-header.component';
+import { PrimaryButtonComponent } from '../../../shared/components/primary-button/primary-button.component';
+import { SecondaryButtonComponent } from '../../../shared/components/secondary-button/secondary-button.component';
+import { ConfirmationModalComponent } from '../../../shared/components/confirmation-modal/confirmation-modal.component';
 
 @Component({
   selector: 'app-decomposition-form',
@@ -36,11 +41,16 @@ import { ICreateDecomposition } from '../../interfaces/decomposition.interface';
     SelectModule,
     TableModule,
     TooltipModule,
-    CurrencyPipe
+    CurrencyPipe,
+    PageHeaderComponent,
+    PrimaryButtonComponent,
+    SecondaryButtonComponent,
+    ConfirmationModalComponent,
   ],
   templateUrl: './decomposition-form.component.html',
 })
 export class DecompositionFormComponent implements OnInit {
+  public themeService = inject(ThemeService);
   private fb = inject(FormBuilder);
   private productsService = inject(ProductsService);
   private branchesService = inject(BranchesService);
@@ -48,6 +58,8 @@ export class DecompositionFormComponent implements OnInit {
   private messageService = inject(MessageService);
   private router = inject(Router);
   private destroyRef = inject(DestroyRef);
+
+  showCancelConfirmModal = false;
 
   decompositionForm: FormGroup;
   loading = signal<boolean>(false);
@@ -268,6 +280,14 @@ export class DecompositionFormComponent implements OnInit {
 
   onCancel(): void {
     this.router.navigate(['/production/decomposition']);
+  }
+
+  confirmCancelProcess(): void {
+    if (this.decompositionForm.dirty || this.items.length > 0) {
+      this.showCancelConfirmModal = true;
+    } else {
+      this.onCancel();
+    }
   }
 
   getSelectedProduct(productId: string): Product | undefined {

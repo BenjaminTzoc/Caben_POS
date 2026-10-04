@@ -1,4 +1,4 @@
-<div class="py-4 px-0 md:px-6 bg-slate-50/50 min-h-screen">
+<div class="py-4 px-0 md:px-6 min-h-screen transition-colors duration-300" [ngClass]="themeService.isDarkMode() ? 'bg-[#0D1117]' : 'bg-slate-50/50'">
   <!-- Top Card: Reusable Page Header -->
   <app-page-header
     title="Inventarios"
@@ -23,14 +23,29 @@
 
     <!-- Filtros Inferiores -->
     <ng-container filters>
-      <!-- Branch Select Reutilizable -->
-      <app-branch-select
-        [branches]="branches"
-        [(ngModel)]="selectedBranchId"
-        [showClear]="isSuperAdmin"
-        [disabled]="!isSuperAdmin"
-        (selectionChange)="loadInventories()"
-      />
+      @if (!isConsolidatedMode() && activeWorkingBranch()?.id) {
+        <div class="flex items-center gap-2.5 px-3 py-2 border rounded-xl shadow-2xs shrink-0 transition-all" [ngClass]="themeService.isDarkMode() 
+              ? 'bg-[#161B22] border-[#30363D] text-[#F0F6FC]' 
+              : 'bg-rose-50/40 border-[#48021C]/25 text-slate-800'">
+          <span class="w-6 h-6 rounded-lg flex items-center justify-center shrink-0 border"
+            [ngClass]="activeWorkingBranch()?.isPlant
+                ? (themeService.isDarkMode() ? 'bg-emerald-950/50 text-emerald-400 border-emerald-800/60' : 'bg-emerald-50 text-emerald-700 border-emerald-200')
+                : (themeService.isDarkMode() ? 'bg-[#1C2D42] text-[#58A6FF] border-[#58A6FF]/30' : 'bg-sky-50 text-sky-700 border-sky-200')">
+            <i [class]="activeWorkingBranch()?.isPlant ? 'pi pi-server' : 'pi pi-shop'" class="text-xs"></i>
+          </span>
+          <span class="text-sm font-medium truncate pr-1"
+            [ngClass]="themeService.isDarkMode() ? 'text-[#F0F6FC]' : 'text-slate-800'">{{ activeWorkingBranch()?.name }}</span>
+        </div>
+      } @else if (canFilterByBranch()) {
+        <!-- Branch Select Reutilizable cuando está en Modo Global -->
+        <app-branch-select
+          [branches]="branches"
+          [(ngModel)]="selectedBranchId"
+          [showClear]="true"
+          placeholder="Todas las sucursales"
+          (selectionChange)="onBranchChange($event)"
+        />
+      }
 
       <!-- Search Input Reutilizable -->
       <app-search-input 
@@ -43,30 +58,48 @@
   <div class="max-w-[1700px] mx-auto space-y-8 md:space-y-12">
     @if (loading) {
       <div class="flex flex-col items-center justify-center py-32 gap-3">
-        <i class="pi pi-spin pi-spinner text-4xl text-[#48021C]"></i>
-        <span class="text-sm font-semibold text-slate-500 tracking-wide">Cargando inventarios...</span>
+        <i class="pi pi-spin pi-spinner text-4xl" [ngClass]="themeService.isDarkMode() ? 'text-[#58A6FF]' : 'text-[#48021C]'"></i>
+        <span class="text-sm font-semibold tracking-wide" [ngClass]="themeService.isDarkMode() ? 'text-[#8B949E]' : 'text-slate-500'">Cargando inventarios...</span>
       </div>
     } @else {
       @for (group of groupedInventories; track group.branch) {
         <div class="space-y-4 md:space-y-6">
           <div class="flex items-center gap-2 md:gap-4 px-4 md:px-0">
-            <div class="h-[1px] flex-1 bg-[#48021C]/25"></div>
-            <div class="flex items-center gap-2 px-4 py-1.5 bg-white rounded-full border border-[#48021C]/25 shadow-2xs">
-              <i class="pi pi-building text-[#48021C] text-xs"></i>
-              <span class="text-[12px] md:text-sm font-semibold text-[#48021C] tracking-widest">{{ group.branch }}</span>
-              <span class="bg-[#48021C] text-white text-[11px] px-2.5 py-0.5 rounded-full font-semibold">
+            <div class="h-[1px] flex-1" [ngClass]="themeService.isDarkMode() ? 'bg-[#30363D]' : 'bg-[#48021C]/25'"></div>
+            <div 
+              class="flex items-center gap-2 px-4 py-1.5 rounded-full border shadow-2xs transition-colors"
+              [ngClass]="themeService.isDarkMode() 
+                ? 'bg-[#161B22] border-[#30363D] text-[#F0F6FC]' 
+                : 'bg-white border-[#48021C]/25 text-[#48021C]'"
+            >
+              <i class="pi pi-building text-xs" [ngClass]="themeService.isDarkMode() ? 'text-[#58A6FF]' : 'text-[#48021C]'"></i>
+              <span class="text-[12px] md:text-sm font-semibold tracking-widest">{{ group.branch }}</span>
+              <span 
+                class="text-[11px] px-2.5 py-0.5 rounded-full font-semibold"
+                [ngClass]="themeService.isDarkMode() ? 'bg-[#1C2D42] text-[#58A6FF]' : 'bg-[#48021C] text-white'"
+              >
                 {{ group.items.length }}
               </span>
             </div>
-            <div class="h-[1px] flex-1 bg-[#48021C]/25"></div>
+            <div class="h-[1px] flex-1" [ngClass]="themeService.isDarkMode() ? 'bg-[#30363D]' : 'bg-[#48021C]/25'"></div>
           </div>
           <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 md:gap-5 px-4 md:px-0">
             @for (inventory of group.items; track inventory.id) {
-              <div class="bg-white rounded-2xl border border-[#48021C]/25 shadow-2xs overflow-hidden flex flex-col justify-between transition-all duration-200 hover:border-[#48021C]/40 hover:shadow-md group">
+              <div 
+                class="rounded-2xl border shadow-2xs overflow-hidden flex flex-col justify-between transition-all duration-200 group"
+                [ngClass]="themeService.isDarkMode() 
+                  ? 'bg-[#161B22] border-[#30363D] hover:border-slate-500 hover:shadow-md' 
+                  : 'bg-white border-[#48021C]/25 hover:border-[#48021C]/40 hover:shadow-md'"
+              >
                 <!-- Zona Superior: Identificación del Producto e Imagen -->
                 <div class="p-3.5 sm:p-4 flex gap-3.5 items-start">
                   <!-- Thumbnail con marco temático -->
-                  <div class="w-20 h-20 sm:w-24 sm:h-24 rounded-xl relative overflow-hidden bg-rose-50/30 flex items-center justify-center flex-shrink-0 border border-[#48021C]/20 shadow-2xs">
+                  <div 
+                    class="w-20 h-20 sm:w-24 sm:h-24 rounded-xl relative overflow-hidden flex items-center justify-center flex-shrink-0 border shadow-2xs transition-colors"
+                    [ngClass]="themeService.isDarkMode() 
+                      ? 'bg-[#0D1117] border-[#30363D]' 
+                      : 'bg-rose-50/30 border-[#48021C]/20'"
+                  >
                     @if (inventory.product?.imageUrl) {
                       <img 
                         [src]="getProductImageUrl(inventory.product?.imageUrl)" 
@@ -74,7 +107,7 @@
                         class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
                       />
                     } @else {
-                      <i class="pi pi-image text-2xl sm:text-3xl text-[#48021C]/25"></i>
+                      <i class="pi pi-image text-2xl sm:text-3xl" [ngClass]="themeService.isDarkMode() ? 'text-slate-600' : 'text-[#48021C]/25'"></i>
                     }
                   </div>
 
@@ -82,17 +115,26 @@
                   <div class="flex-1 min-w-0 flex flex-col">
                     <!-- Fila Superior: SKU y Precio -->
                     <div class="flex items-center justify-between gap-2 mb-1">
-                      <span class="inline-flex items-center text-[10px] font-bold px-2 py-0.5 rounded-md bg-rose-50/70 border border-[#48021C]/20 text-[#48021C] tracking-wide truncate max-w-[140px]">
+                      <span 
+                        class="inline-flex items-center text-[10px] font-bold px-2 py-0.5 rounded-md border tracking-wide truncate max-w-[140px]"
+                        [ngClass]="themeService.isDarkMode() 
+                          ? 'bg-[#0D1117] border-[#30363D] text-[#58A6FF]' 
+                          : 'bg-rose-50/70 border-[#48021C]/20 text-[#48021C]'"
+                      >
                         {{ inventory.product?.sku || 'SIN SKU' }}
                       </span>
-                      <span class="text-xs sm:text-sm font-extrabold text-slate-800 tabular-nums">
+                      <span 
+                        class="text-xs sm:text-sm font-extrabold tabular-nums transition-colors"
+                        [ngClass]="themeService.isDarkMode() ? 'text-[#F0F6FC]' : 'text-slate-800'"
+                      >
                         {{ inventory.product?.price | currency: 'Q' }}
                       </span>
                     </div>
 
                     <!-- Nombre del Producto -->
                     <h3 
-                      class="text-xs sm:text-sm font-bold text-slate-800 leading-snug line-clamp-2 hover:text-[#48021C] transition-colors mb-1.5" 
+                      class="text-xs sm:text-sm font-bold leading-snug line-clamp-2 transition-colors mb-1.5" 
+                      [ngClass]="themeService.isDarkMode() ? 'text-[#F0F6FC] group-hover:text-[#58A6FF]' : 'text-slate-800 group-hover:text-[#48021C]'"
                       [pTooltip]="inventory.product?.name" 
                       tooltipPosition="top"
                     >
@@ -100,16 +142,16 @@
                     </h3>
 
                     <!-- Metadatos Secundarios: Código de Barras / Último Movimiento -->
-                    <div class="flex flex-col gap-0.5 text-[11px] text-slate-500">
+                    <div class="flex flex-col gap-0.5 text-[11px]">
                       @if (inventory.product?.barcode) {
                         <div class="flex items-center gap-1.5 truncate">
-                          <i class="pi pi-barcode text-[10px] text-[#48021C]/60"></i>
-                          <span class="font-medium text-slate-600 truncate">{{ inventory.product?.barcode }}</span>
+                          <i class="pi pi-barcode text-[10px]" [ngClass]="themeService.isDarkMode() ? 'text-[#58A6FF]' : 'text-[#48021C]/60'"></i>
+                          <span class="font-medium truncate" [ngClass]="themeService.isDarkMode() ? 'text-[#8B949E]' : 'text-slate-600'">{{ inventory.product?.barcode }}</span>
                         </div>
                       }
                       <div class="flex items-center gap-1.5">
-                        <i class="pi pi-calendar text-[10px] text-[#48021C]/60"></i>
-                        <span class="text-[10px] sm:text-[11px] text-slate-500">
+                        <i class="pi pi-calendar text-[10px]" [ngClass]="themeService.isDarkMode() ? 'text-[#58A6FF]' : 'text-[#48021C]/60'"></i>
+                        <span class="text-[10px] sm:text-[11px]" [ngClass]="themeService.isDarkMode() ? 'text-[#8B949E]' : 'text-slate-500'">
                           {{ (inventory.lastMovementDate | date: 'dd/MM/yyyy HH:mm') || 'Sin movimientos' }}
                         </span>
                       </div>
@@ -118,17 +160,27 @@
                 </div>
 
                 <!-- Zona Inferior: Barra de Estado de Inventario y Disponibilidad -->
-                <div class="bg-slate-50/80 px-3.5 py-2 sm:py-2.5 border-t border-[#48021C]/15 flex items-center justify-between gap-2">
+                <div 
+                  class="px-3.5 py-2 sm:py-2.5 border-t flex items-center justify-between gap-2 transition-colors"
+                  [ngClass]="themeService.isDarkMode() ? 'bg-[#0D1117]/60 border-[#30363D]' : 'bg-slate-50/80 border-[#48021C]/15'"
+                >
                   <!-- Botón de Disponibilidad -->
                   <button
                     type="button"
                     (click)="toggleInventoryAvailability(inventory, $event)"
                     class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[10px] sm:text-xs font-semibold transition-all cursor-pointer border shadow-2xs"
-                    [ngClass]="inventory.isAvailable !== false ? 'bg-[#dcfce7] text-[#14532d] border-[#14532d]/35 hover:bg-[#bbf7d0]' : 'bg-[#ffe4e6] text-[#9f1239] border-[#9f1239]/35 hover:bg-[#fecdd3]'"
+                    [ngClass]="inventory.isAvailable !== false 
+                      ? (themeService.isDarkMode() ? 'bg-emerald-950/50 text-emerald-300 border-emerald-800/60 hover:bg-emerald-900/50' : 'bg-[#dcfce7] text-[#14532d] border-[#14532d]/35 hover:bg-[#bbf7d0]') 
+                      : (themeService.isDarkMode() ? 'bg-rose-950/50 text-rose-300 border-rose-800/60 hover:bg-rose-900/50' : 'bg-[#ffe4e6] text-[#9f1239] border-[#9f1239]/35 hover:bg-[#fecdd3]')"
                     [pTooltip]="inventory.isAvailable !== false ? 'Clic para cambiar a No Disponible' : 'Clic para activar Disponibilidad'"
                     tooltipPosition="top"
                   >
-                    <span class="w-1.5 h-1.5 rounded-full" [ngClass]="inventory.isAvailable !== false ? 'bg-[#14532d]' : 'bg-[#9f1239]'"></span>
+                    <span 
+                      class="w-1.5 h-1.5 rounded-full" 
+                      [ngClass]="inventory.isAvailable !== false 
+                        ? (themeService.isDarkMode() ? 'bg-emerald-400' : 'bg-[#14532d]') 
+                        : (themeService.isDarkMode() ? 'bg-rose-400' : 'bg-[#9f1239]')"
+                    ></span>
                     <span>{{ inventory.isAvailable !== false ? 'Disponible' : 'No disponible' }}</span>
                   </button>
 
@@ -172,9 +224,9 @@
         </div>
       } @empty {
         <div class="flex flex-col items-center justify-center py-32">
-          <i class="pi pi-inbox text-7xl! text-gray-300 mb-2"></i>
-          <h2 class="text-2xl font-bold text-gray-800 mb-2">No se encontraron inventarios</h2>
-          <p class="text-gray-400 max-w-sm text-center">
+          <i class="pi pi-inbox text-7xl! mb-2" [ngClass]="themeService.isDarkMode() ? 'text-[#30363D]' : 'text-gray-300'"></i>
+          <h2 class="text-2xl font-bold mb-2 transition-colors" [ngClass]="themeService.isDarkMode() ? 'text-[#F0F6FC]' : 'text-gray-800'">No se encontraron inventarios</h2>
+          <p class="max-w-sm text-center transition-colors" [ngClass]="themeService.isDarkMode() ? 'text-[#8B949E]' : 'text-gray-400'">
             No hay registros que coincidan con los filtros seleccionados para esta búsqueda.
           </p>
         </div>
@@ -225,6 +277,7 @@
   @if (showNewInventoryModal) {
     <app-inventory-form 
       [isModal]="true"
+      [initialBranchId]="selectedBranchId"
       (onClose)="showNewInventoryModal = false"
       (onSaved)="onInventorySaved()"
     ></app-inventory-form>

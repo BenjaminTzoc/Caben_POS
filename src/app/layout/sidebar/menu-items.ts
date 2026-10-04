@@ -274,6 +274,12 @@ export const MENU_ITEMS: MenuItem[] = [
         icon: 'pi pi-wallet',
         route: '/sales/payment-methods',
         permission: '',
+      },
+      {
+        label: 'Cuentas Bancarias',
+        icon: 'pi pi-building-columns',
+        route: '/sales/bank-accounts',
+        permission: '',
       }
     ]
   }

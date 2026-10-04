@@ -1,0 +1,61 @@
+/* Estilos para el detalle y monitoreo de viaje */
+:host {
+  display: block;
+  width: 100%;
+}
+
+/* Dark mode overrides for dialogs */
+:host-context(.dark) ::ng-deep .p-dialog {
+  background: #161B22 !important;
+  border: 1px solid #30363D !important;
+  color: #F0F6FC !important;
+}
+
+:host-context(.dark) ::ng-deep .p-dialog-header {
+  background: #1C2128 !important;
+  border-bottom: 1px solid #30363D !important;
+  color: #F0F6FC !important;
+}
+
+:host-context(.dark) ::ng-deep .p-dialog-title {
+  color: #F0F6FC !important;
+  font-weight: 700;
+}
+
+:host-context(.dark) ::ng-deep .p-dialog-header-actions button {
+  color: #8B949E !important;
+}
+
+:host-context(.dark) ::ng-deep .p-dialog-header-actions button:hover {
+  color: #F0F6FC !important;
+  background: #21262D !important;
+}
+
+:host-context(.dark) ::ng-deep .p-dialog-content {
+  background: #161B22 !important;
+  color: #F0F6FC !important;
+}
+
+:host-context(.dark) ::ng-deep .p-dialog-footer {
+  background: #1C2128 !important;
+  border-top: 1px solid #30363D !important;
+}
+
+/* Dark mode overrides for dialog form controls */
+:host-context(.dark) ::ng-deep .p-inputtext,
+:host-context(.dark) ::ng-deep .p-textarea {
+  background: #0D1117 !important;
+  color: #F0F6FC !important;
+  border-color: #30363D !important;
+}
+
+:host-context(.dark) ::ng-deep .p-inputtext:focus,
+:host-context(.dark) ::ng-deep .p-textarea:focus {
+  border-color: #58A6FF !important;
+}
+
+:host-context(.dark) ::ng-deep .p-inputnumber-button {
+  background: #21262D !important;
+  border-color: #30363D !important;
+  color: #F0F6FC !important;
+}

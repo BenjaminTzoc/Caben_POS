@@ -22,6 +22,15 @@ import { BankAccountsService } from '../services/bank-accounts.service';
 import { IBankAccount } from '../interfaces/bank-account.interface';
 import { AuthService } from '../../auth/auth.service';
 
+import { ThemeService } from '../../core/services/theme.service';
+import { PageHeaderComponent } from '../../shared/components/page-header/page-header.component';
+import { PrimaryButtonComponent } from '../../shared/components/primary-button/primary-button.component';
+import { SecondaryButtonComponent } from '../../shared/components/secondary-button/secondary-button.component';
+import { RefreshButtonComponent } from '../../shared/components/refresh-button/refresh-button.component';
+import { SearchInputComponent } from '../../shared/components/search-input/search-input.component';
+import { StandardTableComponent } from '../../shared/components/standard-table/standard-table.component';
+import { StatusBadgeComponent } from '../../shared/components/status-badge/status-badge.component';
+
 @Component({
   selector: 'app-bank-accounts',
   standalone: true,
@@ -39,11 +48,19 @@ import { AuthService } from '../../auth/auth.service';
     ToggleSwitchModule,
     DialogModule,
     InputNumberModule,
-    SelectModule
+    SelectModule,
+    PageHeaderComponent,
+    PrimaryButtonComponent,
+    SecondaryButtonComponent,
+    RefreshButtonComponent,
+    SearchInputComponent,
+    StandardTableComponent,
+    StatusBadgeComponent,
   ],
   templateUrl: './bank-accounts.component.html',
 })
 export class BankAccountsComponent implements OnInit {
+  public themeService = inject(ThemeService);
   private bankService = inject(BankAccountsService);
   private messageService = inject(MessageService);
   private confirmService = inject(ConfirmService);

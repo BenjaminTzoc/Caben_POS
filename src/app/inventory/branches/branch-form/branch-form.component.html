@@ -1,156 +1,204 @@
 <div class="py-4 px-0 md:px-6 bg-slate-50/50 min-h-screen">
-  <!-- Header Section -->
-  <div class="max-w-[1700px] mx-auto px-4 md:px-0 mb-6 md:mb-8">
-    <div class="flex flex-col md:flex-row md:items-end justify-between gap-4">
-      <div class="w-full md:max-w-[60%]">
-        <h1 class="text-2xl md:text-4xl font-semibold text-gray-900 tracking-tight">
-          {{ isEdit ? 'Editar Sucursal' : 'Nueva Sucursal' }}
-        </h1>
-        <p class="hidden md:block text-[#627ca7] mt-1 md:mt-2 text-sm md:text-md font-medium">
-           Completa la información para {{ isEdit ? 'actualizar' : 'añadir' }} una ubicación al catálogo.
-        </p>
-      </div>
-      <div class="flex items-center gap-2 md:gap-4 w-full md:w-auto">
-        <div class="flex-1">
-          <p-button 
-            label="Cancelar" 
-            (onClick)="onCancel()" 
-            variant="outlined" 
-            severity="danger" 
-            icon="pi pi-times"
-            styleClass="border-rose-400! h-[44px] justify-center"
-            fluid
-          />
-        </div>
-        <div class="flex-1">
-          <p-button
-            (onClick)="onSubmit()"
-            [label]="isEdit ? 'Guardar' : 'Crear'"
-            severity="success"
-            [raised]="true"
-            styleClass="shadow-lg h-[44px] justify-center"
-            [loading]="loading"
-            icon="pi pi-check"
-            [disabled]="branchForm.invalid"
-            fluid
-          />
-        </div>
-      </div>
-    </div>
-  </div>
+  <!-- Top Card: Reusable Page Header -->
+  <app-page-header
+    [title]="isEdit ? 'Editar Sucursal' : 'Nueva Sucursal'"
+    [subtitle]="isEdit ? 'Actualiza los datos y ubicación de la sucursal seleccionada.' : 'Completa la información para añadir una nueva ubicación física.'"
+    icon="pi pi-building"
+    [showBackButton]="true"
+    backTooltip="Volver a sucursales"
+    (onBack)="onCancel()"
+    [badge]="isEdit ? 'Edición' : 'Nuevo'"
+    badgeSeverity="burgundy"
+    colorScheme="burgundy"
+  >
+    <!-- Botones Superiores de Acción -->
+    <ng-container actions>
+      <app-secondary-button 
+        label="Cancelar" 
+        icon="pi pi-times" 
+        colorScheme="burgundy"
+        (clicked)="onCancel()" 
+      />
 
-  <form class="max-w-[1100px] mx-auto pb-40" [formGroup]="branchForm">
-    <div class="grid grid-cols-1 md:grid-cols-12 gap-6 md:gap-8">
-      <div class="col-span-12 flex flex-col gap-6">
-        <div class="p-5 md:p-8 rounded-none md:rounded-lg bg-white border-y md:border border-slate-300 shadow-sm relative overflow-hidden">
-          <!-- Background Decorative Icon -->
-          <div class="absolute top-0 right-0 p-4 opacity-[0.03]">
-            <i class="pi pi-building" style="font-size: 8rem"></i>
+      <app-primary-button 
+        [label]="isEdit ? 'Guardar Cambios' : 'Crear Sucursal'" 
+        [icon]="isEdit ? 'pi pi-save' : 'pi pi-check'" 
+        [loading]="loading"
+        [disabled]="branchForm.invalid"
+        (clicked)="onSubmit()" 
+      />
+    </ng-container>
+  </app-page-header>
+
+  <!-- Main Form Content -->
+  <div class="max-w-[1700px] mx-auto">
+    <form class="max-w-[1100px] mx-auto pb-24" [formGroup]="branchForm">
+      <div class="bg-white rounded-2xl border-2 border-[#48021C]/25 shadow-sm overflow-hidden">
+        
+        <!-- Header de la tarjeta del formulario -->
+        <div class="py-3 px-5 md:px-7 bg-gradient-to-r from-[#9f6587]/15 via-[#9f6587]/10 to-[#9f6587]/15 border-b border-[#48021C]/15 flex items-center justify-between">
+          <div class="flex items-center gap-2">
+            <i class="pi pi-info-circle text-xs text-[#762f41]"></i>
+            <h2 class="text-xs md:text-sm font-bold text-[#3b141e] tracking-wide uppercase">
+              Información General de la Sucursal
+            </h2>
+          </div>
+          <span class="text-[11px] font-medium text-slate-500">
+            Campos marcados con <span class="text-rose-600 font-bold">*</span> son requeridos
+          </span>
+        </div>
+
+        <div class="p-5 md:p-8 space-y-6 md:space-y-8">
+          
+          <!-- Fila 1: Nombre de Sucursal y Toggle ¿Es Planta? -->
+          <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-start">
+            <div class="lg:col-span-8 flex flex-col gap-1.5">
+              <label class="text-xs font-semibold text-[#48021C]" for="name">
+                Nombre de la Sucursal <span class="text-rose-600 font-bold">*</span>
+              </label>
+              <input
+                pInputText
+                id="name"
+                formControlName="name"
+                class="w-full !rounded-lg h-[42px] font-medium text-sm !border-[#9f6587]/35 focus:!border-[#48021C] focus:!ring-2 focus:!ring-[#48021C]/15"
+                [ngClass]="{
+                  'ng-invalid ng-dirty !border-rose-400': branchForm.get('name')?.invalid && branchForm.get('name')?.touched
+                }"
+                placeholder="Ej. Sucursal Central, Bodega Norte, Tienda Centro..."
+                autocomplete="off"
+              />
+              @if (branchForm.get('name')?.invalid && branchForm.get('name')?.touched) {
+                <small class="text-rose-600 text-[11px] font-medium flex items-center gap-1 mt-0.5">
+                  <i class="pi pi-exclamation-circle text-[11px]"></i>El nombre debe tener al menos 3 caracteres.
+                </small>
+              }
+            </div>
+
+            <div class="lg:col-span-4 flex items-end">
+              <div class="flex items-center justify-between gap-4 p-3 md:p-3.5 bg-[#eddde1]/35 border border-[#762f41]/25 rounded-xl w-full shadow-2xs">
+                <div class="flex flex-col min-w-0">
+                  <span class="text-xs font-bold text-[#48021C] flex items-center gap-1.5">
+                    <i class="pi pi-cog text-[11px] text-[#762f41]"></i>
+                    ¿Es Planta?
+                  </span>
+                  <span class="text-[10.5px] text-slate-500 font-medium leading-tight mt-0.5">
+                    Habilita funciones de producción
+                  </span>
+                </div>
+                <p-toggleSwitch 
+                  formControlName="isPlant"
+                  styleClass="burgundy-switch"
+                />
+              </div>
+            </div>
           </div>
 
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6 md:gap-y-8">
-            <!-- Name Field -->
-            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-10 items-start">
-              <div class="lg:col-span-8 flex flex-col gap-1.5 md:gap-1">
-                <label class="text-xs md:text-sm font-semibold text-[#3B5B8A]" for="name">
-                  <i class="pi pi-map-marker mr-1 text-xs! text-blue-500"></i>
-                  Nombre de la Sucursal <span class="text-red-700">*</span>
-                </label>
-                <input
-                  pInputText
-                  id="name"
-                  formControlName="name"
-                  class="w-full !rounded-lg h-[44px] md:h-auto font-medium"
-                  [ngClass]="{
-                    'ng-invalid ng-dirty': branchForm.get('name')?.invalid && branchForm.get('name')?.touched
-                  }"
-                  placeholder="Ej. Sucursal Central, Bodega Norte..."
-                  autocomplete="off"
-                />
-                @if (branchForm.get('name')?.invalid && branchForm.get('name')?.touched) {
-                  <small class="text-rose-500 text-[10px] font-medium flex items-center mt-1">
-                    <i class="pi pi-exclamation-circle mr-1 text-[10px]!"></i>El nombre debe tener al menos 3 letras.
-                  </small>
-                }
-              </div>
-
-              <div class="lg:col-span-4 self-stretch flex items-end h-full">
-                <div class="flex flex-col gap-2 p-4 md:p-6 bg-[#D0E2F2] border border-[#4A7FA7] rounded-lg w-full">
-                  <div class="flex items-center justify-between gap-4">
-                    <div class="flex flex-col min-w-0">
-                        <label class="text-xs font-semibold text-[#3B5B8A]">¿Es Planta?</label>
-                        <span class="text-[10px] text-[#3B5B8A] font-medium leading-none mt-1">Habilita producción</span>
-                    </div>
-                    <p-toggleSwitch 
-                      formControlName="isPlant"
-                      severity="info"
-                    />
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <!-- Phone Field -->
-              <div class="flex flex-col gap-1.5 md:gap-1">
-                <label class="text-xs md:text-sm font-semibold text-[#3B5B8A]" for="phone">
-                  <i class="pi pi-phone mr-1 text-xs! text-blue-500"></i>
-                  Teléfono de Contacto
-                </label>
-                <p-inputMask
-                  id="phone"
-                  formControlName="phone"
-                  mask="+502 9999 9999"
-                  styleClass="w-full !rounded-lg h-[44px] md:h-auto font-medium"
-                  placeholder="+502 0000 0000"
-                  autocomplete="off"
-                />
-              </div>
-
-              <!-- Email Field -->
-              <div class="flex flex-col gap-1.5 md:gap-1">
-                <label class="text-xs md:text-sm font-semibold text-[#3B5B8A]" for="email">
-                  <i class="pi pi-envelope mr-1 text-xs! text-blue-500"></i>
-                  Correo Electrónico
-                </label>
-                <input
-                  pInputText
-                  id="email"
-                  formControlName="email"
-                  class="w-full !rounded-lg h-[44px] md:h-auto font-medium"
-                  placeholder="sucursal@ejemplo.com"
-                  autocomplete="off"
-                />
-              </div>
-            </div>
-
-            <!-- Address Field -->
-            <div class="flex flex-col gap-1.5 md:gap-1">
-              <label class="text-xs md:text-sm font-semibold text-[#3B5B8A]" for="address">
-                <i class="pi pi-directions mr-1 text-xs! text-blue-500"></i>
-                Dirección Física Exacta <span class="text-red-700">*</span>
+          <!-- Fila 2: Teléfono y Correo Electrónico -->
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <!-- Teléfono Field -->
+            <div class="flex flex-col gap-1.5">
+              <label class="text-xs font-semibold text-[#48021C]" for="phone">
+                Teléfono de Contacto <span class="text-rose-600 font-bold">*</span>
               </label>
-              <textarea
-                rows="4"
-                pTextarea
-                id="address"
-                formControlName="address"
-                class="w-full !rounded-lg border-slate-300 p-4 font-medium resize-none"
-                [ngClass]="{
-                  'ng-invalid ng-dirty': branchForm.get('address')?.invalid && branchForm.get('address')?.touched
-                }"
-                placeholder="Indica calle, avenida, número de casa, zona..."
+              <p-inputMask
+                id="phone"
+                formControlName="phone"
+                mask="+502 9999 9999"
+                styleClass="w-full !rounded-lg h-[42px] font-medium text-sm !border-[#9f6587]/35 focus:!border-[#48021C] focus:!ring-2 focus:!ring-[#48021C]/15"
+                placeholder="+502 0000 0000"
                 autocomplete="off"
-              ></textarea>
-              @if (branchForm.get('address')?.invalid && branchForm.get('address')?.touched) {
-                <small class="text-rose-500 text-[10px] font-medium flex items-center mt-1">
-                  <i class="pi pi-exclamation-circle mr-1 text-[10px]!"></i>La dirección es obligatoria.
+                [ngClass]="{
+                  'ng-invalid ng-dirty !border-rose-400': branchForm.get('phone')?.invalid && branchForm.get('phone')?.touched
+                }"
+              />
+              @if (branchForm.get('phone')?.invalid && branchForm.get('phone')?.touched) {
+                <small class="text-rose-600 text-[11px] font-medium flex items-center gap-1 mt-0.5">
+                  <i class="pi pi-exclamation-circle text-[11px]"></i>El teléfono de contacto es obligatorio.
+                </small>
+              }
+            </div>
+
+            <!-- Email Field -->
+            <div class="flex flex-col gap-1.5">
+              <label class="text-xs font-semibold text-[#48021C]" for="email">
+                Correo Electrónico
+              </label>
+              <input
+                pInputText
+                id="email"
+                type="email"
+                formControlName="email"
+                class="w-full !rounded-lg h-[42px] font-medium text-sm !border-[#9f6587]/35 focus:!border-[#48021C] focus:!ring-2 focus:!ring-[#48021C]/15"
+                [ngClass]="{
+                  'ng-invalid ng-dirty !border-rose-400': branchForm.get('email')?.invalid && branchForm.get('email')?.touched
+                }"
+                placeholder="sucursal@ejemplo.com"
+                autocomplete="off"
+              />
+              @if (branchForm.get('email')?.invalid && branchForm.get('email')?.touched) {
+                <small class="text-rose-600 text-[11px] font-medium flex items-center gap-1 mt-0.5">
+                  <i class="pi pi-exclamation-circle text-[11px]"></i>Ingrese un correo electrónico válido.
                 </small>
               }
             </div>
           </div>
+
+          <!-- Fila 3: Dirección Física Exacta -->
+          <div class="flex flex-col gap-1.5">
+            <label class="text-xs font-semibold text-[#48021C]" for="address">
+              Dirección Física Exacta <span class="text-rose-600 font-bold">*</span>
+            </label>
+            <textarea
+              rows="3"
+              pTextarea
+              id="address"
+              formControlName="address"
+              class="w-full !rounded-lg border !border-[#9f6587]/35 p-3 font-medium text-sm focus:!border-[#48021C] focus:!ring-2 focus:!ring-[#48021C]/15 resize-none"
+              [ngClass]="{
+                'ng-invalid ng-dirty !border-rose-400': branchForm.get('address')?.invalid && branchForm.get('address')?.touched
+              }"
+              placeholder="Indica calle, avenida, número de local o casa, zona, municipio..."
+              autocomplete="off"
+            ></textarea>
+            @if (branchForm.get('address')?.invalid && branchForm.get('address')?.touched) {
+              <small class="text-rose-600 text-[11px] font-medium flex items-center gap-1 mt-0.5">
+                <i class="pi pi-exclamation-circle text-[11px]"></i>La dirección es obligatoria.
+              </small>
+            }
+          </div>
+
         </div>
+
+        <!-- Footer Bar del Formulario -->
+        <div class="bg-slate-50/80 border-t border-slate-200/80 p-4 px-5 md:px-8 flex items-center justify-between">
+          <button
+            type="button"
+            (click)="onCancel()"
+            class="text-xs font-semibold text-slate-500 hover:text-slate-700 transition-colors flex items-center gap-1.5 cursor-pointer"
+          >
+            <i class="pi pi-arrow-left text-[10px]"></i>
+            Volver sin guardar
+          </button>
+
+          <div class="flex items-center gap-3">
+            <app-secondary-button 
+              label="Cancelar" 
+              icon="pi pi-times" 
+              colorScheme="burgundy"
+              (clicked)="onCancel()" 
+            />
+
+            <app-primary-button 
+              [label]="isEdit ? 'Guardar Cambios' : 'Crear Sucursal'" 
+              [icon]="isEdit ? 'pi pi-save' : 'pi pi-check'" 
+              [loading]="loading"
+              [disabled]="branchForm.invalid"
+              (clicked)="onSubmit()" 
+            />
+          </div>
+        </div>
+
       </div>
-    </div>
-  </form>
+    </form>
+  </div>
 </div>

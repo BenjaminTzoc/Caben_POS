@@ -1,148 +1,143 @@
-<div class="py-4 px-0 md:px-6 bg-slate-50/50 min-h-screen">
+<div class="py-4 px-0 md:px-6 min-h-screen transition-colors duration-200"
+     [ngClass]="themeService.isDarkMode() ? 'bg-[#0D1117]' : 'bg-slate-50/50'">
+  <!-- Header Section -->
+  <app-page-header
+    title="Métodos de Pago"
+    subtitle="Gestione las diferentes formas en que sus clientes pueden pagar sus compras."
+    icon="pi pi-wallet"
+    colorScheme="burgundy"
+  >
+    <ng-container actions>
+      <app-refresh-button (clicked)="loadPaymentMethods()" />
+      <app-primary-button
+        label="Nuevo Método"
+        icon="pi pi-plus"
+        (clicked)="goToNewMethod()"
+      />
+    </ng-container>
+  </app-page-header>
 
-  <div class="max-w-[1700px] mx-auto px-4 md:px-0 mb-4 md:mb-8">
-    <div class="flex flex-col md:flex-row md:items-end justify-between gap-4">
-      <div class="w-full md:max-w-[50%]">
-        <h1 class="text-2xl md:text-4xl font-semibold text-gray-900 tracking-tight line-clamp-1">Métodos de Pago</h1>
-        <p class="hidden md:block text-[#627ca7] mt-1 md:mt-2 text-sm md:text-md font-medium">
-           Gestione las diferentes formas en que sus clientes pueden pagar sus compras.
-        </p>
-      </div>
-      <div class="flex items-center gap-2 w-full md:w-auto">
-        <div class="flex-1">
-          <p-iconfield>
-            <p-inputicon class="pi pi-search" />
-            <input 
-              (input)="dt.filterGlobal($any($event.target).value, 'contains'); dtMobile.filterGlobal($any($event.target).value, 'contains')"
-              type="text" 
-              pInputText 
-              placeholder="Buscar método..."
-              autocomplete="off"
-              class="w-full !rounded-xl"
-            />
-          </p-iconfield>
-        </div>
-        <p-button 
-          label="Nuevo Método"
-          severity="info"
-          icon="pi pi-plus"
-          class="hidden md:block"
-          styleClass="!rounded-xl"
-          (onClick)="goToNewMethod()"
-        />
-        <p-button 
-          severity="info"
-          icon="pi pi-plus"
-          class="block md:hidden"
-          styleClass="!rounded-xl"
-          (onClick)="goToNewMethod()"
+  <div class="max-w-[1700px] mx-auto px-4 md:px-0">
+    <!-- Filters Bar -->
+    <div class="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4 mb-6">
+      <div class="w-full sm:w-auto">
+        <app-search-input
+          [placeholder]="'Buscar por nombre, código o descripción...'"
+          widthClass="w-full sm:w-80 md:w-96"
+          [ngModel]="searchTerm()"
+          (searchChange)="searchTerm.set($event)"
         />
       </div>
-    </div>
-  </div>
 
-  <div class="max-w-[1700px] mx-auto">
-    <div class="flex mb-4 px-4 md:px-0">
       @if (canViewDeleted) {
-        <div class="group bg-white border border-slate-300 rounded-lg py-2 px-4 shadow-sm flex items-center gap-3 transition-all hover:border-indigo-200">
-          <div class="flex flex-col">
-            <label for="showDeleted" class="text-sm font-semibold text-[#3B5B8A]">Mostrar Eliminados</label>
-          </div>
-          <p-toggleSwitch
+        <div class="flex items-center gap-3 px-4 py-2.5 rounded-xl border transition-colors self-start sm:self-auto"
+             [ngClass]="themeService.isDarkMode() ? 'bg-[#161B22] border-[#30363D]' : 'bg-white border-slate-200 shadow-xs'">
+          <label for="showDeleted" class="text-xs font-semibold cursor-pointer select-none"
+                 [ngClass]="themeService.isDarkMode() ? 'text-[#F0F6FC]' : 'text-slate-700'">
+            Mostrar Eliminados
+          </label>
+          <p-toggleswitch
             [(ngModel)]="showDeleted"
             (onChange)="loadPaymentMethods()"
             inputId="showDeleted"
-          ></p-toggleSwitch>
+          />
         </div>
       }
     </div>
-  </div>
 
-  <div class="max-w-[1700px] mx-auto pb-20">
-    <!-- Desktop Table -->
-    <div class="hidden lg:block bg-white rounded-xl border border-slate-300 overflow-x-auto shadow-sm">
-      <p-table
-        #dt
-        [value]="paymentMethods()"
+    <!-- VISTA ESCRITORIO (Standard Table) -->
+    <div class="hidden lg:block">
+      <app-standard-table
+        [value]="filteredMethods()"
         [loading]="loading()"
         [paginator]="true"
         [rows]="10"
-        [showCurrentPageReport]="true"
-        currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords}"
         [rowsPerPageOptions]="[10, 20, 30]"
-        [globalFilterFields]="['name', 'code']"
         dataKey="id"
-        styleClass="p-datatable-modern"
-        [tableStyle]="{'min-width': '1000px'}"
+        emptyIcon="pi pi-wallet"
+        emptyMessage="No se encontraron métodos de pago"
       >
-        <ng-template pTemplate="header">
-          <tr class="h-18! text-sm! bg-slate-50">
-            <th class="!pl-10 tracking-widest text-slate-400 w-[140px]">Estado</th>
-            <th class="tracking-widest text-slate-400 min-w-[250px]" pSortableColumn="name">Nombre <p-sortIcon field="name" /></th>
-            <th class="tracking-widest text-slate-400 w-[150px]" pSortableColumn="code">Código <p-sortIcon field="code" /></th>
-            <th class="tracking-widest text-slate-400 text-center w-[150px]">Req. Banco</th>
-            <th class="tracking-widest text-slate-400 min-w-[200px]">Descripción</th>
-            <th class="!pr-10 tracking-widest text-slate-400 text-right w-[150px]">Acciones</th>
+        <ng-template #header>
+          <tr class="h-14 text-xs uppercase tracking-wider"
+              [ngClass]="themeService.isDarkMode() ? 'bg-[#161B22] text-[#8B949E]' : 'bg-slate-50 text-slate-500'">
+            <th class="!pl-6 w-[120px]">Estado</th>
+            <th pSortableColumn="name">
+              Nombre <p-sortIcon field="name" class="text-xs" />
+            </th>
+            <th class="w-[150px]" pSortableColumn="code">
+              Código <p-sortIcon field="code" class="text-xs" />
+            </th>
+            <th class="text-center w-[150px]">Req. Banco</th>
+            <th>Descripción</th>
+            <th class="!pr-6 text-right w-[120px]">Acciones</th>
           </tr>
         </ng-template>
 
-        <ng-template pTemplate="body" let-method>
-          <tr class="hover:bg-slate-50 transition-all border-b border-slate-100 last:border-0" [ngClass]="{'opacity-60 grayscale-[0.5]': isDeleted(method)}">
-            <td class="!pl-10 py-4">
-              @if (isDeleted(method)) {
-                <span class="inline-flex items-center px-3 py-1 text-[11px] font-semibold rounded-lg bg-rose-50 text-rose-600 border border-rose-300">
-                  <span class="w-1.5 h-1.5 rounded-full bg-rose-500 mr-2"></span> Eliminado
-                </span>
-              } @else {
-                <span class="inline-flex items-center px-3 py-1 text-[11px] font-semibold rounded-lg bg-emerald-50 text-emerald-600 border border-emerald-300">
-                  <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 mr-2"></span> Activo
-                </span>
-              }
+        <ng-template #body let-method>
+          <tr class="transition-colors border-b last:border-0"
+              [ngClass]="[
+                themeService.isDarkMode()
+                  ? 'border-[#30363D] hover:bg-[#161B22]/80 text-[#F0F6FC]'
+                  : 'border-slate-100 hover:bg-slate-50 text-slate-800',
+                isDeleted(method) ? 'opacity-60 grayscale-[0.4]' : ''
+              ]">
+            <td class="!pl-6 py-4">
+              <app-status-badge
+                [value]="isDeleted(method) ? 'Eliminado' : 'Activo'"
+                [severity]="isDeleted(method) ? 'danger' : 'success'"
+              />
             </td>
             <td class="py-4">
-              <span class="font-semibold text-gray-700 text-base">{{ method.name }}</span>
+              <span class="font-bold text-sm"
+                    [ngClass]="themeService.isDarkMode() ? 'text-[#F0F6FC]' : 'text-slate-900'">
+                {{ method.name }}
+              </span>
             </td>
-            <td>
-              <span class="font-mono text-slate-500 bg-slate-100 px-2 py-0.5 rounded text-xs tracking-wider uppercase font-bold">{{ method.code }}</span>
+            <td class="py-4">
+              <code class="px-2.5 py-1 rounded-lg text-xs font-mono font-bold border transition-colors inline-block uppercase"
+                    [ngClass]="themeService.isDarkMode() ? 'bg-[#0D1117] text-[#58A6FF] border-[#30363D]' : 'bg-[#48021C]/5 text-[#48021C] border-[#48021C]/15'">
+                {{ method.code }}
+              </code>
             </td>
-            <td class="text-center">
-               <p-tag 
-                [severity]="method.requiresBankAccount ? 'warn' : 'secondary'" 
+            <td class="py-4 text-center">
+              <app-status-badge
                 [value]="method.requiresBankAccount ? 'Sí' : 'No'"
-                styleClass="!px-3 !py-0.5 rounded-full"
-               />
+                [severity]="method.requiresBankAccount ? 'warn' : 'secondary'"
+                size="xs"
+              />
             </td>
-            <td>
-              <p class="text-xs text-slate-500 line-clamp-1 italic" [pTooltip]="method.description" tooltipPosition="bottom">
+            <td class="py-4">
+              <span class="text-xs line-clamp-1 max-w-xs"
+                    [ngClass]="themeService.isDarkMode() ? 'text-[#8B949E]' : 'text-slate-600'">
                 {{ method.description || 'Sin descripción' }}
-              </p>
+              </span>
             </td>
-            <td class="!pr-10 text-right">
-              <div class="flex justify-end gap-1">
+            <td class="!pr-6 py-4 text-right">
+              <div class="flex items-center justify-end gap-1">
                 @if (!isDeleted(method)) {
                   <button
                     pButton
                     icon="pi pi-pencil"
-                    class="p-button-rounded p-button-text !text-amber-500 hover:!bg-amber-50"
+                    class="p-button-rounded p-button-text !w-8 !h-8 !text-amber-500 hover:!bg-amber-500/10"
                     (click)="onEditMethod(method.id)"
-                    pTooltip="Editar"
+                    pTooltip="Editar Método"
                     tooltipPosition="bottom"
                   ></button>
                   <button
                     pButton
                     icon="pi pi-trash"
-                    class="p-button-rounded p-button-text !text-rose-500 hover:!bg-rose-50"
+                    class="p-button-rounded p-button-text !w-8 !h-8 !text-rose-500 hover:!bg-rose-500/10"
                     (click)="onDeleteMethod(method)"
-                    pTooltip="Eliminar"
+                    pTooltip="Eliminar Método"
                     tooltipPosition="bottom"
                   ></button>
                 } @else {
                   <button
                     pButton
                     icon="pi pi-refresh"
-                    class="p-button-rounded p-button-text !text-emerald-500 hover:!bg-emerald-50"
+                    class="p-button-rounded p-button-text !w-8 !h-8 !text-emerald-500 hover:!bg-emerald-500/10"
                     (click)="restoreMethod(method)"
-                    pTooltip="Restaurar"
+                    pTooltip="Restaurar Método"
                     tooltipPosition="bottom"
                   ></button>
                 }
@@ -150,120 +145,108 @@
             </td>
           </tr>
         </ng-template>
-
-        <ng-template #emptymessage>
-          <tr>
-            <td colspan="6" class="text-center !py-32">
-              <div class="flex flex-col items-center justify-center gap-3 w-full h-full">
-                <i class="pi pi-wallet text-[#95abce]" style="font-size: 5rem"></i>
-                <div class="flex flex-col items-center gap-1">
-                  <p class="text-[#627ca7] font-semibold">No se encontraron métodos de pago.</p>
-                  <p class="text-[#627ca7] text-xs font-medium">Pruebe agregando uno nuevo.</p>
-                </div>
-              </div>
-            </td>
-          </tr>
-        </ng-template>
-      </p-table>
+      </app-standard-table>
     </div>
 
-    <!-- Mobile Table -->
-    <div class="lg:hidden block px-0 md:px-0">
-      <p-table
-        #dtMobile
-        [value]="paymentMethods()"
-        [loading]="loading()"
-        [paginator]="true"
-        [rows]="10"
-        [globalFilterFields]="['name', 'code']"
-        dataKey="id"
-        styleClass="p-datatable-modern bg-transparent w-full"
-        [tableStyle]="{'table-layout': 'fixed', 'width': '100%'}"
-        [breakpoint]="'0px'"
-      >
-        <ng-template pTemplate="body" let-method>
-          <tr class="bg-transparent border-none block">
-            <td class="block !p-0 border-none bg-transparent">
-              <div class="bg-white rounded-2xl shadow-sm border border-slate-200 mx-4 my-2.5 flex flex-col overflow-hidden relative">
-                <div class="flex p-4 items-center gap-4" [ngClass]="{'opacity-60 bg-slate-50': isDeleted(method)}">
-                  <div class="flex items-center justify-center shrink-0">
-                    <span class="w-10 h-10 rounded-lg bg-indigo-50 text-indigo-600 flex items-center justify-center border border-indigo-100 shadow-sm">
-                      <i class="pi pi-wallet text-lg!"></i>
-                    </span>
-                  </div>
-                  <div class="flex-1 min-w-0">
-                    <div class="flex justify-between items-start gap-1">
-                      <div class="flex flex-col min-w-0">
-                        <div class="flex items-center gap-2">
-                           <span class="text-[9px] text-slate-400 font-mono tracking-wider uppercase leading-none mb-1">{{ method.code }}</span>
-                           @if (isDeleted(method)) {
-                             <p-tag value="ELIMINADO" severity="danger" styleClass="text-[8px] !font-semibold px-1.5 py-0.5 rounded-md" />
-                           } @else {
-                             <p-tag value="ACTIVO" severity="success" styleClass="text-[8px] !font-semibold px-1.5 py-0.5 rounded-md" />
-                           }
-                        </div>
-                        <h3 class="font-semibold text-slate-800 text-base leading-tight truncate">{{ method.name }}</h3>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                <div class="px-4 pb-4 flex flex-col gap-2.5">
-                  <div class="flex items-center gap-2 bg-slate-50 p-2.5 rounded-xl border border-slate-100">
-                    <i class="pi pi-align-left text-slate-400" style="font-size: 0.75rem"></i>
-                    <p class="text-[11px] text-slate-600 font-medium italic line-clamp-2 leading-relaxed">
-                      {{ method.description || 'Sin descripción adicional' }}
-                    </p>
-                  </div>
-                  <div class="grid grid-cols-2 gap-2">
-                    <div class="flex items-center gap-1.5 bg-slate-50 px-2.5 py-1.5 rounded-lg border border-slate-100 col-span-2">
-                      <i class="pi pi-building text-slate-400" style="font-size: 0.75rem"></i>
-                      <span class="text-[10px] text-slate-600 font-bold uppercase tracking-wider">Req. Cuenta Bancaria:</span>
-                      <p-tag [severity]="method.requiresBankAccount ? 'warn' : 'secondary'" [value]="method.requiresBankAccount ? 'SÍ' : 'NO'" styleClass="text-[9px] !px-2 !py-0" />
-                    </div>
-                  </div>
-                </div>
-
-                <div class="bg-slate-50/50 border-t border-slate-100 p-2 px-3 flex items-center justify-end">
-                  <div class="flex items-center gap-1">
-                    @if (!isDeleted(method)) {
-                      <p-button
-                        icon="pi pi-pencil"
-                        styleClass="p-button-text !text-amber-500 hover:!bg-amber-50 !w-9 !h-9 !rounded-lg !p-0"
-                        (onClick)="onEditMethod(method.id)"
-                      />
-                      <p-button
-                        icon="pi pi-trash"
-                        styleClass="p-button-text !text-rose-500 hover:!bg-rose-50 !w-9 !h-9 !rounded-lg !p-0"
-                        (onClick)="onDeleteMethod(method)"
-                      />
-                    } @else {
-                      <p-button
-                        icon="pi pi-refresh"
-                        styleClass="p-button-text !text-emerald-500 hover:!bg-emerald-50 !w-9 !h-9 !rounded-lg !p-0"
-                        (onClick)="restoreMethod(method)"
-                      />
-                    }
-                  </div>
-                </div>
+    <!-- VISTA MÓVIL (Tarjetas Responsivas) -->
+    <div class="lg:hidden flex flex-col gap-3">
+      @for (method of filteredMethods(); track method.id) {
+        <div class="rounded-2xl border p-4 shadow-sm transition-all"
+             [ngClass]="[
+               themeService.isDarkMode() ? 'bg-[#161B22] border-[#30363D]' : 'bg-white border-slate-200',
+               isDeleted(method) ? 'opacity-60 grayscale-[0.4]' : ''
+             ]">
+          <!-- Card Header -->
+          <div class="flex items-start justify-between gap-3 pb-3 border-b"
+               [ngClass]="themeService.isDarkMode() ? 'border-[#30363D]' : 'border-slate-100'">
+            <div class="flex items-center gap-3">
+              <div class="w-10 h-10 rounded-xl flex items-center justify-center shrink-0 border"
+                   [ngClass]="themeService.isDarkMode() ? 'bg-[#0D1117] border-[#30363D] text-[#58A6FF]' : 'bg-[#48021C]/5 border-[#48021C]/15 text-[#48021C]'">
+                <i class="pi pi-wallet text-base"></i>
               </div>
-            </td>
-          </tr>
-        </ng-template>
-        <ng-template #emptymessage>
-          <tr>
-            <td class="block !p-0 border-none bg-transparent">
-              <div class="bg-white rounded-lg border border-slate-300 mx-4 my-8 p-10 flex flex-col items-center gap-4 text-center">
-                <i class="pi pi-wallet text-[#95abce]" style="font-size: 4rem"></i>
-                <div class="flex flex-col gap-1">
-                  <p class="text-[#627ca7] font-semibold">No se encontraron métodos</p>
-                  <p class="text-[#627ca7] text-xs">Prueba ajustando los filtros.</p>
-                </div>
+              <div class="flex flex-col min-w-0">
+                <span class="text-[10px] font-mono font-bold uppercase tracking-wider"
+                      [ngClass]="themeService.isDarkMode() ? 'text-[#8B949E]' : 'text-slate-400'">
+                  {{ method.code }}
+                </span>
+                <h3 class="font-bold text-sm truncate"
+                    [ngClass]="themeService.isDarkMode() ? 'text-[#F0F6FC]' : 'text-slate-900'">
+                  {{ method.name }}
+                </h3>
               </div>
-            </td>
-          </tr>
-        </ng-template>
-      </p-table>
+            </div>
+            <app-status-badge
+              [value]="isDeleted(method) ? 'Eliminado' : 'Activo'"
+              [severity]="isDeleted(method) ? 'danger' : 'success'"
+              size="xs"
+            />
+          </div>
+
+          <!-- Card Body Details -->
+          <div class="py-3 flex flex-col gap-2 text-xs">
+            <div class="flex items-center justify-between">
+              <span [ngClass]="themeService.isDarkMode() ? 'text-[#8B949E]' : 'text-slate-500'">Req. Banco:</span>
+              <app-status-badge
+                [value]="method.requiresBankAccount ? 'Sí' : 'No'"
+                [severity]="method.requiresBankAccount ? 'warn' : 'secondary'"
+                size="xs"
+              />
+            </div>
+            @if (method.description) {
+              <div class="flex items-start gap-2 pt-1 border-t text-[11px]"
+                   [ngClass]="themeService.isDarkMode() ? 'border-[#30363D] text-[#8B949E]' : 'border-slate-100 text-slate-600'">
+                <i class="pi pi-align-left mt-0.5 text-xs"></i>
+                <span class="line-clamp-2">{{ method.description }}</span>
+              </div>
+            }
+          </div>
+
+          <!-- Card Footer Actions -->
+          <div class="flex items-center justify-end gap-2 pt-2 border-t"
+               [ngClass]="themeService.isDarkMode() ? 'border-[#30363D]' : 'border-slate-100'">
+            @if (!isDeleted(method)) {
+              <button
+                pButton
+                label="Editar"
+                icon="pi pi-pencil"
+                class="p-button-text !text-xs !py-1.5 !px-3 !text-amber-500 hover:!bg-amber-500/10 !rounded-lg"
+                (click)="onEditMethod(method.id)"
+              ></button>
+              <button
+                pButton
+                label="Eliminar"
+                icon="pi pi-trash"
+                class="p-button-text !text-xs !py-1.5 !px-3 !text-rose-500 hover:!bg-rose-500/10 !rounded-lg"
+                (click)="onDeleteMethod(method)"
+              ></button>
+            } @else {
+              <button
+                pButton
+                label="Restaurar"
+                icon="pi pi-refresh"
+                class="p-button-text !text-xs !py-1.5 !px-3 !text-emerald-500 hover:!bg-emerald-500/10 !rounded-lg"
+                (click)="restoreMethod(method)"
+              ></button>
+            }
+          </div>
+        </div>
+      } @empty {
+        <div class="rounded-2xl border p-12 text-center flex flex-col items-center justify-center gap-3"
+             [ngClass]="themeService.isDarkMode() ? 'bg-[#161B22] border-[#30363D]' : 'bg-white border-slate-200'">
+          <div class="w-16 h-16 rounded-2xl flex items-center justify-center border"
+               [ngClass]="themeService.isDarkMode() ? 'bg-[#0D1117] border-[#30363D] text-[#58A6FF]' : 'bg-[#48021C]/5 border-[#48021C]/15 text-[#48021C]'">
+            <i class="pi pi-wallet text-2xl"></i>
+          </div>
+          <h4 class="font-bold text-base"
+              [ngClass]="themeService.isDarkMode() ? 'text-[#F0F6FC]' : 'text-slate-800'">
+            No se encontraron métodos de pago
+          </h4>
+          <p class="text-xs max-w-xs"
+             [ngClass]="themeService.isDarkMode() ? 'text-[#8B949E]' : 'text-slate-500'">
+            Prueba ajustando los filtros de búsqueda o agrega un nuevo método.
+          </p>
+        </div>
+      }
     </div>
   </div>
 </div>

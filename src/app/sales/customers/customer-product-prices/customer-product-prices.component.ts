@@ -8,6 +8,7 @@ import { catchError, map } from 'rxjs/operators';
 import { ConfirmationModalComponent } from '../../../shared/components/confirmation-modal/confirmation-modal.component';
 import { StandardTableComponent } from '../../../shared/components/standard-table/standard-table.component';
 import { ProductRibbonComponent } from '../../../shared/components/product-ribbon/product-ribbon.component';
+import { ThemeService } from '../../../core/services/theme.service';
 import { CustomersService } from '../../services/customers.service';
 import { ProductsService } from '../../../inventory/services/products.service';
 import { ICustomerProductPrice } from '../../interfaces/customer.interface';
@@ -40,6 +41,7 @@ export interface CustomerPriceRow {
   templateUrl: './customer-product-prices.component.html',
 })
 export class CustomerProductPricesComponent implements OnInit {
+  public themeService = inject(ThemeService);
   @Input() customerId: string | null = null;
 
   private customersService = inject(CustomersService);

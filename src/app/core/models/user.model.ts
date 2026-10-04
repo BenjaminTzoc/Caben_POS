@@ -1,3 +1,11 @@
+export interface BranchSummary {
+  id: string;
+  name: string;
+  code?: string;
+  isPlant?: boolean;
+  isCentral?: boolean;
+}
+
 export interface Permission {
   id: string;
   createdAt: string;
@@ -28,4 +36,5 @@ export interface User {
   emailVerified: boolean;
   roles: Role[];
   permissions: Permission[];
+  branch?: BranchSummary | null;
 }

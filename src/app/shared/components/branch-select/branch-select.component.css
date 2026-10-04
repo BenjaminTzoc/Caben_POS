@@ -1,0 +1,26 @@
+:host ::ng-deep .p-select {
+  display: flex !important;
+  align-items: center !important;
+}
+
+:host ::ng-deep .p-select .p-select-label {
+  display: flex !important;
+  align-items: center !important;
+}
+
+:host-context(.dark) ::ng-deep .p-select .p-select-label.p-placeholder,
+:host-context([data-theme='dark']) ::ng-deep .p-select .p-select-label.p-placeholder,
+:host-context(.dark) ::ng-deep .p-select .p-select-label,
+:host-context([data-theme='dark']) ::ng-deep .p-select .p-select-label {
+  color: #F0F6FC !important;
+}
+
+:host-context(.dark) ::ng-deep .p-select .p-select-dropdown,
+:host-context([data-theme='dark']) ::ng-deep .p-select .p-select-dropdown {
+  color: #8B949E !important;
+}
+
+:host-context(.dark) ::ng-deep .p-select .p-select-clear-icon,
+:host-context([data-theme='dark']) ::ng-deep .p-select .p-select-clear-icon {
+  color: #8B949E !important;
+}

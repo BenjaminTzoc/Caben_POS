@@ -1,4 +1,4 @@
-<div class="py-4 px-0 md:px-6 bg-slate-50/50 min-h-screen">
+<div class="py-4 px-0 md:px-6 min-h-screen transition-colors duration-300" [ngClass]="themeService.isDarkMode() ? 'bg-[#0D1117]' : 'bg-slate-50/50'">
   <!-- Top Card: Reusable Page Header -->
   <app-page-header
     title="Productos"
@@ -25,8 +25,17 @@
       />
 
       @if (canViewDeleted) {
-        <div class="flex items-center gap-3 bg-white border border-[#48021C]/20 rounded-xl px-4 py-2 shadow-xs transition-all hover:border-[#48021C]/40 hover:bg-rose-50/20">
-          <label for="showDeleted" class="text-xs md:text-sm font-semibold text-slate-700 cursor-pointer select-none">
+        <div 
+          class="flex items-center gap-3 border rounded-xl px-4 py-2 shadow-xs transition-all cursor-pointer select-none"
+          [ngClass]="themeService.isDarkMode()
+            ? 'bg-[#161B22] border-[#30363D] hover:border-slate-500 hover:bg-[#1C2128]'
+            : 'bg-white border-[#48021C]/20 hover:border-[#48021C]/40 hover:bg-rose-50/20'"
+        >
+          <label 
+            for="showDeleted" 
+            class="text-xs md:text-sm font-semibold cursor-pointer select-none transition-colors"
+            [ngClass]="themeService.isDarkMode() ? 'text-[#F0F6FC]' : 'text-slate-700'"
+          >
             Mostrar Eliminados
           </label>
           <p-toggleSwitch
@@ -62,106 +71,152 @@
         emptyIcon="pi pi-box"
         emptyMessage="No se encontraron productos en el catálogo."
         colorScheme="navy"
+        [customClass]="themeService.isDarkMode() ? 'theme-dark' : ''"
       >
         <ng-template #header>
-          <tr class="h-11 text-xs bg-[#eddde1] border-b border-[#762f41]/40 text-[#3b141e] font-bold sticky top-0 z-10">
-            <th class="!text-center border-r border-[#762f41]/35 w-10 !px-0.5"></th>
-            <th class="!text-left !pl-4 border-r border-[#762f41]/35 w-[270px] text-[#3b141e]">Producto</th>
-            <th class="!text-left !pl-3 border-r border-[#762f41]/35 w-[130px] text-[#3b141e]">Tipo</th>
-            <th class="!text-center border-r border-[#762f41]/35 w-[110px] !px-2 text-[#3b141e]">SKU</th>
-            <th class="!text-center border-r border-[#762f41]/35 w-[115px] !px-2 text-[#3b141e]">Cód. Barras</th>
-            <th class="!text-right !pr-3 border-r border-[#762f41]/35 w-[95px] text-[#3b141e]">Costo</th>
-            <th class="!text-right !pr-3 border-r border-[#762f41]/35 w-[95px] text-[#3b141e]">Precio</th>
-            <th class="!text-center border-r border-[#762f41]/35 !px-2 w-[95px] text-[#3b141e]">Estado</th>
-            <th class="!text-right !pr-4 w-[240px] text-[#3b141e]">Acciones</th>
+          <tr 
+            class="h-11 text-xs border-b font-bold sticky top-0 z-10 transition-colors"
+            [ngClass]="themeService.isDarkMode() 
+              ? 'bg-[#161B22] border-[#30363D] text-[#8B949E]' 
+              : 'bg-[#eddde1] border-[#762f41]/40 text-[#3b141e]'"
+          >
+            <th class="!text-center w-10 !px-0.5" [ngClass]="themeService.isDarkMode() ? 'border-r border-[#30363D]' : 'border-r border-[#762f41]/35'"></th>
+            <th class="!text-left !pl-4 w-[270px]" [ngClass]="themeService.isDarkMode() ? 'border-r border-[#30363D]' : 'border-r border-[#762f41]/35'">Producto</th>
+            <th class="!text-left !pl-3 w-[130px]" [ngClass]="themeService.isDarkMode() ? 'border-r border-[#30363D]' : 'border-r border-[#762f41]/35'">Tipo</th>
+            <th class="!text-center w-[110px] !px-2" [ngClass]="themeService.isDarkMode() ? 'border-r border-[#30363D]' : 'border-r border-[#762f41]/35'">SKU</th>
+            <th class="!text-center w-[115px] !px-2" [ngClass]="themeService.isDarkMode() ? 'border-r border-[#30363D]' : 'border-r border-[#762f41]/35'">Cód. Barras</th>
+            <th class="!text-right !pr-3 w-[95px]" [ngClass]="themeService.isDarkMode() ? 'border-r border-[#30363D]' : 'border-r border-[#762f41]/35'">Costo</th>
+            <th class="!text-right !pr-3 w-[95px]" [ngClass]="themeService.isDarkMode() ? 'border-r border-[#30363D]' : 'border-r border-[#762f41]/35'">Precio</th>
+            <th class="!text-center !px-2 w-[95px]" [ngClass]="themeService.isDarkMode() ? 'border-r border-[#30363D]' : 'border-r border-[#762f41]/35'">Estado</th>
+            <th class="!text-right !pr-4 w-[240px]">Acciones</th>
           </tr>
         </ng-template>
 
-        <ng-template #body let-product let-expanded="expanded">
+        <ng-template #body let-product let-expanded="expanded" let-rowIndex="rowIndex">
           <tr 
-            [ngClass]="{ 
-              'opacity-60 grayscale-[0.5]': isDeleted(product), 
-              'bg-[#eddde1]/25': expanded, 
-              'odd:bg-[#a65a6b]/[0.05]': !expanded,
-              'cursor-pointer': product.isMaster || (product.variants && product.variants.length > 0)
-            }" 
+            [ngClass]="[
+              isDeleted(product) ? 'opacity-60 grayscale-[0.5]' : '',
+              themeService.isDarkMode()
+                ? (expanded ? '!bg-[#1F242C] border-[#30363D]' : (rowIndex % 2 === 1 ? '!bg-[#161B22] hover:!bg-[#1F242C] border-[#30363D]' : '!bg-[#0D1117] hover:!bg-[#1F242C] border-[#30363D]'))
+                : (expanded ? 'bg-[#eddde1]/25 border-[#762f41]/18' : (rowIndex % 2 === 1 ? 'bg-[#a65a6b]/[0.05] hover:bg-[#eddde1]/45 border-[#762f41]/18' : 'bg-white hover:bg-[#eddde1]/45 border-[#762f41]/18')),
+              (product.isMaster || (product.variants && product.variants.length > 0)) ? 'cursor-pointer' : ''
+            ]" 
             (click)="(product.isMaster || (product.variants && product.variants.length > 0)) ? productsDesktopTable.toggleRow(product, $event) : null"
-            class="hover:!bg-[#eddde1]/45 transition-colors duration-150 border-b border-[#762f41]/18 last:border-0 text-xs"
+            class="transition-colors duration-150 border-b last:border-0 text-xs"
           >
-            <td class="!text-center !py-2.5 border-r border-[#762f41]/18 w-10 !px-0.5">
+            <td class="!text-center !py-2.5 w-10 !px-0.5" [ngClass]="themeService.isDarkMode() ? 'border-r border-[#30363D]' : 'border-r border-[#762f41]/18'">
               @if (product.isMaster || (product.variants && product.variants.length > 0)) {
                 <button 
                   type="button" 
                   pButton 
                   [icon]="expanded ? 'pi pi-chevron-down' : 'pi pi-chevron-right'" 
-                  class="p-button-text p-button-rounded !w-7 !h-7 !p-0 hover:!bg-[#eddde1]/60 !text-[#762f41] inline-flex items-center justify-center cursor-pointer"
+                  class="p-button-text p-button-rounded !w-7 !h-7 !p-0 inline-flex items-center justify-center cursor-pointer transition-colors"
+                  [ngClass]="themeService.isDarkMode() ? '!text-[#58A6FF] hover:!bg-[#30363D]' : '!text-[#762f41] hover:!bg-[#eddde1]/60'"
                   (click)="productsDesktopTable.toggleRow(product, $event); $event.stopPropagation()"
                   [pTooltip]="expanded ? 'Colapsar variantes' : 'Ver variantes'"
                 ></button>
               }
             </td>
-            <td class="!py-2.5 !pl-4 border-r border-[#762f41]/18">
+            <td class="!py-2.5 !pl-4" [ngClass]="themeService.isDarkMode() ? 'border-r border-[#30363D]' : 'border-r border-[#762f41]/18'">
               <div class="flex items-center gap-3 text-left">
-                <div class="w-10 h-10 rounded-lg shrink-0 flex items-center justify-center overflow-hidden border border-slate-200 bg-white shadow-2xs">
+                <div 
+                  class="w-10 h-10 rounded-lg shrink-0 flex items-center justify-center overflow-hidden border shadow-2xs"
+                  [ngClass]="themeService.isDarkMode() ? 'border-[#30363D] bg-[#161B22]' : 'border-slate-200 bg-white'"
+                >
                   @if (product.imageUrl) {
                     <img [src]="getProductImageUrl(product.imageUrl)" [alt]="product.name" class="w-full h-full object-cover"/>
                   } @else {
-                    <i class="pi pi-image text-slate-300 text-sm"></i>
+                    <i class="pi pi-image text-sm" [ngClass]="themeService.isDarkMode() ? 'text-slate-600' : 'text-slate-300'"></i>
                   }
                 </div>
                 <div class="flex flex-col min-w-0">
-                  <p class="font-semibold text-slate-800 tracking-tight leading-tight truncate text-sm mb-0.5">{{ product.name }}</p>
+                  <p 
+                    class="font-semibold tracking-tight leading-tight truncate text-sm mb-0.5"
+                    [ngClass]="themeService.isDarkMode() ? 'text-[#F0F6FC]' : 'text-slate-800'"
+                  >
+                    {{ product.name }}
+                  </p>
                   <div class="flex items-center gap-1.5">
-                    <span class="text-[10.5px] bg-[#7c5aac]/14 text-[#6d4b99] px-1.5 py-0.5 rounded-md font-semibold border border-[#7c5aac]/35" *ngIf="product.category">
-                      {{ product.category.name }}
-                    </span>
+                    @if (product.category) {
+                      <span 
+                        class="text-[10.5px] px-1.5 py-0.5 rounded-md font-semibold border"
+                        [ngClass]="themeService.isDarkMode() 
+                          ? 'bg-[#1C2D42] text-[#58A6FF] border-[#58A6FF]/30' 
+                          : 'bg-[#7c5aac]/14 text-[#6d4b99] border-[#7c5aac]/35'"
+                      >
+                        {{ product.category.name }}
+                      </span>
+                    }
                     @if (product.isMaster) {
-                      <p-tag value="Maestro" severity="secondary" [rounded]="false" styleClass="!text-[10px] !font-semibold !rounded-md !px-1.5 !py-0.2 !bg-[#eddde1]/50 !text-[#762f41] !border !border-[#762f41]/50 shadow-2xs" icon="pi pi-sitemap"/>
+                      <span 
+                        class="text-[10px] font-semibold rounded-md px-1.5 py-0.5 border shadow-2xs inline-flex items-center gap-1"
+                        [ngClass]="themeService.isDarkMode() 
+                          ? 'bg-purple-950/40 text-purple-300 border-purple-800/50' 
+                          : 'bg-[#eddde1]/50 text-[#762f41] border-[#762f41]/50'"
+                      >
+                        <i class="pi pi-sitemap text-[9px]"></i>
+                        Maestro
+                      </span>
                     }
                   </div>
                 </div>
               </div>
             </td>
-            <td class="!py-2.5 !pl-3 border-r border-[#762f41]/18 !text-left">
-              <span class="text-xs text-slate-700 font-medium">{{ getProductTypeLabel(product.type) }}</span>
+            <td class="!py-2.5 !pl-3 !text-left" [ngClass]="themeService.isDarkMode() ? 'border-r border-[#30363D]' : 'border-r border-[#762f41]/18'">
+              <span 
+                class="text-xs font-medium"
+                [ngClass]="themeService.isDarkMode() ? 'text-[#8B949E]' : 'text-slate-700'"
+              >
+                {{ getProductTypeLabel(product.type) }}
+              </span>
             </td>
-            <td class="!py-2.5 !px-2 border-r border-[#762f41]/18 !text-center">
+            <td class="!py-2.5 !px-2 !text-center" [ngClass]="themeService.isDarkMode() ? 'border-r border-[#30363D]' : 'border-r border-[#762f41]/18'">
               @if (product.sku) {
                 <button 
                   type="button"
                   (click)="copyToClipboard(product.sku, 'SKU', $event)"
                   pTooltip="Copiar SKU" 
                   tooltipPosition="top"
-                  class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md bg-brand-variant/[0.08] text-brand-variant border border-brand-variant/30 hover:bg-brand-variant/[0.18] hover:border-brand-variant/55 transition-all active:scale-95 text-[10px] font-semibold tracking-wide cursor-pointer select-none group shadow-2xs"
+                  class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md transition-all active:scale-95 text-[10px] font-semibold tracking-wide cursor-pointer select-none group shadow-2xs border"
+                  [ngClass]="themeService.isDarkMode() 
+                    ? 'bg-[#1C2128] text-[#58A6FF] border-[#30363D] hover:border-[#58A6FF]/60 hover:bg-[#252C37]' 
+                    : 'bg-brand-variant/[0.08] text-brand-variant border-brand-variant/30 hover:bg-brand-variant/[0.18] hover:border-brand-variant/55'"
                 >
                   <span>{{ product.sku }}</span>
                   <i class="pi pi-copy text-[8.5px] opacity-40 group-hover:opacity-100 transition-opacity"></i>
                 </button>
               }
             </td>
-            <td class="!py-2.5 !px-2 border-r border-[#762f41]/18 !text-center">
+            <td class="!py-2.5 !px-2 !text-center" [ngClass]="themeService.isDarkMode() ? 'border-r border-[#30363D]' : 'border-r border-[#762f41]/18'">
               @if (product.barcode) {
                 <button 
                   type="button"
                   (click)="copyToClipboard(product.barcode, 'Código de barras', $event)"
                   pTooltip="Copiar código de barras" 
                   tooltipPosition="top"
-                  class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md bg-brand-variant/[0.08] text-brand-variant border border-brand-variant/30 hover:bg-brand-variant/[0.18] hover:border-brand-variant/55 transition-all active:scale-95 text-[10px] font-semibold tracking-wide cursor-pointer select-none group shadow-2xs"
+                  class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md transition-all active:scale-95 text-[10px] font-semibold tracking-wide cursor-pointer select-none group shadow-2xs border"
+                  [ngClass]="themeService.isDarkMode() 
+                    ? 'bg-[#1C2128] text-[#58A6FF] border-[#30363D] hover:border-[#58A6FF]/60 hover:bg-[#252C37]' 
+                    : 'bg-brand-variant/[0.08] text-brand-variant border-brand-variant/30 hover:bg-brand-variant/[0.18] hover:border-brand-variant/55'"
                 >
                   <span>{{ product.barcode }}</span>
                   <i class="pi pi-copy text-[8.5px] opacity-40 group-hover:opacity-100 transition-opacity"></i>
                 </button>
               } @else {
-                <span class="text-xs">Sin Asignar</span>
+                <span class="text-xs" [ngClass]="themeService.isDarkMode() ? 'text-[#8B949E]' : 'text-slate-400'">Sin Asignar</span>
               }
             </td>
-            <td class="!py-2.5 !pr-3 border-r border-[#762f41]/18 !text-right">
-              <span class="text-xs font-medium text-slate-600">{{ product.cost | currency: 'Q ' }}</span>
+            <td class="!py-2.5 !pr-3 !text-right tabular-nums" [ngClass]="themeService.isDarkMode() ? 'border-r border-[#30363D]' : 'border-r border-[#762f41]/18'">
+              <span class="text-xs font-medium" [ngClass]="themeService.isDarkMode() ? 'text-[#8B949E]' : 'text-slate-600'">
+                {{ product.cost | currency: 'Q ' }}
+              </span>
             </td>
-            <td class="!py-2.5 !pr-3 border-r border-[#762f41]/18 !text-right">
-              <span class="text-xs font-bold text-[#762f41]">{{ product.price | currency: 'Q ' }}</span>
+            <td class="!py-2.5 !pr-3 !text-right tabular-nums" [ngClass]="themeService.isDarkMode() ? 'border-r border-[#30363D]' : 'border-r border-[#762f41]/18'">
+              <span class="text-xs font-bold" [ngClass]="themeService.isDarkMode() ? 'text-[#58A6FF]' : 'text-[#762f41]'">
+                {{ product.price | currency: 'Q ' }}
+              </span>
             </td>
-            <td class="!text-center !py-2.5 !px-2 border-r border-[#762f41]/18">
+            <td class="!text-center !py-2.5 !px-2" [ngClass]="themeService.isDarkMode() ? 'border-r border-[#30363D]' : 'border-r border-[#762f41]/18'">
               <app-status-badge
                 [value]="isDeleted(product) ? 'Eliminado' : 'Activo'"
                 [severity]="isDeleted(product) ? 'danger' : 'success'"
@@ -175,7 +230,10 @@
                     <button 
                       type="button" 
                       (click)="onCreateVariant(product)" 
-                      class="px-2 py-1 rounded-md text-[11px] font-semibold inline-flex items-center gap-1 border border-[#a04576]/50 bg-brand-variant/[0.08] text-[#a04576] hover:bg-brand-variant/[0.18] hover:border-[#a04576]/85 hover:text-[#883260] transition-all cursor-pointer shadow-2xs active:scale-95"
+                      class="px-2 py-1 rounded-md text-[11px] font-semibold inline-flex items-center gap-1 border transition-all cursor-pointer shadow-2xs active:scale-95"
+                      [ngClass]="themeService.isDarkMode() 
+                        ? 'border-purple-800/60 bg-purple-950/30 text-purple-300 hover:bg-purple-900/40 hover:border-purple-600' 
+                        : 'border-[#a04576]/50 bg-brand-variant/[0.08] text-[#a04576] hover:bg-brand-variant/[0.18] hover:border-[#a04576]/85 hover:text-[#883260]'"
                     >
                       <i class="pi pi-plus text-[9px]"></i>
                       <span>Variante</span>
@@ -184,7 +242,10 @@
                   <button 
                     type="button" 
                     (click)="onEditProduct(product.id)" 
-                    class="px-2 py-1 rounded-md text-[11px] font-semibold inline-flex items-center gap-1 border border-amber-600/45 bg-amber-500/[0.08] text-amber-700 hover:bg-amber-500/[0.18] hover:border-amber-600/85 hover:text-amber-800 transition-all cursor-pointer shadow-2xs active:scale-95"
+                    class="px-2 py-1 rounded-md text-[11px] font-semibold inline-flex items-center gap-1 border transition-all cursor-pointer shadow-2xs active:scale-95"
+                    [ngClass]="themeService.isDarkMode() 
+                      ? 'border-amber-800/60 bg-amber-950/30 text-amber-300 hover:bg-amber-900/40 hover:border-amber-600' 
+                      : 'border-amber-600/45 bg-amber-500/[0.08] text-amber-700 hover:bg-amber-500/[0.18] hover:border-amber-600/85 hover:text-amber-800'"
                   >
                     <i class="pi pi-pencil text-[9px]"></i>
                     <span>Editar</span>
@@ -192,7 +253,10 @@
                   <button 
                     type="button" 
                     (click)="onDeleteProduct(product)" 
-                    class="px-2 py-1 rounded-md text-[11px] font-semibold inline-flex items-center gap-1 border border-rose-500/45 bg-rose-500/[0.08] text-rose-600 hover:bg-rose-500/[0.18] hover:border-rose-500/85 hover:text-rose-700 transition-all cursor-pointer shadow-2xs active:scale-95"
+                    class="px-2 py-1 rounded-md text-[11px] font-semibold inline-flex items-center gap-1 border transition-all cursor-pointer shadow-2xs active:scale-95"
+                    [ngClass]="themeService.isDarkMode() 
+                      ? 'border-rose-800/60 bg-rose-950/30 text-rose-300 hover:bg-rose-900/40 hover:border-rose-600' 
+                      : 'border-rose-500/45 bg-rose-500/[0.08] text-rose-600 hover:bg-rose-500/[0.18] hover:border-rose-500/85 hover:text-rose-700'"
                   >
                     <i class="pi pi-trash text-[9px]"></i>
                     <span>Eliminar</span>
@@ -201,7 +265,10 @@
                   <button 
                     type="button" 
                     (click)="onRestoreProduct(product)" 
-                    class="px-2 py-1 rounded-md text-[11px] font-semibold inline-flex items-center gap-1 border border-emerald-500/45 bg-emerald-500/[0.08] text-emerald-600 hover:bg-emerald-500/[0.18] hover:border-emerald-500/85 hover:text-emerald-700 transition-all cursor-pointer shadow-2xs active:scale-95"
+                    class="px-2 py-1 rounded-md text-[11px] font-semibold inline-flex items-center gap-1 border transition-all cursor-pointer shadow-2xs active:scale-95"
+                    [ngClass]="themeService.isDarkMode() 
+                      ? 'border-emerald-800/60 bg-emerald-950/30 text-emerald-300 hover:bg-emerald-900/40 hover:border-emerald-600' 
+                      : 'border-emerald-500/45 bg-emerald-500/[0.08] text-emerald-600 hover:bg-emerald-500/[0.18] hover:border-emerald-500/85 hover:text-emerald-700'"
                   >
                     <i class="pi pi-refresh text-[9px]"></i>
                     <span>Restaurar</span>
@@ -214,20 +281,41 @@
 
         <ng-template #expandedrow let-product>
           <tr>
-            <td colspan="9" class="!p-0 border-b border-[#762f41]/25">
-              <div class="px-8 py-4 bg-[#eddde1]/20 relative overflow-hidden">
+            <td colspan="9" class="!p-0" [ngClass]="themeService.isDarkMode() ? 'border-b border-[#30363D]' : 'border-b border-[#762f41]/25'">
+              <div 
+                class="px-8 py-4 relative overflow-hidden transition-colors"
+                [ngClass]="themeService.isDarkMode() ? 'bg-[#0D1117]/80' : 'bg-[#eddde1]/20'"
+              >
                 <div class="flex items-center gap-2 mb-3 relative z-10">
-                  <i class="pi pi-sitemap text-[#762f41] text-xs"></i>
-                  <span class="text-[11px] font-bold text-[#762f41] uppercase tracking-wider">Variantes Disponibles</span>
-                  <span class="text-[10px] bg-white text-[#762f41] px-2 py-0.5 rounded-full font-bold border border-[#762f41]/30 shadow-2xs">
+                  <i class="pi pi-sitemap text-xs" [ngClass]="themeService.isDarkMode() ? 'text-[#58A6FF]' : 'text-[#762f41]'"></i>
+                  <span 
+                    class="text-[11px] font-bold uppercase tracking-wider"
+                    [ngClass]="themeService.isDarkMode() ? 'text-[#F0F6FC]' : 'text-[#762f41]'"
+                  >
+                    Variantes Disponibles
+                  </span>
+                  <span 
+                    class="text-[10px] px-2 py-0.5 rounded-full font-bold border shadow-2xs"
+                    [ngClass]="themeService.isDarkMode() 
+                      ? 'bg-[#161B22] text-[#58A6FF] border-[#30363D]' 
+                      : 'bg-white text-[#762f41] border-[#762f41]/30'"
+                  >
                     {{ product.variants?.length || 0 }}
                   </span>
                 </div>
                 
-                <div class="bg-white rounded-xl border border-[#762f41]/35 shadow-xs overflow-hidden">
-                  <p-table [value]="product.variants || []" class="p-datatable-sm">
+                <div 
+                  class="rounded-xl border shadow-xs overflow-hidden"
+                  [ngClass]="themeService.isDarkMode() ? 'bg-[#161B22] border-[#30363D]' : 'bg-white border-[#762f41]/35'"
+                >
+                  <p-table [value]="product.variants || []" class="p-datatable-sm" [ngClass]="themeService.isDarkMode() ? 'theme-dark' : ''">
                     <ng-template pTemplate="header">
-                      <tr class="bg-[#eddde1]/60 text-[11px] text-[#3b141e] uppercase tracking-wider font-semibold h-10! border-b border-[#762f41]/30">
+                      <tr 
+                        class="text-[11px] uppercase tracking-wider font-semibold h-10! border-b"
+                        [ngClass]="themeService.isDarkMode() 
+                          ? 'bg-[#1C2128] text-[#8B949E] border-[#30363D]' 
+                          : 'bg-[#eddde1]/60 text-[#3b141e] border-[#762f41]/30'"
+                      >
                         <th class="!pl-6 w-[270px]">Producto / Variante</th>
                         <th class="w-[130px] !text-left !pl-3">Tipo</th>
                         <th class="w-[110px] !text-center">SKU</th>
@@ -239,20 +327,38 @@
                       </tr>
                     </ng-template>
                     <ng-template pTemplate="body" let-variant>
-                      <tr class="text-sm border-b border-[#762f41]/15 last:border-0 hover:!bg-[#eddde1]/35 transition-colors duration-150">
+                      <tr 
+                        class="text-sm border-b last:border-0 transition-colors duration-150"
+                        [ngClass]="themeService.isDarkMode() 
+                          ? 'bg-[#161B22] hover:!bg-[#1F242C] border-[#30363D]' 
+                          : 'hover:!bg-[#eddde1]/35 border-[#762f41]/15'"
+                      >
                         <td class="!pl-6 py-2.5">
                           <div class="flex items-center gap-3">
-                            <div class="w-9 h-9 rounded-lg shadow-2xs border border-slate-200 bg-white shrink-0 flex items-center justify-center overflow-hidden">
+                            <div 
+                              class="w-9 h-9 rounded-lg shadow-2xs border shrink-0 flex items-center justify-center overflow-hidden"
+                              [ngClass]="themeService.isDarkMode() ? 'border-[#30363D] bg-[#0D1117]' : 'border-slate-200 bg-white'"
+                            >
                                @if (variant.imageUrl) {
                                  <img [src]="getProductImageUrl(variant.imageUrl)" class="w-full h-full object-cover" />
                                } @else {
-                                 <i class="pi pi-image text-slate-300 text-xs"></i>
+                                 <i class="pi pi-image text-xs" [ngClass]="themeService.isDarkMode() ? 'text-slate-600' : 'text-slate-300'"></i>
                                }
                             </div>
                             <div class="flex flex-col min-w-0">
-                               <span class="font-semibold text-slate-800 text-sm truncate">{{ variant.name }}</span>
+                               <span 
+                                class="font-semibold text-sm truncate"
+                                [ngClass]="themeService.isDarkMode() ? 'text-[#F0F6FC]' : 'text-slate-800'"
+                               >
+                                {{ variant.name }}
+                              </span>
                                <div class="flex items-center gap-1.5" *ngIf="variant.category">
-                                  <span class="text-[10.5px] bg-[#7c5aac]/14 text-[#6d4b99] px-1.5 py-0.5 rounded-md font-semibold border border-[#7c5aac]/35">
+                                  <span 
+                                    class="text-[10.5px] px-1.5 py-0.5 rounded-md font-semibold border"
+                                    [ngClass]="themeService.isDarkMode() 
+                                      ? 'bg-[#1C2D42] text-[#58A6FF] border-[#58A6FF]/30' 
+                                      : 'bg-[#7c5aac]/14 text-[#6d4b99] border-[#7c5aac]/35'"
+                                  >
                                     {{ variant.category.name }}
                                   </span>
                                </div>
@@ -260,7 +366,12 @@
                           </div>
                         </td>
                         <td class="py-2.5 !pl-3 !text-left">
-                          <span class="text-xs text-slate-700 font-medium">{{ getProductTypeLabel(variant.type || product.type) }}</span>
+                          <span 
+                            class="text-xs font-medium"
+                            [ngClass]="themeService.isDarkMode() ? 'text-[#8B949E]' : 'text-slate-700'"
+                          >
+                            {{ getProductTypeLabel(variant.type || product.type) }}
+                          </span>
                         </td>
                         <td class="py-2.5 !text-center">
                           @if (variant.sku) {
@@ -269,7 +380,10 @@
                               (click)="copyToClipboard(variant.sku, 'SKU', $event)"
                               pTooltip="Copiar SKU" 
                               tooltipPosition="top"
-                              class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md bg-brand-variant/[0.08] text-brand-variant border border-brand-variant/30 hover:bg-brand-variant/[0.18] hover:border-brand-variant/55 transition-all active:scale-95 text-[10px] font-semibold tracking-wide cursor-pointer select-none group shadow-2xs"
+                              class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md transition-all active:scale-95 text-[10px] font-semibold tracking-wide cursor-pointer select-none group shadow-2xs border"
+                              [ngClass]="themeService.isDarkMode() 
+                                ? 'bg-[#1C2128] text-[#58A6FF] border-[#30363D] hover:border-[#58A6FF]/60 hover:bg-[#252C37]' 
+                                : 'bg-brand-variant/[0.08] text-brand-variant border-brand-variant/30 hover:bg-brand-variant/[0.18] hover:border-brand-variant/55'"
                             >
                               <span>{{ variant.sku }}</span>
                               <i class="pi pi-copy text-[8.5px] opacity-40 group-hover:opacity-100 transition-opacity"></i>
@@ -283,20 +397,27 @@
                               (click)="copyToClipboard(variant.barcode, 'Código de barras', $event)"
                               pTooltip="Copiar código de barras" 
                               tooltipPosition="top"
-                              class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md bg-brand-variant/[0.08] text-brand-variant border border-brand-variant/30 hover:bg-brand-variant/[0.18] hover:border-brand-variant/55 transition-all active:scale-95 text-[10px] font-semibold tracking-wide cursor-pointer select-none group shadow-2xs"
+                              class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md transition-all active:scale-95 text-[10px] font-semibold tracking-wide cursor-pointer select-none group shadow-2xs border"
+                              [ngClass]="themeService.isDarkMode() 
+                                ? 'bg-[#1C2128] text-[#58A6FF] border-[#30363D] hover:border-[#58A6FF]/60 hover:bg-[#252C37]' 
+                                : 'bg-brand-variant/[0.08] text-brand-variant border-brand-variant/30 hover:bg-brand-variant/[0.18] hover:border-brand-variant/55'"
                             >
                               <span>{{ variant.barcode }}</span>
                               <i class="pi pi-copy text-[8.5px] opacity-40 group-hover:opacity-100 transition-opacity"></i>
                             </button>
                           } @else {
-                            <span class="text-xs">Sin Asignar</span>
+                            <span class="text-xs" [ngClass]="themeService.isDarkMode() ? 'text-[#8B949E]' : 'text-slate-400'">Sin Asignar</span>
                           }
                         </td>
-                        <td class="py-2.5 !text-right !pr-3">
-                          <span class="text-xs font-medium text-slate-600">{{ variant.cost | currency: 'Q ' }}</span>
+                        <td class="py-2.5 !text-right !pr-3 tabular-nums">
+                          <span class="text-xs font-medium" [ngClass]="themeService.isDarkMode() ? 'text-[#8B949E]' : 'text-slate-600'">
+                            {{ variant.cost | currency: 'Q ' }}
+                          </span>
                         </td>
-                        <td class="py-2.5 !text-right !pr-3">
-                          <span class="text-xs font-bold text-[#762f41]">{{ variant.price | currency: 'Q ' }}</span>
+                        <td class="py-2.5 !text-right !pr-3 tabular-nums">
+                          <span class="text-xs font-bold" [ngClass]="themeService.isDarkMode() ? 'text-[#58A6FF]' : 'text-[#762f41]'">
+                            {{ variant.price | currency: 'Q ' }}
+                          </span>
                         </td>
                         <td class="text-center py-2.5">
                           <app-status-badge
@@ -310,7 +431,10 @@
                               <button 
                                 type="button" 
                                 (click)="onEditProduct(variant.id)" 
-                                class="px-2 py-1 rounded-md text-[11px] font-semibold inline-flex items-center gap-1 border border-amber-600/45 bg-amber-500/[0.08] text-amber-700 hover:bg-amber-500/[0.18] hover:border-amber-600/85 hover:text-amber-800 transition-all cursor-pointer shadow-2xs active:scale-95"
+                                class="px-2 py-1 rounded-md text-[11px] font-semibold inline-flex items-center gap-1 border transition-all cursor-pointer shadow-2xs active:scale-95"
+                                [ngClass]="themeService.isDarkMode() 
+                                  ? 'border-amber-800/60 bg-amber-950/30 text-amber-300 hover:bg-amber-900/40 hover:border-amber-600' 
+                                  : 'border-amber-600/45 bg-amber-500/[0.08] text-amber-700 hover:bg-amber-500/[0.18] hover:border-amber-600/85 hover:text-amber-800'"
                               >
                                 <i class="pi pi-pencil text-[9px]"></i>
                                 <span>Editar</span>
@@ -318,7 +442,10 @@
                               <button 
                                 type="button" 
                                 (click)="onDeleteProduct(variant)" 
-                                class="px-2 py-1 rounded-md text-[11px] font-semibold inline-flex items-center gap-1 border border-rose-500/45 bg-rose-500/[0.08] text-rose-600 hover:bg-rose-500/[0.18] hover:border-rose-500/85 hover:text-rose-700 transition-all cursor-pointer shadow-2xs active:scale-95"
+                                class="px-2 py-1 rounded-md text-[11px] font-semibold inline-flex items-center gap-1 border transition-all cursor-pointer shadow-2xs active:scale-95"
+                                [ngClass]="themeService.isDarkMode() 
+                                  ? 'border-rose-800/60 bg-rose-950/30 text-rose-300 hover:bg-rose-900/40 hover:border-rose-600' 
+                                  : 'border-rose-500/45 bg-rose-500/[0.08] text-rose-600 hover:bg-rose-500/[0.18] hover:border-rose-500/85 hover:text-rose-700'"
                               >
                                 <i class="pi pi-trash text-[9px]"></i>
                                 <span>Eliminar</span>
@@ -362,37 +489,59 @@
         <ng-template pTemplate="body" let-product let-expanded="expanded">
           <tr class="bg-transparent border-none block" [ngClass]="{ 'opacity-60 grayscale-[0.5]': isDeleted(product) }">
             <td class="block !p-0 border-none bg-transparent">
-              <div class="bg-white rounded-2xl shadow-sm border border-slate-200 mx-4 my-2.5 flex flex-col overflow-hidden relative">
+              <div 
+                class="rounded-2xl shadow-sm border mx-4 my-2.5 flex flex-col overflow-hidden relative transition-colors"
+                [ngClass]="themeService.isDarkMode() ? 'bg-[#161B22] border-[#30363D]' : 'bg-white border-slate-200'"
+              >
                 
-                <div class="flex p-4 items-center gap-2">
-                  <div class="w-12 h-12 rounded-lg flex-shrink-0 flex items-center justify-center overflow-hidden border border-[#4A7FA7] bg-[#D0E2F2] shadow-sm">
+                <div class="flex p-4 items-center gap-3">
+                  <div 
+                    class="w-12 h-12 rounded-lg flex-shrink-0 flex items-center justify-center overflow-hidden border shadow-sm"
+                    [ngClass]="themeService.isDarkMode() ? 'border-[#30363D] bg-[#0D1117]' : 'border-[#4A7FA7] bg-[#D0E2F2]'"
+                  >
                     @if (product.imageUrl) {
                       <img [src]="getProductImageUrl(product.imageUrl)" [alt]="product.name" class="w-full h-full object-cover"/>
                     } @else {
-                      <i class="pi pi-box text-lg! text-[#3B5B8A]"></i>
+                      <i class="pi pi-box text-lg!" [ngClass]="themeService.isDarkMode() ? 'text-slate-500' : 'text-[#3B5B8A]'"></i>
                     }
                   </div>
                   <div class="flex-1 min-w-0">
                     <div class="flex justify-between items-start gap-1">
                       <div class="flex flex-col min-w-0">
-                        <span class="text-[10px] text-[#3B5B8A] font-semibold leading-none truncate tracking-wide">{{ product.sku }}</span>
-                        <h3 class="font-semibold text-slate-800 text-lg leading-tight truncate">{{ product.name }}</h3>
+                        <span 
+                          class="text-[10px] font-semibold leading-none truncate tracking-wide"
+                          [ngClass]="themeService.isDarkMode() ? 'text-[#58A6FF]' : 'text-[#3B5B8A]'"
+                        >
+                          {{ product.sku }}
+                        </span>
+                        <h3 
+                          class="font-semibold text-lg leading-tight truncate mt-1"
+                          [ngClass]="themeService.isDarkMode() ? 'text-[#F0F6FC]' : 'text-slate-800'"
+                        >
+                          {{ product.name }}
+                        </h3>
                       </div>
-                      @if (isDeleted(product)) {
-                        <p-tag severity="danger" value="Eliminado" styleClass="!text-[10px] !font-semibold px-1.5 py-0.5 rounded-md" />
-                      } @else {
-                        <p-tag severity="success" value="Activo" styleClass="!text-[10px] !font-semibold px-1.5 py-0.5 rounded-md" />
-                      }
+                      <app-status-badge
+                        [value]="isDeleted(product) ? 'Eliminado' : 'Activo'"
+                        [severity]="isDeleted(product) ? 'danger' : 'success'"
+                        size="xs"
+                      />
                     </div>
-                    <div class="flex items-center gap-2 mt-2">
+                    <div class="flex items-center gap-3 mt-2">
                       <div>
-                        <p class="text-[9px] font-medium text-[#3B5B8A]">Precio</p>
-                        <p class="text-[18px] font-bold text-[#4878c0] leading-none">{{ product.price | currency: 'Q ' }}</p>
+                        <p class="text-[9px] font-medium" [ngClass]="themeService.isDarkMode() ? 'text-[#8B949E]' : 'text-[#3B5B8A]'">Precio</p>
+                        <p class="text-[18px] font-bold leading-none" [ngClass]="themeService.isDarkMode() ? 'text-[#58A6FF]' : 'text-[#4878c0]'">
+                          {{ product.price | currency: 'Q ' }}
+                        </p>
                       </div>
-                      <div class="flex flex-col">
-                        <p class="text-[9px] font-medium text-[#3B5B8A]">Costo</p>
-                        <span class="text-[11px] text-slate-400 line-through" *ngIf="product.cost">{{ product.cost | currency: 'Q ' }}</span>
-                      </div>
+                      @if (product.cost) {
+                        <div class="flex flex-col">
+                          <p class="text-[9px] font-medium" [ngClass]="themeService.isDarkMode() ? 'text-[#8B949E]' : 'text-[#3B5B8A]'">Costo</p>
+                          <span class="text-[11px] line-through" [ngClass]="themeService.isDarkMode() ? 'text-slate-500' : 'text-slate-400'">
+                            {{ product.cost | currency: 'Q ' }}
+                          </span>
+                        </div>
+                      }
                     </div>
                   </div>
                 </div>
@@ -400,40 +549,104 @@
                 <!-- Labels/Tags Section -->
                 <div class="px-4 pb-4 flex items-center gap-2 overflow-x-auto no-scrollbar">
                   @if (product.category) {
-                    <span class="inline-flex text-[11px] bg-slate-100 text-slate-500 font-semibold px-2 py-0.5 rounded border border-slate-200">
+                    <span 
+                      class="inline-flex text-[11px] font-semibold px-2 py-0.5 rounded border"
+                      [ngClass]="themeService.isDarkMode() 
+                        ? 'bg-[#1C2D42] text-[#58A6FF] border-[#58A6FF]/30' 
+                        : 'bg-slate-100 text-slate-500 border-slate-200'"
+                    >
                       {{ product.category.name }}
                     </span>
                   }
                   @if (product.isMaster) {
-                    <p-tag value="Maestro" severity="secondary" styleClass="!text-[11px] !font-semibold px-2 py-0.5 rounded-md !bg-indigo-600 !text-white !border-none" icon="pi pi-sitemap" />
+                    <span 
+                      class="inline-flex text-[11px] font-semibold px-2 py-0.5 rounded-md border"
+                      [ngClass]="themeService.isDarkMode() 
+                        ? 'bg-purple-950/40 text-purple-300 border-purple-800/50' 
+                        : 'bg-indigo-600 text-white border-indigo-600'"
+                    >
+                      <i class="pi pi-sitemap text-[10px] mr-1"></i>
+                      Maestro
+                    </span>
                   }
                   @if (product.type) {
-                    <p-tag [value]="getProductTypeLabel(product.type)" [severity]="getTypeSeverity(product.type)" styleClass="!text-[11px] !font-semibold px-2 py-0.5 rounded-md" />
+                    <span 
+                      class="inline-flex text-[11px] font-semibold px-2 py-0.5 rounded border"
+                      [ngClass]="themeService.isDarkMode() 
+                        ? 'bg-[#1C2128] text-[#8B949E] border-[#30363D]' 
+                        : 'bg-slate-100 text-slate-700 border-slate-200'"
+                    >
+                      {{ getProductTypeLabel(product.type) }}
+                    </span>
                   }
                 </div>
 
                 <!-- Footer Actions -->
-                <div class="bg-slate-50/50 border-t border-slate-100 p-2 px-3 flex items-center justify-between">
+                <div 
+                  class="border-t p-2 px-3 flex items-center justify-between"
+                  [ngClass]="themeService.isDarkMode() ? 'bg-[#0D1117]/60 border-[#30363D]' : 'bg-slate-50/50 border-slate-100'"
+                >
                   <div class="flex items-center gap-1">
                     @if (product.variants && product.variants.length > 0) {
-                      <p-button 
-                        [label]="product.variants.length + ' var.'" 
-                        [icon]="expanded ? 'pi pi-chevron-up' : 'pi pi-chevron-down'" 
-                        [pRowToggler]="product"
-                        [text]="true"
-                        styleClass="!text-indigo-600 font-bold text-[10px] tracking-widest uppercase !py-1 !px-2.5 rounded-lg border border-indigo-100 bg-white shadow-sm"
-                      ></p-button>
+                      <button 
+                        type="button"
+                        (click)="toggleRowExpansion(product)"
+                        class="font-bold text-[10px] tracking-widest uppercase py-1 px-2.5 rounded-lg border shadow-sm inline-flex items-center gap-1 cursor-pointer transition-colors"
+                        [ngClass]="themeService.isDarkMode() 
+                          ? 'bg-[#1C2128] text-[#58A6FF] border-[#30363D] hover:bg-[#252C37]' 
+                          : 'bg-white text-indigo-600 border-indigo-100'"
+                      >
+                        <i [class]="expanded ? 'pi pi-chevron-up' : 'pi pi-chevron-down'"></i>
+                        <span>{{ product.variants.length }} var.</span>
+                      </button>
                     }
                   </div>
-                  <div class="flex items-center gap-1">
+                  <div class="flex items-center gap-1.5">
                     @if (!isDeleted(product)) {
                       @if (product.isMaster) {
-                        <p-button icon="pi pi-plus" styleClass="p-button-text !text-indigo-500 hover:!bg-indigo-50 !w-9 !h-9 !rounded-lg !p-0" (onClick)="onCreateVariant(product)" />
+                        <button 
+                          type="button" 
+                          (click)="onCreateVariant(product)" 
+                          class="p-2 rounded-lg border transition-colors inline-flex items-center justify-center cursor-pointer"
+                          [ngClass]="themeService.isDarkMode() 
+                            ? 'border-purple-800/50 bg-purple-950/30 text-purple-300 hover:bg-purple-900/40' 
+                            : 'border-indigo-100 text-indigo-500 hover:bg-indigo-50'"
+                        >
+                          <i class="pi pi-plus text-xs"></i>
+                        </button>
                       }
-                      <p-button icon="pi pi-pencil" styleClass="p-button-text !text-amber-500 hover:!bg-amber-50 !w-9 !h-9 !rounded-lg !p-0" (onClick)="onEditProduct(product.id)" />
-                      <p-button icon="pi pi-trash" styleClass="p-button-text !text-rose-500 hover:!bg-rose-50 !w-9 !h-9 !rounded-lg !p-0" (onClick)="onDeleteProduct(product)" />
+                      <button 
+                        type="button" 
+                        (click)="onEditProduct(product.id)" 
+                        class="p-2 rounded-lg border transition-colors inline-flex items-center justify-center cursor-pointer"
+                        [ngClass]="themeService.isDarkMode() 
+                          ? 'border-amber-800/50 bg-amber-950/30 text-amber-300 hover:bg-amber-900/40' 
+                          : 'border-amber-100 text-amber-500 hover:bg-amber-50'"
+                      >
+                        <i class="pi pi-pencil text-xs"></i>
+                      </button>
+                      <button 
+                        type="button" 
+                        (click)="onDeleteProduct(product)" 
+                        class="p-2 rounded-lg border transition-colors inline-flex items-center justify-center cursor-pointer"
+                        [ngClass]="themeService.isDarkMode() 
+                          ? 'border-rose-800/50 bg-rose-950/30 text-rose-300 hover:bg-rose-900/40' 
+                          : 'border-rose-100 text-rose-500 hover:bg-rose-50'"
+                      >
+                        <i class="pi pi-trash text-xs"></i>
+                      </button>
                     } @else {
-                      <p-button label="Restaurar" icon="pi pi-refresh" styleClass="p-button-text !text-emerald-500 hover:!bg-emerald-50 text-[10px] font-semibold !py-1 !px-2.5 rounded-lg border border-emerald-100 bg-white shadow-sm" (onClick)="onRestoreProduct(product)" />
+                      <button 
+                        type="button" 
+                        (click)="onRestoreProduct(product)" 
+                        class="text-[10px] font-semibold py-1 px-2.5 rounded-lg border shadow-sm inline-flex items-center gap-1 cursor-pointer transition-colors"
+                        [ngClass]="themeService.isDarkMode() 
+                          ? 'border-emerald-800/50 bg-emerald-950/30 text-emerald-300 hover:bg-emerald-900/40' 
+                          : 'border-emerald-100 bg-white text-emerald-500 hover:bg-emerald-50'"
+                      >
+                        <i class="pi pi-refresh text-[10px]"></i>
+                        <span>Restaurar</span>
+                      </button>
                     }
                   </div>
                 </div>
@@ -445,32 +658,73 @@
         <ng-template #expandedrow let-product>
           <tr>
             <td class="block !p-0 border-none bg-transparent pb-4">
-              <div class="mx-4 px-2 py-4 bg-indigo-50/30 rounded-2xl border-2 border-indigo-100 border-dashed">
+              <div 
+                class="mx-4 px-2 py-4 rounded-2xl border-2 border-dashed transition-colors"
+                [ngClass]="themeService.isDarkMode() ? 'bg-[#161B22]/60 border-[#30363D]' : 'bg-indigo-50/30 border-indigo-100'"
+              >
                 <div class="flex items-center gap-2 mb-3 pl-2">
-                  <i class="pi pi-sitemap text-indigo-500 text-xs"></i>
-                  <span class="text-[9px] font-black text-indigo-900 uppercase tracking-widest">Variantes de este producto</span>
+                  <i class="pi pi-sitemap text-xs" [ngClass]="themeService.isDarkMode() ? 'text-[#58A6FF]' : 'text-indigo-500'"></i>
+                  <span 
+                    class="text-[9px] font-black uppercase tracking-widest"
+                    [ngClass]="themeService.isDarkMode() ? 'text-[#F0F6FC]' : 'text-indigo-900'"
+                  >
+                    Variantes de este producto
+                  </span>
                 </div>
                 
                 <div class="flex flex-col gap-2">
                   @for (variant of product.variants; track variant.id) {
-                    <div class="bg-white p-3 rounded-xl border border-slate-200 flex items-center gap-3 shadow-sm">
-                      <div class="w-10 h-10 rounded-lg bg-slate-50 border border-slate-100 overflow-hidden flex-shrink-0 flex items-center justify-center">
+                    <div 
+                      class="p-3 rounded-xl border flex items-center gap-3 shadow-sm transition-colors"
+                      [ngClass]="themeService.isDarkMode() ? 'bg-[#161B22] border-[#30363D]' : 'bg-white border-slate-200'"
+                    >
+                      <div 
+                        class="w-10 h-10 rounded-lg border overflow-hidden flex-shrink-0 flex items-center justify-center"
+                        [ngClass]="themeService.isDarkMode() ? 'bg-[#0D1117] border-[#30363D]' : 'bg-slate-50 border-slate-100'"
+                      >
                         @if (variant.imageUrl) {
                           <img [src]="getProductImageUrl(variant.imageUrl)" class="w-full h-full object-cover" />
                         } @else {
-                          <i class="pi pi-image text-slate-200 text-xs"></i>
+                          <i class="pi pi-image text-xs" [ngClass]="themeService.isDarkMode() ? 'text-slate-600' : 'text-slate-200'"></i>
                         }
                       </div>
                       <div class="flex-1 min-w-0">
-                        <h4 class="text-[11px] font-bold text-slate-800 leading-tight mb-0.5 truncate">{{ variant.name }}</h4>
+                        <h4 
+                          class="text-[11px] font-bold leading-tight mb-0.5 truncate"
+                          [ngClass]="themeService.isDarkMode() ? 'text-[#F0F6FC]' : 'text-slate-800'"
+                        >
+                          {{ variant.name }}
+                        </h4>
                         <div class="flex items-center gap-2">
-                          <span class="text-[12px] font-black text-indigo-600 tabular-nums">{{ variant.price | currency: 'Q ' }}</span>
-                          <span class="text-[8px] bg-slate-50 text-slate-400 font-bold px-1.5 py-0.5 rounded border border-slate-100 uppercase tracking-tighter">{{ variant.sku }}</span>
+                          <span 
+                            class="text-[12px] font-black tabular-nums"
+                            [ngClass]="themeService.isDarkMode() ? 'text-[#58A6FF]' : 'text-indigo-600'"
+                          >
+                            {{ variant.price | currency: 'Q ' }}
+                          </span>
+                          <span 
+                            class="text-[8px] font-bold px-1.5 py-0.5 rounded border uppercase tracking-tighter"
+                            [ngClass]="themeService.isDarkMode() ? 'bg-[#1C2128] text-[#8B949E] border-[#30363D]' : 'bg-slate-50 text-slate-400 border-slate-100'"
+                          >
+                            {{ variant.sku }}
+                          </span>
                         </div>
                       </div>
                       <div class="flex gap-1">
-                        <button pButton icon="pi pi-pencil" class="p-button-rounded p-button-text !w-8 !h-8 !text-amber-500 bg-slate-50" (click)="onEditProduct(variant.id)"></button>
-                        <button pButton icon="pi pi-trash" class="p-button-rounded p-button-text !w-8 !h-8 !text-rose-500 bg-slate-50" (click)="onDeleteProduct(variant)"></button>
+                        <button 
+                          pButton 
+                          icon="pi pi-pencil" 
+                          class="p-button-rounded p-button-text !w-8 !h-8" 
+                          [ngClass]="themeService.isDarkMode() ? '!text-amber-400 hover:!bg-[#1C2128]' : '!text-amber-500 bg-slate-50'"
+                          (click)="onEditProduct(variant.id)"
+                        ></button>
+                        <button 
+                          pButton 
+                          icon="pi pi-trash" 
+                          class="p-button-rounded p-button-text !w-8 !h-8" 
+                          [ngClass]="themeService.isDarkMode() ? '!text-rose-400 hover:!bg-[#1C2128]' : '!text-rose-500 bg-slate-50'"
+                          (click)="onDeleteProduct(variant)"
+                        ></button>
                       </div>
                     </div>
                   }
@@ -483,11 +737,14 @@
         <ng-template pTemplate="emptymessage">
           <tr>
             <td class="block !p-0 border-none bg-transparent">
-              <div class="bg-white rounded-lg border border-slate-200 mx-4 my-8 p-10 flex flex-col items-center gap-4 text-center">
-                <i class="pi pi-box text-[#95abce]" style="font-size: 4rem"></i>
+              <div 
+                class="rounded-lg border mx-4 my-8 p-10 flex flex-col items-center gap-4 text-center"
+                [ngClass]="themeService.isDarkMode() ? 'bg-[#161B22] border-[#30363D]' : 'bg-white border-slate-200'"
+              >
+                <i class="pi pi-box text-4xl" [ngClass]="themeService.isDarkMode() ? 'text-slate-600' : 'text-[#95abce]'"></i>
                 <div class="flex flex-col gap-1">
-                  <p class="text-[#627ca7] font-bold">No se encontraron productos</p>
-                  <p class="text-[#627ca7] text-xs font-medium">Prueba ajustando los filtros de búsqueda.</p>
+                  <p class="font-bold" [ngClass]="themeService.isDarkMode() ? 'text-[#F0F6FC]' : 'text-[#627ca7]'">No se encontraron productos</p>
+                  <p class="text-xs font-medium" [ngClass]="themeService.isDarkMode() ? 'text-[#8B949E]' : 'text-[#627ca7]'">Prueba ajustando los filtros de búsqueda.</p>
                 </div>
               </div>
             </td>

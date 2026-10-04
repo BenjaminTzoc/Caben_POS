@@ -23,6 +23,7 @@ import { PrimaryButtonComponent } from '../../shared/components/primary-button/p
 import { SearchInputComponent } from '../../shared/components/search-input/search-input.component';
 import { StandardTableComponent } from '../../shared/components/standard-table/standard-table.component';
 import { StatusBadgeComponent } from '../../shared/components/status-badge/status-badge.component';
+import { ThemeService } from '../../core/services/theme.service';
 
 @Component({
   selector: 'app-products',
@@ -52,6 +53,7 @@ export class ProductsComponent implements OnInit {
   @ViewChild('productsDesktopTable') productsDesktopTable?: StandardTableComponent;
   @ViewChild('productsMobileTable') productsMobileTable?: Table;
 
+  public themeService = inject(ThemeService);
   private productsService = inject(ProductsService);
   private messageService = inject(MessageService);
   private confirmService = inject(ConfirmService);

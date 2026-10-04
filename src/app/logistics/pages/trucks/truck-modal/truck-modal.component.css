@@ -1,0 +1,42 @@
+:host {
+  display: block;
+}
+
+/* Dark mode overrides for select popups and controls */
+:host-context(.dark) ::ng-deep .p-select-overlay,
+:host-context(.dark) ::ng-deep .p-dropdown-panel {
+  background: #161B22 !important;
+  border-color: #30363D !important;
+  color: #F0F6FC !important;
+}
+
+:host-context(.dark) ::ng-deep .p-select-option:not(.p-select-option-selected):not(.p-disabled).p-focus,
+:host-context(.dark) ::ng-deep .p-select-option:hover {
+  background: #1C2128 !important;
+  color: #58A6FF !important;
+}
+
+:host-context(.dark) ::ng-deep .p-select-option.p-select-option-selected {
+  background: #1C2D42 !important;
+  color: #58A6FF !important;
+}
+
+:host-context(.dark) ::ng-deep .p-select-header {
+  background: #161B22 !important;
+  border-color: #30363D !important;
+  color: #F0F6FC !important;
+}
+
+:host-context(.dark) ::ng-deep .p-select-filter {
+  background: #0D1117 !important;
+  color: #F0F6FC !important;
+  border-color: #30363D !important;
+}
+
+:host-context(.dark) ::ng-deep .p-select-filter:focus {
+  border-color: #58A6FF !important;
+}
+
+:host-context(.dark) ::ng-deep .p-select-empty-message {
+  color: #8B949E !important;
+}

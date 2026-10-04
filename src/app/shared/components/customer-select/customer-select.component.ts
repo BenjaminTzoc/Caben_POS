@@ -1,8 +1,9 @@
-import { Component, EventEmitter, forwardRef, Input, Output } from '@angular/core';
+import { Component, EventEmitter, forwardRef, inject, Input, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ControlValueAccessor, FormsModule, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { SelectModule } from 'primeng/select';
 import { ICustomer } from '../../../sales/interfaces/customer.interface';
+import { ThemeService } from '../../../core/services/theme.service';
 
 @Component({
   selector: 'app-customer-select',
@@ -18,6 +19,8 @@ import { ICustomer } from '../../../sales/interfaces/customer.interface';
   templateUrl: './customer-select.component.html',
 })
 export class CustomerSelectComponent implements ControlValueAccessor {
+  public themeService = inject(ThemeService);
+
   /** Lista de clientes disponibles */
   @Input() customers: ICustomer[] = [];
 

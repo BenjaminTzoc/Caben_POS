@@ -15,6 +15,12 @@ export const routes: Routes = [
     loadChildren: () => import('./auth/auth.routes').then((m) => m.AUTH_ROUTES),
   },
   {
+    path: 'select-branch',
+    canActivate: [authGuard],
+    loadComponent: () =>
+      import('./pages/select-branch/select-branch.component').then((m) => m.SelectBranchComponent),
+  },
+  {
     path: 'piloto',
     data: { preload: false },
     canActivate: [authGuard, pilotoGuard],

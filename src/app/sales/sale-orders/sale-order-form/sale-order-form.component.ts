@@ -1,5 +1,5 @@
 //prettier-ignore
-import { Component, inject, OnDestroy, OnInit } from '@angular/core';
+import { Component, computed, effect, inject, OnDestroy, OnInit } from '@angular/core';
 //prettier-ignore
 import { AbstractControl, FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, ValidationErrors, Validators } from '@angular/forms';
 import { ButtonModule } from 'primeng/button';
@@ -50,6 +50,8 @@ import { IBankAccount } from '../../interfaces/bank-account.interface';
 import { BankAccountsComponent } from '../../bank-accounts/bank-accounts.component';
 import { ProductsService } from '../../../inventory/services/products.service';
 import { CashSessionDialogComponent } from '../../../shared/components/cash-session-dialog/cash-session-dialog.component';
+import { ThemeService } from '../../../core/services/theme.service';
+import { BranchContextService } from '../../../core/services/branch-context.service';
 
 import { ConfirmationModalComponent } from '../../../shared/components/confirmation-modal/confirmation-modal.component';
 import { PageHeaderComponent } from '../../../shared/components/page-header/page-header.component';
@@ -88,6 +90,8 @@ export class SaleOrderFormComponent implements OnInit, OnDestroy {
   showPaymentsPanel = false;
   private reopenPaymentsAfterRegister = false;
 
+  public themeService = inject(ThemeService);
+  public branchContext = inject(BranchContextService);
   private saleCalculator = inject(SaleCalculatorService);
   private detailManager = inject(SaleDetailManagerService);
   private ordersService = inject(OrdersService);
@@ -109,6 +113,13 @@ export class SaleOrderFormComponent implements OnInit, OnDestroy {
   private productsService = inject(ProductsService);
   private quickQuantityService = inject(QuickQuantityService);
   private destroy$ = new Subject<void>();
+
+  readonly isConsolidatedMode = computed(() => this.branchContext.isGlobalView);
+  readonly activeWorkingBranch = computed(() => this.branchContext.currentBranch());
+
+  get hasActiveWorkingBranch(): boolean {
+    return !this.branchContext.isGlobalView && !!this.branchContext.currentBranch()?.id;
+  }
 
   // Product Catalog
   products: Product[] = [];
@@ -136,6 +147,22 @@ export class SaleOrderFormComponent implements OnInit, OnDestroy {
     { name: 'Encargo Rápido', value: 'Q' }, //QUICK ORDER
   ];
   customers: ICustomer[] = [];
+
+  constructor() {
+    effect(() => {
+      const workingBranch = this.activeWorkingBranch();
+      const isGlobal = this.isConsolidatedMode();
+
+      if (!this.isEditing) {
+        if (!isGlobal && workingBranch?.id) {
+          if (this.orderForm && this.orderForm.get('branchId')?.value !== workingBranch.id) {
+            this.orderForm.patchValue({ branchId: workingBranch.id });
+            this.previousBranchId = workingBranch.id;
+          }
+        }
+      }
+    });
+  }
   selectedCustomer: ICustomer | null = null;
   previousBranchId: string | null = null;
   branches: any[] = [];
@@ -363,6 +390,15 @@ export class SaleOrderFormComponent implements OnInit, OnDestroy {
   }
 
   onBranchChange(event: any): void {
+    if (!this.isEditing && this.hasActiveWorkingBranch) {
+      const workingBranch = this.branchContext.currentBranch();
+      if (workingBranch?.id && event.value !== workingBranch.id) {
+        this.orderForm.get('branchId')?.setValue(workingBranch.id, { emitEvent: false });
+        this.previousBranchId = workingBranch.id;
+      }
+      return;
+    }
+
     const newBranchId = event.value;
 
     if (this.details.length > 0) {
@@ -398,6 +434,15 @@ export class SaleOrderFormComponent implements OnInit, OnDestroy {
     if (!this.branches || this.branches.length === 0) return;
 
     if (this.isEditing) return;
+
+    if (this.hasActiveWorkingBranch) {
+      const workingBranch = this.branchContext.currentBranch();
+      if (workingBranch?.id) {
+        this.orderForm.get('branchId')?.setValue(workingBranch.id);
+        this.previousBranchId = workingBranch.id;
+        return;
+      }
+    }
 
     let selectedBranchId: string | null = null;
 

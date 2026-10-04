@@ -1,4 +1,4 @@
-import { Component, inject, OnInit, Input, Output, EventEmitter, ViewChild, ElementRef } from '@angular/core';
+import { Component, computed, inject, OnInit, Input, Output, EventEmitter, ViewChild, ElementRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { InputTextModule } from 'primeng/inputtext';
 import { InputNumber } from 'primeng/inputnumber';
@@ -33,6 +33,8 @@ import { forkJoin } from 'rxjs';
 import { BranchSelectComponent } from '../../../shared/components/branch-select/branch-select.component';
 import { PrimaryButtonComponent } from '../../../shared/components/primary-button/primary-button.component';
 import { SecondaryButtonComponent } from '../../../shared/components/secondary-button/secondary-button.component';
+import { BranchContextService } from '../../../core/services/branch-context.service';
+import { ThemeService } from '../../../core/services/theme.service';
 
 @Component({
   selector: 'app-inventory-form',
@@ -58,6 +60,7 @@ import { SecondaryButtonComponent } from '../../../shared/components/secondary-b
   styleUrl: './inventory-form.component.css',
 })
 export class InventoryFormComponent implements OnInit {
+  public themeService = inject(ThemeService);
   @ViewChild('ribbonContainer') ribbonContainer?: ElementRef<HTMLDivElement>;
 
   private productsService = inject(ProductsService);
@@ -69,6 +72,11 @@ export class InventoryFormComponent implements OnInit {
   private fb = inject(FormBuilder);
   private router = inject(Router);
 
+  public branchContext = inject(BranchContextService);
+  readonly isConsolidatedMode = computed(() => this.branchContext.isGlobalView);
+  readonly activeWorkingBranch = computed(() => this.branchContext.currentBranch());
+
+  @Input() initialBranchId?: string;
   @Input() isModal = false;
   @Output() onClose = new EventEmitter<void>();
   @Output() onSaved = new EventEmitter<void>();
@@ -110,11 +118,20 @@ export class InventoryFormComponent implements OnInit {
         this.branches = res.data || [];
         this.isLoadingBranches = false;
 
-        // Seleccionar por defecto la primera sucursal con flag isPlant
-        if (this.branches.length > 0 && !this.inventoryForm.get('branchId')?.value) {
-          const plantBranch = this.branches.find((b) => b.isPlant);
-          if (plantBranch) {
-            this.inventoryForm.patchValue({ branchId: plantBranch.id });
+        // Seleccionar por defecto la sucursal activa en memoria o la sucursal inicial
+        if (!this.isConsolidatedMode() && this.activeWorkingBranch()?.id) {
+          this.inventoryForm.patchValue({ branchId: this.activeWorkingBranch()!.id });
+        } else if (this.branches.length > 0 && !this.inventoryForm.get('branchId')?.value) {
+          const preferredBranchId = this.initialBranchId;
+          if (preferredBranchId && this.branches.some((b) => b.id === preferredBranchId)) {
+            this.inventoryForm.patchValue({ branchId: preferredBranchId });
+          } else {
+            const plantBranch = this.branches.find((b) => b.isPlant);
+            if (plantBranch) {
+              this.inventoryForm.patchValue({ branchId: plantBranch.id });
+            } else {
+              this.inventoryForm.patchValue({ branchId: this.branches[0].id });
+            }
           }
         }
       },
@@ -145,8 +162,12 @@ export class InventoryFormComponent implements OnInit {
   }
 
   initForm() {
+    const activeBranchId = (!this.isConsolidatedMode() && this.activeWorkingBranch()?.id)
+      ? this.activeWorkingBranch()!.id
+      : (this.initialBranchId || '');
+
     this.inventoryForm = this.fb.group({
-      branchId: ['', [Validators.required]],
+      branchId: [activeBranchId, [Validators.required]],
       items: this.fb.array([], [Validators.required]),
     });
   }
@@ -249,22 +270,14 @@ export class InventoryFormComponent implements OnInit {
   }
 
   checkUserRole() {
-    this.isSuperAdmin = this.authService.hasPermission('products.manage_global_stock');
-    const user = this.authService.currentUser;
-
-    if (user?.roles?.some((r) => r.isSuperAdmin)) {
-      this.isSuperAdmin = true;
-    }
+    this.isSuperAdmin =
+      this.authService.isSuperAdmin ||
+      this.authService.hasPermission('products.manage_global_stock') ||
+      (this.authService.currentUser?.roles?.some((r) => r.isSuperAdmin || r.name === 'Admin') ?? false);
 
     if (!this.isSuperAdmin) {
-      const userAny = user as any;
-      let userBranchId: string | undefined;
-
-      if (userAny.branchId) {
-        userBranchId = userAny.branchId;
-      } else if (userAny.branch?.id) {
-        userBranchId = userAny.branch.id;
-      }
+      const user = this.authService.currentUser as any;
+      let userBranchId = this.branchContext.currentBranch()?.id || user?.branchId || user?.branch?.id;
 
       if (userBranchId) {
         this.inventoryForm.get('branchId')?.setValue(userBranchId);

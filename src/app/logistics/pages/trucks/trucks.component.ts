@@ -14,6 +14,7 @@ import { SearchInputComponent } from '../../../shared/components/search-input/se
 import { StandardTableComponent } from '../../../shared/components/standard-table/standard-table.component';
 import { StatusBadgeComponent } from '../../../shared/components/status-badge/status-badge.component';
 import { ConfirmationModalComponent } from '../../../shared/components/confirmation-modal/confirmation-modal.component';
+import { ThemeService } from '../../../core/services/theme.service';
 
 @Component({
   selector: 'app-trucks',
@@ -36,6 +37,7 @@ import { ConfirmationModalComponent } from '../../../shared/components/confirmat
   styleUrl: './trucks.component.css',
 })
 export class TrucksComponent implements OnInit {
+  public themeService = inject(ThemeService);
   private trucksService = inject(TrucksService);
   private messageService = inject(MessageService);
 

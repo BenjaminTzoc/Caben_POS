@@ -1,4 +1,4 @@
-<div class="py-4 px-0 md:px-6 bg-slate-50/50 min-h-screen">
+<div class="py-4 px-0 md:px-6 min-h-screen transition-colors duration-200" [ngClass]="themeService.isDarkMode() ? 'bg-[#0D1117]' : 'bg-slate-50/50'">
   <app-page-header
     title="Detalle de liquidación"
     [subtitle]="settlement()?.branchName || ' '"
@@ -11,34 +11,37 @@
 
   <div class="max-w-[1700px] mx-auto px-4 md:px-0 space-y-4 pb-10">
     @if (loading() && !settlement()) {
-      <div class="bg-white rounded-2xl border-2 border-[#48021C]/25 p-12 flex flex-col items-center gap-2 text-sm text-slate-400">
-        <i class="pi pi-spin pi-spinner text-2xl text-[#48021C]"></i>
+      <div class="rounded-2xl p-12 flex flex-col items-center gap-2 text-sm transition-colors"
+        [ngClass]="themeService.isDarkMode() ? 'bg-[#161B22] border border-[#30363D] text-[#8B949E]' : 'bg-white border-2 border-[#48021C]/25 text-slate-400'">
+        <i class="pi pi-spin pi-spinner text-2xl" [ngClass]="themeService.isDarkMode() ? 'text-[#58A6FF]' : 'text-[#48021C]'"></i>
         Cargando liquidación…
       </div>
     }
 
     @if (settlement(); as doc) {
-      <section class="bg-white rounded-2xl border-2 border-[#48021C]/25 shadow-xs overflow-hidden">
-        <div class="py-2.5 px-4 md:px-5 border-b border-[#48021C]/15 bg-[#eddde1]/70 flex flex-wrap items-center gap-2 justify-between">
-          <h2 class="text-sm font-bold text-[#3b141e] m-0">Resumen</h2>
+      <section class="rounded-2xl shadow-xs overflow-hidden transition-colors"
+        [ngClass]="themeService.isDarkMode() ? 'bg-[#161B22] border border-[#30363D]' : 'bg-white border-2 border-[#48021C]/25'">
+        <div class="py-2.5 px-4 md:px-5 border-b flex flex-wrap items-center gap-2 justify-between"
+          [ngClass]="themeService.isDarkMode() ? 'bg-[#1C2128] border-[#30363D]' : 'bg-[#eddde1]/70 border-[#48021C]/15'">
+          <h2 class="text-sm font-bold m-0" [ngClass]="themeService.isDarkMode() ? 'text-[#F0F6FC]' : 'text-[#3b141e]'">Resumen</h2>
           <app-status-badge [value]="statusLabel(doc.status)" [severity]="statusSeverity(doc.status)" size="xs" />
         </div>
         <div class="p-4 md:p-5 grid grid-cols-2 md:grid-cols-4 gap-4 text-xs">
           <div>
-            <p class="text-[10px] font-bold uppercase tracking-wider text-[#9f6587] m-0">Fecha</p>
-            <p class="font-semibold text-slate-800 mt-0.5 m-0">{{ doc.businessDate | date: 'dd/MM/yyyy' }}</p>
+            <p class="text-[10px] font-bold uppercase tracking-wider m-0" [ngClass]="themeService.isDarkMode() ? 'text-[#8B949E]' : 'text-[#9f6587]'">Fecha</p>
+            <p class="font-semibold mt-0.5 m-0" [ngClass]="themeService.isDarkMode() ? 'text-[#F0F6FC]' : 'text-slate-800'">{{ doc.businessDate | date: 'dd/MM/yyyy' }}</p>
           </div>
           <div>
-            <p class="text-[10px] font-bold uppercase tracking-wider text-[#9f6587] m-0">Sucursal</p>
-            <p class="font-semibold text-slate-800 mt-0.5 m-0">{{ doc.branchName }}</p>
+            <p class="text-[10px] font-bold uppercase tracking-wider m-0" [ngClass]="themeService.isDarkMode() ? 'text-[#8B949E]' : 'text-[#9f6587]'">Sucursal</p>
+            <p class="font-semibold mt-0.5 m-0" [ngClass]="themeService.isDarkMode() ? 'text-[#F0F6FC]' : 'text-slate-800'">{{ doc.branchName }}</p>
           </div>
           <div>
-            <p class="text-[10px] font-bold uppercase tracking-wider text-[#9f6587] m-0">Traslado</p>
-            <p class="font-semibold text-slate-800 mt-0.5 m-0">{{ doc.transferNumber || '—' }}</p>
+            <p class="text-[10px] font-bold uppercase tracking-wider m-0" [ngClass]="themeService.isDarkMode() ? 'text-[#8B949E]' : 'text-[#9f6587]'">Traslado</p>
+            <p class="font-semibold mt-0.5 m-0" [ngClass]="themeService.isDarkMode() ? 'text-[#F0F6FC]' : 'text-slate-800'">{{ doc.transferNumber || '—' }}</p>
           </div>
           <div>
-            <p class="text-[10px] font-bold uppercase tracking-wider text-[#9f6587] m-0">Enviada</p>
-            <p class="font-semibold text-slate-800 mt-0.5 m-0">
+            <p class="text-[10px] font-bold uppercase tracking-wider m-0" [ngClass]="themeService.isDarkMode() ? 'text-[#8B949E]' : 'text-[#9f6587]'">Enviada</p>
+            <p class="font-semibold mt-0.5 m-0" [ngClass]="themeService.isDarkMode() ? 'text-[#F0F6FC]' : 'text-slate-800'">
               {{ doc.submittedAt ? (doc.submittedAt | date: 'dd/MM/yyyy hh:mm a') : '—' }}
             </p>
           </div>
@@ -46,22 +49,25 @@
       </section>
 
       @if (doc.cashSessions?.length) {
-        <section class="bg-white rounded-2xl border-2 border-[#48021C]/25 shadow-xs overflow-hidden">
-          <div class="py-2.5 px-4 md:px-5 border-b border-[#48021C]/15 bg-[#eddde1]/70">
-            <h2 class="text-sm font-bold text-[#3b141e] m-0">Cajas del día</h2>
+        <section class="rounded-2xl shadow-xs overflow-hidden transition-colors"
+          [ngClass]="themeService.isDarkMode() ? 'bg-[#161B22] border border-[#30363D]' : 'bg-white border-2 border-[#48021C]/25'">
+          <div class="py-2.5 px-4 md:px-5 border-b"
+            [ngClass]="themeService.isDarkMode() ? 'bg-[#1C2128] border-[#30363D]' : 'bg-[#eddde1]/70 border-[#48021C]/15'">
+            <h2 class="text-sm font-bold m-0" [ngClass]="themeService.isDarkMode() ? 'text-[#F0F6FC]' : 'text-[#3b141e]'">Cajas del día</h2>
           </div>
           <div class="p-4 md:p-5 grid gap-3 md:grid-cols-2">
             @for (session of doc.cashSessions; track session.id) {
-              <div class="rounded-xl border border-[#48021C]/15 px-3.5 py-3">
+              <div class="rounded-xl border px-3.5 py-3 transition-colors"
+                [ngClass]="themeService.isDarkMode() ? 'border-[#30363D] bg-[#0D1117]' : 'border-[#48021C]/15 bg-white'">
                 <div class="flex items-center justify-between gap-2 mb-1.5">
-                  <p class="font-semibold text-slate-800 text-xs truncate m-0">{{ session.userName }}</p>
+                  <p class="font-semibold text-xs truncate m-0" [ngClass]="themeService.isDarkMode() ? 'text-[#F0F6FC]' : 'text-slate-800'">{{ session.userName }}</p>
                   <app-status-badge
                     [value]="cashStatusLabel(session.status)"
                     [severity]="cashStatusSeverity(session.status)"
                     size="xs"
                   />
                 </div>
-                <p class="text-[11px] text-slate-500 tabular-nums m-0">
+                <p class="text-[11px] tabular-nums m-0" [ngClass]="themeService.isDarkMode() ? 'text-[#8B949E]' : 'text-slate-500'">
                   Esperado {{ session.expectedBalance | currency: 'Q ' }}
                   · Contado {{ session.closingBalance | currency: 'Q ' }}
                 </p>
@@ -71,48 +77,57 @@
         </section>
       }
 
-      <section class="bg-white rounded-2xl border-2 border-[#48021C]/25 shadow-xs overflow-hidden">
-        <div class="py-2.5 px-4 md:px-5 border-b border-[#48021C]/15 bg-[#eddde1]/70">
-          <h2 class="text-sm font-bold text-[#3b141e] m-0">Productos</h2>
+      <section class="rounded-2xl shadow-xs overflow-hidden transition-colors"
+        [ngClass]="themeService.isDarkMode() ? 'bg-[#161B22] border border-[#30363D]' : 'bg-white border-2 border-[#48021C]/25'">
+        <div class="py-2.5 px-4 md:px-5 border-b"
+          [ngClass]="themeService.isDarkMode() ? 'bg-[#1C2128] border-[#30363D]' : 'bg-[#eddde1]/70 border-[#48021C]/15'">
+          <h2 class="text-sm font-bold m-0" [ngClass]="themeService.isDarkMode() ? 'text-[#F0F6FC]' : 'text-[#3b141e]'">Productos</h2>
         </div>
         <div class="overflow-x-auto">
           <table class="w-full text-xs border-collapse min-w-[720px]">
-            <thead class="bg-[#eddde1] text-[#3b141e]">
+            <thead [ngClass]="themeService.isDarkMode() ? 'bg-[#1C2128] text-[#8B949E]' : 'bg-[#eddde1] text-[#3b141e]'">
               <tr class="h-11 font-bold">
-                <th class="!text-left !pl-4 border-r border-[#762f41]/35">Producto</th>
-                <th class="!text-right !pr-3 border-r border-[#762f41]/35 w-[130px]">Sistema</th>
-                <th class="!text-right !pr-3 border-r border-[#762f41]/35 w-[130px]">Se queda</th>
-                <th class="!text-right !pr-3 border-r border-[#762f41]/35 w-[130px]">A planta</th>
-                <th class="!text-right !pr-3 border-r border-[#762f41]/35 w-[130px]">Merma</th>
+                <th class="!text-left !pl-4" [ngClass]="themeService.isDarkMode() ? 'border-r border-[#30363D] text-[#F0F6FC]' : 'border-r border-[#762f41]/35'">Producto</th>
+                <th class="!text-right !pr-3 w-[130px]" [ngClass]="themeService.isDarkMode() ? 'border-r border-[#30363D] text-[#F0F6FC]' : 'border-r border-[#762f41]/35'">Sistema</th>
+                <th class="!text-right !pr-3 w-[130px]" [ngClass]="themeService.isDarkMode() ? 'border-r border-[#30363D] text-[#F0F6FC]' : 'border-r border-[#762f41]/35'">Se queda</th>
+                <th class="!text-right !pr-3 w-[130px]" [ngClass]="themeService.isDarkMode() ? 'border-r border-[#30363D] text-[#F0F6FC]' : 'border-r border-[#762f41]/35'">A planta</th>
+                <th class="!text-right !pr-3 w-[130px]" [ngClass]="themeService.isDarkMode() ? 'border-r border-[#30363D] text-[#F0F6FC]' : 'border-r border-[#762f41]/35'">Merma</th>
                 @if (canReceive()) {
-                  <th class="!text-right !pr-4 w-[180px]">Recibido</th>
+                  <th class="!text-right !pr-4 w-[180px]" [ngClass]="themeService.isDarkMode() ? 'text-[#F0F6FC]' : ''">Recibido</th>
                 }
               </tr>
             </thead>
             <tbody>
               @for (item of doc.items; track item.id) {
-                <tr class="border-b border-[#762f41]/18 last:border-0">
-                  <td class="!py-2.5 !pl-4 border-r border-[#762f41]/18">
-                    <p class="font-semibold text-slate-800 m-0">{{ item.productName }}</p>
-                    <p class="text-[10px] text-slate-500 m-0">{{ item.sku }}</p>
+                <tr class="transition-colors last:border-0"
+                  [ngClass]="themeService.isDarkMode() ? 'border-b border-[#30363D] hover:!bg-[#21262D]' : 'border-b border-[#762f41]/18 hover:!bg-[#eddde1]/45'">
+                  <td class="!py-2.5 !pl-4" [ngClass]="themeService.isDarkMode() ? 'border-r border-[#30363D]' : 'border-r border-[#762f41]/18'">
+                    <p class="font-semibold m-0" [ngClass]="themeService.isDarkMode() ? 'text-[#F0F6FC]' : 'text-slate-800'">{{ item.productName }}</p>
+                    <p class="text-[10px] m-0" [ngClass]="themeService.isDarkMode() ? 'text-[#8B949E]' : 'text-slate-500'">{{ item.sku }}</p>
                   </td>
-                  <td class="!py-2.5 !pr-3 border-r border-[#762f41]/18 !text-right tabular-nums font-semibold whitespace-nowrap">
+                  <td class="!py-2.5 !pr-3 !text-right tabular-nums font-semibold whitespace-nowrap"
+                    [ngClass]="themeService.isDarkMode() ? 'border-r border-[#30363D] text-[#F0F6FC]' : 'border-r border-[#762f41]/18'">
                     {{ item.systemQty | number: qtyDigits(item) }}
-                    <span class="text-[10px] font-bold text-[#48021C] ml-0.5">{{ unitOf(item) }}</span>
+                    <span class="text-[10px] font-bold ml-0.5" [ngClass]="themeService.isDarkMode() ? 'text-[#58A6FF]' : 'text-[#48021C]'">{{ unitOf(item) }}</span>
                   </td>
-                  <td class="!py-2.5 !pr-3 border-r border-[#762f41]/18 !text-right tabular-nums font-semibold whitespace-nowrap">
+                  <td class="!py-2.5 !pr-3 !text-right tabular-nums font-semibold whitespace-nowrap"
+                    [ngClass]="themeService.isDarkMode() ? 'border-r border-[#30363D] text-[#F0F6FC]' : 'border-r border-[#762f41]/18'">
                     {{ item.keepQty | number: qtyDigits(item) }}
-                    <span class="text-[10px] font-bold text-[#48021C] ml-0.5">{{ unitOf(item) }}</span>
+                    <span class="text-[10px] font-bold ml-0.5" [ngClass]="themeService.isDarkMode() ? 'text-[#58A6FF]' : 'text-[#48021C]'">{{ unitOf(item) }}</span>
                   </td>
-                  <td class="!py-2.5 !pr-3 border-r border-[#762f41]/18 !text-right tabular-nums font-semibold whitespace-nowrap">
+                  <td class="!py-2.5 !pr-3 !text-right tabular-nums font-semibold whitespace-nowrap"
+                    [ngClass]="themeService.isDarkMode() ? 'border-r border-[#30363D] text-[#F0F6FC]' : 'border-r border-[#762f41]/18'">
                     {{ item.returnQty | number: qtyDigits(item) }}
-                    <span class="text-[10px] font-bold text-[#48021C] ml-0.5">{{ unitOf(item) }}</span>
+                    <span class="text-[10px] font-bold ml-0.5" [ngClass]="themeService.isDarkMode() ? 'text-[#58A6FF]' : 'text-[#48021C]'">{{ unitOf(item) }}</span>
                   </td>
-                  <td class="!py-2.5 !pr-3 border-r border-[#762f41]/18 !text-right tabular-nums font-semibold whitespace-nowrap"
-                    [class.text-amber-700]="item.wasteQty > 0"
+                  <td class="!py-2.5 !pr-3 !text-right tabular-nums font-semibold whitespace-nowrap"
+                    [ngClass]="themeService.isDarkMode() ? 'border-r border-[#30363D]' : 'border-r border-[#762f41]/18'"
+                    [class.text-amber-500]="item.wasteQty > 0"
+                    [class.text-[#F0F6FC]]="item.wasteQty === 0 && themeService.isDarkMode()"
+                    [class.text-slate-800]="item.wasteQty === 0 && !themeService.isDarkMode()"
                   >
                     {{ item.wasteQty | number: qtyDigits(item) }}
-                    <span class="text-[10px] font-bold text-[#48021C] ml-0.5">{{ unitOf(item) }}</span>
+                    <span class="text-[10px] font-bold ml-0.5" [ngClass]="themeService.isDarkMode() ? 'text-[#58A6FF]' : 'text-[#48021C]'">{{ unitOf(item) }}</span>
                   </td>
                   @if (canReceive() && item.returnQty > 0) {
                     <td class="!py-2 !pr-4">
@@ -126,10 +141,11 @@
                           [maxFractionDigits]="item.allowsDecimals ? 2 : 0"
                           class="flex-1 min-w-0 max-w-[7.5rem]"
                           styleClass="w-full !rounded-r-none !rounded-l-lg text-xs"
-                          inputStyleClass="w-full !rounded-r-none !rounded-l-lg !border-[#9f6587]/35 text-xs !text-right"
+                          [inputStyleClass]="'w-full !rounded-r-none !rounded-l-lg text-xs !text-right ' + (themeService.isDarkMode() ? '!bg-[#0D1117] !text-[#F0F6FC] !border-[#30363D] focus:!border-[#58A6FF]' : '!border-[#9f6587]/35')"
                           fluid
                         />
-                        <span class="inline-flex items-center px-2 rounded-r-lg border border-l-0 border-[#9f6587]/35 bg-[#48021C]/10 text-[#48021C] text-[10px] font-bold select-none shrink-0 uppercase">
+                        <span class="inline-flex items-center px-2 rounded-r-lg border border-l-0 text-[10px] font-bold select-none shrink-0 uppercase"
+                          [ngClass]="themeService.isDarkMode() ? 'border-[#30363D] bg-[#1C2D42] text-[#58A6FF]' : 'border-[#9f6587]/35 bg-[#48021C]/10 text-[#48021C]'">
                           {{ unitOf(item) }}
                         </span>
                       </div>
@@ -145,15 +161,21 @@
       </section>
 
       @if (doc.incidents?.length) {
-        <section class="bg-white rounded-2xl border-2 border-[#48021C]/25 shadow-xs overflow-hidden">
-          <div class="py-2.5 px-4 md:px-5 border-b border-[#48021C]/15 bg-[#eddde1]/70">
-            <h2 class="text-sm font-bold text-[#3b141e] m-0">Incidencias</h2>
+        <section class="rounded-2xl shadow-xs overflow-hidden transition-colors"
+          [ngClass]="themeService.isDarkMode() ? 'bg-[#161B22] border border-[#30363D]' : 'bg-white border-2 border-[#48021C]/25'">
+          <div class="py-2.5 px-4 md:px-5 border-b"
+            [ngClass]="themeService.isDarkMode() ? 'bg-[#1C2128] border-[#30363D]' : 'bg-[#eddde1]/70 border-[#48021C]/15'">
+            <h2 class="text-sm font-bold m-0" [ngClass]="themeService.isDarkMode() ? 'text-[#F0F6FC]' : 'text-[#3b141e]'">Incidencias</h2>
           </div>
           <div class="p-4 md:p-5 space-y-3">
             @for (inc of doc.incidents; track inc.id) {
-              <div class="rounded-xl border px-3.5 py-2.5 text-xs space-y-2" [class.border-rose-200]="inc.status === 'open'" [class.bg-rose-50]="inc.status === 'open'" [class.border-[#48021C]/15]="inc.status !== 'open'">
+              <div class="rounded-xl border px-3.5 py-2.5 text-xs space-y-2 transition-colors"
+                [ngClass]="themeService.isDarkMode()
+                  ? (inc.status === 'open' ? 'border-rose-800/50 bg-rose-950/20' : 'border-[#30363D] bg-[#0D1117]')
+                  : (inc.status === 'open' ? 'border-rose-200 bg-rose-50' : 'border-[#48021C]/15 bg-white')"
+              >
                 <div class="flex items-center justify-between gap-2">
-                  <p class="font-bold text-slate-800 m-0">
+                  <p class="font-bold m-0" [ngClass]="themeService.isDarkMode() ? 'text-[#F0F6FC]' : 'text-slate-800'">
                     {{ inc.productName }} · {{ inc.quantity | number: '1.0-2' }}
                   </p>
                   <app-status-badge
@@ -162,12 +184,13 @@
                     size="xs"
                   />
                 </div>
-                <p class="text-slate-600 m-0">{{ inc.description }}</p>
+                <p class="m-0" [ngClass]="themeService.isDarkMode() ? 'text-[#8B949E]' : 'text-slate-600'">{{ inc.description }}</p>
                 @if (inc.attachmentUrls?.length) {
                   <div class="flex gap-1">
                     @for (url of inc.attachmentUrls; track url) {
                       <a [href]="url" target="_blank" rel="noopener">
-                        <img [src]="url" class="w-12 h-12 rounded object-cover border border-[#48021C]/20" alt="Anexo" />
+                        <img [src]="url" class="w-12 h-12 rounded object-cover border"
+                          [ngClass]="themeService.isDarkMode() ? 'border-[#30363D]' : 'border-[#48021C]/20'" alt="Anexo" />
                       </a>
                     }
                   </div>
@@ -176,13 +199,14 @@
                   <textarea
                     pTextarea
                     rows="2"
-                    class="w-full text-xs font-medium !bg-rose-50/40 !border-[#48021C]/25 !rounded-xl p-2.5"
+                    class="w-full text-xs font-medium !rounded-xl p-2.5 transition-colors"
+                    [ngClass]="themeService.isDarkMode() ? '!bg-[#161B22] !text-[#F0F6FC] !border-[#30363D] focus:!border-[#58A6FF] placeholder:text-slate-500' : '!bg-rose-50/40 !border-[#48021C]/25'"
                     [(ngModel)]="resolutionNotes[inc.id]"
                     placeholder="Notas de resolución"
                   ></textarea>
                   <app-primary-button label="Resolver" icon="pi pi-check" [loading]="saving()" (clicked)="resolve(inc.id)" />
                 } @else if (inc.resolutionNotes) {
-                  <p class="text-slate-500 m-0">Resolución: {{ inc.resolutionNotes }}</p>
+                  <p class="m-0" [ngClass]="themeService.isDarkMode() ? 'text-[#8B949E]' : 'text-slate-500'">Resolución: <span [ngClass]="themeService.isDarkMode() ? 'text-[#F0F6FC]' : 'text-slate-700'">{{ inc.resolutionNotes }}</span></p>
                 }
               </div>
             }
@@ -191,17 +215,21 @@
       }
 
       @if (doc.notes) {
-        <section class="bg-white rounded-2xl border-2 border-[#48021C]/25 shadow-xs overflow-hidden">
-          <div class="py-2.5 px-4 md:px-5 border-b border-[#48021C]/15 bg-[#eddde1]/70">
-            <h2 class="text-sm font-bold text-[#3b141e] m-0">Notas</h2>
+        <section class="rounded-2xl shadow-xs overflow-hidden transition-colors"
+          [ngClass]="themeService.isDarkMode() ? 'bg-[#161B22] border border-[#30363D]' : 'bg-white border-2 border-[#48021C]/25'">
+          <div class="py-2.5 px-4 md:px-5 border-b"
+            [ngClass]="themeService.isDarkMode() ? 'bg-[#1C2128] border-[#30363D]' : 'bg-[#eddde1]/70 border-[#48021C]/15'">
+            <h2 class="text-sm font-bold m-0" [ngClass]="themeService.isDarkMode() ? 'text-[#F0F6FC]' : 'text-[#3b141e]'">Notas</h2>
           </div>
-          <p class="p-4 md:p-5 text-sm text-slate-700 m-0">{{ doc.notes }}</p>
+          <p class="p-4 md:p-5 text-sm m-0" [ngClass]="themeService.isDarkMode() ? 'text-[#F0F6FC]' : 'text-slate-700'">{{ doc.notes }}</p>
         </section>
       }
 
       @if (canReceive()) {
-        <section class="bg-white rounded-2xl border-2 border-[#48021C]/25 shadow-xs p-4 md:p-5 space-y-3">
-          <label class="flex items-center gap-2 text-sm text-slate-700 font-medium cursor-pointer">
+        <section class="rounded-2xl shadow-xs p-4 md:p-5 space-y-3 transition-colors"
+          [ngClass]="themeService.isDarkMode() ? 'bg-[#161B22] border border-[#30363D]' : 'bg-white border-2 border-[#48021C]/25'">
+          <label class="flex items-center gap-2 text-sm font-medium cursor-pointer"
+            [ngClass]="themeService.isDarkMode() ? 'text-[#F0F6FC]' : 'text-slate-700'">
             <p-checkbox [(ngModel)]="registerAsWaste" [binary]="true" />
             El faltante en tránsito se da por merma (cierra sin dejar incidencia)
           </label>

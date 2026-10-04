@@ -1,0 +1,153 @@
+<app-standard-modal
+  [(visible)]="visible"
+  [title]="modalTitle"
+  width="92vw"
+  maxWidth="560px"
+  maxHeight="90vh"
+  (closed)="onClose()"
+>
+  <form [formGroup]="form" (ngSubmit)="onSave()" class="flex flex-col gap-4 overflow-y-auto min-h-0 pr-0.5">
+    
+    <!-- Nombre de la sucursal -->
+    <div class="flex flex-col gap-1">
+      <label class="text-xs font-semibold"
+             [ngClass]="themeService.isDarkMode() ? 'text-[#F0F6FC]' : 'text-[#48021C]'" for="name">
+        Nombre de la Sucursal <span class="text-rose-500">*</span>
+      </label>
+      <input
+        type="text"
+        pInputText
+        id="name"
+        formControlName="name"
+        placeholder="Ej. Sucursal Central, Bodega Norte..."
+        class="w-full p-inputtext-sm !rounded-lg text-xs font-medium h-9!"
+        [ngClass]="[
+          themeService.isDarkMode()
+            ? '!bg-[#0D1117] !border-[#30363D] !text-[#F0F6FC] focus:!border-[#58A6FF] focus:!ring-1 focus:!ring-[#58A6FF]/20'
+            : '!bg-white !border-[#9f6587]/35 !text-slate-800 focus:!border-[#9f6587] focus:!ring-2 focus:!ring-[#9f6587]/20',
+          form.get('name')?.invalid && form.get('name')?.touched ? '!border-rose-400 ng-invalid ng-dirty' : ''
+        ]"
+        autocomplete="off"
+      />
+      @if (form.get('name')?.invalid && form.get('name')?.touched) {
+        <small class="text-rose-500 text-[10px] font-medium">El nombre debe tener al menos 3 caracteres</small>
+      }
+    </div>
+
+    <!-- Toggle ¿Es Planta? -->
+    <div class="flex items-center justify-between gap-4 p-3 border rounded-xl shadow-2xs transition-colors"
+         [ngClass]="themeService.isDarkMode() 
+           ? 'bg-[#161B22] border-[#30363D]' 
+           : 'bg-[#eddde1]/35 border-[#762f41]/25'">
+      <div class="flex flex-col min-w-0">
+        <span class="text-xs font-bold flex items-center gap-1.5"
+              [ngClass]="themeService.isDarkMode() ? 'text-[#F0F6FC]' : 'text-[#48021C]'">
+          <i class="pi pi-cog text-[11px]" [ngClass]="themeService.isDarkMode() ? 'text-[#58A6FF]' : 'text-[#762f41]'"></i>
+          ¿Es Planta de Producción?
+        </span>
+        <span class="text-[10.5px] font-medium leading-tight mt-0.5"
+              [ngClass]="themeService.isDarkMode() ? 'text-[#8B949E]' : 'text-slate-500'">
+          Habilita recetas, órdenes de producción y traslados
+        </span>
+      </div>
+      <p-toggleSwitch 
+        formControlName="isPlant"
+        styleClass="burgundy-switch"
+      />
+    </div>
+
+    <!-- Fila Teléfono y Correo -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+      <div class="flex flex-col gap-1">
+        <label class="text-xs font-semibold"
+               [ngClass]="themeService.isDarkMode() ? 'text-[#F0F6FC]' : 'text-[#48021C]'" for="phone">
+          Teléfono <span class="text-rose-500">*</span>
+        </label>
+        <p-inputMask
+          id="phone"
+          formControlName="phone"
+          mask="+502 9999 9999"
+          placeholder="+502 0000 0000"
+          styleClass="w-full !rounded-lg text-xs font-medium h-9!"
+          [ngClass]="[
+            themeService.isDarkMode()
+              ? '!bg-[#0D1117] !border-[#30363D] !text-[#F0F6FC]'
+              : '!bg-white !border-[#9f6587]/35 !text-slate-800',
+            form.get('phone')?.invalid && form.get('phone')?.touched ? '!border-rose-400 ng-invalid ng-dirty' : ''
+          ]"
+          autocomplete="off"
+        />
+        @if (form.get('phone')?.invalid && form.get('phone')?.touched) {
+          <small class="text-rose-500 text-[10px] font-medium">El teléfono es obligatorio</small>
+        }
+      </div>
+
+      <div class="flex flex-col gap-1">
+        <label class="text-xs font-semibold"
+               [ngClass]="themeService.isDarkMode() ? 'text-[#F0F6FC]' : 'text-[#48021C]'" for="email">
+          Correo Electrónico
+        </label>
+        <input
+          type="email"
+          pInputText
+          id="email"
+          formControlName="email"
+          placeholder="sucursal@ejemplo.com"
+          class="w-full p-inputtext-sm !rounded-lg text-xs font-medium h-9!"
+          [ngClass]="[
+            themeService.isDarkMode()
+              ? '!bg-[#0D1117] !border-[#30363D] !text-[#F0F6FC] focus:!border-[#58A6FF] focus:!ring-1 focus:!ring-[#58A6FF]/20'
+              : '!bg-white !border-[#9f6587]/35 !text-slate-800 focus:!border-[#9f6587] focus:!ring-2 focus:!ring-[#9f6587]/20',
+            form.get('email')?.invalid && form.get('email')?.touched ? '!border-rose-400 ng-invalid ng-dirty' : ''
+          ]"
+          autocomplete="off"
+        />
+        @if (form.get('email')?.invalid && form.get('email')?.touched) {
+          <small class="text-rose-500 text-[10px] font-medium">Ingrese un correo válido</small>
+        }
+      </div>
+    </div>
+
+    <!-- Dirección Física -->
+    <div class="flex flex-col gap-1">
+      <label class="text-xs font-semibold"
+             [ngClass]="themeService.isDarkMode() ? 'text-[#F0F6FC]' : 'text-[#48021C]'" for="address">
+        Dirección Física Exacta <span class="text-rose-500">*</span>
+      </label>
+      <textarea
+        pTextarea
+        id="address"
+        formControlName="address"
+        rows="3"
+        placeholder="Indica calle, avenida, número de local o casa, zona, municipio..."
+        class="w-full text-xs font-medium !rounded-xl p-2.5 resize-none transition-colors"
+        [ngClass]="[
+          themeService.isDarkMode()
+            ? '!bg-[#0D1117] !border-[#30363D] !text-[#F0F6FC] focus:!border-[#58A6FF] focus:!ring-2 focus:!ring-[#58A6FF]/10'
+            : '!bg-rose-50/40 !border-[#48021C]/25 hover:!border-[#48021C]/60 hover:!bg-white focus:!border-[#48021C] focus:!ring-2 focus:!ring-[#48021C]/10 !text-slate-800',
+          form.get('address')?.invalid && form.get('address')?.touched ? '!border-rose-400 ng-invalid ng-dirty' : ''
+        ]"
+        autocomplete="off"
+      ></textarea>
+      @if (form.get('address')?.invalid && form.get('address')?.touched) {
+        <small class="text-rose-500 text-[10px] font-medium">La dirección es obligatoria</small>
+      }
+    </div>
+  </form>
+
+  <div footer class="flex items-center justify-end gap-2 w-full">
+    <app-secondary-button
+      label="Cancelar"
+      icon="pi pi-times"
+      colorScheme="burgundy"
+      (clicked)="onClose()"
+    />
+    <app-primary-button
+      [label]="branch ? 'Guardar cambios' : 'Crear sucursal'"
+      [icon]="branch ? 'pi pi-save' : 'pi pi-check'"
+      [loading]="saving"
+      [disabled]="form.invalid"
+      (clicked)="onSave()"
+    />
+  </div>
+</app-standard-modal>

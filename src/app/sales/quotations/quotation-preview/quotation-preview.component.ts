@@ -8,6 +8,7 @@ import { IQuotation } from '../../interfaces/quotation.interface';
 import { QuotationsService } from '../../services/quotations.service';
 import { PrintService } from '../../../shared/services/print.service';
 import { CompanySettingService } from '../../../shared/services/company-setting.service';
+import { ThemeService } from '../../../core/services/theme.service';
 
 @Component({
   selector: 'app-quotation-preview',
@@ -17,6 +18,7 @@ import { CompanySettingService } from '../../../shared/services/company-setting.
   styleUrl: './quotation-preview.component.css',
 })
 export class QuotationPreviewComponent implements OnInit {
+  public themeService = inject(ThemeService);
   private quotationsService = inject(QuotationsService);
   private printService = inject(PrintService);
   private companySettingService = inject(CompanySettingService);

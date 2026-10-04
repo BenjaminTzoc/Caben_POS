@@ -1,4 +1,4 @@
-import { CommonModule } from '@angular/common';
+import { CommonModule, CurrencyPipe } from '@angular/common';
 import { Component, inject, OnDestroy, OnInit, signal } from '@angular/core';
 import { TooltipModule } from 'primeng/tooltip';
 import {
@@ -7,9 +7,8 @@ import {
   ReactiveFormsModule,
   FormsModule,
   Validators,
-  FormArray,
 } from '@angular/forms';
-import { Button, ButtonModule } from 'primeng/button';
+import { ButtonModule } from 'primeng/button';
 import { InputTextModule } from 'primeng/inputtext';
 import { TextareaModule } from 'primeng/textarea';
 import { Supplier } from '../../interfaces/supplier.interface';
@@ -17,20 +16,26 @@ import { SelectModule } from 'primeng/select';
 import { CreatePurchase, IPurchaseOrderResponse } from '../../interfaces/purchase-order.interface';
 import { OrdersService } from '../../services/orders.service';
 import { MessageService } from 'primeng/api';
-import { ConfirmService } from '../../../shared/services/confirm.service';
 import { Router } from '@angular/router';
-import { CurrencyPipe, DatePipe } from '@angular/common';
 import { SuppliersService } from '../../services/suppliers.service';
 import { DatePickerModule } from 'primeng/datepicker';
 import { TableModule } from 'primeng/table';
 import { environment } from '../../../../environments/environment';
-import { DialogModule } from 'primeng/dialog';
 import { InputNumberModule } from 'primeng/inputnumber';
+import { ToggleSwitchModule } from 'primeng/toggleswitch';
 import { WebsocketService } from '../../services/websocket.service';
-import { forkJoin, Subject, takeUntil } from 'rxjs';
+import { Subject, takeUntil } from 'rxjs';
 import { TagModule } from 'primeng/tag';
 import { ProductsService } from '../../../inventory/services/products.service';
-import { Product, ProductType } from '../../../inventory/interfaces/product.interface';
+import { Product } from '../../../inventory/interfaces/product.interface';
+import { ThemeService } from '../../../core/services/theme.service';
+import { PageHeaderComponent } from '../../../shared/components/page-header/page-header.component';
+import { PrimaryButtonComponent } from '../../../shared/components/primary-button/primary-button.component';
+import { SecondaryButtonComponent } from '../../../shared/components/secondary-button/secondary-button.component';
+import { StandardModalComponent } from '../../../shared/components/standard-modal/standard-modal.component';
+import { ConfirmationModalComponent } from '../../../shared/components/confirmation-modal/confirmation-modal.component';
+import { ProductRibbonComponent } from '../../../shared/components/product-ribbon/product-ribbon.component';
+import { ProductsTableComponent, QuotationItem } from '../../../shared/components/products-table/products-table.component';
 
 export enum PurchaseStatus {
   PENDING = 'pending',
@@ -44,6 +49,7 @@ export enum PurchaseStatus {
   imports: [
     CommonModule,
     ReactiveFormsModule,
+    FormsModule,
     ButtonModule,
     InputTextModule,
     DatePickerModule,
@@ -51,41 +57,43 @@ export enum PurchaseStatus {
     SelectModule,
     CurrencyPipe,
     TableModule,
-    DialogModule,
-    FormsModule,
     InputNumberModule,
+    ToggleSwitchModule,
     TagModule,
-    Button,
     TooltipModule,
+    PageHeaderComponent,
+    PrimaryButtonComponent,
+    SecondaryButtonComponent,
+    StandardModalComponent,
+    ConfirmationModalComponent,
+    ProductRibbonComponent,
+    ProductsTableComponent,
   ],
   templateUrl: './purchase-order-form.component.html',
   styleUrl: './purchase-order-form.component.css',
 })
 export class PurchaseOrderFormComponent implements OnInit, OnDestroy {
+  public themeService = inject(ThemeService);
   private fb = inject(FormBuilder);
   private ordersService = inject(OrdersService);
   private suppliersService = inject(SuppliersService);
   private messageService = inject(MessageService);
-  private confirmService = inject(ConfirmService);
   private router = inject(Router);
   private productsService = inject(ProductsService);
   private websocketService = inject(WebsocketService);
   private destroy$ = new Subject<void>();
 
-  statusOptions = [
-    { label: 'Pendiente', value: 'pending' },
-    { label: 'Parcialmente Pagado', value: 'partially_paid' },
-    { label: 'Pagado', value: 'paid' },
-    { label: 'Cancelado', value: 'cancelled' },
-  ];
-
   orderForm!: FormGroup;
   productForm!: FormGroup;
   suppliers: Supplier[] = [];
   purchaseData: IPurchaseOrderResponse = {} as IPurchaseOrderResponse;
-  get orderDetails(): FormArray {
-    return this.orderForm.get('details') as FormArray;
-  }
+
+  // Lista estandarizada de ítems para ProductsTableComponent
+  tableItems: QuotationItem[] = [];
+  applyTax: boolean = false;
+  loadingProducts = signal<boolean>(false);
+  isSaving = signal<boolean>(false);
+  showCancelConfirmModal = false;
 
   dialogVisible: boolean = false;
   products = signal<Product[]>([]);
@@ -169,29 +177,19 @@ export class PurchaseOrderFormComponent implements OnInit, OnDestroy {
   initializeForm(): void {
     this.orderForm = this.fb.group({
       invoiceNumber: ['', [Validators.required]],
-      date: [new Date()],
+      date: [new Date(), [Validators.required]],
       dueDate: [null],
       notes: [''],
       status: [''],
       supplierId: ['', [Validators.required]],
-      details: this.fb.array([]),
     });
 
     this.productForm = this.fb.group({
       productId: ['', [Validators.required]],
       quantity: [1, [Validators.required, Validators.min(0.001)]],
       unitPrice: [0, [Validators.required, Validators.min(0)]],
-      taxPercentage: [0, [Validators.required, Validators.min(0)]],
-      discount: [0, [Validators.required, Validators.min(0)]],
+      discount: [0, [Validators.min(0)]],
     });
-  }
-
-  get orderDetailsForTable(): any[] {
-    return this.orderDetails.controls.map((control) => ({
-      formControl: control,
-      data: control.value,
-      lineTotal: this.calculateLineTotal(control.value),
-    }));
   }
 
   loadSuppliers(): void {
@@ -213,76 +211,87 @@ export class PurchaseOrderFormComponent implements OnInit, OnDestroy {
   }
 
   loadProducts(): void {
+    this.loadingProducts.set(true);
     this.productsService.getProducts(undefined, false, undefined, undefined, false).subscribe({
       next: (res) => {
+        this.loadingProducts.set(false);
         if (res.statusCode === 200) {
           this.products.set(res.data);
         }
       },
       error: (err) => {
+        this.loadingProducts.set(false);
         this.messageService.add({
           severity: 'error',
           summary: 'Error',
           detail: `Error obteniendo productos: ${err.error.message}`,
         });
-        this.dialogVisible = false;
       },
     });
   }
 
-  addDetail(): void {
-    if (this.productForm.invalid) {
-      this.productForm.markAllAsTouched();
-      this.messageService.add({
-        severity: 'error',
-        summary: 'Error',
-        detail: 'Por favor, completa todos los campos requeridos',
+  // Integración con ProductRibbonComponent
+  isProductSelected = (productId: string): boolean => {
+    return this.tableItems.some((item) => item.productId === productId);
+  };
+
+  getItemQuantity = (productId: string): number | undefined => {
+    const item = this.tableItems.find((i) => i.productId === productId);
+    return item ? item.quantity : undefined;
+  };
+
+  onProductSelectFromRibbon(event: { product: Product; quantity: number }): void {
+    const qty = event.quantity || 1;
+    const existingIndex = this.tableItems.findIndex((i) => i.productId === event.product.id);
+
+    if (existingIndex > -1) {
+      this.tableItems[existingIndex].quantity += qty;
+    } else {
+      this.tableItems.push({
+        productId: event.product.id,
+        sku: event.product.sku || '',
+        name: event.product.name,
+        imageUrl: event.product.imageUrl,
+        price: Number(event.product.price || 0),
+        quantity: qty,
+        discount: 0,
+        discountType: 'percentage',
+        maxStock: event.product.stock ?? 0,
+        unitName: event.product.unit?.name || '',
+        unitAbbreviation: event.product.unit?.abbreviation || 'un',
+        allowsDecimals: event.product.unit?.allowsDecimals ?? false,
+        isAvailable: event.product.isAvailable,
+        isUnlimited: true,
       });
-      return;
     }
 
-    const formValue = this.productForm.value;
-
-    const detailGroup = this.fb.group({
-      productId: [formValue.productId, [Validators.required]],
-      quantity: [formValue.quantity, [Validators.required, Validators.min(0.01)]],
-      unitPrice: [formValue.unitPrice, [Validators.required, Validators.min(0)]],
-      taxPercentage: [formValue.taxPercentage, [Validators.min(0)]],
-      discount: [formValue.discount, [Validators.min(0)]],
-      product: [this.selectedProduct],
+    this.tableItems = [...this.tableItems];
+    const unitAbbr = event.product.unit?.abbreviation ? ` ${event.product.unit.abbreviation}` : '';
+    this.messageService.add({
+      severity: 'success',
+      summary: 'Producto Añadido',
+      detail: `${event.product.name} (+${qty}${unitAbbr}) agregado a la orden`,
+      life: 2500,
     });
-
-    this.orderDetails.push(detailGroup);
-
-    this.productForm.reset({
-      quantity: 1,
-      unitPrice: 0,
-      taxPercentage: 0,
-      discount: 0,
-    });
-    this.selectedProduct = undefined;
-    this.dialogVisible = false;
   }
 
-  removeDetail(index: number) {
-    this.orderDetails.removeAt(index);
+  // Integración con ProductsTableComponent
+  onTableItemChange(event: { index: number; item: QuotationItem }): void {
+    this.tableItems[event.index] = event.item;
+    this.tableItems = [...this.tableItems];
   }
 
-  calculateLineTotal(detail: any): number {
-    const unitPrice = detail.unitPrice || 0;
-    const quantity = detail.quantity || 0;
-    const discount = detail.discount || 0;
-    const taxPercentage = detail.taxPercentage || 0;
-
-    const subtotal = unitPrice * quantity;
-    const discountAmount = subtotal * (discount / 100);
-    const subtotalAfterDiscount = subtotal - discountAmount;
-    const taxAmount = subtotalAfterDiscount * (taxPercentage / 100);
-
-    return Number((subtotalAfterDiscount + taxAmount).toFixed(2));
+  removeDetail(index: number): void {
+    this.tableItems.splice(index, 1);
+    this.tableItems = [...this.tableItems];
   }
 
-  calculateTotals(): {
+  clearAllItems(): void {
+    this.tableItems = [];
+  }
+
+  // Cálculo reactivo de totales para la orden de compra
+  get calculatedTotals(): {
     subtotal: number;
     discountTotal: number;
     subtotalWithDiscount: number;
@@ -291,33 +300,38 @@ export class PurchaseOrderFormComponent implements OnInit, OnDestroy {
   } {
     let subtotal = 0;
     let discountTotal = 0;
-    let taxTotal = 0;
 
-    this.orderDetails.controls.forEach((control) => {
-      const detail = control.value;
-      const lineSubtotal = detail.quantity * detail.unitPrice;
-      const lineDiscount = lineSubtotal * (detail.discount / 100);
-      const lineTax = (lineSubtotal - lineDiscount) * (detail.taxPercentage / 100);
+    for (const item of this.tableItems) {
+      const lineGross = (item.quantity || 0) * (item.price || 0);
+      let disc = 0;
+      if (item.discountType === 'percentage') {
+        disc = (lineGross * (item.discount || 0)) / 100;
+      } else {
+        disc = item.discount || 0;
+      }
+      subtotal += lineGross;
+      discountTotal += disc;
+    }
 
-      subtotal += lineSubtotal;
-      discountTotal += lineDiscount;
-      taxTotal += lineTax;
-    });
-
-    const subtotalWithDiscount = subtotal - discountTotal;
-    const total = subtotal - discountTotal + taxTotal;
+    const subtotalWithDiscount = Math.max(0, subtotal - discountTotal);
+    const taxTotal = this.applyTax ? Number((subtotalWithDiscount * 0.12).toFixed(2)) : 0;
+    const total = Number((subtotalWithDiscount + taxTotal).toFixed(2));
 
     return {
       subtotal: Number(subtotal.toFixed(2)),
       discountTotal: Number(discountTotal.toFixed(2)),
       subtotalWithDiscount: Number(subtotalWithDiscount.toFixed(2)),
-      taxTotal: Number(taxTotal.toFixed(2)),
-      total: Number(total.toFixed(2)),
+      taxTotal,
+      total,
     };
   }
 
   onSupplierChange(event: any): void {
     const selectedSupplierId = event.value;
+    if (!selectedSupplierId) {
+      this.purchaseData.supplier = undefined;
+      return;
+    }
 
     this.suppliersService.getSupplier(selectedSupplierId).subscribe({
       next: (res) => {
@@ -339,7 +353,7 @@ export class PurchaseOrderFormComponent implements OnInit, OnDestroy {
     this.dialogVisible = true;
   }
 
-  onProductChange(event: any) {
+  onProductChange(event: any): void {
     const selectedProductId = event.value;
 
     if (!selectedProductId) {
@@ -351,7 +365,7 @@ export class PurchaseOrderFormComponent implements OnInit, OnDestroy {
       next: (response) => {
         if (response.statusCode === 200) {
           this.selectedProduct = response.data;
-          this.productForm.get('unitPrice')?.setValue(Number(this.selectedProduct.price));
+          this.productForm.get('unitPrice')?.setValue(Number(this.selectedProduct.price || 0));
         }
       },
       error: (error) => {
@@ -364,9 +378,9 @@ export class PurchaseOrderFormComponent implements OnInit, OnDestroy {
     });
   }
 
-  onSaveOrder(): void {
-    if (this.orderForm.invalid) {
-      this.orderForm.markAllAsTouched();
+  addDetail(): void {
+    if (this.productForm.invalid) {
+      this.productForm.markAllAsTouched();
       this.messageService.add({
         severity: 'error',
         summary: 'Error',
@@ -375,14 +389,70 @@ export class PurchaseOrderFormComponent implements OnInit, OnDestroy {
       return;
     }
 
-    if (this.orderDetails.length === 0) {
+    const formValue = this.productForm.value;
+    const existingIndex = this.tableItems.findIndex((i) => i.productId === formValue.productId);
+
+    if (existingIndex > -1) {
+      this.tableItems[existingIndex].quantity += Number(formValue.quantity);
+      this.tableItems[existingIndex].price = Number(formValue.unitPrice);
+      this.tableItems[existingIndex].discount = Number(formValue.discount || 0);
+    } else {
+      this.tableItems.push({
+        productId: formValue.productId,
+        sku: this.selectedProduct?.sku || '',
+        name: this.selectedProduct?.name || 'Producto',
+        imageUrl: this.selectedProduct?.imageUrl,
+        price: Number(formValue.unitPrice || 0),
+        quantity: Number(formValue.quantity || 1),
+        discount: Number(formValue.discount || 0),
+        discountType: 'percentage',
+        maxStock: this.selectedProduct?.stock ?? 0,
+        unitName: this.selectedProduct?.unit?.name || '',
+        unitAbbreviation: this.selectedProduct?.unit?.abbreviation || 'un',
+        allowsDecimals: this.selectedProduct?.unit?.allowsDecimals ?? false,
+        isAvailable: this.selectedProduct?.isAvailable,
+        isUnlimited: true,
+      });
+    }
+
+    this.tableItems = [...this.tableItems];
+    this.productForm.reset({
+      quantity: 1,
+      unitPrice: 0,
+      discount: 0,
+    });
+    this.selectedProduct = undefined;
+    this.dialogVisible = false;
+
+    this.messageService.add({
+      severity: 'success',
+      summary: 'Producto Añadido',
+      detail: 'Producto agregado al detalle de la orden',
+      life: 2500,
+    });
+  }
+
+  onSaveOrder(): void {
+    if (this.orderForm.invalid) {
+      this.orderForm.markAllAsTouched();
       this.messageService.add({
         severity: 'error',
         summary: 'Error',
-        detail: 'Debe agregar al menos un producto',
+        detail: 'Por favor, completa todos los campos requeridos (Proveedor y No. Factura)',
       });
       return;
     }
+
+    if (this.tableItems.length === 0) {
+      this.messageService.add({
+        severity: 'error',
+        summary: 'Error',
+        detail: 'Debe agregar al menos un producto a la orden de compra',
+      });
+      return;
+    }
+
+    this.isSaving.set(true);
 
     const formData: CreatePurchase = {
       invoiceNumber: this.orderForm.get('invoiceNumber')?.value,
@@ -392,20 +462,30 @@ export class PurchaseOrderFormComponent implements OnInit, OnDestroy {
         : undefined,
       supplierId: this.orderForm.get('supplierId')?.value,
       notes: this.orderForm.get('notes')?.value,
-      details: this.orderDetails.controls.map((control) => {
-        const detail = control.value;
+      details: this.tableItems.map((item) => {
+        const lineGross = (item.quantity || 0) * (item.price || 0);
+        const discAmount = item.discountType === 'percentage'
+          ? (lineGross * (item.discount || 0)) / 100
+          : (item.discount || 0);
+        const net = Math.max(0, lineGross - discAmount);
+        const taxRate = this.applyTax ? 12 : 0;
+        const taxAmount = (net * taxRate) / 100;
+
         return {
-          productId: detail.productId,
-          quantity: detail.quantity,
-          unitPrice: detail.unitPrice,
-          discount: detail.discount,
-          taxPercentage: detail.taxPercentage,
+          productId: item.productId,
+          quantity: item.quantity,
+          unitPrice: item.price,
+          discount: item.discount || 0,
+          discountAmount: Number(discAmount.toFixed(2)),
+          taxPercentage: taxRate,
+          taxAmount: Number(taxAmount.toFixed(2)),
         };
       }),
     };
 
     this.ordersService.createPurchase(formData).subscribe({
       next: (res) => {
+        this.isSaving.set(false);
         if (res.statusCode === 201) {
           this.messageService.add({
             severity: 'success',
@@ -416,6 +496,7 @@ export class PurchaseOrderFormComponent implements OnInit, OnDestroy {
         }
       },
       error: (err) => {
+        this.isSaving.set(false);
         this.messageService.add({
           severity: 'error',
           summary: 'Error',
@@ -425,24 +506,16 @@ export class PurchaseOrderFormComponent implements OnInit, OnDestroy {
     });
   }
 
-  onBack() {
+  onBack(): void {
     this.router.navigate(['/purchases/orders']);
   }
 
-  onCancelProccess() {
-    this.confirmService.confirm({
-      message: '¿Estás seguro de cancelar este proceso?',
-      header: 'Confirmar cancelación',
-      icon: 'pi pi-info-circle',
-      cancelLabel: 'Regresar',
-      
-      confirmLabel: 'Cancelar proceso',
-      type: 'danger',
-
-      accept: () => {
-        this.onBack();
-      },
-    });
+  confirmCancelProcess(): void {
+    if (this.tableItems.length > 0 || this.orderForm.get('supplierId')?.value) {
+      this.showCancelConfirmModal = true;
+    } else {
+      this.onBack();
+    }
   }
 
   getProductImageUrl(imageUrl: string | null): string {

@@ -17,6 +17,7 @@ import { SearchInputComponent } from '../../../shared/components/search-input/se
 import { PrimaryButtonComponent } from '../../../shared/components/primary-button/primary-button.component';
 import { StatusBadgeComponent } from '../../../shared/components/status-badge/status-badge.component';
 import { ConfirmationModalComponent } from '../../../shared/components/confirmation-modal/confirmation-modal.component';
+import { ThemeService } from '../../../core/services/theme.service';
 
 @Component({
   selector: 'app-customer-categories-modal',
@@ -47,6 +48,7 @@ export class CustomerCategoriesModalComponent implements OnChanges {
   @Output() visibleChange = new EventEmitter<boolean>();
   @Output() categoriesChanged = new EventEmitter<ICustomerCategory[]>();
 
+  public themeService = inject(ThemeService);
   private categoriesService = inject(CustomerCategoriesService);
   private messageService = inject(MessageService);
   private fb = inject(FormBuilder);

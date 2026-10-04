@@ -1,0 +1,18 @@
+<button 
+  type="button"
+  (click)="onClick()"
+  [disabled]="disabled || loading"
+  class="px-3.5 py-1.5 rounded-lg text-sm font-medium border transition-all flex items-center gap-2 cursor-pointer shadow-sm disabled:opacity-50 disabled:cursor-not-allowed group {{ customClass }}"
+  [ngClass]="themeService.isDarkMode() 
+    ? 'bg-rose-500/15 hover:bg-rose-500/25 text-rose-200 hover:text-white border-rose-500/30 hover:border-rose-500/50' 
+    : 'bg-rose-50 hover:bg-rose-100 text-rose-700 hover:text-rose-800 border-rose-200 hover:border-rose-300'"
+>
+  @if (loading) {
+    <i class="pi pi-spin pi-spinner text-sm"
+      [ngClass]="themeService.isDarkMode() ? 'text-rose-300' : 'text-rose-600'"></i>
+  } @else if (icon) {
+    <i [class]="icon" class="text-sm transition-colors"
+      [ngClass]="themeService.isDarkMode() ? 'text-rose-300 group-hover:text-white' : 'text-rose-600 group-hover:text-rose-800'"></i>
+  }
+  <span>{{ label }}</span>
+</button>

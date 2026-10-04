@@ -17,6 +17,11 @@ import { ConfirmService } from '../../../../shared/services/confirm.service';
 import { AreasService } from '../../../services/areas.service';
 import { Area } from '../../../interfaces/area.interface';
 
+import { ThemeService } from '../../../../core/services/theme.service';
+import { PageHeaderComponent } from '../../../../shared/components/page-header/page-header.component';
+import { PrimaryButtonComponent } from '../../../../shared/components/primary-button/primary-button.component';
+import { SecondaryButtonComponent } from '../../../../shared/components/secondary-button/secondary-button.component';
+
 @Component({
   selector: 'app-area-form',
   standalone: true,
@@ -29,11 +34,15 @@ import { Area } from '../../../interfaces/area.interface';
     InputTextModule,
     TextareaModule,
     SelectModule,
+    PageHeaderComponent,
+    PrimaryButtonComponent,
+    SecondaryButtonComponent,
   ],
   templateUrl: './area-form.component.html',
   styleUrl: './area-form.component.css',
 })
 export class AreaFormComponent implements OnInit {
+  public themeService = inject(ThemeService);
   private areasService = inject(AreasService);
   private messageService = inject(MessageService);
   private confirmService = inject(ConfirmService);

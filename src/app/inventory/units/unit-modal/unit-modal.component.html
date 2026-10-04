@@ -1,0 +1,124 @@
+<app-standard-modal
+  [(visible)]="visible"
+  [title]="modalTitle"
+  width="92vw"
+  maxWidth="540px"
+  maxHeight="90vh"
+  (closed)="onClose()"
+>
+  <form [formGroup]="form" (ngSubmit)="onSave()" class="flex flex-col gap-4 overflow-y-auto min-h-0 pr-0.5">
+    
+    <!-- Nombre y Abreviación -->
+    <div class="grid grid-cols-1 sm:grid-cols-12 gap-3 items-start">
+      <div class="sm:col-span-8 flex flex-col gap-1">
+        <label class="text-xs font-semibold"
+               [ngClass]="themeService.isDarkMode() ? 'text-[#F0F6FC]' : 'text-[#48021C]'" for="name">
+          Nombre de la Unidad <span class="text-rose-500">*</span>
+        </label>
+        <input
+          type="text"
+          pInputText
+          id="name"
+          formControlName="name"
+          placeholder="Ej. Kilogramo, Unidad, Metro..."
+          class="w-full p-inputtext-sm !rounded-lg text-xs font-medium h-9!"
+          [ngClass]="[
+            themeService.isDarkMode()
+              ? '!bg-[#0D1117] !border-[#30363D] !text-[#F0F6FC] focus:!border-[#58A6FF] focus:!ring-1 focus:!ring-[#58A6FF]/20'
+              : '!bg-white !border-[#9f6587]/35 !text-slate-800 focus:!border-[#9f6587] focus:!ring-2 focus:!ring-[#9f6587]/20',
+            form.get('name')?.invalid && form.get('name')?.touched ? '!border-rose-400 ng-invalid ng-dirty' : ''
+          ]"
+          autocomplete="off"
+        />
+        @if (form.get('name')?.invalid && form.get('name')?.touched) {
+          <small class="text-rose-500 text-[10px] font-medium">El nombre debe tener al menos 2 caracteres</small>
+        }
+      </div>
+
+      <div class="sm:col-span-4 flex flex-col gap-1">
+        <label class="text-xs font-semibold"
+               [ngClass]="themeService.isDarkMode() ? 'text-[#F0F6FC]' : 'text-[#48021C]'" for="abbreviation">
+          Abreviación <span class="text-rose-500">*</span>
+        </label>
+        <input
+          type="text"
+          pInputText
+          id="abbreviation"
+          formControlName="abbreviation"
+          placeholder="Ej. kg, un, m"
+          class="w-full p-inputtext-sm !rounded-lg text-xs font-bold uppercase tracking-wider h-9!"
+          [ngClass]="[
+            themeService.isDarkMode()
+              ? '!bg-[#0D1117] !border-[#30363D] !text-[#F0F6FC] focus:!border-[#58A6FF] focus:!ring-1 focus:!ring-[#58A6FF]/20'
+              : '!bg-white !border-[#9f6587]/35 !text-slate-800 focus:!border-[#9f6587] focus:!ring-2 focus:!ring-[#9f6587]/20',
+            form.get('abbreviation')?.invalid && form.get('abbreviation')?.touched ? '!border-rose-400 ng-invalid ng-dirty' : ''
+          ]"
+          autocomplete="off"
+        />
+        @if (form.get('abbreviation')?.invalid && form.get('abbreviation')?.touched) {
+          <small class="text-rose-500 text-[10px] font-medium">Requerida</small>
+        }
+      </div>
+    </div>
+
+    <!-- Toggle ¿Permite Decimales? -->
+    <div class="flex items-center justify-between gap-4 p-3 border rounded-xl shadow-2xs transition-colors"
+         [ngClass]="themeService.isDarkMode() 
+           ? 'bg-[#161B22] border-[#30363D]' 
+           : 'bg-[#eddde1]/35 border-[#762f41]/25'">
+      <div class="flex flex-col min-w-0">
+        <span class="text-xs font-bold flex items-center gap-1.5"
+              [ngClass]="themeService.isDarkMode() ? 'text-[#F0F6FC]' : 'text-[#48021C]'">
+          <i class="pi pi-sliders-h text-[11px]" [ngClass]="themeService.isDarkMode() ? 'text-[#58A6FF]' : 'text-[#762f41]'"></i>
+          ¿Permite Decimales?
+        </span>
+        <span class="text-[10.5px] font-medium leading-tight mt-0.5"
+              [ngClass]="themeService.isDarkMode() ? 'text-[#8B949E]' : 'text-slate-500'">
+          Habilita cantidades fraccionarias (ej. 1.5 kg, 0.25 litros)
+        </span>
+      </div>
+      <p-toggleSwitch 
+        formControlName="allowsDecimals"
+        styleClass="burgundy-switch"
+      />
+    </div>
+
+    <!-- Descripción Opcional -->
+    <div class="flex flex-col gap-1">
+      <label class="text-xs font-semibold"
+             [ngClass]="themeService.isDarkMode() ? 'text-[#F0F6FC]' : 'text-[#48021C]'" for="description">
+        Descripción o notas
+      </label>
+      <textarea
+        pTextarea
+        id="description"
+        formControlName="description"
+        rows="3"
+        placeholder="Información adicional sobre el uso de esta unidad..."
+        class="w-full text-xs font-medium !rounded-xl p-2.5 resize-none transition-colors"
+        [ngClass]="[
+          themeService.isDarkMode()
+            ? '!bg-[#0D1117] !border-[#30363D] !text-[#F0F6FC] focus:!border-[#58A6FF] focus:!ring-2 focus:!ring-[#58A6FF]/10'
+            : '!bg-rose-50/40 !border-[#48021C]/25 hover:!border-[#48021C]/60 hover:!bg-white focus:!border-[#48021C] focus:!ring-2 focus:!ring-[#48021C]/10 !text-slate-800'
+        ]"
+        autocomplete="off"
+      ></textarea>
+    </div>
+  </form>
+
+  <div footer class="flex items-center justify-end gap-2 w-full">
+    <app-secondary-button
+      label="Cancelar"
+      icon="pi pi-times"
+      colorScheme="burgundy"
+      (clicked)="onClose()"
+    />
+    <app-primary-button
+      [label]="unit ? 'Guardar cambios' : 'Crear unidad'"
+      [icon]="unit ? 'pi pi-save' : 'pi pi-check'"
+      [loading]="saving"
+      [disabled]="form.invalid"
+      (clicked)="onSave()"
+    />
+  </div>
+</app-standard-modal>

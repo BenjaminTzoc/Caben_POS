@@ -1,7 +1,8 @@
-import { Component, Input, Output, EventEmitter } from '@angular/core';
+import { Component, Input, Output, EventEmitter, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ButtonModule } from 'primeng/button';
 import { TooltipModule } from 'primeng/tooltip';
+import { ThemeService } from '../../../core/services/theme.service';
 
 @Component({
   selector: 'app-page-header',
@@ -10,6 +11,7 @@ import { TooltipModule } from 'primeng/tooltip';
   templateUrl: './page-header.component.html',
 })
 export class PageHeaderComponent {
+  public themeService = inject(ThemeService);
   /** Título principal de la pantalla */
   @Input() title: string = '';
 

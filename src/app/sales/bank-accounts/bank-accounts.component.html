@@ -1,60 +1,80 @@
-<div [ngClass]="isDialogMode ? 'p-0 bg-white' : 'py-4 px-0 md:px-6 bg-slate-50/50 min-h-screen'">
+<div [ngClass]="isDialogMode ? 'p-0 bg-transparent' : 'py-4 px-0 md:px-6 min-h-screen transition-colors duration-200 ' + (themeService.isDarkMode() ? 'bg-[#0D1117]' : 'bg-slate-50/50')">
 
-  <!-- MODE: Dialog (Double-Column inline view) -->
-  <div *ngIf="isDialogMode" class="p-6">
+  <!-- ==================== MODE: Dialog (Double-Column inline view inside POS) ==================== -->
+  <div *ngIf="isDialogMode" class="p-6 transition-colors"
+       [ngClass]="themeService.isDarkMode() ? 'bg-[#161B22] text-[#F0F6FC]' : 'bg-white text-slate-800'">
     <div class="grid grid-cols-12 gap-6">
       <!-- Columna Izquierda: Listado de Cuentas -->
       <div class="col-span-12 md:col-span-7 flex flex-col gap-4">
-        <div class="flex items-center justify-between gap-2 pb-2 border-b border-slate-100">
+        <div class="flex items-center justify-between gap-2 pb-3 border-b"
+             [ngClass]="themeService.isDarkMode() ? 'border-[#30363D]' : 'border-slate-100'">
           <div class="flex items-center gap-2">
-            <i class="pi pi-list text-indigo-600 text-md"></i>
-            <h3 class="font-normal text-[#3B5B8A] text-sm">Cuentas Registradas</h3>
+            <div class="w-7 h-7 rounded-lg flex items-center justify-center border"
+                 [ngClass]="themeService.isDarkMode() ? 'bg-[#0D1117] border-[#30363D] text-[#58A6FF]' : 'bg-[#48021C]/5 border-[#48021C]/15 text-[#48021C]'">
+              <i class="pi pi-building-columns text-xs"></i>
+            </div>
+            <h3 class="font-bold text-sm"
+                [ngClass]="themeService.isDarkMode() ? 'text-[#F0F6FC]' : 'text-[#48021C]'">
+              Cuentas Registradas
+            </h3>
           </div>
           <!-- Search input -->
-          <p-iconfield class="w-48">
-            <p-inputicon class="pi pi-search text-xs" />
-            <input 
-              (input)="onSearchDialog($event)"
-              type="text" 
-              pInputText 
-              placeholder="Buscar..."
-              autocomplete="off"
-              class="w-full !rounded-lg text-[11px] py-1 px-2.5 h-7"
-            />
-          </p-iconfield>
+          <div class="w-48">
+            <p-iconfield>
+              <p-inputicon class="pi pi-search text-xs" />
+              <input 
+                (input)="onSearchDialog($event)"
+                type="text" 
+                pInputText 
+                placeholder="Buscar..."
+                autocomplete="off"
+                class="w-full !rounded-xl text-xs py-1 px-2.5 h-8 font-medium"
+                [ngClass]="themeService.isDarkMode() ? '!bg-[#0D1117] !border-[#30363D] !text-[#F0F6FC]' : '!bg-white !border-slate-300 !text-slate-800'"
+              />
+            </p-iconfield>
+          </div>
         </div>
 
-        <div class="max-h-[350px] overflow-y-auto pr-2 flex flex-col gap-2">
+        <div class="max-h-[380px] overflow-y-auto pr-1 flex flex-col gap-2.5">
           @if (filteredBankAccounts().length === 0) {
-            <div class="text-center py-8 text-slate-400 text-sm font-normal">
-              No hay cuentas bancarias registradas.
+            <div class="text-center py-10 flex flex-col items-center gap-2 text-xs"
+                 [ngClass]="themeService.isDarkMode() ? 'text-[#8B949E]' : 'text-slate-400'">
+              <i class="pi pi-building-columns text-2xl"></i>
+              <span>No hay cuentas bancarias registradas.</span>
             </div>
           } @else {
-            <div *ngFor="let account of filteredBankAccounts()" class="flex items-center justify-between p-3 bg-slate-50 border border-slate-200 rounded-xl transition-all hover:bg-white hover:shadow-md">
-              <div class="flex flex-col gap-0.5 flex-1 pr-4">
+            <div *ngFor="let account of filteredBankAccounts()"
+                 class="flex items-center justify-between p-3.5 rounded-2xl border transition-all"
+                 [ngClass]="themeService.isDarkMode() ? 'bg-[#0D1117] border-[#30363D] hover:border-[#58A6FF]/40' : 'bg-slate-50 border-slate-200 hover:bg-white hover:shadow-xs'">
+              <div class="flex flex-col gap-0.5 flex-1 pr-4 min-w-0">
                 <div class="flex items-center gap-2">
-                  <span class="font-normal text-slate-800 text-sm">{{ account.alias }}</span>
-                  <span *ngIf="account.isActive" class="inline-flex items-center px-1.5 py-0.5 text-[9px] font-normal rounded-md bg-emerald-50 text-emerald-600 border border-emerald-200">
-                    Activa
+                  <span class="font-bold text-xs truncate"
+                        [ngClass]="themeService.isDarkMode() ? 'text-[#F0F6FC]' : 'text-slate-800'">
+                    {{ account.alias }}
                   </span>
-                  <span *ngIf="!account.isActive" class="inline-flex items-center px-1.5 py-0.5 text-[9px] font-normal rounded-md bg-rose-50 text-rose-600 border border-rose-200">
-                    Inactiva
-                  </span>
+                  <app-status-badge
+                    [value]="account.isActive ? 'Activa' : 'Inactiva'"
+                    [severity]="account.isActive ? 'success' : 'danger'"
+                    size="xs"
+                  />
                 </div>
-                <div class="flex flex-wrap items-center gap-x-3 gap-y-1 mt-1 text-[11px] text-slate-500">
+                <div class="flex flex-wrap items-center gap-x-3 gap-y-1 mt-1 text-[11px]"
+                     [ngClass]="themeService.isDarkMode() ? 'text-[#8B949E]' : 'text-slate-500'">
                   <span>{{ account.bankName }}</span>
-                  <span class="font-mono">{{ account.accountNumber }}</span>
-                  <span>Saldo: {{ account.balance | currency: 'Q' }}</span>
+                  <span class="font-mono font-semibold">{{ account.accountNumber }}</span>
+                  <span class="font-bold" [ngClass]="themeService.isDarkMode() ? 'text-[#58A6FF]' : 'text-[#48021C]'">
+                    Saldo: {{ account.balance | currency: 'Q ' }}
+                  </span>
                 </div>
               </div>
-              <div class="flex items-center gap-1" *ngIf="canManage">
+              <div class="flex items-center gap-1 shrink-0" *ngIf="canManage">
                 <button
                   pButton
                   type="button"
                   icon="pi pi-pencil"
                   [text]="true"
                   (click)="onEditAccountInline(account)"
-                  class="hover:!bg-amber-50 !text-amber-500 !rounded-lg !w-8 !h-8"
+                  class="!text-amber-500 hover:!bg-amber-500/10 !rounded-lg !w-7 !h-7 !p-0"
                   pTooltip="Editar"
                   tooltipPosition="top"
                 ></button>
@@ -62,10 +82,9 @@
                   pButton
                   type="button"
                   icon="pi pi-trash"
-                  severity="danger"
                   [text]="true"
                   (click)="onDeleteAccount(account)"
-                  class="hover:!bg-rose-50 !rounded-lg !w-8 !h-8"
+                  class="!text-rose-500 hover:!bg-rose-500/10 !rounded-lg !w-7 !h-7 !p-0"
                   pTooltip="Eliminar"
                   tooltipPosition="top"
                 ></button>
@@ -76,502 +95,586 @@
       </div>
 
       <!-- Columna Derecha: Formulario Nueva/Editar Cuenta -->
-      <div class="col-span-12 md:col-span-5 border-t md:border-t-0 md:border-l border-slate-200 pt-6 md:pt-0 md:pl-6 flex flex-col gap-4" [formGroup]="bankAccountForm" *ngIf="canManage">
-        <div class="flex items-center gap-2 pb-2 border-b border-slate-100">
-          <i [class]="isEditMode ? 'pi pi-pencil text-amber-500 text-md' : 'pi pi-plus-circle text-emerald-600 text-md'"></i>
-          <h3 class="font-normal text-[#3B5B8A] text-sm">{{ isEditMode ? 'Editar Cuenta' : 'Nueva Cuenta' }}</h3>
+      <div class="col-span-12 md:col-span-5 border-t md:border-t-0 md:border-l pt-6 md:pt-0 md:pl-6 flex flex-col gap-4"
+           [ngClass]="themeService.isDarkMode() ? 'border-[#30363D]' : 'border-slate-200'"
+           [formGroup]="bankAccountForm"
+           *ngIf="canManage">
+        <div class="flex items-center gap-2 pb-3 border-b"
+             [ngClass]="themeService.isDarkMode() ? 'border-[#30363D]' : 'border-slate-100'">
+          <i [class]="isEditMode ? 'pi pi-pencil text-amber-500 text-sm' : 'pi pi-plus-circle text-emerald-500 text-sm'"></i>
+          <h3 class="font-bold text-sm"
+              [ngClass]="themeService.isDarkMode() ? 'text-[#F0F6FC]' : 'text-[#48021C]'">
+            {{ isEditMode ? 'Editar Cuenta' : 'Nueva Cuenta' }}
+          </h3>
         </div>
 
         <div class="flex flex-col gap-3">
           <!-- Alias -->
           <div class="flex flex-col gap-1">
-            <label class="text-xs font-normal text-[#3B5B8A]">Nombre / Alias <span class="text-red-700">*</span></label>
+            <label class="text-xs font-semibold"
+                   [ngClass]="themeService.isDarkMode() ? 'text-[#F0F6FC]' : 'text-[#48021C]'">
+              Nombre / Alias <span class="text-rose-500">*</span>
+            </label>
             <input
               pInputText
               formControlName="alias"
-              class="w-full !rounded-lg text-xs py-1 px-2.5 h-8"
-              placeholder="Ej. Cuenta Monetaria..."
+              class="w-full !rounded-xl text-xs py-1.5 px-3 h-9 font-medium"
+              [ngClass]="themeService.isDarkMode() ? '!bg-[#0D1117] !border-[#30363D] !text-[#F0F6FC]' : '!bg-white !border-slate-300 !text-slate-800'"
+              placeholder="Ej. Cuenta Monetaria Banrural"
               autocomplete="off"
             />
             @if (bankAccountForm.get('alias')?.invalid && bankAccountForm.get('alias')?.touched) {
-              <small class="text-rose-500 text-[10px] font-normal mt-0.5">El alias es obligatorio.</small>
+              <small class="text-rose-500 text-[10px] font-medium mt-0.5">El alias es obligatorio.</small>
             }
           </div>
 
           <!-- Banco -->
           <div class="flex flex-col gap-1">
-            <label class="text-xs font-normal text-[#3B5B8A]">Nombre del Banco <span class="text-red-700">*</span></label>
+            <label class="text-xs font-semibold"
+                   [ngClass]="themeService.isDarkMode() ? 'text-[#F0F6FC]' : 'text-[#48021C]'">
+              Nombre del Banco <span class="text-rose-500">*</span>
+            </label>
             <input
               pInputText
               formControlName="bankName"
-              class="w-full !rounded-lg text-xs py-1 px-2.5 h-8"
-              placeholder="Ej. Banco Industrial..."
+              class="w-full !rounded-xl text-xs py-1.5 px-3 h-9 font-medium"
+              [ngClass]="themeService.isDarkMode() ? '!bg-[#0D1117] !border-[#30363D] !text-[#F0F6FC]' : '!bg-white !border-slate-300 !text-slate-800'"
+              placeholder="Ej. Banco Industrial"
               autocomplete="off"
             />
             @if (bankAccountForm.get('bankName')?.invalid && bankAccountForm.get('bankName')?.touched) {
-              <small class="text-rose-500 text-[10px] font-normal mt-0.5">El banco es obligatorio.</small>
+              <small class="text-rose-500 text-[10px] font-medium mt-0.5">El banco es obligatorio.</small>
             }
           </div>
 
           <!-- Número de Cuenta -->
           <div class="flex flex-col gap-1">
-            <label class="text-xs font-normal text-[#3B5B8A]">Número de Cuenta <span class="text-red-700">*</span></label>
+            <label class="text-xs font-semibold"
+                   [ngClass]="themeService.isDarkMode() ? 'text-[#F0F6FC]' : 'text-[#48021C]'">
+              Número de Cuenta <span class="text-rose-500">*</span>
+            </label>
             <input
               pInputText
               formControlName="accountNumber"
-              class="w-full !rounded-lg text-xs py-1 px-2.5 h-8"
-              placeholder="Ej. 123456789..."
+              class="w-full !rounded-xl text-xs py-1.5 px-3 h-9 font-mono font-bold"
+              [ngClass]="themeService.isDarkMode() ? '!bg-[#0D1117] !border-[#30363D] !text-[#58A6FF]' : '!bg-white !border-slate-300 !text-[#48021C]'"
+              placeholder="Ej. 123456789"
               autocomplete="off"
             />
             @if (bankAccountForm.get('accountNumber')?.invalid && bankAccountForm.get('accountNumber')?.touched) {
-              <small class="text-rose-500 text-[10px] font-normal mt-0.5">El número de cuenta es obligatorio.</small>
+              <small class="text-rose-500 text-[10px] font-medium mt-0.5">El número de cuenta es obligatorio.</small>
             }
           </div>
 
           <!-- Titular -->
           <div class="flex flex-col gap-1">
-            <label class="text-xs font-normal text-[#3B5B8A]">Titular <span class="text-red-700">*</span></label>
+            <label class="text-xs font-semibold"
+                   [ngClass]="themeService.isDarkMode() ? 'text-[#F0F6FC]' : 'text-[#48021C]'">
+              Titular de la Cuenta <span class="text-rose-500">*</span>
+            </label>
             <input
               pInputText
               formControlName="holderName"
-              class="w-full !rounded-lg text-xs py-1 px-2.5 h-8"
-              placeholder="Ej. Caben Carnes, S.A...."
+              class="w-full !rounded-xl text-xs py-1.5 px-3 h-9 font-medium"
+              [ngClass]="themeService.isDarkMode() ? '!bg-[#0D1117] !border-[#30363D] !text-[#F0F6FC]' : '!bg-white !border-slate-300 !text-slate-800'"
+              placeholder="Ej. Caben Carnes, S.A."
               autocomplete="off"
             />
             @if (bankAccountForm.get('holderName')?.invalid && bankAccountForm.get('holderName')?.touched) {
-              <small class="text-rose-500 text-[10px] font-normal mt-0.5">El titular es obligatorio.</small>
+              <small class="text-rose-500 text-[10px] font-medium mt-0.5">El titular es obligatorio.</small>
             }
           </div>
 
           <div class="grid grid-cols-2 gap-3">
             <!-- Tipo de Cuenta -->
             <div class="flex flex-col gap-1">
-              <label class="text-xs font-normal text-[#3B5B8A]">Tipo *</label>
+              <label class="text-xs font-semibold"
+                     [ngClass]="themeService.isDarkMode() ? 'text-[#F0F6FC]' : 'text-[#48021C]'">Tipo *</label>
               <p-select
                 [options]="accountTypeOptions"
                 formControlName="accountType"
                 optionLabel="label"
                 optionValue="value"
                 class="w-full text-xs"
-                styleClass="!rounded-lg text-xs border-slate-300! h-8!"
-                size="small"
+                styleClass="!rounded-xl text-xs h-9!"
                 appendTo="body"
+                fluid
               />
             </div>
 
             <!-- Saldo Inicial -->
             <div class="flex flex-col gap-1">
-              <label class="text-xs font-normal text-[#3B5B8A]">Saldo Inicial</label>
+              <label class="text-xs font-semibold"
+                     [ngClass]="themeService.isDarkMode() ? 'text-[#F0F6FC]' : 'text-[#48021C]'">Saldo Inicial</label>
               <p-inputnumber
                 formControlName="balance"
-                mode="decimal"
+                mode="currency"
+                currency="GTQ"
+                locale="es-GT"
                 [min]="0"
-                [minFractionDigits]="2"
-                [maxFractionDigits]="2"
-                [showButtons]="false"
-                [prefix]="'Q '"
-                styleClass="w-full !rounded-lg text-xs h-8!"
-                inputStyleClass="text-xs h-8! py-1! px-2.5! border-slate-300!"
-                size="small"
+                styleClass="w-full !rounded-xl text-xs h-9!"
+                [inputStyleClass]="'!rounded-xl text-xs h-9! py-1! px-2.5! ' + (themeService.isDarkMode() ? '!bg-[#0D1117] !border-[#30363D] !text-[#F0F6FC]' : '!bg-white !border-slate-300 !text-slate-800')"
                 fluid
               />
             </div>
           </div>
 
           <!-- Activa Toggle switch -->
-          <div class="flex items-center justify-between p-2 bg-slate-50 rounded-lg border border-slate-200 mt-1">
-            <span class="text-xs font-normal text-slate-700">¿Cuenta Activa?</span>
+          <div class="flex items-center justify-between p-2.5 rounded-xl border mt-1"
+               [ngClass]="themeService.isDarkMode() ? 'bg-[#0D1117] border-[#30363D]' : 'bg-slate-50 border-slate-200'">
+            <span class="text-xs font-semibold"
+                  [ngClass]="themeService.isDarkMode() ? 'text-[#F0F6FC]' : 'text-slate-700'">¿Cuenta Activa?</span>
             <p-toggleSwitch formControlName="isActive" />
           </div>
 
           <!-- Botones de Acción -->
           <div class="flex gap-2 w-full mt-2">
-            <button
-              pButton
-              type="button"
+            <app-secondary-button
               [label]="isEditMode ? 'Cancelar' : 'Cerrar'"
-              (click)="isEditMode ? onCancelEdit() : onCloseCatalog()"
-              class="p-button-outlined p-button-secondary !rounded-lg flex-1 font-normal h-8 justify-center text-xs"
-            ></button>
-            <button
-              pButton
-              type="button"
+              icon="pi pi-times"
+              colorScheme="burgundy"
+              class="flex-1"
+              (clicked)="isEditMode ? onCancelEdit() : onCloseCatalog()"
+            />
+            <app-primary-button
               [label]="isEditMode ? 'Actualizar' : 'Crear'"
               icon="pi pi-check"
-              (click)="onSaveAccount()"
+              class="flex-1"
+              [disabled]="bankAccountForm.invalid || isSaving"
               [loading]="isSaving"
-              class="flex-1 !rounded-lg font-normal h-8 justify-center text-xs"
-              [severity]="isEditMode ? 'warn' : 'success'"
-            ></button>
+              (clicked)="onSaveAccount()"
+            />
           </div>
         </div>
       </div>
       
       <!-- Permission error for non-admins -->
-      <div class="col-span-12 md:col-span-5 border-t md:border-t-0 md:border-l border-slate-200 pt-6 md:pt-0 md:pl-6 flex flex-col justify-center items-center text-center gap-2" *ngIf="!canManage">
-        <i class="pi pi-lock text-slate-400 text-3xl"></i>
-        <p class="text-xs text-slate-500 font-normal">No tienes permisos para modificar cuentas bancarias.</p>
+      <div class="col-span-12 md:col-span-5 border-t md:border-t-0 md:border-l pt-6 md:pt-0 md:pl-6 flex flex-col justify-center items-center text-center gap-2"
+           [ngClass]="themeService.isDarkMode() ? 'border-[#30363D]' : 'border-slate-200'"
+           *ngIf="!canManage">
+        <i class="pi pi-lock text-3xl" [ngClass]="themeService.isDarkMode() ? 'text-[#8B949E]' : 'text-slate-400'"></i>
+        <p class="text-xs" [ngClass]="themeService.isDarkMode() ? 'text-[#8B949E]' : 'text-slate-500'">
+          No tienes permisos para modificar cuentas bancarias.
+        </p>
       </div>
     </div>
   </div>
 
-  <!-- MODE: Normal Page View -->
+  <!-- ==================== MODE: Full Page View (Menu Catálogos) ==================== -->
   <div *ngIf="!isDialogMode">
-    <!-- Title Header (Desktop/Mobile Page Mode) -->
-    <div class="max-w-[1700px] mx-auto px-4 md:px-0 mb-4 md:mb-8">
-      <div class="flex flex-col md:flex-row md:items-end justify-between gap-4">
-        <div class="w-full md:max-w-[50%]">
-          <h1 class="text-2xl md:text-4xl font-semibold text-gray-900 tracking-tight line-clamp-1">Cuentas Bancarias</h1>
-          <p class="hidden md:block text-[#627ca7] mt-1 md:mt-2 text-sm md:text-md font-medium">
-             Administre las cuentas de banco habilitadas para registrar transferencias y depósitos de cobros.
-          </p>
-        </div>
-        <div class="flex items-center gap-2 w-full md:w-auto">
-          <div class="flex-1">
-            <p-iconfield>
-              <p-inputicon class="pi pi-search" />
-              <input 
-                (input)="onSearch($event)"
-                type="text" 
-                pInputText 
-                placeholder="Buscar cuenta..."
-                autocomplete="off"
-                class="w-full !rounded-xl"
-              />
-            </p-iconfield>
-          </div>
-          <p-button 
-            label="Nueva Cuenta"
-            severity="info"
-            icon="pi pi-plus"
-            class="hidden md:block"
-            styleClass="!rounded-xl"
-            *ngIf="canManage"
-            (onClick)="openNewDialog()"
-          />
-          <p-button 
-            severity="info"
-            icon="pi pi-plus"
-            class="block md:hidden"
-            styleClass="!rounded-xl"
-            *ngIf="canManage"
-            (onClick)="openNewDialog()"
-          />
-        </div>
-      </div>
-    </div>
+    <!-- Header Section -->
+    <app-page-header
+      title="Cuentas Bancarias"
+      subtitle="Administre las cuentas de banco habilitadas para registrar transferencias y depósitos de cobros."
+      icon="pi pi-building-columns"
+      colorScheme="burgundy"
+    >
+      <ng-container actions>
+        <app-refresh-button (clicked)="loadBankAccounts()" />
+        <app-primary-button
+          label="Nueva Cuenta"
+          icon="pi pi-plus"
+          *ngIf="canManage"
+          (clicked)="openNewDialog()"
+        />
+      </ng-container>
+    </app-page-header>
 
-    <!-- Header for Dialog Mode (Compact) -->
-    <div *ngIf="isDialogMode" class="flex items-center justify-between gap-4 mb-4">
-      <div class="flex-1">
-        <p-iconfield>
-          <p-inputicon class="pi pi-search" />
-          <input 
-            (input)="onSearch($event)"
-            type="text" 
-            pInputText 
-            placeholder="Buscar cuenta..."
-            autocomplete="off"
-            class="w-full !rounded-xl text-xs py-1.5 px-3"
-          />
-        </p-iconfield>
+    <div class="max-w-[1700px] mx-auto px-4 md:px-0">
+      <!-- Search Filter Bar -->
+      <div class="flex items-center justify-between gap-4 mb-6">
+        <app-search-input
+          [placeholder]="'Buscar por alias, banco o número de cuenta...'"
+          widthClass="w-full sm:w-80 md:w-96"
+          [ngModel]="searchQuery()"
+          (searchChange)="searchQuery.set($event)"
+        />
       </div>
-      <p-button 
-        label="Nueva Cuenta"
-        severity="info"
-        icon="pi pi-plus"
-        styleClass="!rounded-xl text-xs py-1.5 px-3"
-        *ngIf="canManage"
-        (onClick)="openNewDialog()"
-      />
-    </div>
 
-    <div class="max-w-[1700px] mx-auto pb-10">
       <!-- Desktop Table -->
-      <div class="hidden lg:block bg-white rounded-xl border border-slate-300 overflow-x-auto shadow-sm">
-        <p-table
-          #dt
-          [value]="bankAccounts()"
+      <div class="hidden lg:block">
+        <app-standard-table
+          [value]="filteredBankAccounts()"
           [loading]="loading()"
           [paginator]="true"
           [rows]="10"
-          [showCurrentPageReport]="true"
-          currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords}"
-          [rowsPerPageOptions]="[5, 10, 20]"
-          [globalFilterFields]="['bankName', 'accountNumber', 'alias', 'holderName']"
+          [rowsPerPageOptions]="[10, 20, 30]"
           dataKey="id"
-          styleClass="p-datatable-modern"
-          [tableStyle]="{'min-width': '900px'}"
+          emptyIcon="pi pi-building-columns"
+          emptyMessage="No se encontraron cuentas bancarias"
         >
-          <ng-template pTemplate="header">
-            <tr class="h-14 bg-slate-50 text-xs">
-              <th class="!pl-6 tracking-widest text-slate-400 w-[120px]">Estado</th>
-              <th class="tracking-widest text-slate-400 w-[200px]" pSortableColumn="alias">Nombre / Alias <p-sortIcon field="alias" /></th>
-              <th class="tracking-widest text-slate-400 w-[180px]" pSortableColumn="bankName">Banco <p-sortIcon field="bankName" /></th>
-              <th class="tracking-widest text-slate-400 w-[180px]">Número de Cuenta</th>
-              <th class="tracking-widest text-slate-400 w-[200px]">Titular</th>
-              <th class="tracking-widest text-slate-400 text-right w-[150px]" pSortableColumn="balance">Saldo <p-sortIcon field="balance" /></th>
-              <th class="!pr-6 tracking-widest text-slate-400 text-right w-[130px]" *ngIf="canManage">Acciones</th>
+          <ng-template #header>
+            <tr class="h-14 text-xs uppercase tracking-wider"
+                [ngClass]="themeService.isDarkMode() ? 'bg-[#161B22] text-[#8B949E]' : 'bg-slate-50 text-slate-500'">
+              <th class="!pl-6 w-[120px]">Estado</th>
+              <th pSortableColumn="alias" class="w-[220px]">
+                Nombre / Alias <p-sortIcon field="alias" class="text-xs" />
+              </th>
+              <th pSortableColumn="bankName" class="w-[200px]">
+                Banco <p-sortIcon field="bankName" class="text-xs" />
+              </th>
+              <th class="w-[180px]">Número de Cuenta</th>
+              <th>Titular</th>
+              <th pSortableColumn="balance" class="text-right w-[160px]">
+                Saldo <p-sortIcon field="balance" class="text-xs" />
+              </th>
+              <th class="!pr-6 text-right w-[120px]" *ngIf="canManage">Acciones</th>
             </tr>
           </ng-template>
 
-          <ng-template pTemplate="body" let-account>
-            <tr class="hover:bg-slate-50 transition-all border-b border-slate-100 last:border-0 text-xs">
-              <td class="!pl-6 py-3">
-                <span *ngIf="account.isActive" class="inline-flex items-center px-2 py-0.5 text-[10px] font-semibold rounded-lg bg-emerald-50 text-emerald-600 border border-emerald-300">
-                  Activa
-                </span>
-                <span *ngIf="!account.isActive" class="inline-flex items-center px-2 py-0.5 text-[10px] font-semibold rounded-lg bg-rose-50 text-rose-600 border border-rose-300">
-                  Inactiva
+          <ng-template #body let-account>
+            <tr class="transition-colors border-b last:border-0"
+                [ngClass]="[
+                  themeService.isDarkMode()
+                    ? 'border-[#30363D] hover:bg-[#161B22]/80 text-[#F0F6FC]'
+                    : 'border-slate-100 hover:bg-slate-50 text-slate-800',
+                  !account.isActive ? 'opacity-60 grayscale-[0.4]' : ''
+                ]">
+              <td class="!pl-6 py-4">
+                <app-status-badge
+                  [value]="account.isActive ? 'Activa' : 'Inactiva'"
+                  [severity]="account.isActive ? 'success' : 'danger'"
+                />
+              </td>
+              <td class="py-4">
+                <span class="font-bold text-sm"
+                      [ngClass]="themeService.isDarkMode() ? 'text-[#F0F6FC]' : 'text-slate-900'">
+                  {{ account.alias }}
                 </span>
               </td>
-              <td class="py-3 font-semibold text-slate-800">{{ account.alias }}</td>
-              <td>{{ account.bankName }}</td>
-              <td class="font-mono text-slate-600 font-medium">{{ account.accountNumber }}</td>
-              <td>{{ account.holderName }}</td>
-              <td class="text-right font-bold text-slate-700">{{ account.balance | currency: 'Q' }}</td>
-              <td class="!pr-6 text-right" *ngIf="canManage">
-                <div class="flex justify-end gap-1">
+              <td class="py-4">
+                <span class="text-xs font-semibold"
+                      [ngClass]="themeService.isDarkMode() ? 'text-[#8B949E]' : 'text-slate-600'">
+                  {{ account.bankName }}
+                </span>
+              </td>
+              <td class="py-4">
+                <code class="px-2.5 py-1 rounded-lg text-xs font-mono font-bold border transition-colors inline-block"
+                      [ngClass]="themeService.isDarkMode() ? 'bg-[#0D1117] text-[#58A6FF] border-[#30363D]' : 'bg-[#48021C]/5 text-[#48021C] border-[#48021C]/15'">
+                  {{ account.accountNumber }}
+                </code>
+              </td>
+              <td class="py-4">
+                <span class="text-xs" [ngClass]="themeService.isDarkMode() ? 'text-[#F0F6FC]' : 'text-slate-700'">
+                  {{ account.holderName }}
+                </span>
+              </td>
+              <td class="py-4 text-right">
+                <span class="font-bold text-sm"
+                      [ngClass]="themeService.isDarkMode() ? 'text-[#58A6FF]' : 'text-[#48021C]'">
+                  {{ account.balance | currency: 'Q ' }}
+                </span>
+              </td>
+              <td class="!pr-6 py-4 text-right" *ngIf="canManage">
+                <div class="flex items-center justify-end gap-1">
                   <button
                     pButton
                     icon="pi pi-pencil"
-                    class="p-button-rounded p-button-text p-button-warning !text-amber-500 hover:!bg-amber-50 !w-8 !h-8 !p-0"
+                    class="p-button-rounded p-button-text !w-8 !h-8 !text-amber-500 hover:!bg-amber-500/10"
                     (click)="openEditDialog(account)"
-                    pTooltip="Editar"
+                    pTooltip="Editar Cuenta"
                     tooltipPosition="bottom"
                   ></button>
                   <button
                     pButton
                     icon="pi pi-trash"
-                    class="p-button-rounded p-button-text p-button-danger !text-rose-500 hover:!bg-rose-50 !w-8 !h-8 !p-0"
+                    class="p-button-rounded p-button-text !w-8 !h-8 !text-rose-500 hover:!bg-rose-500/10"
                     (click)="onDeleteAccount(account)"
-                    pTooltip="Eliminar"
+                    pTooltip="Eliminar Cuenta"
                     tooltipPosition="bottom"
                   ></button>
                 </div>
               </td>
             </tr>
           </ng-template>
-
-          <ng-template #emptymessage>
-            <tr>
-              <td colspan="7" class="text-center !py-20">
-                <div class="flex flex-col items-center justify-center gap-3">
-                  <i class="pi pi-credit-card text-[#95abce]" style="font-size: 3rem"></i>
-                  <p class="text-[#627ca7] font-semibold text-sm">No se encontraron cuentas bancarias.</p>
-                </div>
-              </td>
-            </tr>
-          </ng-template>
-        </p-table>
+        </app-standard-table>
       </div>
 
-      <!-- Mobile Table (Only in full page mode, hidden in dialog mode for compact space) -->
-      <div class="block lg:hidden w-full px-2" *ngIf="!isDialogMode">
-        <p-table
-          #dtMobile
-          [value]="bankAccounts()"
-          [loading]="loading()"
-          [paginator]="true"
-          [rows]="5"
-          [globalFilterFields]="['bankName', 'accountNumber', 'alias', 'holderName']"
-          dataKey="id"
-          styleClass="p-datatable-modern bg-transparent w-full"
-          [tableStyle]="{'table-layout': 'fixed', 'width': '100%'}"
-          [breakpoint]="'0px'"
-        >
-          <ng-template pTemplate="body" let-account>
-            <tr class="bg-transparent border-none block">
-              <td class="block !p-0 border-none bg-transparent">
-                <div class="bg-white rounded-2xl shadow-sm border border-slate-200 my-2 flex flex-col overflow-hidden relative">
-                  <div class="flex p-4 items-center gap-4">
-                    <div class="flex items-center justify-center shrink-0">
-                      <span class="w-10 h-10 rounded-lg bg-indigo-50 text-indigo-600 flex items-center justify-center border border-indigo-100 shadow-sm">
-                        <i class="pi pi-credit-card text-lg"></i>
-                      </span>
-                    </div>
-                    <div class="flex-1 min-w-0">
-                      <div class="flex flex-col min-w-0">
-                        <div class="flex items-center gap-2">
-                          <span class="text-[9px] text-slate-400 font-mono tracking-wider leading-none mb-1">{{ account.bankName }}</span>
-                          <p-tag [value]="account.isActive ? 'ACTIVA' : 'INACTIVA'" [severity]="account.isActive ? 'success' : 'danger'" styleClass="text-[8px] !font-semibold px-1.5 py-0.5 rounded-md" />
-                        </div>
-                        <h3 class="font-semibold text-slate-800 text-sm leading-tight truncate">{{ account.alias }}</h3>
-                      </div>
-                    </div>
-                    <div class="text-right">
-                      <span class="text-xs font-bold text-slate-800">{{ account.balance | currency: 'Q' }}</span>
-                    </div>
-                  </div>
-
-                  <div class="px-4 pb-3 flex flex-col gap-1 text-[11px] text-slate-500">
-                    <div><strong>Nº Cuenta:</strong> <span class="font-mono">{{ account.accountNumber }}</span></div>
-                    <div><strong>Titular:</strong> {{ account.holderName }}</div>
-                  </div>
-
-                  <div class="bg-slate-50 border-t border-slate-100 p-2 px-3 flex items-center justify-end" *ngIf="canManage">
-                    <div class="flex items-center gap-1">
-                      <p-button
-                        icon="pi pi-pencil"
-                        styleClass="p-button-text !text-amber-500 hover:!bg-amber-50 !w-8 !h-8 !rounded-lg !p-0"
-                        (onClick)="openEditDialog(account)"
-                      />
-                      <p-button
-                        icon="pi pi-trash"
-                        styleClass="p-button-text !text-rose-500 hover:!bg-rose-50 !w-8 !h-8 !rounded-lg !p-0"
-                        (onClick)="onDeleteAccount(account)"
-                      />
-                    </div>
-                  </div>
+      <!-- Mobile Responsive Cards -->
+      <div class="lg:hidden flex flex-col gap-3">
+        @for (account of filteredBankAccounts(); track account.id) {
+          <div class="rounded-2xl border p-4 shadow-sm transition-all"
+               [ngClass]="[
+                 themeService.isDarkMode() ? 'bg-[#161B22] border-[#30363D]' : 'bg-white border-slate-200',
+                 !account.isActive ? 'opacity-60 grayscale-[0.4]' : ''
+               ]">
+            <!-- Card Header -->
+            <div class="flex items-start justify-between gap-3 pb-3 border-b"
+                 [ngClass]="themeService.isDarkMode() ? 'border-[#30363D]' : 'border-slate-100'">
+              <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl flex items-center justify-center shrink-0 border"
+                     [ngClass]="themeService.isDarkMode() ? 'bg-[#0D1117] border-[#30363D] text-[#58A6FF]' : 'bg-[#48021C]/5 border-[#48021C]/15 text-[#48021C]'">
+                  <i class="pi pi-building-columns text-base"></i>
                 </div>
-              </td>
-            </tr>
-          </ng-template>
-          
-          <ng-template #emptymessage>
-            <tr>
-              <td class="block !p-0 border-none bg-transparent">
-                <div class="bg-white rounded-lg border border-slate-300 mx-4 my-8 p-10 flex flex-col items-center gap-4 text-center">
-                  <i class="pi pi-credit-card text-[#95abce]" style="font-size: 3rem"></i>
-                  <p class="text-[#627ca7] font-semibold text-sm">No se encontraron cuentas.</p>
+                <div class="flex flex-col min-w-0">
+                  <span class="text-[10px] uppercase font-bold tracking-wider"
+                        [ngClass]="themeService.isDarkMode() ? 'text-[#8B949E]' : 'text-slate-400'">
+                    {{ account.bankName }}
+                  </span>
+                  <h3 class="font-bold text-sm truncate"
+                      [ngClass]="themeService.isDarkMode() ? 'text-[#F0F6FC]' : 'text-slate-900'">
+                    {{ account.alias }}
+                  </h3>
                 </div>
-              </td>
-            </tr>
-          </ng-template>
-        </p-table>
+              </div>
+              <app-status-badge
+                [value]="account.isActive ? 'Activa' : 'Inactiva'"
+                [severity]="account.isActive ? 'success' : 'danger'"
+                size="xs"
+              />
+            </div>
+
+            <!-- Card Body Details -->
+            <div class="py-3 flex flex-col gap-2 text-xs">
+              <div class="flex items-center justify-between">
+                <span [ngClass]="themeService.isDarkMode() ? 'text-[#8B949E]' : 'text-slate-500'">Nº Cuenta:</span>
+                <span class="font-mono font-semibold"
+                      [ngClass]="themeService.isDarkMode() ? 'text-[#58A6FF]' : 'text-[#48021C]'">
+                  {{ account.accountNumber }}
+                </span>
+              </div>
+              <div class="flex items-center justify-between">
+                <span [ngClass]="themeService.isDarkMode() ? 'text-[#8B949E]' : 'text-slate-500'">Titular:</span>
+                <span class="font-semibold" [ngClass]="themeService.isDarkMode() ? 'text-[#F0F6FC]' : 'text-slate-800'">
+                  {{ account.holderName }}
+                </span>
+              </div>
+              <div class="flex items-center justify-between pt-1 border-t"
+                   [ngClass]="themeService.isDarkMode() ? 'border-[#30363D]' : 'border-slate-100'">
+                <span class="font-semibold" [ngClass]="themeService.isDarkMode() ? 'text-[#8B949E]' : 'text-slate-500'">Saldo:</span>
+                <span class="font-bold text-sm"
+                      [ngClass]="themeService.isDarkMode() ? 'text-[#58A6FF]' : 'text-[#48021C]'">
+                  {{ account.balance | currency: 'Q ' }}
+                </span>
+              </div>
+            </div>
+
+            <!-- Card Footer Actions -->
+            <div class="flex items-center justify-end gap-2 pt-2 border-t"
+                 [ngClass]="themeService.isDarkMode() ? 'border-[#30363D]' : 'border-slate-100'"
+                 *ngIf="canManage">
+              <button
+                pButton
+                label="Editar"
+                icon="pi pi-pencil"
+                class="p-button-text !text-xs !py-1.5 !px-3 !text-amber-500 hover:!bg-amber-500/10 !rounded-lg"
+                (click)="openEditDialog(account)"
+              ></button>
+              <button
+                pButton
+                label="Eliminar"
+                icon="pi pi-trash"
+                class="p-button-text !text-xs !py-1.5 !px-3 !text-rose-500 hover:!bg-rose-500/10 !rounded-lg"
+                (click)="onDeleteAccount(account)"
+              ></button>
+            </div>
+          </div>
+        } @empty {
+          <div class="rounded-2xl border p-12 text-center flex flex-col items-center justify-center gap-3"
+               [ngClass]="themeService.isDarkMode() ? 'bg-[#161B22] border-[#30363D]' : 'bg-white border-slate-200'">
+            <div class="w-16 h-16 rounded-2xl flex items-center justify-center border"
+                 [ngClass]="themeService.isDarkMode() ? 'bg-[#0D1117] border-[#30363D] text-[#58A6FF]' : 'bg-[#48021C]/5 border-[#48021C]/15 text-[#48021C]'">
+              <i class="pi pi-building-columns text-2xl"></i>
+            </div>
+            <h4 class="font-bold text-base"
+                [ngClass]="themeService.isDarkMode() ? 'text-[#F0F6FC]' : 'text-slate-800'">
+              No se encontraron cuentas bancarias
+            </h4>
+            <p class="text-xs max-w-xs"
+               [ngClass]="themeService.isDarkMode() ? 'text-[#8B949E]' : 'text-slate-500'">
+              Prueba ajustando los filtros de búsqueda o registra una nueva cuenta.
+            </p>
+          </div>
+        }
       </div>
     </div>
   </div>
 
-  <!-- Form Dialog (Create / Edit) -->
+  <!-- ==================== Form Dialog (Create / Edit Modal) ==================== -->
   <p-dialog
     [(visible)]="displayFormDialog"
-    [header]="isEditMode ? 'Editar Cuenta Bancaria' : 'Nueva Cuenta Bancaria'"
     [modal]="true"
     [draggable]="false"
     [resizable]="false"
-    [style]="{ width: '450px' }"
+    [style]="{ width: '480px', maxWidth: '95vw' }"
     appendTo="body"
-    styleClass="p-dialog-modern custom-dialog"
+    [styleClass]="themeService.isDarkMode() ? 'theme-dark' : ''"
   >
-    <form [formGroup]="bankAccountForm" (ngSubmit)="onSaveAccount()" class="space-y-4 pt-2 text-left">
+    <ng-template #header>
+      <div class="flex items-center gap-2.5">
+        <div class="w-8 h-8 rounded-lg flex items-center justify-center border"
+             [ngClass]="themeService.isDarkMode() ? 'bg-[#1C2D42] text-[#58A6FF] border-[#58A6FF]/30' : 'bg-[#48021C]/10 text-[#48021C] border-[#48021C]/20'">
+          <i [class]="isEditMode ? 'pi pi-pencil text-xs' : 'pi pi-building-columns text-xs'"></i>
+        </div>
+        <span class="font-bold text-sm"
+              [ngClass]="themeService.isDarkMode() ? 'text-[#F0F6FC]' : 'text-slate-900'">
+          {{ isEditMode ? 'Editar Cuenta Bancaria' : 'Nueva Cuenta Bancaria' }}
+        </span>
+      </div>
+    </ng-template>
+
+    <form [formGroup]="bankAccountForm" (ngSubmit)="onSaveAccount()" class="flex flex-col gap-4 pt-2">
+      <!-- Alias -->
       <div class="flex flex-col gap-1.5">
-        <label for="alias" class="text-xs font-semibold text-slate-700">Nombre / Alias de la cuenta *</label>
+        <label for="alias" class="text-xs font-semibold"
+               [ngClass]="themeService.isDarkMode() ? 'text-[#F0F6FC]' : 'text-[#48021C]'">
+          Nombre / Alias de la Cuenta <span class="text-rose-500">*</span>
+        </label>
         <input 
           id="alias" 
           type="text" 
           pInputText 
           formControlName="alias" 
           placeholder="Ej. Cuenta Monetaria Banrural" 
-          class="w-full text-xs py-2 border-slate-300! focus:border-brand-deep!" 
+          class="w-full !rounded-xl text-xs h-10 font-medium" 
+          [ngClass]="[
+            themeService.isDarkMode() ? '!bg-[#0D1117] !border-[#30363D] !text-[#F0F6FC]' : '!bg-white !border-slate-300 !text-slate-800',
+            bankAccountForm.get('alias')?.invalid && bankAccountForm.get('alias')?.touched ? '!border-rose-400 ng-invalid ng-dirty' : ''
+          ]"
         />
-        <small class="text-red-500 text-[10px]" *ngIf="bankAccountForm.get('alias')?.touched && bankAccountForm.get('alias')?.invalid">
-          El alias es requerido (mínimo 2 letras)
-        </small>
+        @if (bankAccountForm.get('alias')?.invalid && bankAccountForm.get('alias')?.touched) {
+          <small class="text-rose-500 text-[10px] font-medium flex items-center mt-0.5">
+            <i class="pi pi-exclamation-circle mr-1 text-[10px]"></i>El alias es requerido (mínimo 2 letras).
+          </small>
+        }
       </div>
 
+      <!-- Banco -->
       <div class="flex flex-col gap-1.5">
-        <label for="bankName" class="text-xs font-semibold text-slate-700">Nombre del Banco *</label>
+        <label for="bankName" class="text-xs font-semibold"
+               [ngClass]="themeService.isDarkMode() ? 'text-[#F0F6FC]' : 'text-[#48021C]'">
+          Nombre del Banco <span class="text-rose-500">*</span>
+        </label>
         <input 
           id="bankName" 
           type="text" 
           pInputText 
           formControlName="bankName" 
           placeholder="Ej. Banco Industrial" 
-          class="w-full text-xs py-2 border-slate-300! focus:border-brand-deep!" 
+          class="w-full !rounded-xl text-xs h-10 font-medium" 
+          [ngClass]="[
+            themeService.isDarkMode() ? '!bg-[#0D1117] !border-[#30363D] !text-[#F0F6FC]' : '!bg-white !border-slate-300 !text-slate-800',
+            bankAccountForm.get('bankName')?.invalid && bankAccountForm.get('bankName')?.touched ? '!border-rose-400 ng-invalid ng-dirty' : ''
+          ]"
         />
-        <small class="text-red-500 text-[10px]" *ngIf="bankAccountForm.get('bankName')?.touched && bankAccountForm.get('bankName')?.invalid">
-          El banco es requerido
-        </small>
+        @if (bankAccountForm.get('bankName')?.invalid && bankAccountForm.get('bankName')?.touched) {
+          <small class="text-rose-500 text-[10px] font-medium flex items-center mt-0.5">
+            <i class="pi pi-exclamation-circle mr-1 text-[10px]"></i>El banco es requerido.
+          </small>
+        }
       </div>
 
+      <!-- Número de Cuenta -->
       <div class="flex flex-col gap-1.5">
-        <label for="accountNumber" class="text-xs font-semibold text-slate-700">Número de Cuenta *</label>
+        <label for="accountNumber" class="text-xs font-semibold"
+               [ngClass]="themeService.isDarkMode() ? 'text-[#F0F6FC]' : 'text-[#48021C]'">
+          Número de Cuenta <span class="text-rose-500">*</span>
+        </label>
         <input 
           id="accountNumber" 
           type="text" 
           pInputText 
           formControlName="accountNumber" 
           placeholder="Ej. 123456789" 
-          class="w-full text-xs py-2 border-slate-300! focus:border-brand-deep!" 
+          class="w-full !rounded-xl text-xs h-10 font-mono font-bold" 
+          [ngClass]="[
+            themeService.isDarkMode() ? '!bg-[#0D1117] !border-[#30363D] !text-[#58A6FF]' : '!bg-white !border-slate-300 !text-[#48021C]',
+            bankAccountForm.get('accountNumber')?.invalid && bankAccountForm.get('accountNumber')?.touched ? '!border-rose-400 ng-invalid ng-dirty' : ''
+          ]"
         />
-        <small class="text-red-500 text-[10px]" *ngIf="bankAccountForm.get('accountNumber')?.touched && bankAccountForm.get('accountNumber')?.invalid">
-          El número de cuenta es requerido (mínimo 5 caracteres)
-        </small>
+        @if (bankAccountForm.get('accountNumber')?.invalid && bankAccountForm.get('accountNumber')?.touched) {
+          <small class="text-rose-500 text-[10px] font-medium flex items-center mt-0.5">
+            <i class="pi pi-exclamation-circle mr-1 text-[10px]"></i>El número de cuenta es requerido (mínimo 5 dígitos).
+          </small>
+        }
       </div>
 
+      <!-- Titular -->
       <div class="flex flex-col gap-1.5">
-        <label for="holderName" class="text-xs font-semibold text-slate-700">Titular de la cuenta *</label>
+        <label for="holderName" class="text-xs font-semibold"
+               [ngClass]="themeService.isDarkMode() ? 'text-[#F0F6FC]' : 'text-[#48021C]'">
+          Titular de la Cuenta <span class="text-rose-500">*</span>
+        </label>
         <input 
           id="holderName" 
           type="text" 
           pInputText 
           formControlName="holderName" 
           placeholder="Ej. Caben Carnes y Embutidos, S.A." 
-          class="w-full text-xs py-2 border-slate-300! focus:border-brand-deep!" 
+          class="w-full !rounded-xl text-xs h-10 font-medium" 
+          [ngClass]="[
+            themeService.isDarkMode() ? '!bg-[#0D1117] !border-[#30363D] !text-[#F0F6FC]' : '!bg-white !border-slate-300 !text-slate-800',
+            bankAccountForm.get('holderName')?.invalid && bankAccountForm.get('holderName')?.touched ? '!border-rose-400 ng-invalid ng-dirty' : ''
+          ]"
         />
-        <small class="text-red-500 text-[10px]" *ngIf="bankAccountForm.get('holderName')?.touched && bankAccountForm.get('holderName')?.invalid">
-          El nombre del titular es requerido (mínimo 3 letras)
-        </small>
+        @if (bankAccountForm.get('holderName')?.invalid && bankAccountForm.get('holderName')?.touched) {
+          <small class="text-rose-500 text-[10px] font-medium flex items-center mt-0.5">
+            <i class="pi pi-exclamation-circle mr-1 text-[10px]"></i>El nombre del titular es requerido.
+          </small>
+        }
       </div>
 
       <div class="grid grid-cols-2 gap-3">
+        <!-- Tipo de Cuenta -->
         <div class="flex flex-col gap-1.5">
-          <label for="accountType" class="text-xs font-semibold text-slate-700">Tipo de cuenta *</label>
+          <label for="accountType" class="text-xs font-semibold"
+                 [ngClass]="themeService.isDarkMode() ? 'text-[#F0F6FC]' : 'text-[#48021C]'">Tipo *</label>
           <p-select
             id="accountType"
             [options]="accountTypeOptions"
             formControlName="accountType"
             optionLabel="label"
             optionValue="value"
-            class="w-full"
-            styleClass="border-slate-300! h-8! text-xs! py-0!"
-            size="small"
+            class="w-full text-xs"
+            styleClass="!rounded-xl text-xs h-10!"
             appendTo="body"
+            fluid
           />
         </div>
 
+        <!-- Saldo Inicial -->
         <div class="flex flex-col gap-1.5">
-          <label for="balance" class="text-xs font-semibold text-slate-700">Saldo inicial</label>
+          <label for="balance" class="text-xs font-semibold"
+                 [ngClass]="themeService.isDarkMode() ? 'text-[#F0F6FC]' : 'text-[#48021C]'">Saldo Inicial</label>
           <p-inputnumber
             id="balance"
             formControlName="balance"
-            mode="decimal"
+            mode="currency"
+            currency="GTQ"
+            locale="es-GT"
             [min]="0"
-            [minFractionDigits]="2"
-            [maxFractionDigits]="2"
-            [showButtons]="false"
-            [prefix]="'Q  '"
-            styleClass="w-full border-slate-300! h-8!"
-            inputStyleClass="text-xs h-8! py-1! px-2.5! border-slate-300! focus:border-brand-deep!"
-            size="small"
+            styleClass="w-full !rounded-xl text-xs h-10!"
+            [inputStyleClass]="'!rounded-xl text-xs h-10! py-1! px-2.5! ' + (themeService.isDarkMode() ? '!bg-[#0D1117] !border-[#30363D] !text-[#F0F6FC]' : '!bg-white !border-slate-300 !text-slate-800')"
             fluid
           />
         </div>
       </div>
 
-      <div class="flex items-center justify-between p-3 bg-slate-50 rounded-lg border border-slate-200">
-        <span class="text-xs font-semibold text-slate-700">¿Cuenta Habilitada / Activa?</span>
+      <!-- Activa Toggle switch -->
+      <div class="flex items-center justify-between p-3 rounded-xl border mt-1"
+           [ngClass]="themeService.isDarkMode() ? 'bg-[#0D1117] border-[#30363D]' : 'bg-slate-50 border-slate-200'">
+        <span class="text-xs font-semibold"
+              [ngClass]="themeService.isDarkMode() ? 'text-[#F0F6FC]' : 'text-slate-700'">¿Cuenta Habilitada / Activa?</span>
         <p-toggleSwitch formControlName="isActive" />
       </div>
 
-      <div class="flex justify-end gap-2 pt-2 border-t border-slate-100">
-        <p-button 
-          label="Cancelar" 
-          severity="secondary" 
-          styleClass="p-button-text rounded-xl text-xs py-1.5 px-3" 
-          (onClick)="displayFormDialog = false" 
-          type="button" 
+      <!-- Botones de Acción modal -->
+      <div class="flex items-center justify-end gap-3 pt-3 border-t mt-2"
+           [ngClass]="themeService.isDarkMode() ? 'border-[#30363D]' : 'border-slate-100'">
+        <app-secondary-button
+          label="Cancelar"
+          icon="pi pi-times"
+          colorScheme="burgundy"
+          (clicked)="displayFormDialog = false"
         />
-        <p-button 
-          [label]="isEditMode ? 'Actualizar' : 'Guardar'" 
-          severity="info" 
-          styleClass="rounded-xl text-xs py-1.5 px-3" 
-          [loading]="isSaving" 
-          type="submit" 
+        <app-primary-button
+          [label]="isEditMode ? 'Actualizar' : 'Guardar'"
+          [icon]="isSaving ? 'pi pi-spin pi-spinner' : 'pi pi-check'"
+          [disabled]="bankAccountForm.invalid || isSaving"
+          [loading]="isSaving"
+          (clicked)="onSaveAccount()"
         />
       </div>
     </form>
   </p-dialog>
 </div>
-

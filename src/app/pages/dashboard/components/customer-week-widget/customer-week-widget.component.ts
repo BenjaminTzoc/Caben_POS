@@ -9,6 +9,7 @@ import { WeeklyConsolidatedPreviewComponent } from '../../../../shared/component
 import { ReportsService } from '../../../../core/services/reports.service';
 import { PrintService } from '../../../../shared/services/print.service';
 import { DashboardFilterService } from '../../dashboard-filter.service';
+import { ThemeService } from '../../../../core/services/theme.service';
 import {
   CustomerWeeklyItemDto,
   CustomerWeeklyKpisDto,
@@ -37,6 +38,7 @@ const GUEST_KEY = '__guest__';
 export class CustomerWeekWidgetComponent {
   private reportsService = inject(ReportsService);
   private printService = inject(PrintService);
+  public themeService = inject(ThemeService);
   dashboardFilter = inject(DashboardFilterService);
   private host = inject(ElementRef<HTMLElement>);
 

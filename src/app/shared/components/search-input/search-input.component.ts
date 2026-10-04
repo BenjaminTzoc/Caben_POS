@@ -1,9 +1,10 @@
-import { Component, EventEmitter, forwardRef, Input, Output } from '@angular/core';
+import { Component, EventEmitter, forwardRef, inject, Input, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ControlValueAccessor, FormsModule, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { InputTextModule } from 'primeng/inputtext';
 import { IconFieldModule } from 'primeng/iconfield';
 import { InputIconModule } from 'primeng/inputicon';
+import { ThemeService } from '../../../core/services/theme.service';
 
 @Component({
   selector: 'app-search-input',
@@ -19,6 +20,7 @@ import { InputIconModule } from 'primeng/inputicon';
   templateUrl: './search-input.component.html',
 })
 export class SearchInputComponent implements ControlValueAccessor {
+  public themeService = inject(ThemeService);
   /** Placeholder del buscador */
   @Input() placeholder = 'Buscar por producto o SKU...';
 

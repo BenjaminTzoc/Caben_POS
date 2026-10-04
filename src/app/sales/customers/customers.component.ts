@@ -14,6 +14,7 @@ import { SearchInputComponent } from '../../shared/components/search-input/searc
 import { StandardTableComponent } from '../../shared/components/standard-table/standard-table.component';
 import { StatusBadgeComponent } from '../../shared/components/status-badge/status-badge.component';
 import { ConfirmationModalComponent } from '../../shared/components/confirmation-modal/confirmation-modal.component';
+import { ThemeService } from '../../core/services/theme.service';
 
 @Component({
   selector: 'app-customers',
@@ -35,6 +36,7 @@ import { ConfirmationModalComponent } from '../../shared/components/confirmation
   templateUrl: './customers.component.html',
 })
 export class CustomersComponent implements OnInit {
+  public themeService = inject(ThemeService);
   private customersService = inject(CustomersService);
   private messageService = inject(MessageService);
   private router = inject(Router);

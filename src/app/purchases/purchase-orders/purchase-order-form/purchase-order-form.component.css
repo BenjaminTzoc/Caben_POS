@@ -1,0 +1,158 @@
+:host {
+  display: block;
+  width: 100%;
+}
+
+/* ============================================================ */
+/* DARK MODE OVERRIDES                                          */
+/* ============================================================ */
+
+/* Dialog */
+:host-context(.dark) ::ng-deep .custom-dialog.p-dialog {
+  background: #161B22 !important;
+  border: 1px solid #30363D !important;
+  color: #F0F6FC !important;
+}
+
+:host-context(.dark) ::ng-deep .custom-dialog .p-dialog-header {
+  background: #1C2128 !important;
+  border-bottom: 1px solid #30363D !important;
+  color: #F0F6FC !important;
+}
+
+:host-context(.dark) ::ng-deep .custom-dialog .p-dialog-title {
+  color: #F0F6FC !important;
+  font-weight: 700;
+}
+
+:host-context(.dark) ::ng-deep .custom-dialog .p-dialog-header-actions button {
+  color: #8B949E !important;
+}
+
+:host-context(.dark) ::ng-deep .custom-dialog .p-dialog-content {
+  background: #161B22 !important;
+  color: #F0F6FC !important;
+}
+
+:host-context(.dark) ::ng-deep .custom-dialog .p-dialog-footer {
+  background: #1C2128 !important;
+  border-top: 1px solid #30363D !important;
+}
+
+/* Select */
+:host-context(.dark) ::ng-deep .p-select {
+  background: #0D1117 !important;
+  border-color: #30363D !important;
+  color: #F0F6FC !important;
+}
+
+:host-context(.dark) ::ng-deep .p-select .p-select-label {
+  color: #F0F6FC !important;
+}
+
+:host-context(.dark) ::ng-deep .p-select:hover {
+  border-color: #58A6FF !important;
+}
+
+:host-context(.dark) ::ng-deep .p-select.p-focus {
+  border-color: #58A6FF !important;
+  box-shadow: 0 0 0 2px rgba(88, 166, 255, 0.2) !important;
+}
+
+:host-context(.dark) ::ng-deep .p-select-overlay,
+:host-context(.dark) ::ng-deep .p-dropdown-panel {
+  background: #161B22 !important;
+  border-color: #30363D !important;
+  color: #F0F6FC !important;
+}
+
+:host-context(.dark) ::ng-deep .p-select-header {
+  background: #161B22 !important;
+  border-color: #30363D !important;
+  color: #F0F6FC !important;
+}
+
+:host-context(.dark) ::ng-deep .p-select-filter {
+  background: #0D1117 !important;
+  color: #F0F6FC !important;
+  border-color: #30363D !important;
+}
+
+:host-context(.dark) ::ng-deep .p-select-filter:focus {
+  border-color: #58A6FF !important;
+}
+
+:host-context(.dark) ::ng-deep .p-select-option:not(.p-select-option-selected):not(.p-disabled).p-focus,
+:host-context(.dark) ::ng-deep .p-select-option:hover {
+  background: #1C2128 !important;
+  color: #58A6FF !important;
+}
+
+:host-context(.dark) ::ng-deep .p-select-option.p-select-option-selected {
+  background: #1C2D42 !important;
+  color: #58A6FF !important;
+}
+
+:host-context(.dark) ::ng-deep .p-select-empty-message {
+  color: #8B949E !important;
+}
+
+/* Datepicker */
+:host-context(.dark) ::ng-deep .p-datepicker {
+  background: #161B22 !important;
+  border-color: #30363D !important;
+  color: #F0F6FC !important;
+}
+
+:host-context(.dark) ::ng-deep .p-datepicker-header {
+  background: #161B22 !important;
+  border-color: #30363D !important;
+  color: #F0F6FC !important;
+}
+
+:host-context(.dark) ::ng-deep .p-datepicker-title,
+:host-context(.dark) ::ng-deep .p-datepicker-title button {
+  color: #F0F6FC !important;
+}
+
+:host-context(.dark) ::ng-deep .p-datepicker-prev-button,
+:host-context(.dark) ::ng-deep .p-datepicker-next-button {
+  color: #8B949E !important;
+}
+
+:host-context(.dark) ::ng-deep .p-datepicker table th {
+  color: #8B949E !important;
+}
+
+:host-context(.dark) ::ng-deep .p-datepicker table td > span {
+  color: #F0F6FC !important;
+}
+
+:host-context(.dark) ::ng-deep .p-datepicker table td > span:not(.p-disabled):hover {
+  background: #1C2128 !important;
+  color: #58A6FF !important;
+}
+
+:host-context(.dark) ::ng-deep .p-datepicker table td > span.p-datepicker-day-selected {
+  background: #1C2D42 !important;
+  color: #58A6FF !important;
+}
+
+/* Inputs */
+:host-context(.dark) ::ng-deep .p-inputtext,
+:host-context(.dark) ::ng-deep .p-textarea {
+  background: #0D1117 !important;
+  color: #F0F6FC !important;
+  border-color: #30363D !important;
+}
+
+:host-context(.dark) ::ng-deep .p-inputtext:focus,
+:host-context(.dark) ::ng-deep .p-textarea:focus {
+  border-color: #58A6FF !important;
+  box-shadow: 0 0 0 2px rgba(88, 166, 255, 0.2) !important;
+}
+
+/* Modern Table */
+:host-context(.dark) ::ng-deep .p-datatable-modern .p-datatable-tbody > tr > td {
+  border-bottom: 1px solid #30363D !important;
+}

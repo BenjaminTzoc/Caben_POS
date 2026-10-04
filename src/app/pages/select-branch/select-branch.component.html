@@ -1,0 +1,157 @@
+<div
+  class="min-h-screen flex flex-col justify-between p-6 sm:p-10 relative overflow-hidden font-sans transition-colors duration-300"
+  [ngClass]="themeService.isDarkMode() ? 'bg-[#0D1117]' : 'bg-slate-50'">
+
+  <!-- Header -->
+  <header class="max-w-6xl w-full mx-auto flex items-center justify-between z-10">
+    <div class="flex items-center gap-3">
+      <img src="svg/Logo caben programa-02.svg" alt="Caben Logo" class="h-10 w-auto object-contain"
+        [ngClass]="themeService.isDarkMode() ? 'brightness-0 invert' : 'brightness-0'" />
+      <div class="border-l pl-3" [ngClass]="themeService.isDarkMode() ? 'border-slate-400/30' : 'border-slate-300'">
+        <h1 class="text-lg font-semibold tracking-wide leading-none"
+          [ngClass]="themeService.isDarkMode() ? 'text-white' : 'text-slate-800'">Caben - Carnes y Embutidos</h1>
+        <p class="text-sm mt-0.5" [ngClass]="themeService.isDarkMode() ? 'text-slate-300' : 'text-slate-500'">Sistema de
+          Control y Gestión</p>
+      </div>
+    </div>
+
+    <div class="flex items-center gap-3 sm:gap-4">
+      <div class="text-right hidden sm:block">
+        <p class="text-lg font-medium leading-none"
+          [ngClass]="themeService.isDarkMode() ? 'text-white' : 'text-slate-800'">{{ currentUser?.name }}</p>
+        <p class="text-sm mt-0.5" [ngClass]="themeService.isDarkMode() ? 'text-slate-300' : 'text-slate-500'">{{
+          currentUser?.email }}</p>
+      </div>
+
+      <!-- Theme Mode Toggle Button -->
+      <button type="button" (click)="themeService.toggleTheme()"
+        class="h-9 w-9 rounded-lg flex items-center justify-center transition-all cursor-pointer shadow-sm border"
+        [ngClass]="themeService.isDarkMode() ? 'bg-[#161B22] border-[#30363D] text-amber-300 hover:bg-[#1C2128]' : 'bg-white border-slate-200 text-[#48021C] hover:bg-slate-100'"
+        [title]="themeService.isDarkMode() ? 'Cambiar a Modo Claro' : 'Cambiar a Modo Oscuro'">
+        <i class="pi text-sm" [ngClass]="themeService.isDarkMode() ? 'pi-sun' : 'pi-moon'"></i>
+      </button>
+
+      <app-danger-button label="Cerrar Sesión" icon="pi pi-sign-out" (clicked)="logout()" />
+    </div>
+  </header>
+
+  <!-- Main Content / Cards Grid -->
+  <main class="max-w-5xl w-full mx-auto my-auto py-12 z-10 flex flex-col items-center">
+    <div class="text-center max-w-2xl mx-auto mb-10">
+      <h2 class="text-3xl sm:text-4xl font-medium tracking-tight"
+        [ngClass]="themeService.isDarkMode() ? 'text-white' : 'text-slate-800'">
+        ¿En qué sucursal deseas trabajar hoy?
+      </h2>
+      <p class="text-sm mt-2" [ngClass]="themeService.isDarkMode() ? 'text-slate-300' : 'text-slate-500'">
+        Selecciona la sucursal para posicionar las ventas, inventarios y cajas de tu sesión.
+      </p>
+    </div>
+
+    <!-- Cards Grid -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 w-full">
+
+      <!-- Card Modo Global (Solo visible para SuperAdmin) -->
+      @if (isSuperAdmin) {
+      <div (click)="selectGlobal()"
+        class="group relative rounded-2xl p-6 transition-all duration-300 cursor-pointer shadow-xl hover:-translate-y-1 flex flex-col justify-between border"
+        [ngClass]="themeService.isDarkMode() 
+          ? 'bg-[#161B22] hover:bg-[#1C2128] border-[#30363D] hover:border-[#5C0324]/80 hover:shadow-black/40' 
+          : 'bg-white hover:bg-slate-50/80 border-slate-200 hover:border-[#48021C]/40 hover:shadow-rose-950/5'">
+        <div class="absolute top-4 right-4">
+          <span class="px-2.5 py-0.5 rounded-md text-[11px] font-medium uppercase tracking-wider border" [ngClass]="themeService.isDarkMode() 
+              ? 'bg-[#5C0324]/30 text-[#E8AFCC] border-[#5C0324]/50' 
+              : 'bg-[#48021C]/10 text-[#48021C] border-[#48021C]/20'">
+            Gerencial
+          </span>
+        </div>
+
+        <div>
+          <div class="w-12 h-12 rounded-xl flex items-center justify-center transition-all mb-5 border" [ngClass]="themeService.isDarkMode() 
+              ? 'bg-[#5C0324]/30 text-[#E8AFCC] group-hover:bg-[#5C0324] group-hover:text-white border-[#5C0324]/40' 
+              : 'bg-[#48021C]/10 text-[#48021C] group-hover:bg-[#48021C] group-hover:text-white border-[#48021C]/20'">
+            <i class="pi pi-globe text-xl"></i>
+          </div>
+          <h3 class="text-lg font-bold transition-colors" [ngClass]="themeService.isDarkMode() 
+              ? 'text-white group-hover:text-[#E8AFCC]' 
+              : 'text-slate-800 group-hover:text-[#48021C]'">
+            Modo Consolidado (Todas)
+          </h3>
+          <p class="text-sm mt-1.5 leading-relaxed"
+            [ngClass]="themeService.isDarkMode() ? 'text-slate-400' : 'text-slate-500'">
+            Vista global de métricas, reportes y supervisión integral de todas las sedes.
+          </p>
+        </div>
+
+        <div class="pt-6 border-t flex items-center justify-between mt-6"
+          [ngClass]="themeService.isDarkMode() ? 'border-[#30363D]' : 'border-slate-100'">
+          <span class="text-sm font-medium group-hover:underline"
+            [ngClass]="themeService.isDarkMode() ? 'text-[#E8AFCC]' : 'text-[#48021C]'">Entrar en modo global</span>
+          <i class="pi pi-arrow-right text-xs group-hover:translate-x-1 transition-transform"
+            [ngClass]="themeService.isDarkMode() ? 'text-[#E8AFCC]' : 'text-[#48021C]'"></i>
+        </div>
+      </div>
+      }
+
+      <!-- Cards de Sucursales Específicas -->
+      @for (branch of branches(); track branch.id) {
+      <div (click)="selectBranch(branch)"
+        class="group relative rounded-2xl p-6 transition-all duration-300 cursor-pointer shadow-xl hover:-translate-y-1 flex flex-col justify-between border"
+        [ngClass]="themeService.isDarkMode() 
+          ? 'bg-[#161B22] hover:bg-[#1C2128] border-[#30363D] hover:border-[#58A6FF]/60 hover:shadow-black/40' 
+          : 'bg-white hover:bg-slate-50/80 border-slate-200 hover:border-brand-royal/40 hover:shadow-slate-900/5'">
+        <div class="absolute top-4 right-4 flex items-center gap-1.5">
+          @if (branch.isPlant) {
+          <span class="px-2.5 py-0.5 rounded-md text-[11px] font-medium uppercase tracking-wider border" [ngClass]="themeService.isDarkMode() 
+              ? 'bg-emerald-950/50 text-emerald-400 border-emerald-800/60' 
+              : 'bg-emerald-50 text-emerald-700 border-emerald-200'">
+            Planta
+          </span>
+          } @else {
+          <span class="px-2.5 py-0.5 rounded-md text-[11px] font-medium uppercase tracking-wider border" [ngClass]="themeService.isDarkMode() 
+              ? 'bg-[#0D1117] text-slate-300 border-[#30363D]' 
+              : 'bg-slate-100 text-slate-600 border-slate-200'">
+            Sucursal
+          </span>
+          }
+        </div>
+
+        <div>
+          <div class="w-12 h-12 rounded-xl flex items-center justify-center transition-all mb-5 border" [ngClass]="themeService.isDarkMode() 
+              ? 'bg-[#0D1117] group-hover:bg-[#1C2D42] text-slate-300 group-hover:text-[#58A6FF] border-[#30363D]' 
+              : 'bg-slate-100 group-hover:bg-[#48021C]/10 text-slate-600 group-hover:text-[#48021C] border-slate-200'">
+            <i [class]="branch.isPlant ? 'pi pi-server' : 'pi pi-shop'" class="text-xl"></i>
+          </div>
+          <h3 class="text-lg font-bold transition-colors" [ngClass]="themeService.isDarkMode() 
+              ? 'text-white group-hover:text-[#58A6FF]' 
+              : 'text-slate-800 group-hover:text-[#48021C]'">
+            {{ branch.name }}
+          </h3>
+          <p class="text-sm mt-1.5 leading-relaxed flex items-center gap-1.5 truncate"
+            [ngClass]="themeService.isDarkMode() ? 'text-slate-400' : 'text-slate-500'">
+            <i class="pi pi-map-marker text-xs shrink-0"
+              [ngClass]="themeService.isDarkMode() ? 'text-slate-400' : 'text-slate-400'"></i>
+            <span>{{ branch.address || 'Ubicación registrada' }}</span>
+          </p>
+        </div>
+
+        <div class="pt-6 border-t flex items-center justify-between mt-6"
+          [ngClass]="themeService.isDarkMode() ? 'border-[#30363D]' : 'border-slate-100'">
+          <span class="text-sm font-medium group-hover:underline"
+            [ngClass]="themeService.isDarkMode() ? 'text-slate-300 group-hover:text-[#58A6FF]' : 'text-slate-600 group-hover:text-[#48021C]'">
+            Operar en esta sucursal
+          </span>
+          <i class="pi pi-arrow-right text-xs transition-transform group-hover:translate-x-1"
+            [ngClass]="themeService.isDarkMode() ? 'text-slate-400 group-hover:text-[#58A6FF]' : 'text-slate-400 group-hover:text-[#48021C]'"></i>
+        </div>
+      </div>
+      }
+
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="text-center text-xs z-10 py-4 transition-colors"
+    [ngClass]="themeService.isDarkMode() ? 'text-slate-400' : 'text-slate-500'">
+    Caben - Carnes y Embutidos &bull; Sistema de Control y Gestión
+  </footer>
+</div>

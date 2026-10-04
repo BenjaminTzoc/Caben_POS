@@ -1,236 +1,255 @@
-<p-dialog 
-  [visible]="visible" 
-  (visibleChange)="visibleChange.emit($event)"
-  [modal]="true" 
-  [closable]="!forceActive" 
-  [closeOnEscape]="!forceActive" 
-  [draggable]="false" 
-  [resizable]="false"
-  [showHeader]="false"
-  styleClass="!rounded-2xl border border-slate-200 shadow-xl overflow-hidden"
-  contentStyleClass="!p-0"
-  [style]="{width: '960px'}"
-  [breakpoints]="{'960px': '90vw', '640px': '100vw'}"
-  appendTo="body"
->
+<p-dialog [visible]="visible" (visibleChange)="visibleChange.emit($event)" [modal]="true" [closable]="!forceActive"
+  [closeOnEscape]="!forceActive" [draggable]="false" [resizable]="false" [showHeader]="false"
+  [styleClass]="'cash-session-main-dialog !rounded-2xl shadow-2xl overflow-hidden ' + (themeService.isDarkMode() ? 'is-dark' : 'border border-rose-200')"
+  contentStyleClass="!p-0" [style]="{width: '960px'}" [breakpoints]="{'960px': '90vw', '640px': '100vw'}"
+  appendTo="body">
   <div class="grid grid-cols-1 md:grid-cols-2 min-h-[460px]">
-    
+
     <!-- LEFT SIDE: Welcome / Turn Info -->
-    <div class="p-6 md:p-8 bg-slate-50 border-r border-slate-100 flex flex-col justify-between">
-      
+    <div class="p-6 md:p-8 border-r flex flex-col justify-between transition-colors duration-300"
+      [ngClass]="{'cash-dialog-left-dark border-[#30363d]': themeService.isDarkMode(), 'bg-slate-50 border-slate-100': !themeService.isDarkMode()}">
+
       <!-- CLOSED STATE LEFT -->
       <div *ngIf="!currentSession()" class="space-y-6">
-        <div class="inline-flex items-center gap-2.5 px-3 py-1.5 bg-indigo-50 rounded-lg border border-indigo-200">
-          <span class="relative flex h-2 w-2">
-            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-indigo-400 opacity-75"></span>
-            <span class="relative inline-flex rounded-full h-2 w-2 bg-indigo-500"></span>
-          </span>
-          <span class="text-[10px] font-bold text-indigo-600 tracking-wider uppercase">Sistema Listo</span>
-        </div>
-
         <div class="space-y-1">
-          <h3 class="text-xl md:text-2xl font-bold text-slate-800 leading-tight">
+          <h3 class="text-xl md:text-2xl font-normal leading-tight"
+            [ngClass]="themeService.isDarkMode() ? 'text-slate-100' : 'text-slate-800'">
             ¡Hola, <span class="text-brand-royal">{{ user?.name }}!</span>
           </h3>
-          <p class="text-xs text-slate-500 font-medium leading-relaxed">
-            Es un excelente momento para comenzar. Sigue estos pasos para iniciar tu turno de venta:
+          <p class="text-xs font-medium leading-relaxed"
+            [ngClass]="themeService.isDarkMode() ? 'text-slate-400' : 'text-[#666F8D]'">
+            Sigue estos pasos para iniciar tu turno de venta:
           </p>
         </div>
 
-        <div class="space-y-4 pt-2">
-          <div class="flex gap-4">
-            <div class="flex-shrink-0 w-8 h-8 bg-brand-royal/10 text-brand-royal rounded-lg flex items-center justify-center text-sm font-semibold">
+        <div class="space-y-6 pt-2">
+          <div class="flex gap-4 items-center">
+            <div class="flex-shrink-0 w-8 h-8 rounded-lg flex items-center justify-center text-sm font-semibold"
+              [ngClass]="themeService.isDarkMode() ? 'step-badge-dark' : 'bg-[#48021c]/10 text-[#48021c]'">
               1
             </div>
             <div>
-              <h4 class="font-semibold text-slate-700 text-xs mt-0.5">Verifica tu efectivo</h4>
-              <p class="text-slate-500 text-[10px] leading-relaxed">
+              <h4 class="font-medium text-sm mt-0.5"
+                [ngClass]="themeService.isDarkMode() ? 'text-slate-200' : 'text-slate-700'">Verifica tu efectivo</h4>
+              <p class="font-normal text-xs leading-relaxed"
+                [ngClass]="themeService.isDarkMode() ? 'text-slate-400' : 'text-slate-500'">
                 Cuenta el dinero físico que tienes en gaveta antes de abrir.
               </p>
             </div>
           </div>
 
-          <div class="flex gap-4">
-            <div class="flex-shrink-0 w-8 h-8 bg-brand-royal/10 text-brand-royal rounded-lg flex items-center justify-center text-sm font-semibold">
+          <div class="flex gap-4 items-center">
+            <div class="flex-shrink-0 w-8 h-8 rounded-lg flex items-center justify-center text-sm font-semibold"
+              [ngClass]="themeService.isDarkMode() ? 'step-badge-dark' : 'bg-[#48021c]/10 text-[#48021c]'">
               2
             </div>
             <div>
-              <h4 class="font-semibold text-slate-700 text-xs mt-0.5">Asigna una Sucursal</h4>
-              <p class="text-slate-500 text-[10px] leading-relaxed">
+              <h4 class="font-medium text-sm mt-0.5"
+                [ngClass]="themeService.isDarkMode() ? 'text-slate-200' : 'text-slate-700'">Asigna una Sucursal</h4>
+              <p class="font-normal text-xs leading-relaxed"
+                [ngClass]="themeService.isDarkMode() ? 'text-slate-400' : 'text-slate-500'">
                 Asegúrate de estar operando en la ubicación correcta.
               </p>
             </div>
           </div>
 
-          <div class="flex gap-4">
-            <div class="flex-shrink-0 w-8 h-8 bg-brand-royal/10 text-brand-royal rounded-lg flex items-center justify-center text-sm font-semibold">
+          <div class="flex gap-4 items-center">
+            <div class="flex-shrink-0 w-8 h-8 rounded-lg flex items-center justify-center text-sm font-semibold"
+              [ngClass]="themeService.isDarkMode() ? 'step-badge-dark' : 'bg-[#48021c]/10 text-[#48021c]'">
               3
             </div>
             <div>
-              <h4 class="font-semibold text-slate-700 text-xs mt-0.5">Inicia la Operación</h4>
-              <p class="text-slate-500 text-[10px] leading-relaxed">
+              <h4 class="font-medium text-sm mt-0.5"
+                [ngClass]="themeService.isDarkMode() ? 'text-slate-200' : 'text-slate-700'">Inicia la Operación</h4>
+              <p class="font-normal text-xs leading-relaxed"
+                [ngClass]="themeService.isDarkMode() ? 'text-slate-400' : 'text-slate-500'">
                 Una vez abierta, el sistema registrará cada venta en efectivo.
               </p>
             </div>
           </div>
         </div>
 
-        <div class="p-3.5 bg-amber-50 border border-amber-200 rounded-xl flex gap-3">
-          <i class="pi pi-shield text-amber-500 text-base mt-0.5"></i>
-          <p class="text-[10px] text-amber-800 font-medium leading-relaxed">
-            <span class="font-bold">Recordatorio:</span> No compartas tu sesión de caja con otros usuarios. El arqueo final es responsabilidad única del cajero activo.
+        <div class="p-3.5 border rounded-xl flex gap-3 mt-20"
+          [ngClass]="themeService.isDarkMode() ? 'alert-banner-dark' : 'bg-amber-50 border-amber-200'">
+          <i class="pi pi-shield text-base mt-0.5"
+            [ngClass]="themeService.isDarkMode() ? 'text-amber-400' : 'text-amber-500'"></i>
+          <p class="text-xs font-normal leading-relaxed"
+            [ngClass]="themeService.isDarkMode() ? 'text-amber-200' : 'text-amber-800'">
+            <span class="font-medium">Recordatorio:</span> No compartas tu sesión de caja con otros usuarios. El arqueo
+            final es responsabilidad única del cajero activo.
           </p>
         </div>
       </div>
 
       <!-- ACTIVE STATE LEFT -->
       <div *ngIf="currentSession()" class="space-y-6">
-        <div class="inline-flex items-center gap-2.5 px-3 py-1.5 bg-emerald-50 rounded-lg border border-emerald-200">
+        <div class="inline-flex items-center gap-2.5 px-3 py-1.5 rounded-lg border"
+          [ngClass]="themeService.isDarkMode() ? 'bg-emerald-950/40 border-emerald-800/60' : 'bg-emerald-50/80 border-emerald-200/70'">
           <span class="relative flex h-2 w-2">
             <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-            <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+            <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-600"></span>
           </span>
-          <span class="text-[10px] font-bold text-emerald-600 tracking-wider uppercase">Turno Activo</span>
+          <span class="text-xs font-medium tracking-wider"
+            [ngClass]="themeService.isDarkMode() ? 'text-emerald-400' : 'text-emerald-700'">Turno Activo</span>
         </div>
 
         <div class="space-y-1">
-          <h3 class="text-xl md:text-2xl font-bold text-slate-800 leading-tight">
-            Hola, <span class="text-brand-royal">{{ user?.name }}</span>
+          <h3 class="text-xl md:text-2xl font-normal leading-tight"
+            [ngClass]="themeService.isDarkMode() ? 'text-slate-100' : 'text-slate-800'">
+            ¡Hola, <span class="text-brand-royal">{{ user?.name }}</span>!
           </h3>
-          <p class="text-xs text-slate-500 font-medium">
-            Tu turno está en curso. Resumen de la actividad actual en <span class="text-emerald-600 font-bold">{{ sessionBranchName() }}</span>:
+          <p class="text-xs font-medium" [ngClass]="themeService.isDarkMode() ? 'text-slate-400' : 'text-slate-500'">
+            Tu turno está en curso en <span class="font-medium"
+              [ngClass]="themeService.isDarkMode() ? 'text-emerald-400' : 'text-emerald-700'">{{
+              sessionBranchName() }}</span>.
           </p>
         </div>
 
         <div class="space-y-4 pt-2">
-          <div class="grid grid-cols-2 gap-4">
-            <div class="flex items-center gap-3">
-              <div class="flex-shrink-0 w-8 h-8 bg-brand-royal/10 text-brand-royal rounded-xl flex items-center justify-center">
-                <i class="pi pi-calendar-plus text-xs"></i>
-              </div>
-              <div class="flex flex-col min-w-0">
-                <span class="text-[9px] text-slate-400 font-medium uppercase tracking-wider truncate">Inicio</span>
-                <span class="text-xs font-semibold text-slate-700 truncate" [pTooltip]="(currentSession()?.openedAt | date:'medium') || ''">
-                  {{ currentSession()?.openedAt | date:'short' }}
-                </span>
-              </div>
+          <div class="flex items-center gap-3">
+            <div class="flex-shrink-0 w-8 h-8 rounded-lg flex items-center justify-center"
+              [ngClass]="themeService.isDarkMode() ? 'bg-slate-800 text-blue-400' : 'bg-[#48021c]/10 text-[#48021c]'">
+              <i class="pi pi-calendar-plus text-xs"></i>
             </div>
-
-            <div class="flex items-center gap-3">
-              <div class="flex-shrink-0 w-8 h-8 bg-brand-royal/10 text-brand-royal rounded-xl flex items-center justify-center">
-                <i class="pi pi-wallet text-xs"></i>
-              </div>
-              <div class="flex flex-col min-w-0">
-                <span class="text-[9px] text-slate-400 font-medium uppercase tracking-wider truncate">Fondo Inicial</span>
-                <span class="text-xs font-semibold text-slate-700 truncate">{{ currentSession()?.openingBalance | currency:'Q ' }}</span>
-              </div>
+            <div class="flex flex-col min-w-0">
+              <p class="font-normal text-xs leading-relaxed"
+                [ngClass]="themeService.isDarkMode() ? 'text-slate-400' : 'text-slate-500'">
+                Inicio
+              </p>
+              <h4 class="font-medium text-sm"
+                [ngClass]="themeService.isDarkMode() ? 'text-slate-200' : 'text-slate-700'">
+                {{ currentSession()?.openedAt | date:'short' }}
+              </h4>
             </div>
           </div>
 
-          <div class="flex items-center gap-4">
-            <div class="flex-shrink-0 w-9 h-9 bg-emerald-50 text-emerald-600 rounded-xl flex items-center justify-center">
+          <div class="flex items-center gap-3">
+            <div class="flex-shrink-0 w-8 h-8 rounded-lg flex items-center justify-center"
+              [ngClass]="themeService.isDarkMode() ? 'bg-slate-800 text-blue-400' : 'bg-[#48021c]/10 text-[#48021c]'">
+              <i class="pi pi-wallet text-xs"></i>
+            </div>
+            <div class="flex flex-col min-w-0">
+              <p class="font-normal text-xs leading-relaxed"
+                [ngClass]="themeService.isDarkMode() ? 'text-slate-400' : 'text-slate-500'">
+                Fondo Inicial
+              </p>
+              <h4 class="font-medium text-sm"
+                [ngClass]="themeService.isDarkMode() ? 'text-slate-200' : 'text-slate-700'">
+                {{ currentSession()?.openingBalance | currency:'Q ' }}
+              </h4>
+            </div>
+          </div>
+
+          <div class="flex items-center gap-3">
+            <div class="flex-shrink-0 w-8 h-8 rounded-lg flex items-center justify-center"
+              [ngClass]="themeService.isDarkMode() ? 'bg-emerald-950/50 text-emerald-400' : 'bg-emerald-50/80 text-emerald-700'">
               <i class="pi pi-money-bill text-xs"></i>
             </div>
-            <div class="flex flex-col">
-              <span class="text-[10px] text-slate-400 font-medium uppercase tracking-wider">Ventas en Efectivo</span>
-              <span class="text-xs font-bold text-emerald-600">{{ (currentSession()?.totalCashSales || 0) | currency:'Q ' }}</span>
+            <div class="flex flex-col min-w-0">
+              <p class="font-normal text-xs leading-relaxed"
+                [ngClass]="themeService.isDarkMode() ? 'text-slate-400' : 'text-slate-500'">
+                Ventas en Efectivo
+              </p>
+              <h4 class="font-medium text-sm"
+                [ngClass]="themeService.isDarkMode() ? 'text-emerald-400' : 'text-emerald-700'">
+                {{ (currentSession()?.totalCashSales || 0) | currency:'Q ' }}
+              </h4>
             </div>
           </div>
         </div>
 
-        <div class="p-3.5 bg-amber-50 border border-amber-200 rounded-xl flex gap-3">
-          <i class="pi pi-exclamation-triangle text-amber-500 text-base mt-0.5"></i>
-          <p class="text-[10px] text-amber-800 font-medium leading-relaxed">
-            <span class="font-bold">Nota de Arqueo:</span> Antes de realizar el arqueo y cerrar el turno, asegúrate de haber contado detalladamente todo el efectivo físico de la gaveta.
+        <div class="p-3.5 border rounded-xl flex gap-3 mt-14"
+          [ngClass]="themeService.isDarkMode() ? 'alert-banner-dark' : 'bg-amber-50 border-amber-200'">
+          <i class="pi pi-exclamation-triangle text-base mt-0.5"
+            [ngClass]="themeService.isDarkMode() ? 'text-amber-400' : 'text-amber-500'"></i>
+          <p class="text-xs font-normal leading-relaxed"
+            [ngClass]="themeService.isDarkMode() ? 'text-amber-200' : 'text-amber-800'">
+            <span class="font-medium">Nota de Arqueo:</span> Antes de realizar el arqueo y cerrar el turno, asegúrate de
+            haber contado detalladamente todo el efectivo físico de la gaveta.
           </p>
         </div>
-      </div>
-      
-      <!-- Footer details -->
-      <div class="pt-4 border-t border-slate-200/60 flex items-center justify-between text-[9px] text-slate-400 font-mono">
-        <span>USUARIO: {{ user?.email }}</span>
-        <span>SISTEMA POS</span>
       </div>
     </div>
 
     <!-- RIGHT SIDE: Form Controls -->
-    <div class="p-6 md:p-8 flex flex-col justify-between">
-      
+    <div class="p-6 md:p-8 flex flex-col justify-between transition-colors duration-300"
+      [ngClass]="{'cash-dialog-right-dark': themeService.isDarkMode(), 'bg-white': !themeService.isDarkMode()}">
+
       <!-- CLOSED STATE FORM (APERTURA) -->
       <form *ngIf="!currentSession()" [formGroup]="openForm" class="space-y-5 flex-1 flex flex-col justify-between">
         <div class="space-y-4">
           <!-- Saldo de Apertura -->
           <div class="flex flex-col gap-1.5">
-            <div class="flex items-center justify-between">
-              <label class="text-xs font-bold text-slate-600">Saldo de Apertura (GTQ) <span class="text-rose-500 font-bold">*</span></label>
-              <button 
-                type="button"
-                (click)="showCalculationDialog = true"
-                class="text-[10px] font-semibold text-brand-royal hover:text-brand-deep cursor-pointer flex items-center gap-1 px-2.5 py-1 bg-brand-royal/5 rounded-lg transition-all"
-              >
-                <i class="pi pi-calculator text-xs"></i>
-                Contar Efectivo
+            <label class="text-xs font-normal"
+              [ngClass]="themeService.isDarkMode() ? 'text-slate-300' : 'text-slate-600'">
+              Saldo de Apertura <span class="text-rose-500 font-bold">*</span>
+            </label>
+            <div class="flex items-center gap-2">
+              <p-inputnumber formControlName="openingBalance" mode="decimal" [min]="0" [minFractionDigits]="2"
+                [maxFractionDigits]="2" placeholder="0.00" styleClass="w-full flex-1" prefix="Q "
+                (onFocus)="onInputFocus($event)"
+                inputStyleClass="w-full h-10! py-1! px-3! border-[#424242]! focus:border-brand-deep! text-text-body font-semibold text-sm! rounded-lg" />
+              <button type="button" (click)="showCalculationDialog = true" pTooltip="Contar Efectivo"
+                tooltipPosition="top"
+                class="flex-shrink-0 h-10 w-10 flex items-center justify-center rounded-lg transition-all cursor-pointer"
+                [ngClass]="themeService.isDarkMode() ? 'bg-[#1c2d42] text-[#58a6ff] hover:bg-[#233852] border-none' : 'bg-sky-50 text-sky-600 border border-sky-200 hover:bg-sky-100 hover:text-sky-700'">
+                <i class="pi pi-calculator text-base"></i>
               </button>
             </div>
-            <p-inputnumber
-              formControlName="openingBalance"
-              mode="decimal"
-              [min]="0"
-              [minFractionDigits]="2"
-              [maxFractionDigits]="2"
-              placeholder="0.00"
-              styleClass="w-full"
-              prefix="Q "
-              inputStyleClass="w-full h-10! py-1! px-3! border-slate-300! focus:border-brand-deep! text-text-body font-semibold text-sm rounded-lg"
-            />
           </div>
 
           <!-- Sucursal -->
           <div class="flex flex-col gap-1.5">
-            <label class="text-xs font-bold text-slate-600">Sucursal de Operación <span class="text-rose-500 font-bold">*</span></label>
-            <p-select
-              [options]="branches()"
-              formControlName="branchId"
-              optionLabel="name"
-              optionValue="id"
-              placeholder="Seleccione sucursal..."
-              styleClass="w-full border-slate-300 h-10! text-xs! py-0! rounded-lg flex items-center"
-              appendTo="body"
-              [filter]="true"
-              filterBy="name"
-            />
+            <label class="text-xs font-normal"
+              [ngClass]="themeService.isDarkMode() ? 'text-slate-300' : 'text-slate-600'">
+              Sucursal de Operación <span class="text-rose-500 font-bold">*</span>
+              <span *ngIf="isConsolidatedMode()" class="text-rose-500 font-bold">*</span>
+            </label>
+
+            <!-- Modo Fijo / Informativo (Cuando ya hay una sucursal activa seleccionada) -->
+            <div *ngIf="!isConsolidatedMode() && activeWorkingBranch()?.id"
+              class="flex items-center gap-2.5 px-3 py-2 border rounded-lg"
+              [ngClass]="themeService.isDarkMode() ? 'branch-card-dark border-[#424242] text-slate-200' : 'bg-slate-50 border-slate-200 text-slate-700'">
+              <i class="pi pi-building text-brand-royal text-sm"></i>
+              <div class="flex flex-col">
+                <span class="text-xs font-medium"
+                  [ngClass]="themeService.isDarkMode() ? 'text-slate-100' : 'text-slate-800'">{{
+                  activeWorkingBranch()?.name }}</span>
+                <span class="text-[10px] font-normal"
+                  [ngClass]="themeService.isDarkMode() ? 'text-slate-400' : 'text-slate-500'">Sucursal fija de la
+                  sesión</span>
+              </div>
+            </div>
+
+            <!-- Modo Consolidado / Global (Permite seleccionar la sucursal) -->
+            <p-select *ngIf="isConsolidatedMode() || !activeWorkingBranch()?.id" [options]="branches()"
+              formControlName="branchId" optionLabel="name" optionValue="id" placeholder="Seleccione sucursal..."
+              styleClass="w-full border-slate-300 h-10! text-xs! py-0! rounded-lg flex items-center" appendTo="body"
+              [filter]="true" filterBy="name" />
           </div>
 
           <!-- Notas -->
           <div class="flex flex-col gap-1.5">
-            <label class="text-xs font-bold text-slate-600">Notas de Turno <span class="text-slate-400 font-normal">(Opcional)</span></label>
-            <textarea
-              formControlName="notes"
-              rows="3"
-              class="w-full text-xs p-2.5 border border-slate-300 rounded-lg focus:border-brand-deep! focus:outline-none resize-none font-medium h-24"
-              placeholder="Ej: Fondo inicial para cambio de billetes..."
-            ></textarea>
+            <label class="text-xs font-normal"
+              [ngClass]="themeService.isDarkMode() ? 'text-slate-300' : 'text-slate-600'">
+              Notas de Turno
+            </label>
+            <textarea pTextarea formControlName="notes" rows="3" [autoResize]="false"
+              class="w-full text-sm! p-2.5 border border-slate-300 rounded-lg focus:border-brand-deep! focus:outline-none resize-none font-normal! h-24"
+              placeholder="Ej: Fondo inicial para cambio de billetes..."></textarea>
           </div>
         </div>
 
         <!-- Acciones Apertura -->
-        <div class="flex items-center justify-end gap-2.5 pt-4 mt-auto border-t border-slate-100">
-          <p-button
-            label="Cancelar"
-            [outlined]="true"
-            severity="secondary"
-            (onClick)="cancel()"
-            styleClass="!rounded-lg !px-4 font-semibold h-9! text-xs border-slate-300! text-slate-700! hover:bg-slate-50!"
-            [disabled]="isLoading()"
-          />
-          <p-button
-            label="Confirmar y Abrir Turno"
-            (onClick)="openCash()"
-            [loading]="isLoading()"
-            icon="pi pi-check"
-            styleClass="!rounded-lg !px-5 shadow-sm transition-all font-semibold h-9! justify-center text-xs bg-brand-deep! text-white border-brand-deep! hover:bg-brand-royal!"
-            [disabled]="openForm.invalid"
-          />
+        <div class="flex items-center justify-end gap-2.5 pt-4 mt-auto border-t"
+          [ngClass]="themeService.isDarkMode() ? 'border-[#21262d]' : 'border-slate-100'">
+          <p-button label="Cancelar" [outlined]="!themeService.isDarkMode()" severity="secondary" (onClick)="cancel()"
+            [styleClass]="'!rounded-lg !px-4 font-semibold h-9! text-xs transition-colors ' + 
+              (themeService.isDarkMode() ? 'bg-[#2B2C2E]! text-white! border-none! hover:bg-[#38393C]!' : 'border-slate-300! text-slate-700! hover:bg-slate-50!')"
+            [disabled]="isLoading()" />
+          <p-button label="Confirmar y Abrir Turno" (onClick)="openCash()" [loading]="isLoading()" icon="pi pi-check"
+            styleClass="!rounded-lg !px-5 shadow-sm transition-all font-semibold h-9! justify-center text-xs bg-[#5C0324]! text-white! border-[#5C0324]! hover:bg-[#73042D]!"
+            [disabled]="openForm.invalid" />
         </div>
       </form>
 
@@ -239,60 +258,46 @@
         <div class="space-y-4">
           <!-- Saldo de Cierre -->
           <div class="flex flex-col gap-1.5">
-            <div class="flex items-center justify-between">
-              <label class="text-xs font-bold text-slate-600">Efectivo en Gaveta (Cierre) <span class="text-rose-500 font-bold">*</span></label>
-              <button 
-                type="button"
-                (click)="showCalculationDialog = true"
-                class="text-[10px] font-semibold text-emerald-600 hover:text-emerald-800 cursor-pointer flex items-center gap-1 px-2.5 py-1 bg-emerald-50 rounded-lg transition-all"
-              >
-                <i class="pi pi-calculator text-xs"></i>
-                Contar Efectivo
+            <label class="text-xs font-normal"
+              [ngClass]="themeService.isDarkMode() ? 'text-slate-300' : 'text-slate-600'">
+              Efectivo en Gaveta (Cierre) <span class="text-rose-500 font-bold">*</span>
+            </label>
+            <div class="flex items-center gap-2">
+              <p-inputnumber formControlName="closingBalance" mode="decimal" [min]="0" [minFractionDigits]="2"
+                [maxFractionDigits]="2" placeholder="0.00" styleClass="w-full flex-1" prefix="Q "
+                (onFocus)="onInputFocus($event)"
+                inputStyleClass="w-full h-10! py-1! px-3! border-[#424242]! focus:border-brand-deep! text-text-body font-semibold text-sm! rounded-lg" />
+              <button type="button" (click)="showCalculationDialog = true" pTooltip="Contar Efectivo"
+                tooltipPosition="top"
+                class="flex-shrink-0 h-10 w-10 flex items-center justify-center rounded-lg transition-all cursor-pointer"
+                [ngClass]="themeService.isDarkMode() ? 'bg-[#1c2d42] text-[#58a6ff] hover:bg-[#233852] border-none' : 'bg-sky-50 text-sky-600 border border-sky-200 hover:bg-sky-100 hover:text-sky-700'">
+                <i class="pi pi-calculator text-base"></i>
               </button>
             </div>
-            <p-inputnumber
-              formControlName="closingBalance"
-              mode="decimal"
-              [min]="0"
-              [minFractionDigits]="2"
-              [maxFractionDigits]="2"
-              placeholder="0.00"
-              styleClass="w-full"
-              prefix="Q "
-              inputStyleClass="w-full h-10! py-1! px-3! border-slate-300! focus:border-brand-deep! text-text-body font-semibold text-sm rounded-lg"
-            />
           </div>
 
           <!-- Notas de cierre -->
           <div class="flex flex-col gap-1.5">
-            <label class="text-xs font-bold text-slate-600">Notas de Cierre <span class="text-slate-400 font-normal">(Opcional)</span></label>
-            <textarea
-              formControlName="notes"
-              rows="4"
-              class="w-full text-xs p-2.5 border border-slate-300 rounded-lg focus:border-brand-deep! focus:outline-none resize-none font-medium h-32"
-              placeholder="Detalle si existe algún faltante o sobrante, o notas generales sobre el arqueo..."
-            ></textarea>
+            <label class="text-xs font-normal"
+              [ngClass]="themeService.isDarkMode() ? 'text-slate-300' : 'text-slate-600'">
+              Notas de Cierre
+            </label>
+            <textarea pTextarea formControlName="notes" rows="4" [autoResize]="false"
+              class="w-full text-sm! p-2.5 border border-slate-300 rounded-lg focus:border-brand-deep! focus:outline-none resize-none font-normal! h-32"
+              placeholder="Detalle si existe algún faltante o sobrante, o notas generales sobre el arqueo..."></textarea>
           </div>
         </div>
 
         <!-- Acciones Cierre -->
-        <div class="flex items-center justify-end gap-2.5 pt-4 mt-auto border-t border-slate-100">
-          <p-button
-            label="Cancelar"
-            [outlined]="true"
-            severity="secondary"
-            (onClick)="cancel()"
-            styleClass="!rounded-lg !px-4 font-semibold h-9! text-xs border-slate-300! text-slate-700! hover:bg-slate-50!"
-            [disabled]="isLoading()"
-          />
-          <p-button
-            label="Arqueo y Cerrar Caja"
-            (onClick)="closeCash()"
-            [loading]="isLoading()"
-            icon="pi pi-lock"
-            styleClass="!rounded-lg !px-5 shadow-sm transition-all font-semibold h-9! justify-center text-xs bg-rose-600! text-white border-rose-600! hover:bg-rose-700!"
-            [disabled]="closeForm.invalid"
-          />
+        <div class="flex items-center justify-end gap-2.5 pt-4 mt-auto border-t"
+          [ngClass]="themeService.isDarkMode() ? 'border-[#21262d]' : 'border-slate-100'">
+          <p-button label="Cancelar" [outlined]="!themeService.isDarkMode()" severity="secondary" (onClick)="cancel()"
+            [styleClass]="'!rounded-lg !px-4 font-semibold h-9! text-xs transition-colors ' + 
+              (themeService.isDarkMode() ? 'bg-[#2B2C2E]! text-white! border-none! hover:bg-[#38393C]!' : 'border-slate-300! text-slate-700! hover:bg-slate-50!')"
+            [disabled]="isLoading()" />
+          <p-button label="Arqueo y Cerrar Caja" (onClick)="closeCash()" [loading]="isLoading()" icon="pi pi-lock"
+            styleClass="!rounded-lg !px-5 shadow-sm transition-all font-semibold h-9! justify-center text-xs !bg-[#BE123C] hover:!bg-[#9F1239] !text-white !border-none"
+            [disabled]="closeForm.invalid" />
         </div>
       </form>
 
@@ -301,60 +306,50 @@
 </p-dialog>
 
 <!-- Sub-dialog: Cash Denomination Calculator (GTQ) -->
-<p-dialog 
-  [(visible)]="showCalculationDialog" 
-  [modal]="true" 
-  [draggable]="false" 
-  [resizable]="false"
-  appendTo="body"
-  [baseZIndex]="11000"
-  header="Calculadora de Efectivo"
-  styleClass="!rounded-2xl border border-slate-300 shadow-xl overflow-hidden"
-  contentStyleClass="p-5"
-  [breakpoints]="{'960px': '75vw', '640px': '100vw'}"
-  [style]="{width: '460px'}"
-  (onHide)="resetDenominations()"
->
+<p-dialog [(visible)]="showCalculationDialog" [modal]="true" [draggable]="false" [resizable]="false" appendTo="body"
+  [baseZIndex]="11000" header="Calculadora de Efectivo"
+  [styleClass]="'cash-calc-dialog !rounded-2xl shadow-2xl overflow-hidden ' + (themeService.isDarkMode() ? 'is-dark' : 'border border-slate-300')"
+  contentStyleClass="!px-5 !pt-3 !pb-5" [breakpoints]="{'960px': '85vw', '640px': '100vw'}" [style]="{width: '680px'}"
+  (onHide)="resetDenominations()">
   <div class="space-y-4">
-    <div class="grid grid-cols-1 gap-2.5 max-h-[360px] overflow-y-auto pr-1.5 custom-scrollbar">
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 max-h-[540px] overflow-y-auto pt-1 pb-1 pr-1.5 custom-scrollbar">
       @for (d of denominations; track d.label) {
-        <div class="flex items-center justify-between p-3 bg-slate-50 rounded-xl border border-slate-200 group hover:border-brand-royal/30 hover:bg-white transition-all">
-          <div class="flex flex-col">
-            <span class="text-[9px] font-bold text-slate-400 tracking-wider uppercase">{{ d.value >= 1 ? 'Billete' : 'Moneda' }}</span>
-            <span class="text-sm font-bold text-slate-700">{{ d.label }}</span>
-          </div>
-          <div>
-            <p-inputnumber 
-              [(ngModel)]="d.count" 
-              [showButtons]="true" 
-              buttonLayout="horizontal" 
-              spinnerMode="horizontal"
-              [min]="0"
-              inputStyleClass="w-14 h-8! py-0.5! px-1! text-center font-bold text-xs"
-              styleClass="w-full overflow-hidden bg-white h-8!"
-              decrementButtonClass="p-button-text p-button-secondary !w-8 !h-8"
-              incrementButtonClass="p-button-text p-button-secondary !w-8 !h-8"
-              incrementButtonIcon="pi pi-plus text-[9px]"
-              decrementButtonIcon="pi pi-minus text-[9px]"
-            ></p-inputnumber>
-          </div>
+      <div class="flex items-center justify-between p-3 rounded-xl border transition-all"
+        [ngClass]="themeService.isDarkMode() ? 'calc-row-dark' : 'bg-slate-50 border-slate-200 group hover:border-brand-royal/30 hover:bg-white'">
+        <div class="flex flex-col">
+          <span class="text-[11px] font-normal tracking-wider"
+            [ngClass]="themeService.isDarkMode() ? 'text-slate-400' : 'text-slate-400'">{{ d.value >= 1 ? 'Billete' :
+            'Moneda' }}</span>
+          <span class="text-sm font-medium"
+            [ngClass]="themeService.isDarkMode() ? 'text-slate-200' : 'text-slate-700'">{{
+            d.label }}</span>
         </div>
+        <div>
+          <p-inputnumber [(ngModel)]="d.count" [showButtons]="true" buttonLayout="horizontal" spinnerMode="horizontal"
+            [min]="0" (onFocus)="onInputFocus($event)"
+            inputStyleClass="w-14 h-8! py-0.5! px-1! text-center font-medium text-xs"
+            [styleClass]="'w-full overflow-hidden h-8! ' + (themeService.isDarkMode() ? '!bg-[#0D1117] !border-[#30363D]' : 'bg-white')"
+            [decrementButtonClass]="themeService.isDarkMode() ? 'p-button-text !text-slate-300 !border-0 hover:!bg-white/10' : 'p-button-text p-button-secondary !w-8 !h-8'"
+            [incrementButtonClass]="themeService.isDarkMode() ? 'p-button-text !text-slate-300 !border-0 hover:!bg-white/10' : 'p-button-text p-button-secondary !w-8 !h-8'"
+            incrementButtonIcon="pi pi-plus text-[9px]" decrementButtonIcon="pi pi-minus text-[9px]"></p-inputnumber>
+        </div>
+      </div>
       }
     </div>
 
-    <div class="p-4 bg-brand-royal rounded-xl flex items-center justify-between shadow-sm">
+    <div class="p-4 rounded-xl flex items-center justify-between shadow-md transition-colors"
+      [ngClass]="themeService.isDarkMode() ? 'bg-[#161B22] border border-[#30363D]' : 'bg-[#48021C] text-white'">
       <div class="flex flex-col text-white">
-        <span class="text-[10px] font-semibold tracking-wider uppercase opacity-85">Total Calculado</span>
-        <span class="text-xl font-bold">
+        <span class="text-xs font-medium tracking-wider opacity-85"
+          [ngClass]="themeService.isDarkMode() ? 'text-slate-400' : 'text-slate-200'">Total Calculado</span>
+        <span class="text-xl font-semibold text-white">
           {{ calculatedTotal | currency:'Q ' }}
         </span>
       </div>
-      <p-button 
-        label="Aplicar" 
-        icon="pi pi-check" 
-        (onClick)="calculateTotal()"
-        styleClass="!bg-white !text-brand-royal !border-none !rounded-lg !px-4 !h-8.5 font-bold"
-      ></p-button>
+      <p-button label="Aplicar" icon="pi pi-check" (onClick)="calculateTotal()"
+        [styleClass]="themeService.isDarkMode() 
+          ? '!bg-[#5C0324] !text-white !border-none !rounded-lg !px-4 !h-8.5 font-bold hover:!bg-[#73042D]' 
+          : '!bg-white !text-[#48021C] hover:!bg-slate-100 !border-none !rounded-lg !px-4 !h-8.5 font-bold'"></p-button>
     </div>
   </div>
 </p-dialog>

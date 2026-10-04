@@ -1,4 +1,4 @@
-import { Component, inject, OnInit, ViewChild, ElementRef } from '@angular/core';
+import { Component, computed, effect, inject, OnInit, ViewChild, ElementRef } from '@angular/core';
 import { FormBuilder, FormGroup, FormArray, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -22,6 +22,8 @@ import { Product } from '../../interfaces/product.interface';
 import { Branch } from '../../interfaces/branch.interface';
 import { UpdateInventoryTransferDto } from '../../interfaces/inventory-transfer.interface';
 import { environment } from '../../../../environments/environment';
+import { ThemeService } from '../../../core/services/theme.service';
+import { BranchContextService } from '../../../core/services/branch-context.service';
 
 @Component({
   selector: 'app-transfer-form',
@@ -46,6 +48,8 @@ import { environment } from '../../../../environments/environment';
   styleUrl: './transfer-form.component.css',
 })
 export class TransferFormComponent implements OnInit {
+  public themeService = inject(ThemeService);
+  public branchContext = inject(BranchContextService);
   @ViewChild('ribbonContainer') ribbonContainer?: ElementRef<HTMLDivElement>;
 
   private readonly productsService = inject(ProductsService);
@@ -55,6 +59,13 @@ export class TransferFormComponent implements OnInit {
   private readonly fb = inject(FormBuilder);
   private readonly router = inject(Router);
   private readonly route = inject(ActivatedRoute);
+
+  readonly isConsolidatedMode = computed(() => this.branchContext.isGlobalView);
+  readonly activeWorkingBranch = computed(() => this.branchContext.currentBranch());
+
+  get hasActiveWorkingBranch(): boolean {
+    return !this.branchContext.isGlobalView && !!this.branchContext.currentBranch()?.id;
+  }
 
   transferForm: FormGroup;
   products: any[] = [];
@@ -69,14 +80,15 @@ export class TransferFormComponent implements OnInit {
   transferNumber: string = '';
 
   get destinationBranches(): Branch[] {
-    const originId = this.transferForm.get('originBranchId')?.value;
+    const originId = this.transferForm.get('originBranchId')?.value || (this.hasActiveWorkingBranch ? this.activeWorkingBranch()?.id : null);
     if (!originId) return this.branches;
     return this.branches.filter((b) => b.id !== originId);
   }
 
   get selectedOriginBranch(): Branch | undefined {
-    const id = this.transferForm.get('originBranchId')?.value;
-    return this.branches.find((b) => b.id === id);
+    const id = this.transferForm.get('originBranchId')?.value || (this.hasActiveWorkingBranch ? this.activeWorkingBranch()?.id : null);
+    if (!id) return undefined;
+    return this.branches.find((b) => b.id === id) || (this.hasActiveWorkingBranch && this.activeWorkingBranch()?.id === id ? (this.activeWorkingBranch() as Branch) : undefined);
   }
 
   get selectedDestinationBranch(): Branch | undefined {
@@ -118,16 +130,40 @@ export class TransferFormComponent implements OnInit {
       notes: [null],
       items: this.fb.array([], [Validators.required]),
     });
+
+    effect(() => {
+      const workingBranch = this.activeWorkingBranch();
+      const isGlobal = this.isConsolidatedMode();
+
+      if (!this.isEditMode) {
+        if (!isGlobal && workingBranch?.id) {
+          const currentOrigin = this.transferForm.get('originBranchId')?.value;
+          if (currentOrigin !== workingBranch.id) {
+            this.transferForm.patchValue({ originBranchId: workingBranch.id });
+            this.loadBranchCatalog(workingBranch.id);
+            if (this.transferForm.get('destinationBranchId')?.value === workingBranch.id) {
+              this.transferForm.get('destinationBranchId')?.setValue(null);
+            }
+          }
+        }
+      }
+    });
   }
 
   ngOnInit(): void {
-    this.loadBranches();
     const id = this.route.snapshot.paramMap.get('id');
     if (id) {
       this.isEditMode = true;
       this.transferId = id;
       this.loadTransferForEdit(id);
+    } else if (this.hasActiveWorkingBranch) {
+      const workingBranch = this.branchContext.currentBranch();
+      if (workingBranch?.id) {
+        this.transferForm.patchValue({ originBranchId: workingBranch.id });
+        this.loadBranchCatalog(workingBranch.id);
+      }
     }
+    this.loadBranches();
   }
 
   loadTransferForEdit(id: string): void {
@@ -294,7 +330,21 @@ export class TransferFormComponent implements OnInit {
 
   loadBranches() {
     this.branchesService.getBranches().subscribe({
-      next: (res) => (this.branches = res.data),
+      next: (res) => {
+        this.branches = res.data;
+        if (!this.isEditMode && this.hasActiveWorkingBranch) {
+          const workingBranch = this.branchContext.currentBranch();
+          if (workingBranch?.id) {
+            if (this.transferForm.get('originBranchId')?.value !== workingBranch.id) {
+              this.transferForm.patchValue({ originBranchId: workingBranch.id });
+              this.loadBranchCatalog(workingBranch.id);
+              if (this.transferForm.get('destinationBranchId')?.value === workingBranch.id) {
+                this.transferForm.get('destinationBranchId')?.setValue(null);
+              }
+            }
+          }
+        }
+      },
       error: (err) => this.showError('Error cargando sucursales', err),
     });
   }
@@ -332,6 +382,17 @@ export class TransferFormComponent implements OnInit {
   }
 
   onOriginChange() {
+    if (!this.isEditMode && this.hasActiveWorkingBranch) {
+      const workingBranch = this.branchContext.currentBranch();
+      if (workingBranch?.id) {
+        if (this.transferForm.get('originBranchId')?.value !== workingBranch.id) {
+          this.transferForm.patchValue({ originBranchId: workingBranch.id });
+          this.loadBranchCatalog(workingBranch.id);
+        }
+      }
+      return;
+    }
+
     const originId = this.transferForm.get('originBranchId')?.value;
     
     if (originId) {
@@ -367,7 +428,10 @@ export class TransferFormComponent implements OnInit {
       return;
     }
 
-    const { originBranchId, destinationBranchId } = this.transferForm.value;
+    const rawValue = this.transferForm.getRawValue();
+    const originBranchId = rawValue.originBranchId || (this.hasActiveWorkingBranch ? this.branchContext.currentBranch()?.id : null);
+    const destinationBranchId = rawValue.destinationBranchId;
+
     if (originBranchId === destinationBranchId) {
       this.messageService.add({
         severity: 'error',
@@ -378,9 +442,10 @@ export class TransferFormComponent implements OnInit {
     }
 
     this.loading = true;
-    const rawValue = this.transferForm.value;
     const body = {
       ...rawValue,
+      originBranchId,
+      destinationBranchId,
       items: rawValue.items.map((item: any) => ({
         productId: item.productId,
         quantity: item.quantity,

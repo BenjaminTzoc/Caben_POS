@@ -18,6 +18,7 @@ import { CustomerProductPricesComponent } from '../customer-product-prices/custo
 import { ConfirmationModalComponent } from '../../../shared/components/confirmation-modal/confirmation-modal.component';
 import { StatusBadgeComponent } from '../../../shared/components/status-badge/status-badge.component';
 import { CustomerCategoriesModalComponent } from '../../customer-categories/customer-categories-modal/customer-categories-modal.component';
+import { ThemeService } from '../../../core/services/theme.service';
 
 @Component({
   selector: 'app-customer-form',
@@ -41,6 +42,7 @@ import { CustomerCategoriesModalComponent } from '../../customer-categories/cust
   templateUrl: './customer-form.component.html',
 })
 export class CustomerFormComponent implements OnInit {
+  public themeService = inject(ThemeService);
   @ViewChild(CustomerProductPricesComponent) pricesComponent?: CustomerProductPricesComponent;
 
   private fb = inject(FormBuilder);

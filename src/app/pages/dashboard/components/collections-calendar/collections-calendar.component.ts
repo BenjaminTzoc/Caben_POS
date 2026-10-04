@@ -2,7 +2,6 @@ import { Component, computed, effect, inject, signal, untracked } from '@angular
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
-import { DatePickerModule } from 'primeng/datepicker';
 import { TooltipModule } from 'primeng/tooltip';
 import { MessageService } from 'primeng/api';
 import { ReportsService } from '../../../../core/services/reports.service';
@@ -10,17 +9,19 @@ import { CalendarEventDto, CalendarOrderDto, DashboardCalendarDto } from '../../
 import { OrdersService } from '../../../../sales/services/orders.service';
 import { DashboardFilterService } from '../../dashboard-filter.service';
 import { StatusBadgeComponent } from '../../../../shared/components/status-badge/status-badge.component';
+import { ThemeService } from '../../../../core/services/theme.service';
 
 const REMINDER_COOLDOWN_MS = 4 * 60 * 60 * 1000;
 
 @Component({
   selector: 'app-collections-calendar',
   standalone: true,
-  imports: [CommonModule, FormsModule, DatePickerModule, TooltipModule, StatusBadgeComponent],
+  imports: [CommonModule, FormsModule, TooltipModule, StatusBadgeComponent],
   templateUrl: './collections-calendar.component.html',
   styleUrl: './collections-calendar.component.css',
 })
 export class CollectionsCalendarComponent {
+  themeService = inject(ThemeService);
   private reportsService = inject(ReportsService);
   private ordersService = inject(OrdersService);
   private dashboardFilter = inject(DashboardFilterService);
@@ -47,6 +48,67 @@ export class CollectionsCalendarComponent {
   });
 
   selectedLabel = computed(() => this.formatLong(this.selectedDate()));
+
+  currentMonthYearLabel = computed(() => {
+    const month = this.viewMonth();
+    const name = month.toLocaleDateString('es-GT', { month: 'long' });
+    return `${name.charAt(0).toUpperCase() + name.slice(1)} ${month.getFullYear()}`;
+  });
+
+  calendarGrid = computed(() => {
+    const monthDate = this.viewMonth();
+    const year = monthDate.getFullYear();
+    const month = monthDate.getMonth();
+    
+    // First day of current month
+    const firstDay = new Date(year, month, 1);
+    // Last day of current month
+    const lastDay = new Date(year, month + 1, 0);
+    
+    // Start of calendar grid (Monday based: 0=Mon, 6=Sun)
+    let startDayOfWeek = firstDay.getDay() - 1;
+    if (startDayOfWeek === -1) startDayOfWeek = 6;
+    
+    const cells = [];
+    
+    // Previous month padding days
+    const prevMonthLastDay = new Date(year, month, 0).getDate();
+    for (let i = startDayOfWeek - 1; i >= 0; i--) {
+      const d = new Date(year, month - 1, prevMonthLastDay - i);
+      cells.push({
+        date: d,
+        dayNumber: d.getDate(),
+        isCurrentMonth: false,
+        key: this.toKey(d),
+      });
+    }
+    
+    // Current month days
+    for (let i = 1; i <= lastDay.getDate(); i++) {
+      const d = new Date(year, month, i);
+      cells.push({
+        date: d,
+        dayNumber: i,
+        isCurrentMonth: true,
+        key: this.toKey(d),
+      });
+    }
+    
+    // Next month padding days to complete 35 or 42 cells (5 or 6 weeks)
+    const totalCells = cells.length <= 35 ? 35 : 42;
+    let nextMonthDay = 1;
+    while (cells.length < totalCells) {
+      const d = new Date(year, month + 1, nextMonthDay++);
+      cells.push({
+        date: d,
+        dayNumber: d.getDate(),
+        isCurrentMonth: false,
+        key: this.toKey(d),
+      });
+    }
+    
+    return cells;
+  });
 
   kpis = computed(() => {
     const todayKey = this.toKey(new Date());
@@ -96,6 +158,19 @@ export class CollectionsCalendarComponent {
       });
   }
 
+  shiftMonth(offset: number) {
+    const current = this.viewMonth();
+    const next = new Date(current.getFullYear(), current.getMonth() + offset, 1);
+    this.viewMonth.set(next);
+    const today = new Date();
+    if (today.getFullYear() === next.getFullYear() && today.getMonth() === next.getMonth()) {
+      this.selectedDate.set(today);
+    } else {
+      this.selectedDate.set(next);
+    }
+    this.loadCalendar();
+  }
+
   onMonthChange(event: { month?: number; year?: number }) {
     if (event.month === undefined || event.year === undefined) return;
     const next = new Date(event.year, event.month - 1, 1);
@@ -114,12 +189,24 @@ export class CollectionsCalendarComponent {
     this.selectedDate.set(date);
   }
 
-  dayInfo(date: { year: number; month: number; day: number }) {
-    const key = `${date.year}-${String(date.month + 1).padStart(2, '0')}-${String(date.day).padStart(2, '0')}`;
+  dayInfoByKey(key: string) {
     const orders = this.ordersByDate()[key] ?? [];
     const pending = orders.reduce((sum, o) => sum + (o.pendingAmount || 0), 0);
     const overdue = orders.some((o) => this.isOverdue(o));
     return { key, pending, overdue, count: orders.length };
+  }
+
+  dayInfo(date: { year: number; month: number; day: number }) {
+    const key = `${date.year}-${String(date.month + 1).padStart(2, '0')}-${String(date.day).padStart(2, '0')}`;
+    return this.dayInfoByKey(key);
+  }
+
+  isSameDay(d1: Date, d2: Date) {
+    return d1.getFullYear() === d2.getFullYear() && d1.getMonth() === d2.getMonth() && d1.getDate() === d2.getDate();
+  }
+
+  isTodayDate(d: Date) {
+    return this.isSameDay(d, new Date());
   }
 
   isToday(date: { year: number; month: number; day: number }) {

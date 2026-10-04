@@ -16,6 +16,8 @@ import { MessageService } from 'primeng/api';
 import { CashRegisterService } from '../../../inventory/services/cash-register.service';
 import { BranchesService } from '../../../inventory/services/branches.service';
 import { AuthService } from '../../../auth/auth.service';
+import { BranchContextService } from '../../../core/services/branch-context.service';
+import { ThemeService } from '../../../core/services/theme.service';
 import { Branch } from '../../../inventory/interfaces/branch.interface';
 
 @Component({
@@ -41,6 +43,8 @@ export class CashSessionDialogComponent implements OnInit {
   private cashService = inject(CashRegisterService);
   private branchesService = inject(BranchesService);
   private authService = inject(AuthService);
+  public branchContext = inject(BranchContextService);
+  public themeService = inject(ThemeService);
   private messageService = inject(MessageService);
   private fb = inject(FormBuilder);
   private router = inject(Router);
@@ -56,6 +60,10 @@ export class CashSessionDialogComponent implements OnInit {
   isLoading = signal(false);
   showCalculationDialog = false;
   sessionBranchName = signal<string>('');
+
+  // Context branch properties
+  isConsolidatedMode = computed(() => this.branchContext.isGlobalView);
+  activeWorkingBranch = computed(() => this.branchContext.currentBranch());
 
   // Forms
   openForm!: FormGroup;
@@ -89,6 +97,14 @@ export class CashSessionDialogComponent implements OnInit {
         });
       } else {
         this.sessionBranchName.set('');
+      }
+    });
+
+    // Automatically sync branch selection when context changes
+    effect(() => {
+      const workingBranch = this.branchContext.currentBranch();
+      if (workingBranch && workingBranch.id) {
+        this.openForm.get('branchId')?.setValue(workingBranch.id);
       }
     });
   }
@@ -132,16 +148,26 @@ export class CashSessionDialogComponent implements OnInit {
     this.branchesService.getBranches().subscribe({
       next: (res) => {
         this.branches.set(res.data);
-        // Pre-select user's branch
-        const user: any = this.user;
-        const userBranchId = user?.branchId || user?.branch?.id;
-        if (userBranchId) {
-          this.openForm.get('branchId')?.setValue(userBranchId);
-        } else if (res.data.length > 0) {
-          this.openForm.get('branchId')?.setValue(res.data[0].id);
-        }
+        this.syncBranchSelection(res.data);
       }
     });
+  }
+
+  syncBranchSelection(branchList: Branch[] = this.branches()) {
+    const currentWorkingBranch = this.branchContext.currentBranch();
+    if (currentWorkingBranch && currentWorkingBranch.id) {
+      // Si hay una sucursal específica seleccionada en el contexto, fijarla
+      this.openForm.get('branchId')?.setValue(currentWorkingBranch.id);
+    } else {
+      // Modo consolidado / global o sin sucursal fija
+      const user: any = this.user;
+      const userBranchId = user?.branchId || user?.branch?.id;
+      if (userBranchId) {
+        this.openForm.get('branchId')?.setValue(userBranchId);
+      } else if (branchList.length > 0 && !this.openForm.get('branchId')?.value) {
+        this.openForm.get('branchId')?.setValue(branchList[0].id);
+      }
+    }
   }
 
   calculateTotal() {
@@ -198,11 +224,7 @@ export class CashSessionDialogComponent implements OnInit {
         });
         this.isLoading.set(false);
         this.openForm.reset({ openingBalance: 0, branchId: '', notes: '' });
-        // Auto-select user branch again
-        const userBranchId = (this.user as any)?.branchId || (this.user as any)?.branch?.id;
-        if (userBranchId) {
-          this.openForm.get('branchId')?.setValue(userBranchId);
-        }
+        this.syncBranchSelection();
         this.closeDialog();
         this.router.navigate(['/logistics/settlements/today']);
       },
@@ -220,6 +242,12 @@ export class CashSessionDialogComponent implements OnInit {
   closeDialog() {
     this.visible = false;
     this.visibleChange.emit(false);
+  }
+
+  onInputFocus(event: any) {
+    if (event?.target && typeof event.target.select === 'function') {
+      event.target.select();
+    }
   }
 
   cancel() {

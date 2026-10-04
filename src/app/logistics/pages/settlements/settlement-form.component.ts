@@ -19,6 +19,7 @@ import { BranchesService } from '../../../inventory/services/branches.service';
 import { Branch } from '../../../inventory/interfaces/branch.interface';
 import { environment } from '../../../../environments/environment';
 import { prepareIncidentPhoto } from '../../../piloto/utils/incident-photo';
+import { ThemeService } from '../../../core/services/theme.service';
 
 @Component({
   selector: 'app-settlement-form',
@@ -39,8 +40,10 @@ import { prepareIncidentPhoto } from '../../../piloto/utils/incident-photo';
     StatusBadgeComponent,
   ],
   templateUrl: './settlement-form.component.html',
+  styleUrl: './settlement-form.component.css',
 })
 export class SettlementFormComponent implements OnInit {
+  public themeService = inject(ThemeService);
   private api = inject(BranchSettlementsService);
   private messages = inject(MessageService);
   private auth = inject(AuthService);

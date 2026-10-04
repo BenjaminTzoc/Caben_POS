@@ -7,6 +7,7 @@ import { DatePickerModule } from 'primeng/datepicker';
 import { TooltipModule } from 'primeng/tooltip';
 import { MessageService } from 'primeng/api';
 import { AuthService } from '../../../auth/auth.service';
+import { BranchContextService } from '../../../core/services/branch-context.service';
 import { TripsService } from '../../services/trips.service';
 import { BranchesService } from '../../../inventory/services/branches.service';
 import { Trip, TripStatus } from '../../interfaces/trip.interface';
@@ -18,6 +19,7 @@ import { SearchInputComponent } from '../../../shared/components/search-input/se
 import { StandardTableComponent } from '../../../shared/components/standard-table/standard-table.component';
 import { StatusBadgeComponent } from '../../../shared/components/status-badge/status-badge.component';
 import { ConfirmationModalComponent } from '../../../shared/components/confirmation-modal/confirmation-modal.component';
+import { ThemeService } from '../../../core/services/theme.service';
 
 @Component({
   selector: 'app-trips',
@@ -41,8 +43,10 @@ import { ConfirmationModalComponent } from '../../../shared/components/confirmat
   styleUrl: './trips.component.css',
 })
 export class TripsComponent implements OnInit {
+  public themeService = inject(ThemeService);
   private tripsService = inject(TripsService);
   private branchesService = inject(BranchesService);
+  private branchContext = inject(BranchContextService);
   private messageService = inject(MessageService);
   private router = inject(Router);
   private auth = inject(AuthService);
@@ -50,6 +54,10 @@ export class TripsComponent implements OnInit {
   trips = signal<Trip[]>([]);
   branches = signal<Branch[]>([]);
   loading = signal<boolean>(false);
+
+  // Contexto de sucursal activa
+  activeBranch = this.branchContext.currentBranch;
+  hasActiveWorkingBranch = computed(() => !this.branchContext.isGlobalView && !!this.activeBranch()?.id);
 
   searchTerm = signal<string>('');
   selectedStatus = signal<TripStatus | null>(null);
@@ -105,7 +113,13 @@ export class TripsComponent implements OnInit {
   loadTrips(): void {
     this.loading.set(true);
 
-    const originBranchId = this.isSuperAdmin ? this.selectedOriginBranch() || undefined : undefined;
+    let originBranchId: string | undefined = undefined;
+    if (this.hasActiveWorkingBranch()) {
+      originBranchId = this.activeBranch()?.id || undefined;
+    } else if (this.isSuperAdmin) {
+      originBranchId = this.selectedOriginBranch() || undefined;
+    }
+
     const status = this.selectedStatus() || undefined;
     const dateStr = this.formatDate(this.selectedDate);
 

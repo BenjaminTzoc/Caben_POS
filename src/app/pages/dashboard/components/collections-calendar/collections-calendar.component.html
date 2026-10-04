@@ -1,159 +1,277 @@
-<div class="cal-card">
-  <div class="cal-head">
+<div class="inline-flex flex-col p-4 w-fit max-w-full rounded-xl overflow-hidden transition-all duration-300 border"
+  [ngClass]="themeService.isDarkMode() 
+    ? 'bg-[#161B22] border-[#30363D] shadow-2xl' 
+    : 'bg-gradient-to-b from-[#f8eef3] via-[#fdf7f9] to-white border-[#d9b8c8] shadow-[0_1px_0_rgb(72_2_28/0.08)]'">
+  
+  <div class="flex items-start justify-between gap-3 mb-3">
     <div>
       <div class="flex items-center gap-2">
-        <h3 class="text-base font-semibold tracking-tight text-[#48021C]">Calendario de cobros</h3>
+        <h3 class="text-base font-medium truncate"
+          [ngClass]="themeService.isDarkMode() ? 'text-[#F0F6FC]' : 'text-[#48021C]'">Calendario de cobros</h3>
       </div>
+      <p class="text-[11px] font-medium leading-tight mt-0.5 truncate"
+        [ngClass]="themeService.isDarkMode() ? 'text-[#8B949E]' : 'text-[#9f6587]'">Monitoreo y gestión de vencimientos</p>
       @if (errorMessage()) {
         <p class="text-[10px] font-medium text-rose-500 mt-0.5">{{ errorMessage() }}</p>
       }
     </div>
     <div class="flex items-center gap-3 shrink-0">
-      <span class="legend legend-due">Vence</span>
-      <span class="legend legend-overdue">Vencido</span>
+      <span class="inline-flex items-center gap-1.5 text-[11px] font-medium before:content-[''] before:w-2 before:h-2 before:rounded-full before:bg-amber-500"
+        [ngClass]="themeService.isDarkMode() ? 'text-slate-300' : 'text-slate-600'">Vence</span>
+      <span class="inline-flex items-center gap-1.5 text-[11px] font-medium before:content-[''] before:w-2 before:h-2 before:rounded-full before:bg-rose-500"
+        [ngClass]="themeService.isDarkMode() ? 'text-slate-300' : 'text-slate-600'">Vencido</span>
     </div>
   </div>
 
-  <div class="cal-kpis">
-    <article class="kpi-chip kpi-teal">
-      <p class="kpi-label text-[#1B768E]">Por cobrar del mes</p>
-      <p class="kpi-value">{{ kpis().monthPending | currency:'GTQ':'symbol':'1.0-0' }}</p>
+  <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 mb-3">
+    <article class="px-3 py-2 rounded-lg border transition-colors"
+      [ngClass]="themeService.isDarkMode() ? 'border-none bg-cyan-950/40 text-cyan-200' : 'border-[#9ecad6] bg-[#e8f4f7]'">
+      <p class="text-[10px] font-normal leading-tight"
+        [ngClass]="themeService.isDarkMode() ? 'text-slate-400' : 'text-[#1B768E]'">Por cobrar del mes</p>
+      <p class="mt-0.5 text-sm font-semibold tabular-nums leading-tight"
+        [ngClass]="themeService.isDarkMode() ? 'text-slate-100' : 'text-[#1B768E]'">{{ kpis().monthPending | currency:'GTQ':'symbol':'1.0-0' }}</p>
     </article>
-    <article class="kpi-chip kpi-rose">
-      <p class="kpi-label text-rose-600">Vencido</p>
-      <p class="kpi-value text-rose-700">{{ kpis().monthOverdue | currency:'GTQ':'symbol':'1.0-0' }}</p>
+    <article class="px-3 py-2 rounded-lg border transition-colors"
+      [ngClass]="themeService.isDarkMode() ? 'border-none bg-rose-950/40 text-rose-200' : 'border-rose-200 bg-rose-50'">
+      <p class="text-[10px] font-normal leading-tight"
+        [ngClass]="themeService.isDarkMode() ? 'text-slate-400' : 'text-rose-600'">Vencido</p>
+      <p class="mt-0.5 text-sm font-semibold tabular-nums leading-tight"
+        [ngClass]="themeService.isDarkMode() ? 'text-rose-400' : 'text-rose-700'">{{ kpis().monthOverdue | currency:'GTQ':'symbol':'1.0-0' }}</p>
     </article>
-    <article class="kpi-chip kpi-sky">
-      <p class="kpi-label text-sky-700">Vence hoy</p>
-      <p class="kpi-value text-[#1B768E]">{{ kpis().dueToday | currency:'GTQ':'symbol':'1.0-0' }}</p>
+    <article class="px-3 py-2 rounded-lg border transition-colors"
+      [ngClass]="themeService.isDarkMode() ? 'border-none bg-sky-950/40 text-sky-200' : 'border-sky-200 bg-sky-50'">
+      <p class="text-[10px] font-normal leading-tight"
+        [ngClass]="themeService.isDarkMode() ? 'text-slate-400' : 'text-sky-700'">Vence hoy</p>
+      <p class="mt-0.5 text-sm font-semibold tabular-nums leading-tight"
+        [ngClass]="themeService.isDarkMode() ? 'text-slate-100' : 'text-[#1B768E]'">{{ kpis().dueToday | currency:'GTQ':'symbol':'1.0-0' }}</p>
     </article>
-    <article class="kpi-chip kpi-amber">
-      <p class="kpi-label text-amber-700">Esta semana</p>
-      <p class="kpi-value">{{ kpis().dueWeek | currency:'GTQ':'symbol':'1.0-0' }}</p>
+    <article class="px-3 py-2 rounded-lg border transition-colors"
+      [ngClass]="themeService.isDarkMode() ? 'border-none bg-amber-950/40 text-amber-200' : 'border-amber-200 bg-amber-50'">
+      <p class="text-[10px] font-normal leading-tight"
+        [ngClass]="themeService.isDarkMode() ? 'text-slate-400' : 'text-amber-700'">Esta semana</p>
+      <p class="mt-0.5 text-sm font-semibold tabular-nums leading-tight"
+        [ngClass]="themeService.isDarkMode() ? 'text-slate-100' : 'text-slate-800'">{{ kpis().dueWeek | currency:'GTQ':'symbol':'1.0-0' }}</p>
     </article>
   </div>
 
-  <div class="cal-body">
-    <div class="cal-picker relative">
+  <div class="flex flex-col lg:flex-row lg:items-start gap-3">
+    <!-- Pure Tailwind Calendar Panel with Card Border & Background -->
+    <div class="w-full sm:w-[23.5rem] max-w-full shrink-0 relative flex flex-col min-w-0 p-3 rounded-lg border transition-colors self-start"
+      [ngClass]="themeService.isDarkMode() ? 'border-[#30363D] bg-[#0D1117]' : 'border-[#d9b8c8] bg-white/90'">
       @if (isLoading()) {
-        <div class="cal-loading">
-          <i class="pi pi-spin pi-spinner text-xl text-[#48021C]"></i>
+        <div class="absolute inset-0 z-20 flex items-center justify-center rounded-lg"
+          [ngClass]="themeService.isDarkMode() ? 'bg-[#161B22]/80' : 'bg-white/70'">
+          <i class="pi pi-spin pi-spinner text-xl"
+            [ngClass]="themeService.isDarkMode() ? 'text-[#58A6FF]' : 'text-[#48021C]'"></i>
         </div>
       }
-      <p-datepicker
-        [ngModel]="selectedDate()"
-        (ngModelChange)="onDateSelect($event)"
-        [inline]="true"
-        (onMonthChange)="onMonthChange($event)"
-        styleClass="cobros-calendar"
-      >
-        <ng-template #date let-date>
-          @let info = dayInfo(date);
-          <div
-            class="cal-day"
-            [class.has-due]="info.count > 0 && !info.overdue"
-            [class.has-overdue]="info.overdue"
-            [class.is-today]="isToday(date)"
+
+      <!-- Header: Month Title & Navigation -->
+      <div class="flex items-center justify-between pb-2 mb-2 border-b transition-colors"
+        [ngClass]="themeService.isDarkMode() ? 'border-[#30363D]' : 'border-[#d9b8c8]'">
+        <button type="button"
+          class="w-7 h-7 rounded-lg flex items-center justify-center cursor-pointer transition-colors"
+          [ngClass]="themeService.isDarkMode() ? 'text-slate-400 hover:text-white hover:bg-[#1C2128]' : 'text-[#48021C] hover:bg-[#9f6587]/15'"
+          (click)="shiftMonth(-1)"
+          pTooltip="Mes anterior">
+          <i class="pi pi-chevron-left text-xs!"></i>
+        </button>
+        
+        <span class="text-sm font-semibold tracking-tight capitalize select-none"
+          [ngClass]="themeService.isDarkMode() ? 'text-[#F0F6FC]' : 'text-[#48021C]'">
+          {{ currentMonthYearLabel() }}
+        </span>
+
+        <button type="button"
+          class="w-7 h-7 rounded-lg flex items-center justify-center cursor-pointer transition-colors"
+          [ngClass]="themeService.isDarkMode() ? 'text-slate-400 hover:text-white hover:bg-[#1C2128]' : 'text-[#48021C] hover:bg-[#9f6587]/15'"
+          (click)="shiftMonth(1)"
+          pTooltip="Mes siguiente">
+          <i class="pi pi-chevron-right text-xs!"></i>
+        </button>
+      </div>
+
+      <!-- Weekday Headers -->
+      <div class="grid grid-cols-7 gap-1 text-center mb-1">
+        <span class="text-[10px] font-bold py-1 select-none"
+          [ngClass]="themeService.isDarkMode() ? 'text-slate-400' : 'text-[#48021C]'">Lu</span>
+        <span class="text-[10px] font-bold py-1 select-none"
+          [ngClass]="themeService.isDarkMode() ? 'text-slate-400' : 'text-[#48021C]'">Ma</span>
+        <span class="text-[10px] font-bold py-1 select-none"
+          [ngClass]="themeService.isDarkMode() ? 'text-slate-400' : 'text-[#48021C]'">Mi</span>
+        <span class="text-[10px] font-bold py-1 select-none"
+          [ngClass]="themeService.isDarkMode() ? 'text-slate-400' : 'text-[#48021C]'">Ju</span>
+        <span class="text-[10px] font-bold py-1 select-none"
+          [ngClass]="themeService.isDarkMode() ? 'text-slate-400' : 'text-[#48021C]'">Vi</span>
+        <span class="text-[10px] font-bold py-1 select-none"
+          [ngClass]="themeService.isDarkMode() ? 'text-slate-400' : 'text-[#48021C]'">Sa</span>
+        <span class="text-[10px] font-bold py-1 select-none"
+          [ngClass]="themeService.isDarkMode() ? 'text-slate-400' : 'text-[#48021C]'">Do</span>
+      </div>
+
+      <!-- Days Grid -->
+      <div class="grid grid-cols-7 gap-1">
+        @for (cell of calendarGrid(); track cell.key) {
+          @let info = dayInfoByKey(cell.key);
+          @let selected = isSameDay(cell.date, selectedDate());
+          @let today = isTodayDate(cell.date);
+
+          <button type="button"
+            class="flex flex-col items-center justify-center min-h-[2.65rem] rounded-lg p-0.5 box-border border cursor-pointer transition-all relative"
+            [class.opacity-35]="!cell.isCurrentMonth"
+            [ngClass]="[
+              info.count > 0 && !info.overdue 
+                ? (themeService.isDarkMode() ? 'bg-amber-950/45 border-amber-900/50' : 'bg-[#fffbeb] border-amber-200')
+                : (info.overdue 
+                    ? (themeService.isDarkMode() ? 'bg-rose-950/50 border-rose-900/60' : 'bg-[#fff1f2] border-rose-200')
+                    : (themeService.isDarkMode() ? 'border-[#30363D]/40 bg-[#161B22]/60 hover:bg-[#1C2128]' : 'border-slate-100 bg-slate-50/60 hover:bg-slate-100')),
+              selected 
+                ? (themeService.isDarkMode() ? '!ring-2 !ring-[#58A6FF] !ring-offset-1 !ring-offset-[#0D1117]' : '!ring-2 !ring-[#48021C] !ring-offset-1 !ring-offset-white')
+                : '',
+              today && !selected
+                ? (themeService.isDarkMode() ? '!shadow-[inset_0_0_0_1.5px_#58A6FF]' : '!shadow-[inset_0_0_0_1.5px_#48021C]')
+                : ''
+            ]"
             [pTooltip]="dayTooltip(info)"
             [tooltipDisabled]="!info.count"
             tooltipPosition="top"
-          >
-            <span class="cal-num">{{ date.day }}</span>
+            (click)="onDateSelect(cell.date)">
+            <span class="text-xs font-semibold leading-none select-none"
+              [ngClass]="themeService.isDarkMode() ? 'text-slate-200' : 'text-[#334155]'">
+              {{ cell.dayNumber }}
+            </span>
             @if (info.count) {
-              <span class="cal-amt">{{ compactAmount(info.pending) }}</span>
+              <span class="mt-0.5 text-[8.5px] font-bold tabular-nums leading-none"
+                [ngClass]="info.overdue 
+                  ? (themeService.isDarkMode() ? 'text-rose-400' : 'text-[#be123c]') 
+                  : (themeService.isDarkMode() ? 'text-amber-400' : 'text-[#b45309]')">
+                {{ compactAmount(info.pending) }}
+              </span>
             }
-          </div>
-        </ng-template>
-      </p-datepicker>
+          </button>
+        }
+      </div>
     </div>
 
-    <div class="cal-detail">
-      <div class="detail-head">
+    <div class="flex-1 w-full lg:w-[24.65rem] max-w-full min-w-0 flex flex-col rounded-lg overflow-hidden border self-start"
+      [ngClass]="themeService.isDarkMode() ? 'border-[#30363D] bg-[#0D1117]' : 'border-[#d9b8c8] bg-white'">
+      <div class="flex items-center justify-between gap-3 px-3 py-2 border-b"
+        [ngClass]="themeService.isDarkMode() ? 'bg-[#161B22] border-[#30363D]' : 'bg-[#f3e4eb] border-[#d9b8c8]'">
         <div>
-          <p class="text-[10px] font-bold text-[#48021C]">Cobros del día</p>
-          <p class="text-sm font-semibold text-slate-800 capitalize">{{ selectedLabel() }}</p>
+          <p class="text-[10px] font-medium leading-tight"
+            [ngClass]="themeService.isDarkMode() ? 'text-slate-400' : 'text-[#48021C]'">Cobros del día</p>
+          <p class="text-sm font-semibold capitalize"
+            [ngClass]="themeService.isDarkMode() ? 'text-[#F0F6FC]' : 'text-slate-800'">{{ selectedLabel() }}</p>
         </div>
         <div class="text-right">
-          <p class="text-sm font-bold tabular-nums text-slate-800">{{ selectedTotals().pending | currency:'GTQ':'symbol':'1.0-0' }}</p>
-          <p class="text-[10px] font-semibold text-[#48021C]/70">{{ selectedTotals().count }} factura{{ selectedTotals().count === 1 ? '' : 's' }}</p>
+          <p class="text-sm font-bold tabular-nums"
+            [ngClass]="themeService.isDarkMode() ? 'text-[#F0F6FC]' : 'text-slate-800'">{{ selectedTotals().pending | currency:'GTQ':'symbol':'1.0-0' }}</p>
+          <p class="text-[10px] font-medium"
+            [ngClass]="themeService.isDarkMode() ? 'text-slate-400' : 'text-[#48021C]/70'">{{ selectedTotals().count }} factura{{ selectedTotals().count === 1 ? '' : 's' }}</p>
         </div>
       </div>
 
-      <div class="detail-list">
+      <div class="max-h-[20.5rem] overflow-y-auto divide-y"
+        [ngClass]="themeService.isDarkMode() ? 'divide-[#30363D]/60' : 'divide-slate-100'">
         @for (order of selectedOrders(); track order.saleId) {
-          <article class="detail-row" (click)="openOrder(order)">
-            <div class="row-main">
+          <article class="flex items-start justify-between gap-2.5 px-3 py-2 text-left cursor-pointer transition-colors"
+            [ngClass]="themeService.isDarkMode() ? 'bg-[#0D1117] hover:bg-[#161B22]' : 'bg-white hover:bg-slate-50'"
+            (click)="openOrder(order)">
+            <div class="min-w-0 flex-1">
               <div class="flex items-center gap-1.5 min-w-0 flex-wrap">
-                <span class="text-[11px] font-semibold text-slate-700">#{{ order.invoiceNumber }}</span>
+                <span class="text-[11px] font-semibold"
+                  [ngClass]="themeService.isDarkMode() ? 'text-slate-300' : 'text-slate-700'">#{{ order.invoiceNumber }}</span>
                 <app-status-badge [value]="dueLabel(order)" [severity]="dueTone(order)" size="xs" />
                 @if (order.isPreorder && !order.delivered) {
                   <app-status-badge value="Preorden" severity="purple" size="xs" />
                 }
               </div>
-              <p class="text-xs font-medium text-slate-700 truncate">{{ order.customerName }}</p>
-              <p class="row-meta">
-                {{ windowLabel(order) }}
+              <p class="text-xs font-medium truncate mt-0.5"
+                [ngClass]="themeService.isDarkMode() ? 'text-slate-200' : 'text-slate-700'">{{ order.customerName }}</p>
+              <p class="text-[10px] font-normal truncate mt-0.5 flex items-center gap-1"
+                [ngClass]="themeService.isDarkMode() ? 'text-slate-400' : 'text-[#64748b]'">
+                <span>{{ windowLabel(order) }}</span>
                 <span>·</span>
-                {{ order.branchName }}
+                <span>{{ order.branchName }}</span>
                 @if (order.phone) {
                   <span>·</span>
-                  {{ order.phone }}
+                  <span>{{ order.phone }}</span>
                 }
               </p>
               @if (lastPaymentLabel(order); as lastPay) {
-                <p class="row-pay">{{ lastPay }}</p>
+                <p class="text-[10px] font-medium mt-0.5"
+                  [ngClass]="themeService.isDarkMode() ? 'text-emerald-400' : 'text-[#48021C]'">{{ lastPay }}</p>
               }
               @if (remindLabel(order); as reminded) {
-                <p class="row-remind">{{ reminded }}</p>
+                <p class="text-[10px] font-medium mt-0.5"
+                  [ngClass]="themeService.isDarkMode() ? 'text-[#58A6FF]' : 'text-[#48021C]'">{{ reminded }}</p>
               }
               @if (order.notes) {
-                <p class="row-note">{{ order.notes }}</p>
+                <p class="text-[10px] italic leading-tight mt-1"
+                  [ngClass]="themeService.isDarkMode() ? 'text-slate-400' : 'text-[#48021C]'">{{ order.notes }}</p>
               }
             </div>
 
-            <div class="row-side">
-              <p class="text-xs font-bold tabular-nums text-slate-800">{{ order.pendingAmount | currency:'GTQ':'symbol':'1.0-0' }}</p>
-              <p class="text-[10px] font-semibold text-slate-400">{{ paidPercent(order) }}% abonado</p>
-              <div class="pay-bar" [attr.title]="paidAmount(order) | currency:'GTQ':'symbol':'1.0-0'">
-                <span [style.width.%]="paidPercent(order)"></span>
+            <div class="shrink-0 flex flex-col items-end gap-0.5">
+              <p class="text-xs font-bold tabular-nums"
+                [ngClass]="themeService.isDarkMode() ? 'text-slate-100' : 'text-slate-800'">{{ order.pendingAmount | currency:'GTQ':'symbol':'1.0-0' }}</p>
+              <p class="text-[10px] font-medium"
+                [ngClass]="themeService.isDarkMode() ? 'text-slate-400' : 'text-slate-400'">{{ paidPercent(order) }}% abonado</p>
+              <div class="w-16 h-1 rounded-full overflow-hidden my-0.5"
+                [ngClass]="themeService.isDarkMode() ? 'bg-[#30363D]' : 'bg-slate-200'"
+                [attr.title]="paidAmount(order) | currency:'GTQ':'symbol':'1.0-0'">
+                <div class="h-full"
+                  [ngClass]="themeService.isDarkMode() ? 'bg-[#58A6FF]' : 'bg-[#48021C]'"
+                  [style.width.%]="paidPercent(order)"></div>
               </div>
-              <div class="row-actions">
+              <div class="flex gap-1 mt-1">
                 <button
                   type="button"
-                  class="act-btn"
+                  class="w-6 h-6 inline-flex items-center justify-center rounded border transition-colors cursor-pointer disabled:opacity-35 disabled:cursor-not-allowed"
+                  [ngClass]="themeService.isDarkMode() 
+                    ? 'border-[#30363D] bg-[#161B22] text-slate-300 hover:bg-[#1C2128]' 
+                    : 'border-slate-200 bg-white text-slate-600 hover:bg-slate-100'"
                   [disabled]="!canRemind(order)"
                   [pTooltip]="remindTooltip(order)"
                   tooltipPosition="top"
                   (click)="remind($event, order)"
                 >
-                  <i class="pi" [class.pi-whatsapp]="!isReminding(order)" [class.pi-spin]="isReminding(order)" [class.pi-spinner]="isReminding(order)"></i>
+                  <i class="pi text-[11px]" [class.pi-whatsapp]="!isReminding(order)" [class.pi-spin]="isReminding(order)" [class.pi-spinner]="isReminding(order)"></i>
                 </button>
                 <button
                   type="button"
-                  class="act-btn"
+                  class="w-6 h-6 inline-flex items-center justify-center rounded border transition-colors cursor-pointer disabled:opacity-35 disabled:cursor-not-allowed"
+                  [ngClass]="themeService.isDarkMode() 
+                    ? 'border-[#30363D] bg-[#161B22] text-slate-300 hover:bg-[#1C2128]' 
+                    : 'border-slate-200 bg-white text-slate-600 hover:bg-slate-100'"
                   [disabled]="!order.phone"
                   pTooltip="Llamar"
                   tooltipPosition="top"
                   (click)="call($event, order)"
                 >
-                  <i class="pi pi-phone"></i>
+                  <i class="pi pi-phone text-[11px]"></i>
                 </button>
                 <button
                   type="button"
-                  class="act-btn act-pay"
+                  class="w-6 h-6 inline-flex items-center justify-center rounded border transition-colors cursor-pointer"
+                  [ngClass]="themeService.isDarkMode() 
+                    ? 'border-rose-900/60 bg-rose-950/40 text-rose-300 hover:bg-rose-900/50' 
+                    : 'border-[#e4c9d5] bg-rose-50 text-[#48021C] hover:bg-rose-100'"
                   pTooltip="Abrir para abonar"
                   tooltipPosition="top"
                   (click)="registerPayment($event, order)"
                 >
-                  <i class="pi pi-wallet"></i>
+                  <i class="pi pi-wallet text-[11px]"></i>
                 </button>
               </div>
             </div>
           </article>
         } @empty {
-          <div class="detail-empty">
-            <p class="text-xs font-semibold text-slate-500">Sin cobros este día</p>
-            <p class="text-[11px] text-slate-400 mt-1">Elige un día con monto en el calendario.</p>
+          <div class="p-4 text-center">
+            <p class="text-xs font-semibold"
+              [ngClass]="themeService.isDarkMode() ? 'text-slate-300' : 'text-slate-500'">Sin cobros este día</p>
+            <p class="text-[11px] mt-1"
+              [ngClass]="themeService.isDarkMode() ? 'text-slate-500' : 'text-slate-400'">Elige un día con monto en el calendario.</p>
           </div>
         }
       </div>

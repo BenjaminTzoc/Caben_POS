@@ -10,6 +10,7 @@ import { MessageService } from 'primeng/api';
 import { TripsService } from '../../../services/trips.service';
 import { TrucksService } from '../../../services/trucks.service';
 import { BranchesService } from '../../../../inventory/services/branches.service';
+import { BranchContextService } from '../../../../core/services/branch-context.service';
 import { CreateTripDto, CreateTripItemDto, TripItemType } from '../../../interfaces/trip.interface';
 import { Truck } from '../../../interfaces/truck.interface';
 import { Branch } from '../../../../inventory/interfaces/branch.interface';
@@ -17,6 +18,7 @@ import { PageHeaderComponent } from '../../../../shared/components/page-header/p
 import { PrimaryButtonComponent } from '../../../../shared/components/primary-button/primary-button.component';
 import { SecondaryButtonComponent } from '../../../../shared/components/secondary-button/secondary-button.component';
 import { StandardTableComponent } from '../../../../shared/components/standard-table/standard-table.component';
+import { ThemeService } from '../../../../core/services/theme.service';
 
 @Component({
   selector: 'app-trip-form',
@@ -40,6 +42,8 @@ import { StandardTableComponent } from '../../../../shared/components/standard-t
   styleUrl: './trip-form.component.css',
 })
 export class TripFormComponent implements OnInit {
+  public themeService = inject(ThemeService);
+  private branchContext = inject(BranchContextService);
   private fb = inject(FormBuilder);
   private router = inject(Router);
   private route = inject(ActivatedRoute);
@@ -51,6 +55,10 @@ export class TripFormComponent implements OnInit {
   tripForm: FormGroup;
   saving = signal<boolean>(false);
   loadingOperations = signal<boolean>(false);
+
+  // Contexto de sucursal activa
+  activeBranch = this.branchContext.currentBranch;
+  hasActiveWorkingBranch = computed(() => !this.branchContext.isGlobalView && !!this.activeBranch()?.id);
 
   // Catálogos
   branches = signal<Branch[]>([]);
@@ -86,6 +94,14 @@ export class TripFormComponent implements OnInit {
   ngOnInit(): void {
     this.presetTransferId = this.route.snapshot.queryParamMap.get('transferId');
     if (this.presetTransferId) this.activeTab = 'transfers';
+
+    if (this.hasActiveWorkingBranch()) {
+      const activeId = this.activeBranch()?.id;
+      if (activeId) {
+        this.tripForm.patchValue({ originBranchId: activeId });
+      }
+    }
+
     this.loadCatalogData();
   }
 
@@ -95,9 +111,16 @@ export class TripFormComponent implements OnInit {
       next: (res) => {
         const plants = res.data || [];
         this.branches.set(plants);
-        const preferredOrigin = this.route.snapshot.queryParamMap.get('originBranchId');
-        const current = this.tripForm.get('originBranchId')?.value;
-        const originId = preferredOrigin || current || plants[0]?.id || null;
+
+        let originId: string | null = null;
+        if (this.hasActiveWorkingBranch()) {
+          originId = this.activeBranch()?.id || null;
+        } else {
+          const preferredOrigin = this.route.snapshot.queryParamMap.get('originBranchId');
+          const current = this.tripForm.get('originBranchId')?.value;
+          originId = preferredOrigin || current || plants[0]?.id || null;
+        }
+
         if (originId) {
           this.tripForm.patchValue({ originBranchId: originId });
           this.onOriginBranchChange();

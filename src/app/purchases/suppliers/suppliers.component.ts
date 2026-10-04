@@ -15,6 +15,14 @@ import { IconFieldModule } from 'primeng/iconfield';
 import { InputIconModule } from 'primeng/inputicon';
 import { TooltipModule } from 'primeng/tooltip';
 
+import { ThemeService } from '../../core/services/theme.service';
+import { PageHeaderComponent } from '../../shared/components/page-header/page-header.component';
+import { PrimaryButtonComponent } from '../../shared/components/primary-button/primary-button.component';
+import { RefreshButtonComponent } from '../../shared/components/refresh-button/refresh-button.component';
+import { SearchInputComponent } from '../../shared/components/search-input/search-input.component';
+import { StandardTableComponent } from '../../shared/components/standard-table/standard-table.component';
+import { StatusBadgeComponent } from '../../shared/components/status-badge/status-badge.component';
+
 @Component({
   selector: 'app-suppliers',
   standalone: true,
@@ -29,11 +37,18 @@ import { TooltipModule } from 'primeng/tooltip';
     IconFieldModule,
     InputIconModule,
     TooltipModule,
+    PageHeaderComponent,
+    PrimaryButtonComponent,
+    RefreshButtonComponent,
+    SearchInputComponent,
+    StandardTableComponent,
+    StatusBadgeComponent,
   ],
   templateUrl: './suppliers.component.html',
   styleUrl: './suppliers.component.css',
 })
 export class SuppliersComponent {
+  public themeService = inject(ThemeService);
   private suppliersService = inject(SuppliersService);
   private router = inject(Router);
   private confirmService = inject(ConfirmService);

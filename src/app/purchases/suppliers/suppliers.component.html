@@ -1,144 +1,150 @@
-<div class="py-4 px-0 md:px-6 bg-slate-50/50 min-h-screen">
+<div class="py-4 px-0 md:px-6 min-h-screen transition-colors duration-200"
+     [ngClass]="themeService.isDarkMode() ? 'bg-[#0D1117]' : 'bg-slate-50/50'">
   <!-- Header Section -->
-  <div class="max-w-[1700px] mx-auto px-4 md:px-0 mb-2 md:mb-8">
-    <div class="flex flex-col md:flex-row md:items-end justify-between gap-4">
-      <div class="w-full md:max-w-[50%]">
-        <h1 class="text-2xl md:text-4xl font-semibold text-gray-900 tracking-tight">Proveedores</h1>
-        <p class="hidden md:block text-gray-500 mt-1 md:mt-2 text-sm md:text-md">
-           Gestiona tus socios comerciales y el historial de suministros.
-        </p>
-      </div>
-      <div class="flex items-center gap-2 w-full md:w-auto">
-        <div class="flex-1">
-          <p-iconfield>
-            <p-inputicon class="pi pi-search" />
-            <input 
-              [(ngModel)]="searchTerm"
-              (input)="onSearchChange()"
-              type="text" 
-              pInputText 
-              placeholder="Buscar proveedor..."
-              autocomplete="off"
-              fluid
-            />
-          </p-iconfield>
-        </div>
-        <p-button 
-          label="Nuevo Proveedor"
-          severity="info"
-          icon="pi pi-plus"
-          class="hidden md:block"
-          (onClick)="createSupplier()"
-        />
-        <p-button 
-          severity="info"
-          icon="pi pi-plus"
-          class="block md:hidden!"
-          (onClick)="createSupplier()"
-        />
-      </div>
-    </div>
-  </div>
+  <app-page-header
+    title="Proveedores"
+    subtitle="Gestiona tus socios comerciales y el historial de suministros."
+    icon="pi pi-truck"
+    colorScheme="burgundy"
+  >
+    <ng-container actions>
+      <app-refresh-button (clicked)="loadSuppliers()" />
+      <app-primary-button
+        label="Nuevo Proveedor"
+        icon="pi pi-plus"
+        (clicked)="createSupplier()"
+      />
+    </ng-container>
+  </app-page-header>
 
-  <div class="max-w-[1700px] mx-auto">
-    <div class="flex mb-4 px-4 md:px-0">
-      <div class="group bg-white border border-slate-300 rounded-lg py-2 px-4 shadow-sm flex items-center gap-3 transition-all hover:border-indigo-200">
-        <div class="flex flex-col">
-          <label for="showDeleted" class="text-sm font-semibold text-[#3B5B8A]">Mostrar Eliminados</label>
-        </div>
-        <p-toggleSwitch
-          [(ngModel)]="includeDeleted"
-          (onChange)="onToggleDeletedChange()"
+  <div class="max-w-[1700px] mx-auto px-4 md:px-0">
+    <!-- Filters Bar -->
+    <div class="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4 mb-6">
+      <div class="w-full sm:w-auto">
+        <app-search-input
+          [placeholder]="'Buscar por nombre, NIT, contacto...'"
+          widthClass="w-full sm:w-80 md:w-96"
+          [ngModel]="searchTerm()"
+          (searchChange)="searchTerm.set($event); onSearchChange()"
+        />
+      </div>
+
+      <div class="flex items-center gap-3 px-4 py-2.5 rounded-xl border transition-colors self-start sm:self-auto"
+           [ngClass]="themeService.isDarkMode() ? 'bg-[#161B22] border-[#30363D]' : 'bg-white border-slate-200 shadow-xs'">
+        <label for="showDeleted" class="text-xs font-semibold cursor-pointer select-none"
+               [ngClass]="themeService.isDarkMode() ? 'text-[#F0F6FC]' : 'text-slate-700'">
+          Mostrar Eliminados
+        </label>
+        <p-toggleswitch
+          [ngModel]="includeDeleted()"
+          (ngModelChange)="includeDeleted.set($event); onToggleDeletedChange()"
           inputId="showDeleted"
-        ></p-toggleSwitch>
+        />
       </div>
     </div>
 
-    <!-- VISTA ESCRITORIO (Tabla Clásica) -->
-    <div class="hidden lg:block bg-white rounded-xl border border-slate-300 overflow-hidden shadow-sm">
-      <p-table
-        #suppliersDesktopTable
+    <!-- VISTA ESCRITORIO (Standard Table) -->
+    <div class="hidden lg:block">
+      <app-standard-table
         [value]="suppliers()"
         [loading]="loading()"
         [paginator]="true"
         [rows]="10"
-        [showCurrentPageReport]="true"
-        currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords}"
         [rowsPerPageOptions]="[10, 20, 30]"
         dataKey="id"
-        styleClass="p-datatable-modern"
+        emptyIcon="pi pi-truck"
+        emptyMessage="No se encontraron proveedores"
       >
-        <ng-template pTemplate="header">
-          <tr class="h-18! text-sm! bg-slate-50">
-            <th class="!pl-10 tracking-widest text-slate-400 w-[110px]">Estado</th>
-            <th class="tracking-widest text-slate-400" pSortableColumn="name">Proveedor <p-sortIcon class="w-3! h-3!" field="name" /></th>
-            <th class="tracking-widest text-slate-400 w-[130px]">NIT / ID</th>
-            <th class="tracking-widest text-slate-400">Contacto</th>
-            <th class="tracking-widest text-slate-400">Ubicación</th>
-            <th class="!pr-10 tracking-widest text-slate-400 text-right">Acciones</th>
+        <ng-template #header>
+          <tr class="h-14 text-xs uppercase tracking-wider"
+              [ngClass]="themeService.isDarkMode() ? 'bg-[#161B22] text-[#8B949E]' : 'bg-slate-50 text-slate-500'">
+            <th class="!pl-6 w-[120px]">Estado</th>
+            <th pSortableColumn="name">
+              Proveedor <p-sortIcon field="name" class="text-xs" />
+            </th>
+            <th class="w-[140px]">NIT / ID</th>
+            <th>Contacto</th>
+            <th>Ubicación</th>
+            <th class="!pr-6 text-right w-[120px]">Acciones</th>
           </tr>
         </ng-template>
 
-        <ng-template pTemplate="body" let-supplier>
-          <tr class="group hover:bg-slate-50 transition-all border-b border-slate-100 last:border-0"
-              [ngClass]="{ 'opacity-60 grayscale-[0.5]': supplier.deletedAt }">
-            <td class="!pl-10 py-4">
-              @if (supplier.deletedAt) {
-                <span class="inline-flex items-center px-3 py-1 text-xs font-semibold rounded-lg bg-rose-50 text-rose-600 border border-rose-300">
-                  <span class="w-1.5 h-1.5 rounded-full bg-rose-500 mr-2"></span> Inactivo
-                </span>
-              } @else {
-                <span class="inline-flex items-center px-3 py-1 text-xs font-semibold rounded-lg bg-emerald-50 text-emerald-600 border border-emerald-300">
-                  <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 mr-2"></span> Activo
-                </span>
-              }
+        <ng-template #body let-supplier>
+          <tr class="transition-colors border-b last:border-0"
+              [ngClass]="[
+                themeService.isDarkMode()
+                  ? 'border-[#30363D] hover:bg-[#161B22]/80 text-[#F0F6FC]'
+                  : 'border-slate-100 hover:bg-slate-50 text-slate-800',
+                supplier.deletedAt ? 'opacity-60 grayscale-[0.4]' : ''
+              ]">
+            <td class="!pl-6 py-4">
+              <app-status-badge
+                [value]="supplier.deletedAt ? 'Inactivo' : 'Activo'"
+                [severity]="supplier.deletedAt ? 'danger' : 'success'"
+              />
             </td>
-            <td>
+            <td class="py-4">
               <div class="flex flex-col">
-                <span class="font-semibold text-gray-700 text-base">{{ supplier.name }}</span>
-                <span class="text-xs text-gray-400">{{ supplier.email || 'Sin correo registrado' }}</span>
+                <span class="font-semibold text-sm"
+                      [ngClass]="themeService.isDarkMode() ? 'text-[#F0F6FC]' : 'text-slate-900'">
+                  {{ supplier.name }}
+                </span>
+                <span class="text-xs truncate max-w-xs"
+                      [ngClass]="themeService.isDarkMode() ? 'text-[#8B949E]' : 'text-slate-400'">
+                  {{ supplier.email || 'Sin correo registrado' }}
+                </span>
               </div>
             </td>
-            <td class="text-center md:text-left">
-              <code class="px-2 py-1 bg-blue-50 text-blue-600 rounded-md text-sm font-bold border border-blue-200">
+            <td class="py-4">
+              <code class="px-2.5 py-1 rounded-lg text-xs font-bold border transition-colors inline-block"
+                    [ngClass]="themeService.isDarkMode() ? 'bg-[#0D1117] text-[#58A6FF] border-[#30363D]' : 'bg-[#48021C]/5 text-[#48021C] border-[#48021C]/15'">
                 {{ supplier.nit || 'C/F' }}
               </code>
             </td>
-            <td>
+            <td class="py-4">
               <div class="flex flex-col">
-                <span class="text-sm font-medium text-slate-700">{{ supplier.contactName || 'No asignado' }}</span>
-                <span class="text-xs text-[#3B5B8A] font-semibold">{{ supplier.phone }}</span>
+                <span class="text-xs font-semibold"
+                      [ngClass]="themeService.isDarkMode() ? 'text-[#F0F6FC]' : 'text-slate-700'">
+                  {{ supplier.contactName || 'No asignado' }}
+                </span>
+                <span class="text-xs font-medium"
+                      [ngClass]="themeService.isDarkMode() ? 'text-[#58A6FF]' : 'text-[#48021C]'">
+                  {{ supplier.phone || 'Sin teléfono' }}
+                </span>
               </div>
             </td>
-            <td>
-              <span class="text-sm text-slate-600 line-clamp-1 max-w-xs italic">{{ supplier.address || 'Sin dirección' }}</span>
+            <td class="py-4">
+              <span class="text-xs line-clamp-1 max-w-xs"
+                    [ngClass]="themeService.isDarkMode() ? 'text-[#8B949E]' : 'text-slate-600'">
+                {{ supplier.address || 'Sin dirección registrada' }}
+              </span>
             </td>
-            <td class="!pr-10 text-right">
-              <div class="flex justify-end gap-1">
+            <td class="!pr-6 py-4 text-right">
+              <div class="flex items-center justify-end gap-1">
                 @if (!supplier.deletedAt) {
                   <button
                     pButton
                     icon="pi pi-pencil"
-                    class="p-button-rounded p-button-text !text-amber-500 hover:!bg-amber-50"
+                    class="p-button-rounded p-button-text !w-8 !h-8 !text-amber-500 hover:!bg-amber-500/10"
                     (click)="editSupplier(supplier.id)"
-                    pTooltip="Editar"
+                    pTooltip="Editar Proveedor"
                     tooltipPosition="bottom"
                   ></button>
                   <button
                     pButton
                     icon="pi pi-trash"
-                    class="p-button-rounded p-button-text !text-rose-500 hover:!bg-rose-50"
+                    class="p-button-rounded p-button-text !w-8 !h-8 !text-rose-500 hover:!bg-rose-500/10"
                     (click)="deleteSupplier(supplier)"
-                    pTooltip="Eliminar"
+                    pTooltip="Eliminar Proveedor"
                     tooltipPosition="bottom"
                   ></button>
                 } @else {
                   <button
                     pButton
                     icon="pi pi-refresh"
-                    class="p-button-rounded p-button-text !text-emerald-500 hover:!bg-emerald-50"
+                    class="p-button-rounded p-button-text !w-8 !h-8 !text-emerald-500 hover:!bg-emerald-500/10"
                     (click)="restoreSupplier(supplier)"
-                    pTooltip="Restaurar"
+                    pTooltip="Restaurar Proveedor"
                     tooltipPosition="bottom"
                   ></button>
                 }
@@ -146,120 +152,120 @@
             </td>
           </tr>
         </ng-template>
-
-        <ng-template #emptymessage>
-          <tr>
-            <td colspan="6" class="text-center !py-32">
-              <div class="flex flex-col items-center justify-center gap-3 w-full h-full">
-                <i class="pi pi-truck text-[#95abce]" style="font-size: 5rem"></i>
-                <div class="flex flex-col items-center gap-1">
-                  <p class="text-[#627ca7] font-bold text-xl">No se encontraron proveedores.</p>
-                  <p class="text-[#627ca7] text-sm font-medium">Prueba ajustando los filtros de búsqueda.</p>
-                </div>
-              </div>
-            </td>
-          </tr>
-        </ng-template>
-      </p-table>
+      </app-standard-table>
     </div>
 
-    <!-- VISTA MÓVIL (Lista de Tarjetas) -->
-    <div class="lg:hidden block">
-      <p-table
-        #suppliersMobileTable
-        [value]="suppliers()"
-        [loading]="loading()"
-        [paginator]="true"
-        [rows]="10"
-        dataKey="id"
-        styleClass="p-datatable-modern bg-transparent w-full"
-        [showCurrentPageReport]="false"
-        [tableStyle]="{'table-layout': 'fixed', 'width': '100%'}"
-        [breakpoint]="'0px'"
-      >
-        <ng-template pTemplate="body" let-supplier>
-          <tr class="bg-transparent border-none block" [ngClass]="{ 'opacity-60 grayscale-[0.5]': supplier.deletedAt }">
-            <td class="block !p-0 border-none bg-transparent">
-              <div class="bg-white rounded-2xl shadow-sm border border-slate-200 mx-4 my-2.5 flex flex-col overflow-hidden relative">
-                <div class="flex p-4 items-center gap-4">
-                  <div class="flex items-center justify-center shrink-0">
-                    <span class="w-10 h-10 rounded-xl bg-[#D0E2F2] text-[#3B5B8A] flex items-center justify-center border border-[#4A7FA7] shadow-sm">
-                        <i class="pi pi-truck text-lg!"></i>
-                    </span>
-                  </div>
-                  <div class="flex-1 min-w-0">
-                    <div class="flex justify-between items-start gap-1">
-                      <div class="flex flex-col min-w-0">
-                        <span class="text-[10px] text-[#3B5B8A] font-semibold leading-none mb-1">NIT: {{ supplier.nit || 'C/F' }}</span>
-                        <h3 class="font-semibold text-slate-800 text-lg leading-tight truncate">{{ supplier.name }}</h3>
-                      </div>
-                      @if (supplier.deletedAt) {
-                        <p-tag severity="danger" value="Inactivo" styleClass="!text-[10px] !font-semibold px-1.5 py-0.5 rounded-md" />
-                      } @else {
-                        <p-tag value="Activo" severity="success" styleClass="!text-[10px] !font-semibold px-1.5 py-0.5 rounded-md" />
-                      }
-                    </div>
-                  </div>
-                </div>
-
-                <div class="px-4 pb-4 flex flex-col gap-2.5">
-                  <div class="flex items-center gap-4">
-                     <div class="flex items-center gap-1.5 bg-slate-100 px-2 py-1 rounded-md border border-slate-300">
-                        <i class="pi pi-phone text-[#4A7FA7] font-black!" style="font-size: 0.75rem"></i>
-                        <span class="text-[10px] text-[#3B5B8A] font-semibold uppercase tracking-wider">{{ supplier.phone || 'No asignado' }}</span>
-                     </div>
-                     <p class="text-[11px] font-medium text-[#3B5B8A] line-clamp-1 flex-1 truncate">{{ supplier.email || 'Sin correo' }}</p>
-                  </div>
-                  <div class="flex items-center gap-2 bg-slate-50 p-2 rounded-lg border border-slate-100">
-                    <i class="pi pi-map-marker text-[#4A7FA7] font-black!" style="font-size: 0.75rem"></i>
-                    <p class="text-[11px] text-[#3B5B8A] font-medium line-clamp-1 flex-1 leading-relaxed">
-                      {{ supplier.address || 'Sin dirección registrada adicional' }}
-                    </p>
-                  </div>
-                </div>
-
-                <div class="bg-slate-50/50 border-t border-slate-100 p-2 px-3 flex items-center justify-end">
-                  <div class="flex items-center gap-1">
-                    @if (!supplier.deletedAt) {
-                      <p-button
-                        icon="pi pi-pencil"
-                        styleClass="p-button-text !text-amber-600 hover:!bg-amber-50 !w-9 !h-9 !rounded-lg !p-0"
-                        (onClick)="editSupplier(supplier.id)"
-                      />
-                      <p-button
-                        icon="pi pi-trash"
-                        styleClass="p-button-text !text-rose-600 hover:!bg-rose-50 !w-9 !h-9 !rounded-lg !p-0"
-                        (onClick)="deleteSupplier(supplier)"
-                      />
-                    } @else {
-                      <p-button
-                        label="Restaurar"
-                        icon="pi pi-refresh"
-                        styleClass="p-button-text !text-emerald-500 hover:!bg-emerald-50 text-[10px] font-semibold !py-1 !px-2.5 rounded-lg border border-emerald-100 bg-white shadow-sm"
-                        (onClick)="restoreSupplier(supplier)"
-                      />
-                    }
-                  </div>
-                </div>
+    <!-- VISTA MÓVIL (Tarjetas Responsivas) -->
+    <div class="lg:hidden flex flex-col gap-3">
+      @for (supplier of suppliers(); track supplier.id) {
+        <div class="rounded-2xl border p-4 shadow-sm transition-all"
+             [ngClass]="[
+               themeService.isDarkMode() ? 'bg-[#161B22] border-[#30363D]' : 'bg-white border-slate-200',
+               supplier.deletedAt ? 'opacity-60 grayscale-[0.4]' : ''
+             ]">
+          <!-- Card Header -->
+          <div class="flex items-start justify-between gap-3 pb-3 border-b"
+               [ngClass]="themeService.isDarkMode() ? 'border-[#30363D]' : 'border-slate-100'">
+            <div class="flex items-center gap-3">
+              <div class="w-10 h-10 rounded-xl flex items-center justify-center shrink-0 border"
+                   [ngClass]="themeService.isDarkMode() ? 'bg-[#0D1117] border-[#30363D] text-[#58A6FF]' : 'bg-[#48021C]/5 border-[#48021C]/15 text-[#48021C]'">
+                <i class="pi pi-truck text-base"></i>
               </div>
-            </td>
-          </tr>
-        </ng-template>
-
-        <ng-template #emptymessage>
-          <tr>
-            <td class="block !p-0 border-none bg-transparent">
-              <div class="bg-white rounded-lg border border-slate-300 mx-4 my-8 p-10 flex flex-col items-center gap-4 text-center">
-                <i class="pi pi-truck text-[#95abce]" style="font-size: 4rem"></i>
-                <div class="flex flex-col gap-1">
-                  <p class="text-[#627ca7] font-semibold">No se encontraron proveedores.</p>
-                  <p class="text-[#627ca7] text-xs">Prueba ajustando los filtros de búsqueda.</p>
-                </div>
+              <div class="flex flex-col min-w-0">
+                <span class="text-[10px] uppercase font-bold tracking-wider"
+                      [ngClass]="themeService.isDarkMode() ? 'text-[#8B949E]' : 'text-slate-400'">
+                  NIT: {{ supplier.nit || 'C/F' }}
+                </span>
+                <h3 class="font-bold text-sm truncate"
+                    [ngClass]="themeService.isDarkMode() ? 'text-[#F0F6FC]' : 'text-slate-900'">
+                  {{ supplier.name }}
+                </h3>
               </div>
-            </td>
-          </tr>
-        </ng-template>
-      </p-table>
+            </div>
+            <app-status-badge
+              [value]="supplier.deletedAt ? 'Inactivo' : 'Activo'"
+              [severity]="supplier.deletedAt ? 'danger' : 'success'"
+              size="xs"
+            />
+          </div>
+
+          <!-- Card Body Details -->
+          <div class="py-3 flex flex-col gap-2 text-xs">
+            <div class="flex items-center justify-between">
+              <span [ngClass]="themeService.isDarkMode() ? 'text-[#8B949E]' : 'text-slate-500'">Contacto:</span>
+              <span class="font-semibold" [ngClass]="themeService.isDarkMode() ? 'text-[#F0F6FC]' : 'text-slate-800'">
+                {{ supplier.contactName || 'No asignado' }}
+              </span>
+            </div>
+            <div class="flex items-center justify-between">
+              <span [ngClass]="themeService.isDarkMode() ? 'text-[#8B949E]' : 'text-slate-500'">Teléfono:</span>
+              <span class="font-semibold" [ngClass]="themeService.isDarkMode() ? 'text-[#58A6FF]' : 'text-[#48021C]'">
+                {{ supplier.phone || 'Sin registrar' }}
+              </span>
+            </div>
+            @if (supplier.email) {
+              <div class="flex items-center justify-between">
+                <span [ngClass]="themeService.isDarkMode() ? 'text-[#8B949E]' : 'text-slate-500'">Email:</span>
+                <span class="truncate max-w-[200px]" [ngClass]="themeService.isDarkMode() ? 'text-[#8B949E]' : 'text-slate-600'">
+                  {{ supplier.email }}
+                </span>
+              </div>
+            }
+            @if (supplier.address) {
+              <div class="flex items-start gap-2 pt-1 border-t text-[11px]"
+                   [ngClass]="themeService.isDarkMode() ? 'border-[#30363D] text-[#8B949E]' : 'border-slate-100 text-slate-600'">
+                <i class="pi pi-map-marker mt-0.5 text-xs"></i>
+                <span class="line-clamp-2">{{ supplier.address }}</span>
+              </div>
+            }
+          </div>
+
+          <!-- Card Footer Actions -->
+          <div class="flex items-center justify-end gap-2 pt-2 border-t"
+               [ngClass]="themeService.isDarkMode() ? 'border-[#30363D]' : 'border-slate-100'">
+            @if (!supplier.deletedAt) {
+              <button
+                pButton
+                label="Editar"
+                icon="pi pi-pencil"
+                class="p-button-text !text-xs !py-1.5 !px-3 !text-amber-500 hover:!bg-amber-500/10 !rounded-lg"
+                (click)="editSupplier(supplier.id)"
+              ></button>
+              <button
+                pButton
+                label="Eliminar"
+                icon="pi pi-trash"
+                class="p-button-text !text-xs !py-1.5 !px-3 !text-rose-500 hover:!bg-rose-500/10 !rounded-lg"
+                (click)="deleteSupplier(supplier)"
+              ></button>
+            } @else {
+              <button
+                pButton
+                label="Restaurar"
+                icon="pi pi-refresh"
+                class="p-button-text !text-xs !py-1.5 !px-3 !text-emerald-500 hover:!bg-emerald-500/10 !rounded-lg"
+                (click)="restoreSupplier(supplier)"
+              ></button>
+            }
+          </div>
+        </div>
+      } @empty {
+        <div class="rounded-2xl border p-12 text-center flex flex-col items-center justify-center gap-3"
+             [ngClass]="themeService.isDarkMode() ? 'bg-[#161B22] border-[#30363D]' : 'bg-white border-slate-200'">
+          <div class="w-16 h-16 rounded-2xl flex items-center justify-center border"
+               [ngClass]="themeService.isDarkMode() ? 'bg-[#0D1117] border-[#30363D] text-[#58A6FF]' : 'bg-[#48021C]/5 border-[#48021C]/15 text-[#48021C]'">
+            <i class="pi pi-truck text-2xl"></i>
+          </div>
+          <h4 class="font-bold text-base"
+              [ngClass]="themeService.isDarkMode() ? 'text-[#F0F6FC]' : 'text-slate-800'">
+            No se encontraron proveedores
+          </h4>
+          <p class="text-xs max-w-xs"
+             [ngClass]="themeService.isDarkMode() ? 'text-[#8B949E]' : 'text-slate-500'">
+            Prueba ajustando los filtros de búsqueda o agrega un nuevo proveedor.
+          </p>
+        </div>
+      }
     </div>
   </div>
 </div>

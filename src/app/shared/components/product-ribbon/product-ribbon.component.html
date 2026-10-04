@@ -1,26 +1,38 @@
-<div class="bg-white rounded-2xl border-2 border-[#48021C]/25 overflow-hidden shadow-xs flex flex-col">
+<div 
+  class="rounded-2xl border-2 overflow-hidden shadow-xs flex flex-col transition-colors"
+  [ngClass]="themeService.isDarkMode() ? 'bg-[#161B22] border-[#30363D]' : 'bg-white border-[#48021C]/25'"
+>
   <!-- Cabecera de la cinta -->
-  <div class="py-2.5 px-4 md:px-6 border-b border-[#48021C]/15 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 bg-rose-50/60 rounded-t-2xl flex-shrink-0">
+  <div 
+    class="py-2.5 px-4 md:px-6 border-b flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 rounded-t-2xl flex-shrink-0 transition-colors"
+    [ngClass]="themeService.isDarkMode() ? 'bg-[#161B22] border-[#30363D]' : 'bg-rose-50/60 border-[#48021C]/15'"
+  >
     <div class="flex items-center gap-2.5">
-      <div class="w-8 h-8 rounded-lg bg-[#48021C]/10 text-[#48021C] flex items-center justify-center border border-[#48021C]/20 shrink-0">
+      <div 
+        class="w-8 h-8 rounded-lg flex items-center justify-center border shrink-0 transition-colors"
+        [ngClass]="themeService.isDarkMode() ? 'bg-[#1C2D42] text-[#58A6FF] border-[#58A6FF]/30' : 'bg-[#48021C]/10 text-[#48021C] border-[#48021C]/20'"
+      >
         <i class="pi pi-box text-sm"></i>
       </div>
       <div class="flex flex-col">
-        <span class="text-sm font-semibold text-[#48021C] leading-none">{{ title }}</span>
-        <span class="text-xs text-[#9f6587] font-medium mt-1">{{ subtitle }}</span>
+        <span class="text-sm font-semibold leading-none transition-colors" [ngClass]="themeService.isDarkMode() ? 'text-[#F0F6FC]' : 'text-[#48021C]'">{{ title }}</span>
+        <span class="text-xs font-medium mt-1 transition-colors" [ngClass]="themeService.isDarkMode() ? 'text-[#8B949E]' : 'text-[#9f6587]'">{{ subtitle }}</span>
       </div>
     </div>
 
     <!-- Buscador integrado -->
     <div class="w-full sm:w-72">
       <p-iconfield>
-        <p-inputicon class="pi pi-search text-slate-400" />
+        <p-inputicon class="pi pi-search text-xs" [ngClass]="themeService.isDarkMode() ? 'text-slate-500' : 'text-slate-400'" />
         <input 
           type="text" 
           pInputText 
           [(ngModel)]="searchQuery" 
           placeholder="Buscar por nombre o SKU..." 
-          class="w-full h-8! py-1! px-8! text-xs font-medium !bg-white !border-[#48021C]/25 hover:!border-[#48021C]/60 focus:!border-[#48021C] focus:!ring-2 focus:!ring-[#48021C]/10 !rounded-xl"
+          class="w-full h-8! py-1! px-8! text-xs font-medium !rounded-xl transition-all"
+          [ngClass]="themeService.isDarkMode() 
+            ? '!bg-[#0D1117] !border-[#30363D] !text-[#F0F6FC] placeholder:!text-slate-500 hover:!border-slate-500 focus:!border-[#58A6FF] focus:!ring-2 focus:!ring-[#58A6FF]/20' 
+            : '!bg-white !border-[#48021C]/25 !text-slate-800 hover:!border-[#48021C]/60 focus:!border-[#48021C] focus:!ring-2 focus:!ring-[#48021C]/10'"
         />
       </p-iconfield>
     </div>
@@ -29,16 +41,16 @@
   <!-- Cuerpo del Carrusel -->
   <div class="py-3 px-2 md:px-4">
     @if (loading) {
-      <div class="flex items-center justify-center py-6 gap-2 text-slate-500 text-xs">
-        <i class="pi pi-spin pi-spinner text-lg text-[#48021C]"></i>
+      <div class="flex items-center justify-center py-6 gap-2 text-xs" [ngClass]="themeService.isDarkMode() ? 'text-[#8B949E]' : 'text-slate-500'">
+        <i class="pi pi-spin pi-spinner text-lg" [ngClass]="themeService.isDarkMode() ? 'text-[#58A6FF]' : 'text-[#48021C]'"></i>
         <span class="font-medium">Cargando catálogo de productos...</span>
       </div>
     } @else if (!products || products.length === 0) {
-      <div class="text-center py-6 text-slate-500 text-xs italic font-medium">
+      <div class="text-center py-6 text-xs italic font-medium" [ngClass]="themeService.isDarkMode() ? 'text-[#8B949E]' : 'text-slate-500'">
         {{ emptyMessage }}
       </div>
     } @else if (filteredProducts.length === 0) {
-      <div class="text-center py-6 text-slate-500 text-xs italic font-medium">
+      <div class="text-center py-6 text-xs italic font-medium" [ngClass]="themeService.isDarkMode() ? 'text-[#8B949E]' : 'text-slate-500'">
         No se encontraron productos que coincidan con "{{ searchQuery }}".
       </div>
     } @else {
@@ -49,7 +61,10 @@
           (click)="scrollCatalog('left')"
           pTooltip="Anterior"
           tooltipPosition="top"
-          class="w-8 flex-shrink-0 flex items-center justify-center bg-white hover:bg-rose-50 text-[#6e3757] hover:text-[#48021C] transition-all cursor-pointer rounded-xl border border-[#48021C]/20 shadow-2xs hover:scale-105 active:scale-95"
+          class="w-8 flex-shrink-0 flex items-center justify-center transition-all cursor-pointer rounded-xl border shadow-2xs hover:scale-105 active:scale-95"
+          [ngClass]="themeService.isDarkMode() 
+            ? 'bg-[#1C2128] hover:bg-[#30363D] text-[#F0F6FC] border-[#30363D]' 
+            : 'bg-white hover:bg-rose-50 text-[#6e3757] hover:text-[#48021C] border-[#48021C]/20'"
         >
           <i class="pi pi-chevron-left text-sm font-bold"></i>
         </button>
@@ -72,18 +87,27 @@
               class="flex items-center justify-between gap-2 cursor-pointer hover:opacity-85 transition-all"
             >
               <div class="flex items-center gap-2.5 min-w-0 flex-1">
-                <div class="w-9 h-9 rounded-lg border border-slate-200 flex items-center justify-center overflow-hidden flex-shrink-0 bg-white">
+                <div 
+                  class="w-9 h-9 rounded-lg border flex items-center justify-center overflow-hidden flex-shrink-0 transition-colors"
+                  [ngClass]="themeService.isDarkMode() ? 'bg-[#0D1117] border-[#30363D]' : 'bg-white border-slate-200'"
+                >
                   <img *ngIf="p.imageUrl" [src]="getProductImageUrl(p.imageUrl)" class="w-full h-full object-cover" />
-                  <i *ngIf="!p.imageUrl" class="pi pi-image text-slate-300 text-sm"></i>
+                  <i *ngIf="!p.imageUrl" class="pi pi-image text-sm" [ngClass]="themeService.isDarkMode() ? 'text-slate-600' : 'text-slate-300'"></i>
                 </div>
                 <div class="flex flex-col min-w-0">
                   <div class="flex items-center gap-1.5">
-                    <span class="font-bold text-slate-800 truncate leading-tight text-xs group-hover:text-[#48021C] transition-colors">
+                    <span 
+                      class="font-bold truncate leading-tight text-xs transition-colors"
+                      [ngClass]="themeService.isDarkMode() ? 'text-[#F0F6FC] group-hover:text-[#58A6FF]' : 'text-slate-800 group-hover:text-[#48021C]'"
+                    >
                       {{ p.name }}
                     </span>
                   </div>
                   <div class="flex items-center gap-1.5 mt-0.5">
-                    <span class="text-[11px] font-semibold text-[#6b3353] truncate">
+                    <span 
+                      class="text-[11px] font-semibold truncate transition-colors"
+                      [ngClass]="themeService.isDarkMode() ? 'text-[#58A6FF]' : 'text-[#6b3353]'"
+                    >
                       {{ p.sku || '---' }}
                     </span>
                   </div>
@@ -91,15 +115,21 @@
               </div>
               
               <div class="flex flex-col items-end flex-shrink-0">
-                <span *ngIf="showPrice" class="font-bold text-emerald-600 whitespace-nowrap text-xs">{{ p.price | currency:'Q ' }}</span>
+                <span *ngIf="showPrice" class="font-bold whitespace-nowrap text-xs" [ngClass]="themeService.isDarkMode() ? 'text-emerald-400' : 'text-emerald-600'">{{ p.price | currency:'Q ' }}</span>
                 @if (showStock) {
                   @if (p.isAvailable && (!p.stock || p.stock === 0)) {
-                    <span class="inline-flex items-center gap-1 text-[11px] font-bold text-purple-700 whitespace-nowrap mt-0.5">
+                    <span 
+                      class="inline-flex items-center gap-1 text-[11px] font-bold whitespace-nowrap mt-0.5"
+                      [ngClass]="themeService.isDarkMode() ? 'text-purple-400' : 'text-purple-700'"
+                    >
                       <i class="pi pi-infinity text-[11px]"></i> Ilimitado
                     </span>
                   } @else {
-                    <span class="text-[11px] font-bold text-slate-700 whitespace-nowrap mt-0.5">
-                      Stock: <strong class="text-emerald-700 font-bold">{{ p.stock ?? 0 }}</strong> {{ p.unit?.abbreviation || 'un' }}
+                    <span 
+                      class="text-[11px] font-bold whitespace-nowrap mt-0.5"
+                      [ngClass]="themeService.isDarkMode() ? 'text-[#8B949E]' : 'text-slate-700'"
+                    >
+                      Stock: <strong [ngClass]="themeService.isDarkMode() ? 'text-emerald-400' : 'text-emerald-700'" class="font-bold">{{ p.stock ?? 0 }}</strong> {{ p.unit.abbreviation || 'un' }}
                     </span>
                   }
                 }
@@ -107,8 +137,11 @@
             </div>
 
             @if (showQuickQuantity) {
-            <div class="flex items-center justify-between pt-1.5 border-t border-[#48021C]/10 gap-2">
-              <label class="text-[10px] font-semibold text-slate-500 flex items-center gap-1">
+            <div 
+              class="flex items-center justify-between pt-1.5 border-t gap-2 transition-colors"
+              [ngClass]="themeService.isDarkMode() ? 'border-[#30363D]' : 'border-[#48021C]/10'"
+            >
+              <label class="text-[10px] font-semibold flex items-center gap-1" [ngClass]="themeService.isDarkMode() ? 'text-[#8B949E]' : 'text-slate-500'">
                 <i class="pi pi-bolt text-amber-500 text-[10px]"></i>
                 Cant. rápida:
               </label>
@@ -123,11 +156,19 @@
                     [value]="getQuickQuantity(p.id) ?? ''" 
                     (input)="onQuickQuantityChange(p.id, $event)"
                     (keyup.enter)="onProductClick(p, qtyInput)"
-                    class="w-full h-6.5! pl-1.5 pr-1 text-right font-semibold text-slate-800 bg-white border border-[#48021C]/25 rounded-l-lg focus:border-[#48021C] focus:outline-none text-[14px] leading-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                    class="w-full h-6.5! pl-1.5 pr-1 text-right font-semibold rounded-l-lg text-[14px] leading-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none transition-colors"
+                    [ngClass]="themeService.isDarkMode() 
+                      ? 'text-[#F0F6FC] bg-[#161B22] border border-[#30363D] focus:border-[#58A6FF] focus:outline-none' 
+                      : 'text-slate-800 bg-white border border-[#48021C]/25 focus:border-[#48021C] focus:outline-none'"
                     pTooltip="Atajo de cantidad rápida (Enter)"
                     tooltipPosition="top"
                   />
-                  <p-inputgroup-addon class="!text-[13px] !font-semibold !text-slate-700 !bg-rose-50/80 !px-1.5 !h-6.5 flex items-center border border-l-0 border-[#48021C]/25 rounded-r-lg select-none">
+                  <p-inputgroup-addon 
+                    class="!text-[13px] !font-semibold !px-1.5 !h-6.5 flex items-center border border-l-0 rounded-r-lg select-none transition-colors"
+                    [ngClass]="themeService.isDarkMode() 
+                      ? '!text-[#8B949E] !bg-[#1C2128] !border-[#30363D]' 
+                      : '!text-slate-700 !bg-rose-50/80 !border-[#48021C]/25'"
+                  >
                     {{ p.unit.abbreviation || 'un' }}
                   </p-inputgroup-addon>
                 </p-inputgroup>
@@ -143,7 +184,10 @@
           (click)="scrollCatalog('right')"
           pTooltip="Siguiente"
           tooltipPosition="top"
-          class="w-8 flex-shrink-0 flex items-center justify-center bg-white hover:bg-rose-50 text-[#6e3757] hover:text-[#48021C] transition-all cursor-pointer rounded-xl border border-[#48021C]/20 shadow-2xs hover:scale-105 active:scale-95"
+          class="w-8 flex-shrink-0 flex items-center justify-center transition-all cursor-pointer rounded-xl border shadow-2xs hover:scale-105 active:scale-95"
+          [ngClass]="themeService.isDarkMode() 
+            ? 'bg-[#1C2128] hover:bg-[#30363D] text-[#F0F6FC] border-[#30363D]' 
+            : 'bg-white hover:bg-rose-50 text-[#6e3757] hover:text-[#48021C] border-[#48021C]/20'"
         >
           <i class="pi pi-chevron-right text-sm font-bold"></i>
         </button>

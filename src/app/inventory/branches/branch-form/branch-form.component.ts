@@ -11,6 +11,9 @@ import { InputMaskModule } from 'primeng/inputmask';
 import { MessageService } from 'primeng/api';
 import { ConfirmService } from '../../../shared/services/confirm.service';
 import { BranchesService } from '../../services/branches.service';
+import { PageHeaderComponent } from '../../../shared/components/page-header/page-header.component';
+import { PrimaryButtonComponent } from '../../../shared/components/primary-button/primary-button.component';
+import { SecondaryButtonComponent } from '../../../shared/components/secondary-button/secondary-button.component';
 
 @Component({
   selector: 'app-branch-form',
@@ -23,7 +26,10 @@ import { BranchesService } from '../../services/branches.service';
     TextareaModule,
     CardModule,
     ToggleSwitchModule,
-    InputMaskModule
+    InputMaskModule,
+    PageHeaderComponent,
+    PrimaryButtonComponent,
+    SecondaryButtonComponent,
   ],
   templateUrl: './branch-form.component.html',
   styleUrl: './branch-form.component.css',

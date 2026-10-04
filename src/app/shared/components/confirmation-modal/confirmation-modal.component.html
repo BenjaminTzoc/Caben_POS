@@ -11,24 +11,27 @@
   appendTo="body"
   [baseZIndex]="10000"
   contentStyleClass="!p-0 !overflow-hidden flex flex-col w-full"
-  styleClass="confirm-modal-dialog !rounded-2xl !overflow-hidden shadow-2xl !bg-white !border-2 !border-[#48021C]/25"
+  [styleClass]="'confirm-modal-dialog !rounded-2xl !overflow-hidden shadow-2xl ' + (themeService.isDarkMode() ? '!bg-[#161B22] !border-2 !border-[#30363D]' : '!bg-white !border-2 !border-[#48021C]/25')"
   (onHide)="onDialogHide()"
 >
-  <div class="p-0 flex flex-col w-full overflow-hidden bg-white">
+  <div class="p-0 flex flex-col w-full overflow-hidden transition-colors" [ngClass]="themeService.isDarkMode() ? 'bg-[#161B22]' : 'bg-white'">
     <div
-      class="flex items-center gap-2.5 py-2.5 px-4 border-b rounded-t-2xl flex-shrink-0"
-      [ngClass]="chromeClasses"
+      class="flex items-center gap-2.5 py-2.5 px-4 border-b rounded-t-2xl flex-shrink-0 transition-colors"
+      [ngClass]="themeService.isDarkMode() ? 'bg-[#161B22] border-[#30363D]' : chromeClasses"
     >
       <button
         type="button"
         (click)="handleClose()"
         class="w-8 h-8 rounded-lg border flex items-center justify-center shadow-xs transition-all active:scale-95 cursor-pointer shrink-0"
-        [ngClass]="closeButtonClasses"
+        [ngClass]="themeService.isDarkMode() ? 'bg-[#1C2128] text-slate-300 border-[#30363D] hover:bg-[#30363D]' : closeButtonClasses"
         title="Cerrar"
       >
         <i class="pi pi-times text-xs font-semibold"></i>
       </button>
-      <h2 class="text-base md:text-lg font-semibold text-slate-900 tracking-tight leading-none m-0 truncate">
+      <h2 
+        class="text-base md:text-lg font-semibold tracking-tight leading-none m-0 truncate transition-colors"
+        [ngClass]="themeService.isDarkMode() ? 'text-[#F0F6FC]' : 'text-slate-900'"
+      >
         {{ header }}
       </h2>
     </div>
@@ -42,13 +45,19 @@
       </div>
 
       @if (title) {
-        <h3 class="text-base md:text-lg font-bold text-slate-800 mb-2 tracking-tight leading-snug">
+        <h3 
+          class="text-base md:text-lg font-bold mb-2 tracking-tight leading-snug transition-colors"
+          [ngClass]="themeService.isDarkMode() ? 'text-[#F0F6FC]' : 'text-slate-800'"
+        >
           {{ title }}
         </h3>
       }
 
       @if (message) {
-        <p class="text-xs md:text-sm text-slate-600 font-medium mb-2 leading-relaxed max-w-md">
+        <p 
+          class="text-xs md:text-sm font-medium mb-2 leading-relaxed max-w-md transition-colors"
+          [ngClass]="themeService.isDarkMode() ? 'text-[#8B949E]' : 'text-slate-600'"
+        >
           {{ message }}
         </p>
       }
@@ -63,15 +72,16 @@
     </div>
 
     <div
-      class="flex items-center justify-end gap-2.5 py-3 px-4 md:px-5 border-t flex-shrink-0"
-      [ngClass]="chromeClasses"
+      class="flex items-center justify-end gap-2.5 py-3 px-4 md:px-5 border-t flex-shrink-0 transition-colors"
+      [ngClass]="themeService.isDarkMode() ? 'bg-[#161B22] border-[#30363D]' : chromeClasses"
     >
       <button
         pButton
         type="button"
         [label]="cancelLabel"
         (click)="handleClose()"
-        class="p-button-text p-button-secondary font-semibold text-xs whitespace-nowrap !px-4 !h-[38px] hover:!bg-white/80 !rounded-lg cursor-pointer"
+        class="p-button-text font-semibold text-xs whitespace-nowrap !px-4 !h-[38px] !rounded-lg cursor-pointer"
+        [ngClass]="themeService.isDarkMode() ? '!text-[#8B949E] hover:!bg-[#1C2128]' : 'p-button-secondary hover:!bg-white/80'"
       ></button>
       <button
         pButton

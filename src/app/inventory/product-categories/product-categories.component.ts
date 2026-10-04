@@ -1,49 +1,69 @@
 import { CommonModule, DatePipe } from '@angular/common';
-import { Component, inject, OnInit, signal } from '@angular/core';
-import { ReactiveFormsModule } from '@angular/forms';
+import { Component, computed, inject, OnInit, signal } from '@angular/core';
+import { ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { ButtonModule } from 'primeng/button';
 import { Category } from '../interfaces/product.interface';
 import { TableModule } from 'primeng/table';
-import { IconFieldModule } from 'primeng/iconfield';
-import { InputIconModule } from 'primeng/inputicon';
-import { InputTextModule } from 'primeng/inputtext';
-import { FormsModule } from '@angular/forms';
 import { ToggleSwitchModule } from 'primeng/toggleswitch';
 import { TagModule } from 'primeng/tag';
 import { ProductsService } from '../services/products.service';
 import { MessageService } from 'primeng/api';
 import { ConfirmService } from '../../shared/services/confirm.service';
 import { AuthService } from '../../auth/auth.service';
+import { ThemeService } from '../../core/services/theme.service';
+import { PageHeaderComponent } from '../../shared/components/page-header/page-header.component';
+import { PrimaryButtonComponent } from '../../shared/components/primary-button/primary-button.component';
+import { RefreshButtonComponent } from '../../shared/components/refresh-button/refresh-button.component';
+import { SearchInputComponent } from '../../shared/components/search-input/search-input.component';
+import { StandardTableComponent } from '../../shared/components/standard-table/standard-table.component';
+import { StatusBadgeComponent } from '../../shared/components/status-badge/status-badge.component';
 
 @Component({
   selector: 'app-product-categories',
+  standalone: true,
   imports: [
     CommonModule,
     ReactiveFormsModule,
+    FormsModule,
     ButtonModule,
     TableModule,
-    IconFieldModule,
-    InputIconModule,
-    InputTextModule,
     DatePipe,
-    FormsModule,
     ToggleSwitchModule,
     TagModule,
+    PageHeaderComponent,
+    PrimaryButtonComponent,
+    RefreshButtonComponent,
+    SearchInputComponent,
+    StandardTableComponent,
+    StatusBadgeComponent,
   ],
   templateUrl: './product-categories.component.html',
   styleUrl: './product-categories.component.css',
 })
 export class ProductCategoriesComponent implements OnInit {
+  public themeService = inject(ThemeService);
   private router = inject(Router);
   private productsService = inject(ProductsService);
   private messageService = inject(MessageService);
   private confirmService = inject(ConfirmService);
   private authService = inject(AuthService);
 
-  categories: Category[] = [];
+  categories = signal<Category[]>([]);
   loading = signal<boolean>(false);
-  showDeleted: boolean = false;
+  showDeleted = false;
+  searchTerm = signal<string>('');
+
+  filteredCategories = computed(() => {
+    const term = this.searchTerm().toLowerCase().trim();
+    if (!term) return this.categories();
+    return this.categories().filter(c => 
+      c.name?.toLowerCase().includes(term) ||
+      c.description?.toLowerCase().includes(term) ||
+      c.defaultUnit?.name?.toLowerCase().includes(term) ||
+      c.defaultUnit?.abbreviation?.toLowerCase().includes(term)
+    );
+  });
 
   get canViewDeleted(): boolean {
     const user = this.authService.currentUser;
@@ -61,7 +81,7 @@ export class ProductCategoriesComponent implements OnInit {
     this.productsService.getCategories(this.showDeleted).subscribe({
       next: (res) => {
         if (res.statusCode === 200) {
-          this.categories = res.data;
+          this.categories.set(res.data);
         }
       },
       error: (err) => {

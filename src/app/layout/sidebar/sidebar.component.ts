@@ -24,6 +24,8 @@ import { CommonModule } from '@angular/common';
 
 import { TooltipModule } from 'primeng/tooltip';
 
+import { BranchContextService } from '../../core/services/branch-context.service';
+
 @Component({
   selector: 'app-sidebar',
   imports: [RouterLink, RouterLinkActive, ButtonModule, CommonModule, TooltipModule],
@@ -32,10 +34,22 @@ import { TooltipModule } from 'primeng/tooltip';
 })
 export class SidebarComponent implements OnInit, OnDestroy {
   private cashService = inject(CashRegisterService);
+  private branchContext = inject(BranchContextService);
   @Input() sidebarCollapsed = false;
   @Output() toggleSidebar = new EventEmitter<boolean>();
 
-  menuItems = computed(() => this.authService.mainMenuSignal());
+  menuItems = computed(() => {
+    const items = this.authService.mainMenuSignal();
+    if (!this.branchContext.isGlobalView) {
+      return items.filter(
+        (item) =>
+          item.label.toLowerCase() !== 'catálogos' &&
+          item.label.toLowerCase() !== 'catalogos' &&
+          item.route !== '/catalogs'
+      );
+    }
+    return items;
+  });
   activeSubmenu: string | null = null;
   private userSubscription!: Subscription;
   currentUser = signal<User | null>(null);

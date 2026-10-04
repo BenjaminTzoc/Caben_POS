@@ -9,6 +9,8 @@ import { trigger, style, transition, animate } from '@angular/animations';
 import { CashRegisterService } from '../../inventory/services/cash-register.service';
 import { CashSessionDialogComponent } from '../../shared/components/cash-session-dialog/cash-session-dialog.component';
 
+import { BranchContextService } from '../../core/services/branch-context.service';
+
 @Component({
   selector: 'app-modern-sidebar',
   standalone: true,
@@ -32,6 +34,7 @@ export class ModernSidebarComponent implements OnInit, OnDestroy {
   private router = inject(Router);
   public authService = inject(AuthService);
   private cashService = inject(CashRegisterService);
+  private branchContext = inject(BranchContextService);
   private routerSub?: Subscription;
 
   @Input() collapsed = false;
@@ -39,7 +42,19 @@ export class ModernSidebarComponent implements OnInit, OnDestroy {
   @Output() toggle = new EventEmitter<boolean>();
 
   showCashDialog = signal(false);
-  menuItems = computed(() => this.authService.mainMenuSignal());
+  menuItems = computed(() => {
+    const items = this.authService.mainMenuSignal();
+    if (!this.branchContext.isGlobalView) {
+      // Ocultar módulo Catálogos cuando hay una sucursal activa específica
+      return items.filter(
+        (item) =>
+          item.label.toLowerCase() !== 'catálogos' &&
+          item.label.toLowerCase() !== 'catalogos' &&
+          item.route !== '/catalogs'
+      );
+    }
+    return items;
+  });
   expandedItems: Set<string> = new Set();
   activeRoute = '';
   hoveredItem: string | null = null;

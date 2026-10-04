@@ -1,8 +1,19 @@
-<div class="py-4 px-0 md:px-6 bg-[#9f6587]/[0.06] min-h-screen">
+<div 
+  class="py-4 px-0 md:px-6 min-h-screen transition-colors duration-200"
+  [ngClass]="themeService.isDarkMode() ? 'bg-[#0D1117]' : 'bg-[#9f6587]/[0.06]'"
+>
   <!-- Top Card: Header & Actions -->
   <div class="max-w-[1700px] mx-auto px-4 md:px-0 mb-5">
-    <div class="bg-white rounded-xl border border-[#9f6587]/35 shadow-xs overflow-hidden">
-      <div class="py-3 px-4 md:px-6 flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-gradient-to-r from-[#9f6587]/15 via-[#9f6587]/8 to-[#9f6587]/15 border-b border-[#9f6587]/25">
+    <div 
+      class="rounded-xl border shadow-xs overflow-hidden transition-colors"
+      [ngClass]="themeService.isDarkMode() ? 'bg-[#161B22] border-[#30363D]' : 'bg-white border-[#9f6587]/35'"
+    >
+      <div 
+        class="py-3 px-4 md:px-6 flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b transition-colors"
+        [ngClass]="themeService.isDarkMode() 
+          ? 'bg-[#1C2128] border-[#30363D]' 
+          : 'bg-gradient-to-r from-[#9f6587]/15 via-[#9f6587]/8 to-[#9f6587]/15 border-[#9f6587]/25'"
+      >
         <div class="flex items-center gap-2.5">
           <p-button 
             icon="pi pi-arrow-left" 
@@ -12,20 +23,33 @@
             (onClick)="onCancel()" 
             pTooltip="Volver a traslados"
             tooltipPosition="bottom"
-            styleClass="!w-7 !h-7 !p-0 text-[#6e3757] hover:text-[#48021C] bg-white hover:bg-[#9f6587]/15 border border-[#9f6587]/35! !rounded-md shadow-2xs hover:scale-105 active:scale-95 transition-all cursor-pointer [&_.p-button-icon]:!text-xs"
+            [styleClass]="themeService.isDarkMode()
+              ? '!w-7 !h-7 !p-0 !text-[#58A6FF] hover:!text-white !bg-[#161B22] hover:!bg-[#30363D] border border-[#30363D]! !rounded-md shadow-2xs hover:scale-105 active:scale-95 transition-all cursor-pointer [&_.p-button-icon]:!text-xs'
+              : '!w-7 !h-7 !p-0 text-[#6e3757] hover:text-[#48021C] bg-white hover:bg-[#9f6587]/15 border border-[#9f6587]/35! !rounded-md shadow-2xs hover:scale-105 active:scale-95 transition-all cursor-pointer [&_.p-button-icon]:!text-xs'"
           />
           <div>
             <div class="flex items-center gap-2">
-              <h1 class="text-base md:text-lg font-semibold text-[#48021C] tracking-tight leading-none m-0">
+              <h1 
+                class="text-base md:text-lg font-semibold tracking-tight leading-none m-0"
+                [ngClass]="themeService.isDarkMode() ? 'text-[#F0F6FC]' : 'text-[#48021C]'"
+              >
                 {{ isEditMode ? ('Modificar Traslado ' + (transferNumber ? ('#' + transferNumber) : '')) : 'Registrar Traslado de Inventario' }}
               </h1>
               @if (isEditMode) {
-                <span class="inline-flex items-center px-2 py-0.5 text-[10px] font-bold rounded-full bg-amber-50 text-amber-700 border border-amber-300 shadow-2xs">
+                <span 
+                  class="inline-flex items-center px-2 py-0.5 text-[10px] font-bold rounded-full shadow-2xs border"
+                  [ngClass]="themeService.isDarkMode() 
+                    ? 'bg-amber-950/40 text-amber-300 border-amber-800/50' 
+                    : 'bg-amber-50 text-amber-700 border-amber-300'"
+                >
                   Pendiente
                 </span>
               }
             </div>
-            <p class="text-[11px] text-[#9f6587] font-medium mt-1">
+            <p 
+              class="text-[11px] font-medium mt-1"
+              [ngClass]="themeService.isDarkMode() ? 'text-[#8B949E]' : 'text-[#9f6587]'"
+            >
               {{ isEditMode ? 'Edición de ruta, notas y productos antes del despacho del traslado' : 'Movimiento controlado de stock entre sucursales' }}
             </p>
           </div>
@@ -38,7 +62,9 @@
             variant="outlined" 
             severity="secondary" 
             size="small"
-            styleClass="!rounded-lg text-xs md:text-sm font-semibold !px-4 !py-2 cursor-pointer border-[#9f6587]/35 text-slate-700 hover:bg-white"
+            [styleClass]="themeService.isDarkMode()
+              ? '!rounded-lg text-xs md:text-sm font-semibold !px-4 !py-2 cursor-pointer border-[#30363D] text-slate-300 hover:bg-[#1C2128]'
+              : '!rounded-lg text-xs md:text-sm font-semibold !px-4 !py-2 cursor-pointer border-[#9f6587]/35 text-slate-700 hover:bg-white'"
           />
           <p-button
             (onClick)="onSave()"
@@ -47,7 +73,9 @@
             [loading]="loading"
             icon="pi pi-check"
             size="small"
-            styleClass="!rounded-lg text-xs md:text-sm! font-semibold !bg-[#48021C] !text-white !border-[#48021C] hover:!bg-[#350114] inline-flex items-center gap-1.5 shadow-sm transition-all cursor-pointer !px-4 !py-2"
+            [styleClass]="themeService.isDarkMode()
+              ? '!rounded-lg text-xs md:text-sm! font-semibold !bg-[#58A6FF] !text-[#0D1117] hover:!bg-[#79b8ff] !border-none inline-flex items-center gap-1.5 shadow-sm transition-all cursor-pointer !px-4 !py-2 font-bold disabled:!opacity-40 disabled:!cursor-not-allowed'
+              : '!rounded-lg text-xs md:text-sm! font-semibold !bg-[#48021C] !text-white !border-[#48021C] hover:!bg-[#350114] inline-flex items-center gap-1.5 shadow-sm transition-all cursor-pointer !px-4 !py-2 disabled:!opacity-40 disabled:!cursor-not-allowed'"
           />
         </div>
       </div>
@@ -59,9 +87,18 @@
       
       <!-- Columna Izquierda: Configuración de Origen/Destino y Notas -->
       <div class="col-span-12 lg:col-span-4 flex flex-col gap-4">
-        <div class="bg-white rounded-xl border border-[#9f6587]/35 shadow-xs overflow-hidden flex flex-col">
-          <div class="py-2.5 px-4 bg-[#9f6587]/10 border-b border-[#9f6587]/20 flex items-center justify-between">
-            <span class="text-xs font-bold text-[#48021C]">
+        <div 
+          class="rounded-xl border shadow-xs overflow-hidden flex flex-col transition-colors"
+          [ngClass]="themeService.isDarkMode() ? 'bg-[#161B22] border-[#30363D]' : 'bg-white border-[#9f6587]/35'"
+        >
+          <div 
+            class="py-2.5 px-4 border-b flex items-center justify-between transition-colors"
+            [ngClass]="themeService.isDarkMode() ? 'bg-[#1C2128] border-[#30363D]' : 'bg-[#9f6587]/10 border-[#9f6587]/20'"
+          >
+            <span 
+              class="text-xs font-bold"
+              [ngClass]="themeService.isDarkMode() ? 'text-[#F0F6FC]' : 'text-[#48021C]'"
+            >
               Ruta del Traslado
             </span>
           </div>
@@ -69,28 +106,70 @@
           <div class="p-4 flex flex-col gap-3.5">
             <!-- Sucursal Origen -->
             <div class="flex flex-col gap-1">
-              <label class="text-xs font-semibold text-[#48021C]">
+              <label 
+                class="text-xs font-semibold"
+                [ngClass]="themeService.isDarkMode() ? 'text-[#F0F6FC]' : 'text-[#48021C]'"
+              >
                 Sucursal de Origen <span class="text-rose-500">*</span>
               </label>
-              <p-select
-                [options]="branches"
-                formControlName="originBranchId"
-                optionLabel="name"
-                optionValue="id"
-                placeholder="Seleccionar origen..."
-                (onChange)="onOriginChange()"
-                appendTo="body"
-                size="small"
-                class="w-full"
-                styleClass="w-full !rounded-lg !border-[#9f6587]/35 focus-within:!border-[#9f6587] focus-within:!ring-2 focus-within:!ring-[#9f6587]/20 text-xs font-medium"
-                fluid
-              ></p-select>
-              <span class="text-[10px] text-slate-500">Sucursal desde donde saldrá la mercadería</span>
+              @if (!isEditMode && hasActiveWorkingBranch) {
+                <div 
+                  class="flex items-center gap-2.5 px-3 py-2 border rounded-xl shadow-2xs transition-all w-full" 
+                  [ngClass]="themeService.isDarkMode() 
+                    ? 'bg-[#0D1117] border-[#30363D] text-[#F0F6FC]' 
+                    : 'bg-rose-50/40 border-[#48021C]/25 text-slate-800'"
+                >
+                  <span 
+                    class="w-6 h-6 rounded-lg flex items-center justify-center shrink-0 border"
+                    [ngClass]="activeWorkingBranch()?.isPlant
+                      ? (themeService.isDarkMode() ? 'bg-emerald-950/50 text-emerald-400 border-emerald-800/60' : 'bg-emerald-50 text-emerald-700 border-emerald-200')
+                      : (themeService.isDarkMode() ? 'bg-[#1C2D42] text-[#58A6FF] border-[#58A6FF]/30' : 'bg-sky-50 text-sky-700 border-sky-200')"
+                  >
+                    <i [class]="activeWorkingBranch()?.isPlant ? 'pi pi-server' : 'pi pi-shop'" class="text-xs"></i>
+                  </span>
+                  <div class="flex flex-col min-w-0 pr-1">
+                    <span 
+                      class="text-xs md:text-sm font-semibold truncate"
+                      [ngClass]="themeService.isDarkMode() ? 'text-[#F0F6FC]' : 'text-slate-800'"
+                    >
+                      {{ activeWorkingBranch()?.name }}
+                    </span>
+                    <span 
+                      class="text-[10px] md:text-[11px] font-medium"
+                      [ngClass]="themeService.isDarkMode() ? 'text-slate-400' : 'text-slate-500'"
+                    >
+                      Sucursal activa
+                    </span>
+                  </div>
+                </div>
+              } @else {
+                <p-select
+                  [options]="branches"
+                  formControlName="originBranchId"
+                  optionLabel="name"
+                  optionValue="id"
+                  placeholder="Seleccionar origen..."
+                  (onChange)="onOriginChange()"
+                  appendTo="body"
+                  size="small"
+                  class="w-full"
+                  [disabled]="isEditMode"
+                  [styleClass]="themeService.isDarkMode()
+                    ? 'w-full !rounded-lg !bg-[#0D1117] !text-[#F0F6FC] !border-[#30363D] focus-within:!border-[#58A6FF] focus-within:!ring-2 focus-within:!ring-[#58A6FF]/20 text-xs font-medium'
+                    : 'w-full !rounded-lg !border-[#9f6587]/35 focus-within:!border-[#9f6587] focus-within:!ring-2 focus-within:!ring-[#9f6587]/20 text-xs font-medium'"
+                  [panelStyleClass]="themeService.isDarkMode() ? '!bg-[#161B22] !border-[#30363D] !text-[#F0F6FC] shadow-2xl' : '!bg-white !border-slate-200 shadow-xl'"
+                  fluid
+                ></p-select>
+              }
+              <span class="text-[10px]" [ngClass]="themeService.isDarkMode() ? 'text-[#8B949E]' : 'text-slate-500'">Sucursal desde donde saldrá la mercadería</span>
             </div>
 
             <!-- Sucursal Destino -->
             <div class="flex flex-col gap-1">
-              <label class="text-xs font-semibold text-[#48021C]">
+              <label 
+                class="text-xs font-semibold"
+                [ngClass]="themeService.isDarkMode() ? 'text-[#F0F6FC]' : 'text-[#48021C]'"
+              >
                 Sucursal de Destino <span class="text-rose-500">*</span>
               </label>
               <p-select
@@ -102,30 +181,39 @@
                 appendTo="body"
                 size="small"
                 class="w-full"
-                styleClass="w-full !rounded-lg !border-[#9f6587]/35 focus-within:!border-[#9f6587] focus-within:!ring-2 focus-within:!ring-[#9f6587]/20 text-xs font-medium"
+                [styleClass]="themeService.isDarkMode()
+                  ? 'w-full !rounded-lg !bg-[#0D1117] !text-[#F0F6FC] !border-[#30363D] focus-within:!border-[#58A6FF] focus-within:!ring-2 focus-within:!ring-[#58A6FF]/20 text-xs font-medium'
+                  : 'w-full !rounded-lg !border-[#9f6587]/35 focus-within:!border-[#9f6587] focus-within:!ring-2 focus-within:!ring-[#9f6587]/20 text-xs font-medium'"
+                [panelStyleClass]="themeService.isDarkMode() ? '!bg-[#161B22] !border-[#30363D] !text-[#F0F6FC] shadow-2xl' : '!bg-white !border-slate-200 shadow-xl'"
                 fluid
               ></p-select>
-              <span class="text-[10px] text-slate-500">Sucursal que recibirá los productos</span>
+              <span class="text-[10px]" [ngClass]="themeService.isDarkMode() ? 'text-[#8B949E]' : 'text-slate-500'">Sucursal que recibirá los productos</span>
             </div>
 
             <!-- Resumen Visual de Ruta -->
             @if (selectedOriginBranch && selectedDestinationBranch) {
-              <div class="bg-[#7c5aac]/10 rounded-lg p-2.5 border border-[#7c5aac]/25 flex flex-col gap-1.5 text-xs mt-1">
+              <div 
+                class="rounded-lg p-2.5 border flex flex-col gap-1.5 text-xs mt-1 transition-colors"
+                [ngClass]="themeService.isDarkMode() ? 'bg-[#0D1117] border-[#30363D]' : 'bg-[#7c5aac]/10 border-[#7c5aac]/25'"
+              >
                 <div class="flex items-center justify-between">
-                  <span class="text-slate-700 font-semibold">Origen:</span>
-                  <span class="text-slate-950 font-bold truncate max-w-[170px]">{{ selectedOriginBranch.name }}</span>
+                  <span [ngClass]="themeService.isDarkMode() ? 'text-[#8B949E]' : 'text-slate-700'" class="font-semibold">Origen:</span>
+                  <span [ngClass]="themeService.isDarkMode() ? 'text-[#F0F6FC]' : 'text-slate-950'" class="font-bold truncate max-w-[170px]">{{ selectedOriginBranch.name }}</span>
                 </div>
-                <div class="h-px bg-[#7c5aac]/20 my-0.5"></div>
+                <div class="h-px my-0.5" [ngClass]="themeService.isDarkMode() ? 'bg-[#30363D]' : 'bg-[#7c5aac]/20'"></div>
                 <div class="flex items-center justify-between">
-                  <span class="text-slate-700 font-semibold">Destino:</span>
-                  <span class="text-slate-950 font-bold truncate max-w-[170px]">{{ selectedDestinationBranch.name }}</span>
+                  <span [ngClass]="themeService.isDarkMode() ? 'text-[#8B949E]' : 'text-slate-700'" class="font-semibold">Destino:</span>
+                  <span [ngClass]="themeService.isDarkMode() ? 'text-[#F0F6FC]' : 'text-slate-950'" class="font-bold truncate max-w-[170px]">{{ selectedDestinationBranch.name }}</span>
                 </div>
               </div>
             }
 
             <!-- Notas / Observaciones -->
             <div class="flex flex-col gap-1 pt-1">
-              <label class="text-xs font-semibold text-[#48021C]">
+              <label 
+                class="text-xs font-semibold"
+                [ngClass]="themeService.isDarkMode() ? 'text-[#F0F6FC]' : 'text-[#48021C]'"
+              >
                 Notas / Motivo del Traslado
               </label>
               <textarea
@@ -133,7 +221,10 @@
                 formControlName="notes"
                 rows="3"
                 placeholder="Observaciones adicionales, justificación o detalles..."
-                class="w-full !rounded-lg !p-2.5 !border-[#9f6587]/35 focus:!border-[#9f6587] focus:!ring-2 focus:!ring-[#9f6587]/20 text-xs resize-none"
+                class="w-full !rounded-lg !p-2.5 text-xs resize-none transition-all"
+                [ngClass]="themeService.isDarkMode()
+                  ? '!bg-[#0D1117] !text-[#F0F6FC] !border-[#30363D] focus:!border-[#58A6FF] focus:!ring-2 focus:!ring-[#58A6FF]/20'
+                  : '!border-[#9f6587]/35 focus:!border-[#9f6587] focus:!ring-2 focus:!ring-[#9f6587]/20'"
               ></textarea>
             </div>
           </div>
@@ -145,24 +236,45 @@
         
         <!-- CINTA DE CATÁLOGO RÁPIDO DE LA SUCURSAL DE ORIGEN -->
         @if (transferForm.get('originBranchId')?.value) {
-          <div class="bg-white rounded-xl border border-[#9f6587]/35 overflow-hidden shadow-xs flex flex-col">
-            <div class="py-2.5 px-4 border-b border-[#9f6587]/25 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2.5 bg-gradient-to-r from-[#9f6587]/15 via-[#9f6587]/8 to-[#9f6587]/15">
+          <div 
+            class="rounded-xl border overflow-hidden shadow-xs flex flex-col transition-colors"
+            [ngClass]="themeService.isDarkMode() ? 'bg-[#161B22] border-[#30363D]' : 'bg-white border-[#9f6587]/35'"
+          >
+            <div 
+              class="py-2.5 px-4 border-b flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2.5 transition-colors"
+              [ngClass]="themeService.isDarkMode() 
+                ? 'bg-[#1C2128] border-[#30363D]' 
+                : 'bg-gradient-to-r from-[#9f6587]/15 via-[#9f6587]/8 to-[#9f6587]/15 border-[#9f6587]/25'"
+            >
               <div class="flex flex-col">
-                <span class="text-xs sm:text-sm font-bold text-[#48021C] leading-none">Catálogo Disponible en Origen</span>
-                <span class="text-[11px] font-medium text-[#9f6587] mt-0.5">Haz clic en un producto para agregarlo o removerlo</span>
+                <span 
+                  class="text-xs sm:text-sm font-bold leading-none"
+                  [ngClass]="themeService.isDarkMode() ? 'text-[#F0F6FC]' : 'text-[#48021C]'"
+                >
+                  Catálogo Disponible en Origen
+                </span>
+                <span 
+                  class="text-[11px] font-medium mt-0.5"
+                  [ngClass]="themeService.isDarkMode() ? 'text-[#8B949E]' : 'text-[#9f6587]'"
+                >
+                  Haz clic en un producto para agregarlo o removerlo
+                </span>
               </div>
 
               <!-- Buscador integrado en la cabecera -->
               <div class="w-full sm:w-56">
                 <p-iconfield>
-                  <p-inputicon class="pi pi-search text-[#9f6587] !text-xs" />
+                  <p-inputicon class="pi pi-search !text-xs" [ngClass]="themeService.isDarkMode() ? 'text-[#58A6FF]' : 'text-[#9f6587]'" />
                   <input 
                     type="text" 
                     pInputText 
                     [(ngModel)]="productSearchTerm" 
                     [ngModelOptions]="{standalone: true}"
                     placeholder="Buscar por nombre o SKU..." 
-                    class="w-full !h-7 !py-1 !px-7 !text-xs !rounded-lg !border-[#9f6587]/35 focus:!border-[#9f6587] focus:!ring-1 focus:!ring-[#9f6587]/30"
+                    class="w-full !h-7 !py-1 !px-7 !text-xs !rounded-lg transition-all"
+                    [ngClass]="themeService.isDarkMode()
+                      ? '!bg-[#0D1117] !text-[#F0F6FC] !border-[#30363D] focus:!border-[#58A6FF] focus:!ring-1 focus:!ring-[#58A6FF]/30'
+                      : '!border-[#9f6587]/35 focus:!border-[#9f6587] focus:!ring-1 focus:!ring-[#9f6587]/30'"
                   />
                 </p-iconfield>
               </div>
@@ -170,16 +282,16 @@
 
             <div class="py-2.5 px-0">
               @if (isLoadingProducts) {
-                <div class="flex items-center justify-center py-6 gap-2 text-[#9f6587] text-xs font-semibold">
-                  <i class="pi pi-spin pi-spinner text-base text-[#48021C]"></i>
+                <div class="flex items-center justify-center py-6 gap-2 text-xs font-semibold" [ngClass]="themeService.isDarkMode() ? 'text-[#8B949E]' : 'text-[#9f6587]'">
+                  <i class="pi pi-spin pi-spinner text-base" [ngClass]="themeService.isDarkMode() ? 'text-[#58A6FF]' : 'text-[#48021C]'"></i>
                   <span>Cargando productos de la sucursal...</span>
                 </div>
               } @else if (products.length === 0) {
-                <div class="text-center py-6 text-slate-500 text-xs italic">
+                <div class="text-center py-6 text-xs italic" [ngClass]="themeService.isDarkMode() ? 'text-[#8B949E]' : 'text-slate-500'">
                   Esta sucursal no tiene existencias registradas para trasladar.
                 </div>
               } @else if (filteredRibbonProducts.length === 0) {
-                <div class="text-center py-6 text-slate-500 text-xs italic">
+                <div class="text-center py-6 text-xs italic" [ngClass]="themeService.isDarkMode() ? 'text-[#8B949E]' : 'text-slate-500'">
                   No hay productos que coincidan con "{{ productSearchTerm }}".
                 </div>
               } @else {
@@ -190,7 +302,10 @@
                     (click)="scrollRibbon('left')"
                     pTooltip="Anterior"
                     tooltipPosition="top"
-                    class="w-7 md:w-8 flex-shrink-0 flex items-center justify-center bg-transparent hover:bg-[#9f6587]/15 text-[#6e3757] hover:text-[#48021C] transition-all cursor-pointer rounded-lg focus:outline-none border border-transparent hover:border-[#9f6587]/30"
+                    class="w-7 md:w-8 flex-shrink-0 flex items-center justify-center bg-transparent transition-all cursor-pointer rounded-lg focus:outline-none border border-transparent"
+                    [ngClass]="themeService.isDarkMode() 
+                      ? 'text-[#58A6FF] hover:bg-[#1C2128] hover:border-[#30363D]' 
+                      : 'text-[#6e3757] hover:text-[#48021C] hover:bg-[#9f6587]/15 hover:border-[#9f6587]/30'"
                   >
                     <i class="pi pi-chevron-left text-xs font-bold"></i>
                   </button>
@@ -202,7 +317,9 @@
                   >
                     <div 
                       *ngFor="let p of filteredRibbonProducts" 
-                      [class]="isProductSelected(p.id) ? 'border-[#48021C] bg-[#48021C]/5 shadow-xs ring-1 ring-[#48021C]/30' : 'border-[#9f6587]/25 bg-[#9f6587]/[0.03] hover:bg-white hover:border-[#9f6587]/50 hover:shadow-xs'"
+                      [ngClass]="themeService.isDarkMode() 
+                        ? (isProductSelected(p.id) ? 'border-[#58A6FF] bg-[#1C2D42] shadow-xs ring-1 ring-[#58A6FF]/40' : 'border-[#30363D] bg-[#0D1117] hover:bg-[#161B22] hover:border-slate-500 hover:shadow-xs')
+                        : (isProductSelected(p.id) ? 'border-[#48021C] bg-[#48021C]/5 shadow-xs ring-1 ring-[#48021C]/30' : 'border-[#9f6587]/25 bg-[#9f6587]/[0.03] hover:bg-white hover:border-[#9f6587]/50 hover:shadow-xs')"
                       class="w-[calc((100%-1.5rem)/3)] min-w-[210px] flex-shrink-0 flex flex-col justify-between gap-2 p-2.5 rounded-xl border transition-all text-xs group"
                     >
                       <!-- Fila Superior: Imagen + Info + Check/Plus -->
@@ -214,7 +331,10 @@
                       >
                         <div class="flex items-start gap-2.5 min-w-0 flex-1">
                           <!-- Miniatura de Imagen -->
-                          <div class="w-10 h-10 rounded-lg overflow-hidden border border-[#9f6587]/30 bg-slate-50 flex-shrink-0 flex items-center justify-center shadow-2xs">
+                          <div 
+                            class="w-10 h-10 rounded-lg overflow-hidden border flex-shrink-0 flex items-center justify-center shadow-2xs"
+                            [ngClass]="themeService.isDarkMode() ? 'border-[#30363D] bg-[#161B22]' : 'border-[#9f6587]/30 bg-slate-50'"
+                          >
                             <img 
                               [src]="getProductImageUrl(p.imageUrl)" 
                               [alt]="p.name"
@@ -224,30 +344,43 @@
                           </div>
 
                           <div class="flex flex-col min-w-0 flex-1">
-                            <span class="px-1.5 py-0.5 bg-[#7c5aac]/15 text-[#7c5aac] rounded text-[10px] font-bold border border-[#7c5aac]/30 self-start mb-0.5">
+                            <span 
+                              class="px-1.5 py-0.5 rounded text-[10px] font-bold border self-start mb-0.5"
+                              [ngClass]="themeService.isDarkMode() 
+                                ? 'bg-[#1C2D42] text-[#58A6FF] border-[#58A6FF]/30' 
+                                : 'bg-[#7c5aac]/15 text-[#7c5aac] border-[#7c5aac]/30'"
+                            >
                               {{ p.sku || '---' }}
                             </span>
-                            <span class="font-bold text-slate-800 leading-snug text-xs break-words group-hover:text-[#48021C] transition-colors line-clamp-2">
+                            <span 
+                              class="font-bold leading-snug text-xs break-words transition-colors line-clamp-2"
+                              [ngClass]="themeService.isDarkMode() 
+                                ? 'text-[#F0F6FC] group-hover:text-[#58A6FF]' 
+                                : 'text-slate-800 group-hover:text-[#48021C]'"
+                            >
                               {{ p.name }}
                             </span>
                           </div>
                         </div>
                         
                         <div class="flex items-center flex-shrink-0">
-                          <span *ngIf="isProductSelected(p.id)" class="w-5 h-5 rounded-full bg-[#48021C] text-white flex items-center justify-center shadow-2xs text-[9px] font-bold" pTooltip="Agregado (clic para sumar más)" tooltipPosition="top">
+                          <span *ngIf="isProductSelected(p.id)" class="w-5 h-5 rounded-full flex items-center justify-center shadow-2xs text-[9px] font-bold" [ngClass]="themeService.isDarkMode() ? 'bg-[#58A6FF] text-[#0D1117]' : 'bg-[#48021C] text-white'" pTooltip="Agregado (clic para sumar más)" tooltipPosition="top">
                             <i class="pi pi-plus text-[9px]"></i>
                           </span>
-                          <span *ngIf="!isProductSelected(p.id)" class="w-5 h-5 rounded-full bg-white border border-[#9f6587]/30 group-hover:bg-[#48021C]/10 text-[#9f6587] group-hover:text-[#48021C] flex items-center justify-center transition-colors text-[9px]">
+                          <span *ngIf="!isProductSelected(p.id)" class="w-5 h-5 rounded-full border flex items-center justify-center transition-colors text-[9px]" [ngClass]="themeService.isDarkMode() ? 'bg-[#161B22] border-[#30363D] text-[#8B949E] group-hover:text-[#58A6FF] group-hover:border-[#58A6FF]' : 'bg-white border-[#9f6587]/30 group-hover:bg-[#48021C]/10 text-[#9f6587] group-hover:text-[#48021C]'">
                             <i class="pi pi-plus text-[9px]"></i>
                           </span>
                         </div>
                       </div>
 
                       <!-- Fila Inferior: Atajo de Cantidad Rápida y Stock Origen -->
-                      <div class="flex items-center justify-between pt-1.5 border-t border-[#9f6587]/15 gap-2 select-none">
-                        <div class="flex items-center gap-1 text-[11px] font-semibold text-slate-700">
+                      <div 
+                        class="flex items-center justify-between pt-1.5 border-t gap-2 select-none"
+                        [ngClass]="themeService.isDarkMode() ? 'border-[#30363D]' : 'border-[#9f6587]/15'"
+                      >
+                        <div class="flex items-center gap-1 text-[11px] font-semibold" [ngClass]="themeService.isDarkMode() ? 'text-[#8B949E]' : 'text-slate-700'">
                           <span>Stock:</span>
-                          <strong class="font-bold text-emerald-700">{{ p.stock }}</strong>
+                          <strong [ngClass]="themeService.isDarkMode() ? 'text-emerald-400' : 'text-emerald-700'" class="font-bold">{{ p.stock }}</strong>
                         </div>
 
                         <div class="flex items-center w-28" (click)="$event.stopPropagation()">
@@ -260,11 +393,19 @@
                               (ngModelChange)="setQuickQuantity(p.id, $event)"
                               [ngModelOptions]="{standalone: true}"
                               (keyup.enter)="toggleProduct(p)"
-                              class="w-full h-6.5! pl-1.5 pr-1 text-right font-bold text-slate-800 bg-white border border-[#9f6587]/35 rounded-l-md focus:border-[#48021C] focus:outline-none text-[11px] [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                              class="w-full h-6.5! pl-1.5 pr-1 text-right font-bold rounded-l-md focus:outline-none text-[11px] [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none transition-all"
+                              [ngClass]="themeService.isDarkMode() 
+                                ? 'bg-[#161B22] text-[#F0F6FC] border border-[#30363D] focus:border-[#58A6FF]' 
+                                : 'bg-white text-slate-800 border border-[#9f6587]/35 focus:border-[#48021C]'"
                               pTooltip="Atajo de cantidad rápida"
                               tooltipPosition="top"
                             />
-                            <p-inputgroup-addon class="!text-[10px] !font-semibold !text-[#48021C] !bg-[#9f6587]/15 !px-1.5 !h-6.5 flex items-center border border-l-0 border-[#9f6587]/35 rounded-r-md select-none">
+                            <p-inputgroup-addon 
+                              class="!text-[10px] !font-semibold !px-1.5 !h-6.5 flex items-center border border-l-0 rounded-r-md select-none"
+                              [ngClass]="themeService.isDarkMode()
+                                ? '!bg-[#1C2128] !text-[#58A6FF] border-[#30363D]'
+                                : '!text-[#48021C] !bg-[#9f6587]/15 border-[#9f6587]/35'"
+                            >
                               {{ p.unitAbbreviation || 'un' }}
                             </p-inputgroup-addon>
                           </p-inputgroup>
@@ -279,7 +420,10 @@
                     (click)="scrollRibbon('right')"
                     pTooltip="Siguiente"
                     tooltipPosition="top"
-                    class="w-7 md:w-8 flex-shrink-0 flex items-center justify-center bg-transparent hover:bg-[#9f6587]/15 text-[#6e3757] hover:text-[#48021C] transition-all cursor-pointer rounded-lg focus:outline-none border border-transparent hover:border-[#9f6587]/30"
+                    class="w-7 md:w-8 flex-shrink-0 flex items-center justify-center bg-transparent transition-all cursor-pointer rounded-lg focus:outline-none border border-transparent"
+                    [ngClass]="themeService.isDarkMode() 
+                      ? 'text-[#58A6FF] hover:bg-[#1C2128] hover:border-[#30363D]' 
+                      : 'text-[#6e3757] hover:text-[#48021C] hover:bg-[#9f6587]/15 hover:border-[#9f6587]/30'"
                   >
                     <i class="pi pi-chevron-right text-xs font-bold"></i>
                   </button>
@@ -290,11 +434,27 @@
         }
 
         <!-- Tabla de Ítems a Trasladar -->
-        <div class="bg-white rounded-xl border border-[#9f6587]/35 overflow-hidden shadow-xs flex flex-col">
-          <div class="py-2.5 px-4 border-b border-[#9f6587]/25 flex items-center justify-between bg-[#9f6587]/10 flex-shrink-0">
+        <div 
+          class="rounded-xl border overflow-hidden shadow-xs flex flex-col transition-colors"
+          [ngClass]="themeService.isDarkMode() ? 'bg-[#161B22] border-[#30363D]' : 'bg-white border-[#9f6587]/35'"
+        >
+          <div 
+            class="py-2.5 px-4 border-b flex items-center justify-between flex-shrink-0 transition-colors"
+            [ngClass]="themeService.isDarkMode() ? 'bg-[#1C2128] border-[#30363D]' : 'bg-[#9f6587]/10 border-[#9f6587]/25'"
+          >
             <div class="flex items-center gap-2">
-              <span class="text-xs font-bold text-[#48021C]">Ítems a Trasladar</span>
-              <span class="text-[10.5px] font-bold px-2 py-0.5 rounded-full bg-white text-[#7c5aac] border border-[#7c5aac]/30 shadow-2xs">
+              <span 
+                class="text-xs font-bold"
+                [ngClass]="themeService.isDarkMode() ? 'text-[#F0F6FC]' : 'text-[#48021C]'"
+              >
+                Ítems a Trasladar
+              </span>
+              <span 
+                class="text-[10.5px] font-bold px-2 py-0.5 rounded-full shadow-2xs border"
+                [ngClass]="themeService.isDarkMode() 
+                  ? 'bg-[#1C2D42] text-[#58A6FF] border-[#58A6FF]/30' 
+                  : 'bg-white text-[#7c5aac] border-[#7c5aac]/30'"
+              >
                 {{ items.length }} {{ items.length === 1 ? 'producto' : 'productos' }}
               </span>
             </div>
@@ -303,7 +463,10 @@
               <button 
                 type="button" 
                 (click)="clearAllItems()"
-                class="px-2 py-0.5 rounded-md text-[11px] font-semibold inline-flex items-center gap-1 border border-rose-500/45 bg-rose-500/[0.08] text-rose-600 hover:bg-rose-500/[0.18] hover:border-rose-500/85 hover:text-rose-700 transition-all cursor-pointer shadow-2xs active:scale-95"
+                class="px-2 py-0.5 rounded-md text-[11px] font-semibold inline-flex items-center gap-1 border transition-all cursor-pointer shadow-2xs active:scale-95"
+                [ngClass]="themeService.isDarkMode() 
+                  ? 'border-rose-800/60 bg-rose-950/30 text-rose-300 hover:bg-rose-900/40 hover:border-rose-600' 
+                  : 'border-rose-500/45 bg-rose-500/[0.08] text-rose-600 hover:bg-rose-500/[0.18] hover:border-rose-500/85 hover:text-rose-700'"
               >
                 <i class="pi pi-trash text-[9px]"></i>
                 <span>Limpiar lista</span>
@@ -312,61 +475,95 @@
           </div>
 
           @if (!transferForm.get('originBranchId')?.value) {
-            <div class="p-5 m-4 rounded-xl bg-[#9f6587]/10 border border-[#9f6587]/25 flex items-center gap-3">
-              <div class="w-8 h-8 rounded-lg bg-[#9f6587]/20 text-[#48021C] flex items-center justify-center flex-shrink-0">
+            <div 
+              class="p-5 m-4 rounded-xl border flex items-center gap-3 transition-colors"
+              [ngClass]="themeService.isDarkMode() ? 'bg-[#0D1117] border-[#30363D]' : 'bg-[#9f6587]/10 border-[#9f6587]/25'"
+            >
+              <div 
+                class="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0"
+                [ngClass]="themeService.isDarkMode() ? 'bg-[#1C2D42] text-[#58A6FF]' : 'bg-[#9f6587]/20 text-[#48021C]'"
+              >
                 <i class="pi pi-info-circle text-sm"></i>
               </div>
               <div>
-                <p class="text-xs font-bold text-[#48021C] leading-none mb-0.5">Sucursal de origen requerida</p>
-                <p class="text-[11px] text-slate-700">Selecciona la sucursal de origen para cargar el catálogo disponible de productos.</p>
+                <p class="text-xs font-bold leading-none mb-0.5" [ngClass]="themeService.isDarkMode() ? 'text-[#F0F6FC]' : 'text-[#48021C]'">Sucursal de origen requerida</p>
+                <p class="text-[11px]" [ngClass]="themeService.isDarkMode() ? 'text-[#8B949E]' : 'text-slate-700'">Selecciona la sucursal de origen para cargar el catálogo disponible de productos.</p>
               </div>
             </div>
           } @else if (items.length === 0) {
-            <div class="py-12 flex flex-col items-center justify-center text-slate-400 border-2 border-dashed border-[#9f6587]/25 rounded-xl text-center m-4 bg-[#9f6587]/[0.02]">
-              <div class="w-10 h-10 rounded-full bg-[#9f6587]/15 text-[#48021C] flex items-center justify-center mb-2">
+            <div 
+              class="py-12 flex flex-col items-center justify-center border-2 border-dashed rounded-xl text-center m-4 transition-colors"
+              [ngClass]="themeService.isDarkMode() ? 'border-[#30363D] bg-[#0D1117]/50' : 'border-[#9f6587]/25 bg-[#9f6587]/[0.02] text-slate-400'"
+            >
+              <div 
+                class="w-10 h-10 rounded-full flex items-center justify-center mb-2"
+                [ngClass]="themeService.isDarkMode() ? 'bg-[#1C2D42] text-[#58A6FF]' : 'bg-[#9f6587]/15 text-[#48021C]'"
+              >
                 <i class="pi pi-box text-base"></i>
               </div>
-              <p class="font-bold text-xs text-[#48021C]">Ningún producto agregado al traslado</p>
-              <p class="text-[11px] text-slate-500 mt-0.5 max-w-sm">
+              <p class="font-bold text-xs" [ngClass]="themeService.isDarkMode() ? 'text-[#F0F6FC]' : 'text-[#48021C]'">Ningún producto agregado al traslado</p>
+              <p class="text-[11px] mt-0.5 max-w-sm" [ngClass]="themeService.isDarkMode() ? 'text-[#8B949E]' : 'text-slate-500'">
                 Haz clic en las tarjetas del catálogo superior para agregar productos al envío.
               </p>
             </div>
           } @else {
             <div class="overflow-x-auto w-full max-h-[420px] overflow-y-auto" formArrayName="items">
               <table class="w-full text-left text-xs border-collapse">
-                <thead class="sticky top-0 bg-[#7c5aac]/15 text-[#48021C] border-b border-[#7c5aac]/30 z-10">
-                  <tr class="h-9 text-[11.5px] font-bold">
-                    <th class="px-4 py-2 text-left border-r border-[#7c5aac]/20 w-[120px]">SKU</th>
-                    <th class="px-4 py-2 text-left border-r border-[#7c5aac]/20">Producto</th>
-                    <th class="px-4 py-2 text-center border-r border-[#7c5aac]/20 w-[120px]">Stock Origen</th>
-                    <th class="px-4 py-2 text-center border-r border-[#7c5aac]/20 w-[160px]">Cantidad a Enviar</th>
+                <thead 
+                  class="sticky top-0 border-b z-10 font-bold"
+                  [ngClass]="themeService.isDarkMode() 
+                    ? 'bg-[#1C2128] text-[#8B949E] border-[#30363D]' 
+                    : 'bg-[#7c5aac]/15 text-[#48021C] border-[#7c5aac]/30'"
+                >
+                  <tr class="h-9 text-[11.5px]">
+                    <th class="px-4 py-2 text-left w-[120px]" [ngClass]="themeService.isDarkMode() ? 'border-r border-[#30363D]' : 'border-r border-[#7c5aac]/20'">SKU</th>
+                    <th class="px-4 py-2 text-left" [ngClass]="themeService.isDarkMode() ? 'border-r border-[#30363D]' : 'border-r border-[#7c5aac]/20'">Producto</th>
+                    <th class="px-4 py-2 text-center w-[120px]" [ngClass]="themeService.isDarkMode() ? 'border-r border-[#30363D]' : 'border-r border-[#7c5aac]/20'">Stock Origen</th>
+                    <th class="px-4 py-2 text-center w-[160px]" [ngClass]="themeService.isDarkMode() ? 'border-r border-[#30363D]' : 'border-r border-[#7c5aac]/20'">Cantidad a Enviar</th>
                     <th class="px-3 py-2 text-center w-[70px]">Acción</th>
                   </tr>
                 </thead>
-                <tbody class="divide-y divide-[#7c5aac]/15 bg-white">
+                <tbody class="divide-y" [ngClass]="themeService.isDarkMode() ? 'divide-[#30363D] bg-[#161B22]' : 'divide-[#7c5aac]/15 bg-white'">
                   @for (item of items.controls; track item.get('productId')?.value || i; let i = $index) {
-                    <tr [formGroupName]="i" class="hover:bg-[#7c5aac]/[0.08] transition-colors border-b border-[#7c5aac]/15 text-xs">
+                    <tr 
+                      [formGroupName]="i" 
+                      class="transition-colors border-b text-xs"
+                      [ngClass]="themeService.isDarkMode() ? 'hover:bg-[#1F242C] border-[#30363D]' : 'hover:bg-[#7c5aac]/[0.08] border-[#7c5aac]/15'"
+                    >
                       <!-- SKU -->
-                      <td class="px-4 py-2.5 border-r border-[#7c5aac]/15 align-middle">
-                        <span class="px-1.5 py-0.5 bg-[#7c5aac]/15 text-[#7c5aac] rounded text-[10.5px] font-bold border border-[#7c5aac]/30">
+                      <td class="px-4 py-2.5 align-middle" [ngClass]="themeService.isDarkMode() ? 'border-r border-[#30363D]' : 'border-r border-[#7c5aac]/15'">
+                        <span 
+                          class="px-1.5 py-0.5 rounded text-[10.5px] font-bold border"
+                          [ngClass]="themeService.isDarkMode() 
+                            ? 'bg-[#1C2D42] text-[#58A6FF] border-[#58A6FF]/30' 
+                            : 'bg-[#7c5aac]/15 text-[#7c5aac] border-[#7c5aac]/30'"
+                        >
                           {{ item.get('sku')?.value || '---' }}
                         </span>
                       </td>
 
                       <!-- Producto Info -->
-                      <td class="px-4 py-2.5 border-r border-[#7c5aac]/15 font-semibold text-slate-800 align-middle">
+                      <td 
+                        class="px-4 py-2.5 font-semibold align-middle"
+                        [ngClass]="themeService.isDarkMode() ? 'border-r border-[#30363D] text-[#F0F6FC]' : 'border-r border-[#7c5aac]/15 text-slate-800'"
+                      >
                         {{ item.get('name')?.value }}
                       </td>
 
                       <!-- Stock en Origen -->
-                      <td class="px-4 py-2.5 text-center border-r border-[#7c5aac]/15 align-middle">
-                        <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200/80">
+                      <td class="px-4 py-2.5 text-center align-middle" [ngClass]="themeService.isDarkMode() ? 'border-r border-[#30363D]' : 'border-r border-[#7c5aac]/15'">
+                        <span 
+                          class="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-bold border"
+                          [ngClass]="themeService.isDarkMode() 
+                            ? 'bg-emerald-950/40 text-emerald-300 border-emerald-800/50' 
+                            : 'bg-emerald-50 text-emerald-700 border-emerald-200/80'"
+                        >
                           {{ item.get('maxStock')?.value }} {{ item.get('unitAbbreviation')?.value || '' }}
                         </span>
                       </td>
 
                       <!-- Cantidad a Enviar -->
-                      <td class="px-4 py-2.5 align-middle border-r border-[#7c5aac]/15 text-center">
+                      <td class="px-4 py-2.5 align-middle text-center" [ngClass]="themeService.isDarkMode() ? 'border-r border-[#30363D]' : 'border-r border-[#7c5aac]/15'">
                         <div class="w-32 mx-auto">
                           <p-inputgroup class="w-full !h-7">
                             <p-inputnumber 
@@ -379,13 +576,20 @@
                               [minFractionDigits]="item.get('allowsDecimals')?.value ? 2 : 0" 
                               [maxFractionDigits]="item.get('allowsDecimals')?.value ? 2 : 0" 
                               [showButtons]="false" 
-                              styleClass="border-[#7c5aac]/30! h-7! w-full" 
+                              styleClass="h-7! w-full" 
                               size="small" 
                               [fluid]="true" 
-                              inputStyleClass="text-xs h-7! py-1! px-2! text-right font-bold text-slate-800 border-[#7c5aac]/30! focus:border-[#48021C]!" 
+                              [inputStyleClass]="themeService.isDarkMode()
+                                ? 'text-xs h-7! py-1! px-2! text-right font-bold !bg-[#0D1117] !text-[#F0F6FC] !border-[#30363D] focus:!border-[#58A6FF]'
+                                : 'text-xs h-7! py-1! px-2! text-right font-bold text-slate-800 border-[#7c5aac]/30! focus:border-[#48021C]!'"
                             />
                             @if (item.get('unitAbbreviation')?.value) {
-                              <p-inputgroup-addon class="!text-[10.5px] !font-bold !text-[#48021C] !bg-[#7c5aac]/15 !px-2 !h-7 flex items-center select-none border border-l-0 border-[#7c5aac]/30">
+                              <p-inputgroup-addon 
+                                class="!text-[10.5px] !font-bold !px-2 !h-7 flex items-center select-none border border-l-0"
+                                [ngClass]="themeService.isDarkMode()
+                                  ? '!bg-[#1C2128] !text-[#58A6FF] !border-[#30363D]'
+                                  : '!text-[#48021C] !bg-[#7c5aac]/15 border-[#7c5aac]/30'"
+                              >
                                 {{ item.get('unitAbbreviation')?.value }}
                               </p-inputgroup-addon>
                             }
@@ -398,7 +602,10 @@
                         <button
                           type="button"
                           (click)="removeItem(i)"
-                          class="px-2 py-1 rounded-md text-[11px] font-semibold inline-flex items-center gap-1 border border-rose-500/45 bg-rose-500/[0.08] text-rose-600 hover:bg-rose-500/[0.18] hover:border-rose-500/85 hover:text-rose-700 transition-all cursor-pointer shadow-2xs active:scale-95"
+                          class="px-2 py-1 rounded-md text-[11px] font-semibold inline-flex items-center gap-1 border transition-all cursor-pointer shadow-2xs active:scale-95"
+                          [ngClass]="themeService.isDarkMode() 
+                            ? 'border-rose-800/60 bg-rose-950/30 text-rose-300 hover:bg-rose-900/40 hover:border-rose-600' 
+                            : 'border-rose-500/45 bg-rose-500/[0.08] text-rose-600 hover:bg-rose-500/[0.18] hover:border-rose-500/85 hover:text-rose-700'"
                           pTooltip="Quitar del traslado"
                           tooltipPosition="top"
                         >
@@ -412,15 +619,18 @@
             </div>
 
             <!-- Footer Summary -->
-            <div class="bg-[#7c5aac]/10 border-t border-[#7c5aac]/30 p-2.5 px-5 flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2">
-              <div class="flex items-center gap-3 text-[11px] text-slate-700">
-                <span>Líneas: <strong class="text-slate-900 font-bold">{{ items.length }}</strong></span>
+            <div 
+              class="border-t p-2.5 px-5 flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2 transition-colors"
+              [ngClass]="themeService.isDarkMode() ? 'bg-[#1C2128] border-[#30363D]' : 'bg-[#7c5aac]/10 border-[#7c5aac]/30'"
+            >
+              <div class="flex items-center gap-3 text-[11px]" [ngClass]="themeService.isDarkMode() ? 'text-[#8B949E]' : 'text-slate-700'">
+                <span>Líneas: <strong [ngClass]="themeService.isDarkMode() ? 'text-[#F0F6FC]' : 'text-slate-900'">{{ items.length }}</strong></span>
                 <span>•</span>
-                <span>Total Piezas: <strong class="text-slate-900 font-bold">{{ totalUnitsCount }}</strong></span>
+                <span>Total Piezas: <strong [ngClass]="themeService.isDarkMode() ? 'text-[#F0F6FC]' : 'text-slate-900'">{{ totalUnitsCount }}</strong></span>
               </div>
               <div class="flex items-center justify-between sm:justify-end gap-2">
-                <span class="text-xs font-medium text-[#48021C]">Valor Estimado del Traslado:</span>
-                <span class="text-xs font-bold text-[#48021C] tabular-nums">
+                <span class="text-xs font-medium" [ngClass]="themeService.isDarkMode() ? 'text-[#8B949E]' : 'text-[#48021C]'">Valor Estimado del Traslado:</span>
+                <span class="text-xs font-bold tabular-nums" [ngClass]="themeService.isDarkMode() ? 'text-[#58A6FF]' : 'text-[#48021C]'">
                   {{ totalEstimatedValue | currency: 'Q ' : 'symbol' : '1.2-2' }}
                 </span>
               </div>

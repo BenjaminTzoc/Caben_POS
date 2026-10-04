@@ -1,11 +1,11 @@
-<div [class]="isModal ? 'p-0 bg-transparent min-h-0 flex flex-col max-h-[80vh] w-full' : 'py-4 px-0 md:px-6 bg-slate-50/50 min-h-screen'">
+<div [class]="isModal ? 'p-0 bg-transparent min-h-0 flex flex-col max-h-[80vh] w-full' : 'py-4 px-0 md:px-6 min-h-screen transition-colors duration-300'" [ngClass]="!isModal && themeService.isDarkMode() ? 'bg-[#0D1117]' : (!isModal ? 'bg-slate-50/50' : '')">
   <!-- Header Section (Solo si no es modal) -->
   @if (!isModal) {
     <div class="max-w-[1700px] mx-auto px-4 md:px-0 mb-6 md:mb-8">
       <div class="flex flex-col md:flex-row md:items-end justify-between gap-4">
         <div class="w-full md:max-w-[60%]">
-          <h1 class="text-2xl md:text-4xl font-semibold text-gray-900 tracking-tight">Generar nuevo inventario</h1>
-          <p class="hidden md:block text-[#627ca7] mt-1 md:mt-2 text-sm md:text-md font-medium">
+          <h1 class="text-2xl md:text-4xl font-semibold tracking-tight transition-colors" [ngClass]="themeService.isDarkMode() ? 'text-[#F0F6FC]' : 'text-gray-900'">Generar nuevo inventario</h1>
+          <p class="hidden md:block mt-1 md:mt-2 text-sm md:text-md font-medium transition-colors" [ngClass]="themeService.isDarkMode() ? 'text-[#8B949E]' : 'text-[#627ca7]'">
              Establece las existencias iniciales y límites de stock para un producto en una sucursal.
           </p>
         </div>
@@ -39,12 +39,15 @@
       </div>
 
       <!-- Nota Importante (Móvil) -->
-      <div class="mt-4 md:hidden p-4 rounded-xl bg-indigo-50 border border-indigo-200 border-dashed">
-        <div class="flex items-center gap-2 text-indigo-600 mb-1">
+      <div 
+        class="mt-4 md:hidden p-4 rounded-xl border border-dashed transition-colors"
+        [ngClass]="themeService.isDarkMode() ? 'bg-[#1C2D42]/40 border-[#58A6FF]/30 text-[#8B949E]' : 'bg-indigo-50 border-indigo-200 text-indigo-700'"
+      >
+        <div class="flex items-center gap-2 mb-1" [ngClass]="themeService.isDarkMode() ? 'text-[#58A6FF]' : 'text-indigo-600'">
           <i class="pi pi-info-circle text-xs"></i>
           <span class="text-[10px] font-medium uppercase tracking-widest">Nota Importante</span>
         </div>
-        <p class="text-[11px] text-indigo-700 leading-relaxed font-normal">
+        <p class="text-[11px] leading-relaxed font-normal">
           Este formulario es para inicializar el inventario de un producto en una sucursal nueva. No use esto para ajustes de stock cotidianos.
         </p>
       </div>
@@ -54,47 +57,83 @@
   <form class="w-full grid grid-cols-12 gap-3 md:gap-4 max-w-[1700px] mx-auto flex-1 min-h-0" [formGroup]="inventoryForm">
     <!-- Left Column: Selection & Stock -->
     <div [class]="isModal ? 'w-full col-span-12 flex flex-col min-h-0 flex-1' : 'col-start-1 col-span-12 lg:col-span-8 flex flex-col gap-6 md:gap-8'">
-      <div [class]="isModal ? 'w-full p-0 bg-transparent border-0 flex flex-col min-h-0 flex-1' : 'p-5 md:p-8 rounded-none md:rounded-lg bg-white border-y md:border border-slate-300'">
+      <div 
+        [class]="isModal ? 'w-full p-0 bg-transparent border-0 flex flex-col min-h-0 flex-1' : 'p-5 md:p-8 rounded-none md:rounded-2xl border-y md:border transition-colors'"
+        [ngClass]="isModal ? '' : (themeService.isDarkMode() ? 'bg-[#161B22] border-[#30363D]' : 'bg-white border-slate-300')"
+      >
 
         <!-- Branch Selector (Fijo arriba en el modal con ancho ajustado) -->
         <div class="flex flex-col gap-1 mb-3 flex-shrink-0">
-          <label class="text-xs font-semibold text-slate-700" for="branch">
+          <label class="text-xs font-semibold" [ngClass]="themeService.isDarkMode() ? 'text-[#F0F6FC]' : 'text-slate-700'" for="branch">
             Sucursal de Destino <span class="text-rose-500">*</span>
           </label>
-          <app-branch-select
-            [branches]="branches"
-            [showClear]="true"
-            [disabled]="isLoadingBranches || isSaving"
-            formControlName="branchId"
-            [placeholder]="isLoadingBranches ? 'Cargando sucursales...' : 'Seleccionar sucursal...'"
-            widthClass="w-full sm:w-80 md:w-96"
-          />
-          @if (inventoryForm.get('branchId')?.invalid && inventoryForm.get('branchId')?.touched) {
-            <small class="text-rose-500 text-[11px] font-medium flex items-center mt-0.5">
-              <i class="pi pi-exclamation-circle mr-1 text-[10px]"></i>Seleccione una sucursal para ver los productos.
-            </small>
+          @if (!isConsolidatedMode() && activeWorkingBranch()?.id) {
+            <div 
+              class="flex items-center gap-2.5 px-3 py-1.5 border rounded-xl shadow-2xs transition-all w-fit min-w-[16rem]" 
+              [ngClass]="themeService.isDarkMode() 
+                ? 'bg-[#161B22] border-[#30363D] text-[#F0F6FC]' 
+                : 'bg-rose-50/40 border-[#48021C]/25 text-slate-800'"
+            >
+              <span 
+                class="w-6 h-6 rounded-lg flex items-center justify-center shrink-0 border"
+                [ngClass]="activeWorkingBranch()?.isPlant
+                  ? (themeService.isDarkMode() ? 'bg-emerald-950/50 text-emerald-400 border-emerald-800/60' : 'bg-emerald-50 text-emerald-700 border-emerald-200')
+                  : (themeService.isDarkMode() ? 'bg-[#1C2D42] text-[#58A6FF] border-[#58A6FF]/30' : 'bg-sky-50 text-sky-700 border-sky-200')"
+              >
+                <i [class]="activeWorkingBranch()?.isPlant ? 'pi pi-server' : 'pi pi-shop'" class="text-xs"></i>
+              </span>
+              <span 
+                class="text-sm font-medium truncate pr-1"
+                [ngClass]="themeService.isDarkMode() ? 'text-[#F0F6FC]' : 'text-slate-800'"
+              >
+                {{ activeWorkingBranch()?.name }}
+              </span>
+            </div>
+          } @else {
+            <app-branch-select
+              [branches]="branches"
+              [showClear]="true"
+              [disabled]="isLoadingBranches || isSaving"
+              formControlName="branchId"
+              [placeholder]="isLoadingBranches ? 'Cargando sucursales...' : 'Seleccionar sucursal...'"
+              widthClass="w-full sm:w-80 md:w-96"
+            />
+            @if (inventoryForm.get('branchId')?.invalid && inventoryForm.get('branchId')?.touched) {
+              <small class="text-rose-500 text-[11px] font-medium flex items-center mt-0.5">
+                <i class="pi pi-exclamation-circle mr-1 text-[10px]"></i>Seleccione una sucursal para ver los productos.
+              </small>
+            }
           }
         </div>
 
-        <!-- RECUADRO DE ATAJOS RÁPIDOS DE PRODUCTOS (Estándar de Órdenes de Venta) -->
-        <div class="bg-white rounded-xl border border-slate-300 overflow-hidden shadow-sm mb-3 flex-shrink-0">
-          <div class="p-3.5 px-5 border-b border-slate-200 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 bg-brand-royal/5">
+        <!-- RECUADRO DE ATAJOS RÁPIDOS DE PRODUCTOS -->
+        <div 
+          class="rounded-xl border overflow-hidden shadow-sm mb-3 flex-shrink-0 transition-colors"
+          [ngClass]="themeService.isDarkMode() ? 'bg-[#161B22] border-[#30363D]' : 'bg-white border-slate-300'"
+        >
+          <div 
+            class="p-3.5 px-5 border-b flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 transition-colors"
+            [ngClass]="themeService.isDarkMode() ? 'bg-[#0D1117] border-[#30363D]' : 'bg-[#48021C]/5 border-slate-200'"
+          >
             <div class="flex flex-col">
-              <span class="text-sm font-semibold text-title-secondary leading-none">Catálogo Rápido de Productos</span>
-              <span class="text-xs font-semibold text-brand-royal mt-1">Haz clic en un producto para agregarlo al inventario</span>
+              <span class="text-sm font-semibold leading-none transition-colors" [ngClass]="themeService.isDarkMode() ? 'text-[#F0F6FC]' : 'text-[#48021C]'">Catálogo Rápido de Productos</span>
+              <span class="text-xs font-semibold mt-1 transition-colors" [ngClass]="themeService.isDarkMode() ? 'text-[#58A6FF]' : 'text-[#48021C]/80'">Haz clic en un producto para agregarlo al inventario</span>
             </div>
 
             <!-- Buscador integrado en la cabecera -->
             <div class="w-full sm:w-64">
               <p-iconfield>
-                <p-inputicon class="pi pi-search text-text-muted text-xs" />
+                <p-inputicon class="pi pi-search text-xs" [ngClass]="themeService.isDarkMode() ? 'text-slate-500' : 'text-slate-400'" />
                 <input 
                   type="text" 
                   pInputText 
                   [(ngModel)]="productSearchTerm" 
                   [ngModelOptions]="{standalone: true}"
                   placeholder="Buscar por nombre o SKU..." 
-                  class="w-full h-8.5! py-1.5! px-8! text-xs! border-slate-300! focus:border-brand-deep! !rounded-lg"
+                  class="w-full h-8.5! py-1.5! px-8! text-xs! !rounded-lg transition-all"
+                  [ngClass]="themeService.isDarkMode() 
+                    ? '!bg-[#161B22] !border-[#30363D] !text-[#F0F6FC] placeholder:!text-slate-500 hover:!border-slate-500 focus:!border-[#58A6FF] focus:!ring-2 focus:!ring-[#58A6FF]/20' 
+                    : '!bg-white !border-slate-300 !text-slate-800 hover:!border-[#48021C]/60 focus:!border-[#48021C] focus:!ring-2 focus:!ring-[#48021C]/10'"
                 />
               </p-iconfield>
             </div>
@@ -102,27 +141,30 @@
 
           <div class="py-3.5 px-0">
             @if (isLoadingProducts) {
-              <div class="flex items-center justify-center py-6 gap-2 text-text-muted text-xs">
-                <i class="pi pi-spin pi-spinner text-lg text-brand-royal"></i>
+              <div class="flex items-center justify-center py-6 gap-2 text-xs" [ngClass]="themeService.isDarkMode() ? 'text-[#8B949E]' : 'text-slate-500'">
+                <i class="pi pi-spin pi-spinner text-lg" [ngClass]="themeService.isDarkMode() ? 'text-[#58A6FF]' : 'text-[#48021C]'"></i>
                 <span>Cargando catálogo de productos...</span>
               </div>
             } @else if (products.length === 0) {
-              <div class="text-center py-6 text-text-muted text-xs italic">
+              <div class="text-center py-6 text-xs italic" [ngClass]="themeService.isDarkMode() ? 'text-[#8B949E]' : 'text-slate-500'">
                 No se encontraron productos disponibles para gestionar stock.
               </div>
             } @else if (filteredRibbonProducts.length === 0) {
-              <div class="text-center py-6 text-text-muted text-xs italic">
+              <div class="text-center py-6 text-xs italic" [ngClass]="themeService.isDarkMode() ? 'text-[#8B949E]' : 'text-slate-500'">
                 No hay productos que coincidan con "{{ productSearchTerm }}".
               </div>
             } @else {
               <div class="flex items-stretch w-full px-2 gap-1.5">
-                <!-- Botón Izquierdo Ocupando Espacio Layout -->
+                <!-- Botón Izquierdo -->
                 <button
                   type="button"
                   (click)="scrollRibbon('left')"
                   pTooltip="Anterior"
                   tooltipPosition="top"
-                  class="w-7 md:w-8 flex-shrink-0 flex items-center justify-center bg-transparent hover:bg-slate-100 text-slate-600 hover:text-brand-royal transition-all cursor-pointer rounded-lg focus:outline-none border border-transparent hover:border-slate-200"
+                  class="w-7 md:w-8 flex-shrink-0 flex items-center justify-center transition-all cursor-pointer rounded-lg focus:outline-none border"
+                  [ngClass]="themeService.isDarkMode() 
+                    ? 'bg-[#1C2128] hover:bg-[#30363D] text-[#F0F6FC] border-[#30363D]' 
+                    : 'bg-transparent hover:bg-slate-100 text-slate-600 hover:text-[#48021C] border-transparent hover:border-slate-200'"
                 >
                   <i class="pi pi-chevron-left text-lg font-bold"></i>
                 </button>
@@ -135,53 +177,90 @@
                   <div 
                     *ngFor="let p of filteredRibbonProducts" 
                     (click)="toggleProduct(p)"
-                    [class]="isProductSelected(p.id) ? 'border-brand-royal bg-indigo-50/50 shadow-2xs ring-1 ring-brand-royal/30' : 'border-slate-200/80 bg-slate-50/50 hover:bg-white hover:border-indigo-300 hover:shadow-xs'"
                     class="w-[calc((100%-1.5rem)/3)] min-w-[210px] flex-shrink-0 flex flex-col justify-between gap-2 p-3 rounded-xl border transition-all text-xs cursor-pointer select-none group"
+                    [ngClass]="isProductSelected(p.id) 
+                      ? (themeService.isDarkMode() ? 'border-[#58A6FF] bg-[#1C2D42]/60 shadow-2xs ring-1 ring-[#58A6FF]/30' : 'border-[#48021C] bg-[#48021C]/5 shadow-2xs ring-1 ring-[#48021C]/30') 
+                      : (themeService.isDarkMode() ? 'border-[#30363D] bg-[#0D1117] hover:bg-[#1C2128] hover:border-slate-500 hover:shadow-xs' : 'border-slate-200/80 bg-slate-50/50 hover:bg-white hover:border-[#48021C]/30 hover:shadow-xs')"
                   >
                     <!-- Fila Superior: Info + Check/Plus -->
                     <div class="flex items-start justify-between gap-2">
                       <div class="flex items-start gap-2.5 min-w-0 flex-1">
-                        <div class="w-9 h-9 rounded-lg border border-slate-200 flex items-center justify-center overflow-hidden flex-shrink-0 bg-white shadow-2xs mt-0.5">
+                        <div 
+                          class="w-9 h-9 rounded-lg border flex items-center justify-center overflow-hidden flex-shrink-0 shadow-2xs mt-0.5 transition-colors"
+                          [ngClass]="themeService.isDarkMode() ? 'bg-[#0D1117] border-[#30363D]' : 'bg-white border-slate-200'"
+                        >
                           <img *ngIf="p.imageUrl" [src]="getProductImageUrl(p.imageUrl)" class="w-full h-full object-cover" />
-                          <i *ngIf="!p.imageUrl" class="pi pi-image text-slate-300 text-sm"></i>
+                          <i *ngIf="!p.imageUrl" class="pi pi-image text-sm" [ngClass]="themeService.isDarkMode() ? 'text-slate-600' : 'text-slate-300'"></i>
                         </div>
                         <div class="flex flex-col min-w-0 flex-1">
-                          <span class="text-[10px] font-bold text-brand-royal uppercase tracking-wider leading-none mb-1">{{ p.sku || '---' }}</span>
-                          <span class="font-bold text-slate-800 leading-snug text-xs break-words group-hover:text-brand-royal transition-colors">
+                          <span 
+                            class="text-[10px] font-bold uppercase tracking-wider leading-none mb-1 transition-colors"
+                            [ngClass]="themeService.isDarkMode() ? 'text-[#58A6FF]' : 'text-[#48021C]'"
+                          >
+                            {{ p.sku || '---' }}
+                          </span>
+                          <span 
+                            class="font-bold leading-snug text-xs break-words transition-colors"
+                            [ngClass]="themeService.isDarkMode() ? 'text-[#F0F6FC] group-hover:text-[#58A6FF]' : 'text-slate-800 group-hover:text-[#48021C]'"
+                          >
                             {{ p.name }}
                           </span>
                         </div>
                       </div>
                       
                       <div class="flex items-center flex-shrink-0">
-                        <span *ngIf="isProductSelected(p.id)" class="w-5 h-5 rounded-full bg-brand-royal text-white flex items-center justify-center shadow-2xs text-[9px] font-bold">
+                        <span 
+                          *ngIf="isProductSelected(p.id)" 
+                          class="w-5 h-5 rounded-full flex items-center justify-center shadow-2xs text-[9px] font-bold"
+                          [ngClass]="themeService.isDarkMode() ? 'bg-[#58A6FF] text-[#0D1117]' : 'bg-[#48021C] text-white'"
+                        >
                           <i class="pi pi-check text-[9px]"></i>
                         </span>
-                        <span *ngIf="!isProductSelected(p.id)" class="w-5 h-5 rounded-full bg-slate-100 group-hover:bg-indigo-50 text-slate-400 group-hover:text-brand-royal flex items-center justify-center transition-colors text-[9px]">
+                        <span 
+                          *ngIf="!isProductSelected(p.id)" 
+                          class="w-5 h-5 rounded-full flex items-center justify-center transition-colors text-[9px]"
+                          [ngClass]="themeService.isDarkMode() 
+                            ? 'bg-[#1C2128] group-hover:bg-[#1C2D42] text-slate-400 group-hover:text-[#58A6FF]' 
+                            : 'bg-slate-100 group-hover:bg-rose-50 text-slate-400 group-hover:text-[#48021C]'"
+                        >
                           <i class="pi pi-plus text-[9px]"></i>
                         </span>
                       </div>
                     </div>
 
                     <!-- Fila Inferior: Unidad y Estado -->
-                    <div class="flex items-center justify-between pt-1.5 border-t border-slate-200/60 text-[10px]">
-                      <span class="text-slate-600 font-semibold bg-white px-2 py-0.5 rounded border border-slate-200">
+                    <div 
+                      class="flex items-center justify-between pt-1.5 border-t text-[10px] transition-colors"
+                      [ngClass]="themeService.isDarkMode() ? 'border-[#30363D]' : 'border-slate-200/60'"
+                    >
+                      <span 
+                        class="font-semibold px-2 py-0.5 rounded border transition-colors"
+                        [ngClass]="themeService.isDarkMode() ? 'text-slate-300 bg-[#161B22] border-[#30363D]' : 'text-slate-600 bg-white border-slate-200'"
+                      >
                         {{ p.unit.abbreviation || 'un' }}
                       </span>
-                      <span class="font-semibold" [class]="isProductSelected(p.id) ? 'text-brand-royal font-bold' : 'text-slate-400 group-hover:text-slate-600'">
+                      <span 
+                        class="font-semibold transition-colors" 
+                        [ngClass]="isProductSelected(p.id) 
+                          ? (themeService.isDarkMode() ? 'text-[#58A6FF] font-bold' : 'text-[#48021C] font-bold') 
+                          : (themeService.isDarkMode() ? 'text-slate-500 group-hover:text-slate-300' : 'text-slate-400 group-hover:text-slate-600')"
+                      >
                         {{ isProductSelected(p.id) ? '✓ Agregado' : '+ Seleccionar' }}
                       </span>
                     </div>
                   </div>
                 </div>
 
-                <!-- Botón Derecho Ocupando Espacio Layout -->
+                <!-- Botón Derecho -->
                 <button
                   type="button"
                   (click)="scrollRibbon('right')"
                   pTooltip="Siguiente"
                   tooltipPosition="top"
-                  class="w-7 md:w-8 flex-shrink-0 flex items-center justify-center bg-transparent hover:bg-slate-100 text-slate-600 hover:text-brand-royal transition-all cursor-pointer rounded-lg focus:outline-none border border-transparent hover:border-slate-200"
+                  class="w-7 md:w-8 flex-shrink-0 flex items-center justify-center transition-all cursor-pointer rounded-lg focus:outline-none border"
+                  [ngClass]="themeService.isDarkMode() 
+                    ? 'bg-[#1C2128] hover:bg-[#30363D] text-[#F0F6FC] border-[#30363D]' 
+                    : 'bg-transparent hover:bg-slate-100 text-slate-600 hover:text-[#48021C] border-transparent hover:border-slate-200'"
                 >
                   <i class="pi pi-chevron-right text-lg font-bold"></i>
                 </button>
@@ -191,11 +270,20 @@
         </div>
 
         <!-- Section: Configuración de Existencias de Productos Seleccionados -->
-        <div class="bg-white rounded-xl border border-slate-200 overflow-hidden shadow-2xs flex flex-col flex-1 min-h-0">
-          <div class="p-3 px-4 border-b border-slate-100 flex items-center justify-between bg-slate-50/50 flex-shrink-0">
+        <div 
+          class="rounded-xl border overflow-hidden shadow-2xs flex flex-col flex-1 min-h-0 transition-colors"
+          [ngClass]="themeService.isDarkMode() ? 'bg-[#161B22] border-[#30363D]' : 'bg-white border-slate-200'"
+        >
+          <div 
+            class="p-3 px-4 border-b flex items-center justify-between flex-shrink-0 transition-colors"
+            [ngClass]="themeService.isDarkMode() ? 'bg-[#0D1117] border-[#30363D]' : 'bg-slate-50/50 border-slate-100'"
+          >
             <div class="flex items-center gap-2">
-              <h2 class="text-xs sm:text-sm font-semibold text-slate-800 tracking-tight">Configuración de existencias</h2>
-              <span class="text-[10px] sm:text-[11px] font-bold px-2 py-0.5 rounded-full bg-slate-100 text-slate-600 border border-slate-200">
+              <h2 class="text-xs sm:text-sm font-semibold tracking-tight transition-colors" [ngClass]="themeService.isDarkMode() ? 'text-[#F0F6FC]' : 'text-slate-800'">Configuración de existencias</h2>
+              <span 
+                class="text-[10px] sm:text-[11px] font-bold px-2 py-0.5 rounded-full border transition-colors"
+                [ngClass]="themeService.isDarkMode() ? 'bg-[#1C2D42] text-[#58A6FF] border-[#58A6FF]/30' : 'bg-slate-100 text-slate-600 border-slate-200'"
+              >
                 {{ items.length }} {{ items.length === 1 ? 'producto' : 'productos' }}
               </span>
             </div>
@@ -204,7 +292,7 @@
               <button 
                 type="button" 
                 (click)="clearAllItems()"
-                class="text-[11px] font-semibold text-rose-500 hover:text-rose-700 transition-colors bg-transparent border-none cursor-pointer p-0"
+                class="text-[11px] font-semibold text-rose-500 hover:text-rose-400 transition-colors bg-transparent border-none cursor-pointer p-0"
               >
                 Limpiar lista
               </button>
@@ -214,13 +302,19 @@
           <div class="p-3 flex-1 min-h-0 flex flex-col">
             <!-- Empty State (No items selected) -->
             @if (items.length === 0) {
-              <div class="p-6 rounded-xl bg-slate-50 border border-dashed border-slate-200 flex flex-col items-center justify-center text-center gap-2 my-auto">
-                <div class="w-10 h-10 rounded-full bg-brand-royal/10 text-brand-royal flex items-center justify-center">
+              <div 
+                class="p-6 rounded-xl border border-dashed flex flex-col items-center justify-center text-center gap-2 my-auto transition-colors"
+                [ngClass]="themeService.isDarkMode() ? 'bg-[#0D1117] border-[#30363D]' : 'bg-slate-50 border-slate-200'"
+              >
+                <div 
+                  class="w-10 h-10 rounded-full flex items-center justify-center transition-colors"
+                  [ngClass]="themeService.isDarkMode() ? 'bg-[#1C2D42] text-[#58A6FF]' : 'bg-[#48021C]/10 text-[#48021C]'"
+                >
                   <i class="pi pi-box text-lg"></i>
                 </div>
                 <div>
-                  <p class="text-xs sm:text-sm font-bold text-slate-800">Ningún producto seleccionado</p>
-                  <p class="text-xs text-slate-600 font-medium mt-1 max-w-sm leading-relaxed">
+                  <p class="text-xs sm:text-sm font-bold transition-colors" [ngClass]="themeService.isDarkMode() ? 'text-[#F0F6FC]' : 'text-slate-800'">Ningún producto seleccionado</p>
+                  <p class="text-xs font-medium mt-1 max-w-sm leading-relaxed transition-colors" [ngClass]="themeService.isDarkMode() ? 'text-[#8B949E]' : 'text-slate-600'">
                     Haz clic en las tarjetas del catálogo superior para añadir productos y configurar su existencia inicial y límites.
                   </p>
                 </div>
@@ -229,24 +323,36 @@
               <!-- Dynamic Items FormArray List -->
               <div formArrayName="items" class="flex flex-col gap-2.5 overflow-y-auto pr-1 flex-1 min-h-0 max-h-[38vh]">
                 @for (item of items.controls; track $index) {
-                  <div [formGroupName]="$index" 
-                       class="p-3 rounded-xl border border-slate-200/90 bg-slate-50/50 hover:bg-white hover:border-slate-300 transition-all flex flex-col gap-2.5 shadow-2xs">
-                    
+                  <div 
+                    [formGroupName]="$index" 
+                    class="p-3 rounded-xl border transition-all flex flex-col gap-2.5 shadow-2xs"
+                    [ngClass]="themeService.isDarkMode() ? 'bg-[#0D1117] border-[#30363D] hover:border-slate-500' : 'bg-slate-50/50 border-slate-200/90 hover:bg-white hover:border-slate-300'"
+                  >
                     <!-- Row Header: Product Info & Remove Button -->
                     <div class="flex items-center justify-between gap-2">
                       <div class="flex items-center gap-2 min-w-0 flex-1">
-                        <div class="w-7 h-7 rounded-lg bg-white overflow-hidden border border-slate-200 flex-shrink-0 flex items-center justify-center">
+                        <div 
+                          class="w-7 h-7 rounded-lg overflow-hidden border flex-shrink-0 flex items-center justify-center transition-colors"
+                          [ngClass]="themeService.isDarkMode() ? 'bg-[#161B22] border-[#30363D]' : 'bg-white border-slate-200'"
+                        >
                           @if (item.get('imageUrl')?.value) {
                             <img [src]="getProductImageUrl(item.get('imageUrl')?.value)" class="w-full h-full object-cover" />
                           } @else {
-                            <i class="pi pi-image text-slate-300 text-xs"></i>
+                            <i class="pi pi-image text-xs" [ngClass]="themeService.isDarkMode() ? 'text-slate-600' : 'text-slate-300'"></i>
                           }
                         </div>
                         <div class="flex items-center gap-1.5 min-w-0 flex-1">
-                          <span class="text-[10px] font-bold text-brand-royal bg-brand-royal/10 border border-brand-royal/20 px-1.5 py-0.5 rounded uppercase flex-shrink-0">
+                          <span 
+                            class="text-[10px] font-bold border px-1.5 py-0.5 rounded uppercase flex-shrink-0 transition-colors"
+                            [ngClass]="themeService.isDarkMode() ? 'text-[#58A6FF] bg-[#1C2D42] border-[#58A6FF]/30' : 'text-[#48021C] bg-[#48021C]/10 border-[#48021C]/20'"
+                          >
                             {{ item.get('sku')?.value }}
                           </span>
-                          <span class="text-xs font-semibold text-slate-800 break-words leading-tight" [title]="item.get('name')?.value">
+                          <span 
+                            class="text-xs font-semibold break-words leading-tight transition-colors" 
+                            [ngClass]="themeService.isDarkMode() ? 'text-[#F0F6FC]' : 'text-slate-800'"
+                            [title]="item.get('name')?.value"
+                          >
                             {{ item.get('name')?.value }}
                           </span>
                         </div>
@@ -257,7 +363,7 @@
                         (onClick)="removeItem($index)"
                         severity="danger"
                         [text]="true"
-                        styleClass="!w-7 !h-7 !rounded-lg text-rose-500 hover:!bg-rose-50 p-0 flex-shrink-0"
+                        styleClass="!w-7 !h-7 !rounded-lg text-rose-500 hover:!bg-rose-500/10 p-0 flex-shrink-0"
                         size="small"
                         pTooltip="Quitar producto"
                         tooltipPosition="left"
@@ -266,11 +372,14 @@
 
                     <!-- Stock Inputs Grid for manageStock === true OR Availability Toggle for manageStock === false -->
                     @if (item.get('manageStock')?.value) {
-                      <div class="grid grid-cols-3 gap-2.5 items-start pt-1.5 border-t border-slate-200/60">
+                      <div 
+                        class="grid grid-cols-3 gap-2.5 items-start pt-1.5 border-t transition-colors"
+                        [ngClass]="themeService.isDarkMode() ? 'border-[#30363D]' : 'border-slate-200/60'"
+                      >
                         <!-- Stock Inicial -->
                         <div class="flex flex-col gap-1">
                           <div class="flex items-center justify-between h-5">
-                            <label class="text-[11px] font-semibold text-slate-700 leading-none">
+                            <label class="text-[11px] font-semibold leading-none" [ngClass]="themeService.isDarkMode() ? 'text-[#F0F6FC]' : 'text-slate-700'">
                               Stock Inicial <span class="text-rose-500">*</span>
                             </label>
                           </div>
@@ -282,12 +391,15 @@
                               [minFractionDigits]="item.get('allowsDecimals')?.value ? 2 : 0"
                               [maxFractionDigits]="item.get('allowsDecimals')?.value ? 2 : 0"
                               placeholder="0"
-                              styleClass="w-full !bg-white text-xs"
+                              [styleClass]="'w-full text-xs ' + (themeService.isDarkMode() ? '!bg-[#161B22] !border-[#30363D] !text-[#F0F6FC]' : '!bg-white')"
                               size="small"
                               fluid
                             />
                             @if (item.get('unitAbbreviation')?.value) {
-                              <p-inputgroup-addon class="!text-[11px] !font-semibold !text-slate-600 !bg-slate-100 !px-2 select-none">
+                              <p-inputgroup-addon 
+                                class="!text-[11px] !font-semibold !px-2 select-none transition-colors"
+                                [ngClass]="themeService.isDarkMode() ? '!text-[#8B949E] !bg-[#1C2128] !border-[#30363D]' : '!text-slate-600 !bg-slate-100'"
+                              >
                                 {{ item.get('unitAbbreviation')?.value }}
                               </p-inputgroup-addon>
                             }
@@ -297,7 +409,7 @@
                         <!-- Mínimo -->
                         <div class="flex flex-col gap-1">
                           <div class="flex items-center justify-between h-5">
-                            <label class="text-[11px] font-semibold text-slate-700 leading-none">Mínimo</label>
+                            <label class="text-[11px] font-semibold leading-none" [ngClass]="themeService.isDarkMode() ? 'text-[#F0F6FC]' : 'text-slate-700'">Mínimo</label>
                             <p-toggleswitch formControlName="minStockActivated" styleClass="!scale-[0.6] origin-right" />
                           </div>
                           <p-inputgroup class="w-full">
@@ -309,12 +421,15 @@
                               [minFractionDigits]="item.get('allowsDecimals')?.value ? 2 : 0"
                               [maxFractionDigits]="item.get('allowsDecimals')?.value ? 2 : 0"
                               placeholder="0"
-                              styleClass="w-full !bg-white text-xs"
+                              [styleClass]="'w-full text-xs ' + (themeService.isDarkMode() ? '!bg-[#161B22] !border-[#30363D] !text-[#F0F6FC]' : '!bg-white')"
                               size="small"
                               fluid
                             />
                             @if (item.get('unitAbbreviation')?.value) {
-                              <p-inputgroup-addon class="!text-[11px] !font-semibold !text-slate-600 !bg-slate-100 !px-2 select-none">
+                              <p-inputgroup-addon 
+                                class="!text-[11px] !font-semibold !px-2 select-none transition-colors"
+                                [ngClass]="themeService.isDarkMode() ? '!text-[#8B949E] !bg-[#1C2128] !border-[#30363D]' : '!text-slate-600 !bg-slate-100'"
+                              >
                                 {{ item.get('unitAbbreviation')?.value }}
                               </p-inputgroup-addon>
                             }
@@ -324,7 +439,7 @@
                         <!-- Máximo -->
                         <div class="flex flex-col gap-1">
                           <div class="flex items-center justify-between h-5">
-                            <label class="text-[11px] font-semibold text-slate-700 leading-none">Máximo</label>
+                            <label class="text-[11px] font-semibold leading-none" [ngClass]="themeService.isDarkMode() ? 'text-[#F0F6FC]' : 'text-slate-700'">Máximo</label>
                             <p-toggleswitch formControlName="maxStockActivated" styleClass="!scale-[0.6] origin-right" />
                           </div>
                           <p-inputgroup class="w-full">
@@ -336,12 +451,15 @@
                               [minFractionDigits]="item.get('allowsDecimals')?.value ? 2 : 0"
                               [maxFractionDigits]="item.get('allowsDecimals')?.value ? 2 : 0"
                               placeholder="0"
-                              styleClass="w-full !bg-white text-xs"
+                              [styleClass]="'w-full text-xs ' + (themeService.isDarkMode() ? '!bg-[#161B22] !border-[#30363D] !text-[#F0F6FC]' : '!bg-white')"
                               size="small"
                               fluid
                             />
                             @if (item.get('unitAbbreviation')?.value) {
-                              <p-inputgroup-addon class="!text-[11px] !font-semibold !text-slate-600 !bg-slate-100 !px-2 select-none">
+                              <p-inputgroup-addon 
+                                class="!text-[11px] !font-semibold !px-2 select-none transition-colors"
+                                [ngClass]="themeService.isDarkMode() ? '!text-[#8B949E] !bg-[#1C2128] !border-[#30363D]' : '!text-slate-600 !bg-slate-100'"
+                              >
                                 {{ item.get('unitAbbreviation')?.value }}
                               </p-inputgroup-addon>
                             }
@@ -349,16 +467,22 @@
                         </div>
                       </div>
                     } @else {
-                      <div class="flex items-center justify-between pt-2 border-t border-slate-200/60 bg-amber-50/60 rounded-lg px-3 py-2">
+                      <div 
+                        class="flex items-center justify-between pt-2 border-t rounded-lg px-3 py-2 transition-colors"
+                        [ngClass]="themeService.isDarkMode() ? 'border-[#30363D] bg-amber-950/30' : 'border-slate-200/60 bg-amber-50/60'"
+                      >
                         <div class="flex items-center gap-2">
-                          <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 text-amber-800 border border-amber-200">
+                          <span 
+                            class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold border transition-colors"
+                            [ngClass]="themeService.isDarkMode() ? 'bg-amber-950/50 text-amber-300 border-amber-800/60' : 'bg-amber-100 text-amber-800 border-amber-200'"
+                          >
                             <i class="pi pi-info-circle mr-1 text-[9px]"></i>
                             Sin gestión de Stock
                           </span>
-                          <span class="text-[11px] text-slate-800">Cambia esta configuración en el módulo Productos.</span>
+                          <span class="text-[11px]" [ngClass]="themeService.isDarkMode() ? 'text-slate-300' : 'text-slate-800'">Cambia esta configuración en el módulo Productos.</span>
                         </div>
                         <div class="flex items-center gap-2">
-                          <span class="text-[11px] font-medium" [ngClass]="item.get('isAvailable')?.value ? 'text-emerald-600 font-bold' : 'text-slate-400'">
+                          <span class="text-[11px] font-medium" [ngClass]="item.get('isAvailable')?.value ? 'text-emerald-400 font-bold' : 'text-slate-400'">
                             {{ item.get('isAvailable')?.value ? 'Disponible' : 'No disponible' }}
                           </span>
                           <p-toggleSwitch formControlName="isAvailable" severity="success" />
@@ -375,7 +499,10 @@
 
       <!-- Modal Action Buttons Footer (Fijo abajo) -->
       @if (isModal) {
-        <div class="flex items-center justify-end gap-2.5 pt-3 border-t border-slate-100 flex-shrink-0">
+        <div 
+          class="flex items-center justify-end gap-2.5 pt-3 border-t flex-shrink-0 transition-colors"
+          [ngClass]="themeService.isDarkMode() ? 'border-[#30363D]' : 'border-slate-100'"
+        >
           <app-secondary-button 
             label="Cancelar" 
             icon="pi pi-times"
@@ -397,24 +524,30 @@
     @if (!isModal) {
       <div class="col-span-12 lg:col-span-4 flex flex-col gap-6 md:gap-8 mt-6 lg:mt-0">
         <!-- Info Card (Nota Importante) -->
-        <div class="p-6 rounded-xl bg-indigo-50 border border-indigo-200 border-dashed">
-          <div class="flex items-center gap-3 text-indigo-600 mb-2">
+        <div 
+          class="p-6 rounded-xl border border-dashed transition-colors"
+          [ngClass]="themeService.isDarkMode() ? 'bg-[#1C2D42]/40 border-[#58A6FF]/30 text-[#8B949E]' : 'bg-indigo-50 border-indigo-200 text-indigo-700'"
+        >
+          <div class="flex items-center gap-3 mb-2" [ngClass]="themeService.isDarkMode() ? 'text-[#58A6FF]' : 'text-indigo-600'">
             <i class="pi pi-info-circle"></i>
             <span class="text-xs font-medium uppercase tracking-widest">Nota Importante</span>
           </div>
-          <p class="text-[11px] text-indigo-700 leading-relaxed font-normal">
+          <p class="text-[11px] leading-relaxed font-normal">
             Este formulario es para inicializar el inventario de un producto en una
             sucursal nueva. No use esto para ajustes de stock cotidianos.
           </p>
         </div>
 
         <!-- Action Card (Finalizar Proceso) -->
-        <div class="p-6 rounded-xl bg-amber-50 border border-amber-200 border-dashed flex flex-col gap-3">
-          <div class="flex items-center gap-3 text-amber-600 mb-2">
-            <i class="pi pi-check-circle text-lg text-amber-600"></i>
-            <span class="text-xs font-medium uppercase tracking-widest text-amber-600">Finalizar Proceso</span>
+        <div 
+          class="p-6 rounded-xl border border-dashed flex flex-col gap-3 transition-colors"
+          [ngClass]="themeService.isDarkMode() ? 'bg-amber-950/30 border-amber-800/50 text-amber-300' : 'bg-amber-50 border-amber-200 text-amber-700'"
+        >
+          <div class="flex items-center gap-3 mb-2" [ngClass]="themeService.isDarkMode() ? 'text-amber-400' : 'text-amber-600'">
+            <i class="pi pi-check-circle text-lg"></i>
+            <span class="text-xs font-medium uppercase tracking-widest">Finalizar Proceso</span>
           </div>
-          <p class="text-[11px] text-amber-700 leading-relaxed font-normal">
+          <p class="text-[11px] leading-relaxed font-normal">
             Verifique que los productos y la sucursal sean correctos antes de guardar. Estos datos inicializarán los registros de control físico.
           </p>
         </div>

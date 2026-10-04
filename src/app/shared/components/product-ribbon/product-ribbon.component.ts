@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { environment } from '../../../../environments/environment';
 import { Product } from '../../../inventory/interfaces/product.interface';
 import { QuickQuantityService } from '../../../sales/services/quick-quantity.service';
+import { ThemeService } from '../../../core/services/theme.service';
 
 // PrimeNG
 import { ButtonModule } from 'primeng/button';
@@ -32,6 +33,7 @@ import { InputGroupAddonModule } from 'primeng/inputgroupaddon';
   templateUrl: './product-ribbon.component.html',
 })
 export class ProductRibbonComponent {
+  public themeService = inject(ThemeService);
   private quickQuantityService = inject(QuickQuantityService);
 
   @ViewChild('catalogContainer') catalogContainer!: ElementRef<HTMLDivElement>;
@@ -140,9 +142,18 @@ export class ProductRibbonComponent {
   }
 
   cardClasses(product: Product): string {
-    const selected = this.isProductSelected(product.id)
-      ? 'border-[#48021C] bg-[#48021C]/5 shadow-xs ring-1 ring-[#48021C]/30'
-      : 'border-[#48021C]/20 bg-rose-50/20 hover:bg-white hover:border-[#48021C]/50 hover:shadow-xs';
+    const isDark = this.themeService.isDarkMode();
+    let selected = '';
+    if (this.isProductSelected(product.id)) {
+      selected = isDark 
+        ? 'border-[#58A6FF] bg-[#1C2D42]/60 shadow-xs ring-1 ring-[#58A6FF]/40' 
+        : 'border-[#48021C] bg-[#48021C]/5 shadow-xs ring-1 ring-[#48021C]/30';
+    } else {
+      selected = isDark 
+        ? 'border-[#30363D] bg-[#0D1117] hover:bg-[#161B22] hover:border-slate-500 hover:shadow-xs' 
+        : 'border-[#48021C]/20 bg-rose-50/20 hover:bg-white hover:border-[#48021C]/50 hover:shadow-xs';
+    }
+
     const size = this.compactCards
       ? 'w-[calc((100%-2.25rem)/4)] min-w-[192px] max-w-[250px]'
       : 'w-[calc((100%-1.5rem)/3)] min-w-[210px] max-w-[320px]';

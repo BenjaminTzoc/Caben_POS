@@ -9,6 +9,7 @@ import { RefreshButtonComponent } from '../../../shared/components/refresh-butto
 import { SearchInputComponent } from '../../../shared/components/search-input/search-input.component';
 import { StandardTableComponent } from '../../../shared/components/standard-table/standard-table.component';
 import { StatusBadgeComponent } from '../../../shared/components/status-badge/status-badge.component';
+import { ThemeService } from '../../../core/services/theme.service';
 
 @Component({
   selector: 'app-cash-history',
@@ -27,6 +28,7 @@ import { StatusBadgeComponent } from '../../../shared/components/status-badge/st
   templateUrl: './cash-history.component.html',
 })
 export class CashHistoryComponent implements OnInit {
+  public themeService = inject(ThemeService);
   private cashService = inject(CashRegisterService);
   private router = inject(Router);
 

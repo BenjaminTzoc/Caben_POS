@@ -1,12 +1,17 @@
-<div class="bg-white rounded-2xl border-2 border-[#48021C]/25 overflow-hidden shadow-xs flex flex-col">
+<div class="rounded-2xl border overflow-hidden shadow-xs flex flex-col transition-colors"
+     [ngClass]="themeService.isDarkMode() ? 'bg-[#161B22] border-[#30363D]' : 'bg-white border-[#48021C]/25'">
   <!-- Encabezado de la tabla -->
-  <div class="py-2.5 px-4 md:px-6 border-b border-[#48021C]/15 flex items-center justify-between bg-rose-50/60 rounded-t-2xl flex-shrink-0">
+  <div class="py-2.5 px-4 md:px-6 border-b flex items-center justify-between rounded-t-2xl flex-shrink-0 transition-colors"
+       [ngClass]="themeService.isDarkMode() ? 'bg-[#1C2128] border-[#30363D]' : 'bg-rose-50/60 border-[#48021C]/15'">
     <div class="flex items-center gap-2">
-      <div class="w-7 h-7 rounded-lg bg-[#48021C]/10 text-[#48021C] flex items-center justify-center border border-[#48021C]/20 shrink-0">
+      <div class="w-7 h-7 rounded-lg flex items-center justify-center border shrink-0"
+           [ngClass]="themeService.isDarkMode() ? 'bg-[#58A6FF]/10 text-[#58A6FF] border-[#58A6FF]/30' : 'bg-[#48021C]/10 text-[#48021C] border-[#48021C]/20'">
         <i class="pi pi-list text-xs"></i>
       </div>
-      <span class="text-xs sm:text-sm font-bold text-[#48021C]">{{ title }}</span>
-      <span class="text-[10.5px] font-bold px-2 py-0.5 rounded-full bg-white text-[#48021C] border border-[#48021C]/25 shadow-2xs">
+      <span class="text-xs sm:text-sm font-bold"
+            [ngClass]="themeService.isDarkMode() ? 'text-[#F0F6FC]' : 'text-[#48021C]'">{{ title }}</span>
+      <span class="text-[10.5px] font-bold px-2 py-0.5 rounded-full border shadow-2xs"
+            [ngClass]="themeService.isDarkMode() ? 'bg-[#0D1117] text-[#8B949E] border-[#30363D]' : 'bg-white text-[#48021C] border-[#48021C]/25'">
         {{ items.length }} {{ items.length === 1 ? 'producto' : 'productos' }}
       </span>
     </div>
@@ -15,7 +20,10 @@
       <button 
         type="button" 
         (click)="onClearAll()"
-        class="px-2.5 py-1 rounded-lg text-xs font-semibold inline-flex items-center gap-1.5 border border-rose-500/40 bg-rose-500/[0.08] text-rose-700 hover:bg-rose-500/[0.18] hover:border-rose-500/80 transition-all cursor-pointer shadow-2xs active:scale-95"
+        class="px-2.5 py-1 rounded-lg text-xs font-semibold inline-flex items-center gap-1.5 border transition-all cursor-pointer shadow-2xs active:scale-95"
+        [ngClass]="themeService.isDarkMode() 
+          ? 'border-rose-500/30 bg-rose-500/10 text-rose-400 hover:bg-rose-500/20 hover:border-rose-500/60' 
+          : 'border-rose-500/40 bg-rose-500/[0.08] text-rose-700 hover:bg-rose-500/[0.18] hover:border-rose-500/80'"
       >
         <i class="pi pi-trash text-[10px]"></i>
         <span>Limpiar lista</span>
@@ -25,12 +33,16 @@
 
   <!-- Estado Vacío -->
   @if (items.length === 0) {
-    <div class="py-12 flex flex-col items-center justify-center text-slate-400 border-2 border-dashed border-[#48021C]/20 rounded-xl text-center m-4 md:m-6 bg-rose-50/[0.15]">
-      <div class="w-12 h-12 rounded-full bg-[#48021C]/10 text-[#48021C] flex items-center justify-center mb-2.5 border border-[#48021C]/15">
+    <div class="py-12 flex flex-col items-center justify-center text-center m-4 md:m-6 border-2 border-dashed rounded-xl transition-colors"
+         [ngClass]="themeService.isDarkMode() ? 'border-[#30363D] bg-[#0D1117]/60 text-[#8B949E]' : 'border-[#48021C]/20 bg-rose-50/[0.15] text-slate-400'">
+      <div class="w-12 h-12 rounded-full flex items-center justify-center mb-2.5 border"
+           [ngClass]="themeService.isDarkMode() ? 'bg-[#58A6FF]/10 text-[#58A6FF] border-[#58A6FF]/20' : 'bg-[#48021C]/10 text-[#48021C] border-[#48021C]/15'">
         <i class="pi pi-shopping-bag text-lg"></i>
       </div>
-      <p class="font-bold text-xs sm:text-sm text-[#48021C]">{{ emptyTitle }}</p>
-      <p class="text-xs text-slate-500 mt-1 max-w-sm">
+      <p class="font-bold text-xs sm:text-sm"
+         [ngClass]="themeService.isDarkMode() ? 'text-[#F0F6FC]' : 'text-[#48021C]'">{{ emptyTitle }}</p>
+      <p class="text-xs mt-1 max-w-sm"
+         [ngClass]="themeService.isDarkMode() ? 'text-[#8B949E]' : 'text-slate-500'">
         {{ emptySubtitle }}
       </p>
     </div>
@@ -38,35 +50,49 @@
     <!-- Tabla de ítems con scroll horizontal si es necesario -->
     <div class="overflow-x-auto w-full max-h-[460px] overflow-y-auto">
       <table class="w-full text-left text-xs border-collapse">
-        <thead class="sticky top-0 bg-rose-100/70 text-[#48021C] border-b border-[#48021C]/20 z-10">
+        <thead class="sticky top-0 border-b z-10"
+               [ngClass]="themeService.isDarkMode() ? 'bg-[#1C2128] text-[#F0F6FC] border-[#30363D]' : 'bg-rose-100/70 text-[#48021C] border-[#48021C]/20'">
           <tr class="h-9 text-[11.5px] font-bold">
-            <th class="px-4 py-2 text-left border-r border-[#48021C]/15 min-w-[170px]">Producto</th>
-            <th *ngIf="showPrice" class="px-3 py-2 text-center border-r border-[#48021C]/15 w-[128px]">Precio Unit.</th>
-            <th class="px-3 py-2 text-center border-r border-[#48021C]/15 w-[125px]">Cantidad</th>
-            <th *ngIf="showDiscount" class="px-3 py-2 text-center border-r border-[#48021C]/15 w-[105px]">Descuento</th>
-            <th class="px-4 py-2 text-right border-r border-[#48021C]/15 w-[120px]">Subtotal</th>
+            <th class="px-4 py-2 text-left border-r min-w-[170px]"
+                [ngClass]="themeService.isDarkMode() ? 'border-[#30363D]' : 'border-[#48021C]/15'">Producto</th>
+            <th *ngIf="showPrice" class="px-3 py-2 text-center border-r w-[128px]"
+                [ngClass]="themeService.isDarkMode() ? 'border-[#30363D]' : 'border-[#48021C]/15'">Precio Unit.</th>
+            <th class="px-3 py-2 text-center border-r w-[125px]"
+                [ngClass]="themeService.isDarkMode() ? 'border-[#30363D]' : 'border-[#48021C]/15'">Cantidad</th>
+            <th *ngIf="showDiscount" class="px-3 py-2 text-center border-r w-[105px]"
+                [ngClass]="themeService.isDarkMode() ? 'border-[#30363D]' : 'border-[#48021C]/15'">Descuento</th>
+            <th class="px-4 py-2 text-right border-r w-[120px]"
+                [ngClass]="themeService.isDarkMode() ? 'border-[#30363D]' : 'border-[#48021C]/15'">Subtotal</th>
             <th *ngIf="!disabled" class="px-3 py-2 text-center w-[55px]">Acción</th>
           </tr>
         </thead>
-        <tbody class="divide-y divide-[#48021C]/10 bg-white">
+        <tbody class="divide-y"
+               [ngClass]="themeService.isDarkMode() ? 'divide-[#30363D] bg-[#161B22]' : 'divide-[#48021C]/10 bg-white'">
           @for (item of items; track $index; let i = $index) {
             <tr
-              class="hover:bg-rose-50/40 transition-colors border-b border-[#48021C]/10 text-xs"
-              [class.bg-teal-50/55]="item.isCustomPrice"
-              [class.hover:bg-teal-50/80]="item.isCustomPrice"
+              class="transition-colors border-b text-xs"
+              [ngClass]="themeService.isDarkMode() 
+                ? (item.isCustomPrice ? 'bg-teal-950/20 hover:bg-teal-950/30 border-[#30363D]' : 'hover:bg-[#1C2128] border-[#30363D]') 
+                : (item.isCustomPrice ? 'bg-teal-50/55 hover:bg-teal-50/80 border-[#48021C]/10' : 'hover:bg-rose-50/40 border-[#48021C]/10')"
             >
               <!-- Producto Info con SKU debajo del nombre -->
-              <td class="px-4 py-2.5 border-r border-[#48021C]/10 font-semibold text-slate-800 align-middle"
+              <td class="px-4 py-2.5 border-r font-semibold align-middle"
+                  [ngClass]="themeService.isDarkMode() ? 'border-[#30363D] text-[#F0F6FC]' : 'border-[#48021C]/10 text-slate-800'"
                   [class.border-l-4]="item.isCustomPrice"
                   [class.border-l-teal-500]="item.isCustomPrice">
                 <div class="flex items-center gap-2.5">
-                  <div class="w-9 h-9 rounded-lg border border-slate-200 flex items-center justify-center overflow-hidden flex-shrink-0 bg-white shadow-2xs">
+                  <div class="w-9 h-9 rounded-lg border flex items-center justify-center overflow-hidden flex-shrink-0 shadow-2xs"
+                       [ngClass]="themeService.isDarkMode() ? 'border-[#30363D] bg-[#0D1117]' : 'border-slate-200 bg-white'">
                     <img *ngIf="item.imageUrl" [src]="getProductImageUrl(item.imageUrl)" class="w-full h-full object-cover" />
-                    <i *ngIf="!item.imageUrl" class="pi pi-image text-slate-300 text-xs"></i>
+                    <i *ngIf="!item.imageUrl" class="pi pi-image text-xs"
+                       [ngClass]="themeService.isDarkMode() ? 'text-[#8B949E]' : 'text-slate-300'"></i>
                   </div>
                   <div class="flex flex-col min-w-0">
-                    <span class="font-bold text-slate-800 text-xs leading-snug truncate" [title]="item.name">{{ item.name }}</span>
-                    <span class="text-[11px] font-bold text-[#6b3353] mt-0.5">
+                    <span class="font-bold text-xs leading-snug truncate" 
+                          [ngClass]="themeService.isDarkMode() ? 'text-[#F0F6FC]' : 'text-slate-800'"
+                          [title]="item.name">{{ item.name }}</span>
+                    <span class="text-[11px] font-bold mt-0.5"
+                          [ngClass]="themeService.isDarkMode() ? 'text-[#58A6FF]' : 'text-[#6b3353]'">
                       {{ item.sku || '---' }}
                     </span>
                   </div>
@@ -74,15 +100,19 @@
               </td>
 
               <!-- Precio Unitario -->
-              <td *ngIf="showPrice" class="px-2.5 py-2.5 align-middle border-r border-[#48021C]/10 text-center">
+              <td *ngIf="showPrice" class="px-2.5 py-2.5 align-middle border-r text-center"
+                  [ngClass]="themeService.isDarkMode() ? 'border-[#30363D]' : 'border-[#48021C]/10'">
                 @if (disabled) {
                   <div class="flex flex-col items-center gap-0.5">
                     <span
                       class="text-xs font-bold tabular-nums"
-                      [class]="item.isCustomPrice ? 'text-teal-800' : 'text-slate-800'"
+                      [class]="item.isCustomPrice 
+                        ? (themeService.isDarkMode() ? 'text-teal-400' : 'text-teal-800') 
+                        : (themeService.isDarkMode() ? 'text-[#F0F6FC]' : 'text-slate-800')"
                     >{{ item.price | currency:'Q ' }}</span>
                     @if (showListStrike(item)) {
-                      <span class="text-[10px] font-semibold text-slate-400 line-through tabular-nums">{{ item.listPrice | currency:'Q ' }}</span>
+                      <span class="text-[10px] font-semibold line-through tabular-nums"
+                            [ngClass]="themeService.isDarkMode() ? 'text-[#8B949E]' : 'text-slate-400'">{{ item.listPrice | currency:'Q ' }}</span>
                     }
                   </div>
                 } @else {
@@ -101,28 +131,32 @@
                       [minFractionDigits]="2"
                       [maxFractionDigits]="2"
                       [styleClass]="item.isCustomPrice
-                        ? 'border-teal-400! h-7! w-full bg-teal-50!'
-                        : 'border-[#48021C]/20! h-7! w-full'"
+                        ? (themeService.isDarkMode() ? 'border-teal-600! h-7! w-full bg-teal-950/40!' : 'border-teal-400! h-7! w-full bg-teal-50!')
+                        : (themeService.isDarkMode() ? 'border-[#30363D]! h-7! w-full bg-[#0D1117]!' : 'border-[#48021C]/20! h-7! w-full')"
                       size="small" 
                       [fluid]="true" 
                       [inputStyleClass]="item.isCustomPrice
-                        ? 'text-[11px] h-7! py-1! px-1.5! text-right font-bold text-teal-800 border-teal-400! focus:border-teal-600! rounded-lg bg-teal-50!'
-                        : 'text-[11px] h-7! py-1! px-1.5! text-right font-bold text-slate-800 border-[#48021C]/20! focus:border-[#48021C]! rounded-lg'"
+                        ? (themeService.isDarkMode() ? 'text-[11px] h-7! py-1! px-1.5! text-right font-bold text-teal-300 border-teal-600! focus:border-teal-400! rounded-lg bg-teal-950/40!' : 'text-[11px] h-7! py-1! px-1.5! text-right font-bold text-teal-800 border-teal-400! focus:border-teal-600! rounded-lg bg-teal-50!')
+                        : (themeService.isDarkMode() ? 'text-[11px] h-7! py-1! px-1.5! text-right font-bold text-[#F0F6FC] border-[#30363D]! focus:border-[#58A6FF]! rounded-lg bg-[#0D1117]!' : 'text-[11px] h-7! py-1! px-1.5! text-right font-bold text-slate-800 border-[#48021C]/20! focus:border-[#48021C]! rounded-lg')"
                     />
                     @if (showListStrike(item)) {
-                      <span class="text-[10px] font-semibold text-slate-400 line-through tabular-nums leading-none">{{ item.listPrice | currency:'Q ' }}</span>
+                      <span class="text-[10px] font-semibold line-through tabular-nums leading-none"
+                            [ngClass]="themeService.isDarkMode() ? 'text-[#8B949E]' : 'text-slate-400'">{{ item.listPrice | currency:'Q ' }}</span>
                     }
                   </div>
                 }
               </td>
 
               <!-- Cantidad -->
-              <td class="px-2.5 py-2.5 align-middle border-r border-[#48021C]/10 text-center">
+              <td class="px-2.5 py-2.5 align-middle border-r text-center"
+                  [ngClass]="themeService.isDarkMode() ? 'border-[#30363D]' : 'border-[#48021C]/10'">
                 @if (disabled) {
-                  <span class="text-xs font-bold text-slate-800 tabular-nums">
+                  <span class="text-xs font-bold tabular-nums"
+                        [ngClass]="themeService.isDarkMode() ? 'text-[#F0F6FC]' : 'text-slate-800'">
                     {{ item.quantity | number:(item.allowsDecimals ? '1.2-2' : '1.0-0') }}
                     @if (item.unitAbbreviation) {
-                      <span class="text-[10px] font-bold text-[#48021C] ml-0.5">{{ item.unitAbbreviation }}</span>
+                      <span class="text-[10px] font-bold ml-0.5"
+                            [ngClass]="themeService.isDarkMode() ? 'text-[#58A6FF]' : 'text-[#48021C]'">{{ item.unitAbbreviation }}</span>
                     }
                   </span>
                 } @else {
@@ -138,13 +172,18 @@
                         [minFractionDigits]="item.allowsDecimals ? 2 : 0" 
                         [maxFractionDigits]="item.allowsDecimals ? 2 : 0" 
                         [showButtons]="false"
-                        styleClass="border-[#48021C]/25! h-7! w-full" 
+                        [styleClass]="themeService.isDarkMode() ? 'border-[#30363D]! h-7! w-full bg-[#0D1117]!' : 'border-[#48021C]/25! h-7! w-full'" 
                         size="small" 
                         [fluid]="true" 
-                        inputStyleClass="text-[11px] h-7! py-1! px-1.5! text-right font-bold text-slate-800 border-[#48021C]/25! focus:border-[#48021C]!" 
+                        [inputStyleClass]="themeService.isDarkMode() 
+                          ? 'text-[11px] h-7! py-1! px-1.5! text-right font-bold text-[#F0F6FC] border-[#30363D]! focus:border-[#58A6FF]! bg-[#0D1117]!' 
+                          : 'text-[11px] h-7! py-1! px-1.5! text-right font-bold text-slate-800 border-[#48021C]/25! focus:border-[#48021C]!'" 
                       />
                       @if (item.unitAbbreviation) {
-                        <p-inputgroup-addon class="!text-[10px] !font-bold !text-[#48021C] !bg-rose-100/70 !px-1.5 !h-7 flex items-center select-none border border-l-0 border-[#48021C]/25">
+                        <p-inputgroup-addon class="!text-[10px] !font-bold !px-1.5 !h-7 flex items-center select-none border border-l-0"
+                                            [ngClass]="themeService.isDarkMode() 
+                                              ? '!text-[#58A6FF] !bg-[#1C2128] !border-[#30363D]' 
+                                              : '!text-[#48021C] !bg-rose-100/70 !border-[#48021C]/25'">
                           {{ item.unitAbbreviation }}
                         </p-inputgroup-addon>
                       }
@@ -154,9 +193,13 @@
               </td>
 
               <!-- Descuento con selector % / Q -->
-              <td *ngIf="showDiscount" class="px-2.5 py-2.5 align-middle border-r border-[#48021C]/10 text-center">
+              <td *ngIf="showDiscount" class="px-2.5 py-2.5 align-middle border-r text-center"
+                  [ngClass]="themeService.isDarkMode() ? 'border-[#30363D]' : 'border-[#48021C]/10'">
                 @if (disabled) {
-                  <span class="text-xs font-bold tabular-nums" [class]="(item.discount || 0) > 0 ? 'text-rose-700' : 'text-slate-500'">
+                  <span class="text-xs font-bold tabular-nums" 
+                        [class]="(item.discount || 0) > 0 
+                          ? (themeService.isDarkMode() ? 'text-rose-400' : 'text-rose-700') 
+                          : (themeService.isDarkMode() ? 'text-[#8B949E]' : 'text-slate-500')">
                     @if (!(item.discount || 0)) {
                       —
                     } @else if (item.discountType === 'percentage') {
@@ -178,15 +221,20 @@
                         [max]="item.discountType === 'percentage' ? 100 : ((item.quantity * item.price) || 0)"
                         [minFractionDigits]="item.discountType === 'percentage' ? 0 : 2"
                         [maxFractionDigits]="2"
-                        styleClass="border-[#48021C]/25! h-7! w-full" 
+                        [styleClass]="themeService.isDarkMode() ? 'border-[#30363D]! h-7! w-full bg-[#0D1117]!' : 'border-[#48021C]/25! h-7! w-full'" 
                         size="small" 
                         [fluid]="true" 
-                        inputStyleClass="text-[11px] h-7! py-1! px-1.5! text-right font-bold text-rose-700 border-[#48021C]/25! focus:border-[#48021C]!" 
+                        [inputStyleClass]="themeService.isDarkMode() 
+                          ? 'text-[11px] h-7! py-1! px-1.5! text-right font-bold text-rose-400 border-[#30363D]! focus:border-[#58A6FF]! bg-[#0D1117]!' 
+                          : 'text-[11px] h-7! py-1! px-1.5! text-right font-bold text-rose-700 border-[#48021C]/25! focus:border-[#48021C]!'" 
                       />
                       <button
                         type="button"
                         (click)="toggleDiscountType(item, i)"
-                        class="px-1.5 h-7 text-[10.5px] font-bold text-[#48021C] bg-rose-100/80 hover:bg-rose-200/90 border border-l-0 border-[#48021C]/25 rounded-r-lg transition-all cursor-pointer flex items-center justify-center select-none active:scale-95"
+                        class="px-1.5 h-7 text-[10.5px] font-bold border border-l-0 rounded-r-lg transition-all cursor-pointer flex items-center justify-center select-none active:scale-95"
+                        [ngClass]="themeService.isDarkMode() 
+                          ? 'text-[#F0F6FC] bg-[#1C2128] hover:bg-[#30363D] border-[#30363D]' 
+                          : 'text-[#48021C] bg-rose-100/80 hover:bg-rose-200/90 border-[#48021C]/25'"
                         pTooltip="Cambiar a {{ item.discountType === 'percentage' ? 'Monto fijo (Q)' : 'Porcentaje (%)' }}"
                         tooltipPosition="top"
                       >
@@ -198,7 +246,8 @@
               </td>
 
               <!-- Subtotal de Línea (penúltima columna) -->
-              <td class="px-4 py-2.5 text-right font-bold text-[#48021C] border-r border-[#48021C]/10 align-middle tabular-nums"
+              <td class="px-4 py-2.5 text-right font-bold border-r align-middle tabular-nums"
+                  [ngClass]="themeService.isDarkMode() ? 'text-[#F0F6FC] border-[#30363D]' : 'text-[#48021C] border-[#48021C]/10'"
                   [class.border-r-0]="disabled">
                 {{ getItemSubtotal(item) | currency:'Q ' }}
               </td>
@@ -208,7 +257,10 @@
                 <button
                   type="button"
                   (click)="removeItem(i)"
-                  class="w-7 h-7 rounded-lg text-xs font-semibold inline-flex items-center justify-center border border-rose-500/40 bg-rose-500/[0.08] text-rose-600 hover:bg-rose-500/[0.2] hover:border-rose-500/80 hover:text-rose-700 transition-all cursor-pointer shadow-2xs active:scale-95"
+                  class="w-7 h-7 rounded-lg text-xs font-semibold inline-flex items-center justify-center border transition-all cursor-pointer shadow-2xs active:scale-95"
+                  [ngClass]="themeService.isDarkMode() 
+                    ? 'border-rose-500/30 bg-rose-500/10 text-rose-400 hover:bg-rose-500/20 hover:border-rose-500/60' 
+                    : 'border-rose-500/40 bg-rose-500/[0.08] text-rose-600 hover:bg-rose-500/[0.2] hover:border-rose-500/80 hover:text-rose-700'"
                   pTooltip="Quitar de la lista"
                   tooltipPosition="top"
                 >
@@ -222,29 +274,35 @@
     </div>
 
     <!-- Barra inferior de totales de la tabla -->
-    <div *ngIf="showTotals" class="bg-rose-50/80 border-t border-[#48021C]/20 p-3 px-6 flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3">
-      <div class="flex items-center gap-3 text-xs text-slate-700">
-        <span>Líneas: <strong class="text-[#48021C] font-bold">{{ items.length }}</strong></span>
+    <div *ngIf="showTotals" class="border-t p-3 px-6 flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 transition-colors"
+         [ngClass]="themeService.isDarkMode() ? 'bg-[#1C2128] border-[#30363D]' : 'bg-rose-50/80 border-[#48021C]/20'">
+      <div class="flex items-center gap-3 text-xs"
+           [ngClass]="themeService.isDarkMode() ? 'text-[#8B949E]' : 'text-slate-700'">
+        <span>Líneas: <strong class="font-bold" [ngClass]="themeService.isDarkMode() ? 'text-[#F0F6FC]' : 'text-[#48021C]'">{{ items.length }}</strong></span>
         <span>•</span>
-        <span>Total Unidades: <strong class="text-[#48021C] font-bold">{{ totalUnitsCount }}</strong></span>
+        <span>Total Unidades: <strong class="font-bold" [ngClass]="themeService.isDarkMode() ? 'text-[#F0F6FC]' : 'text-[#48021C]'">{{ totalUnitsCount }}</strong></span>
         @if (showDiscount && totalDiscount > 0) {
           <span>•</span>
-          <span>Desc. Total: <strong class="text-rose-600 font-bold">{{ totalDiscount | currency:'Q ' }}</strong></span>
+          <span>Desc. Total: <strong class="font-bold" [ngClass]="themeService.isDarkMode() ? 'text-rose-400' : 'text-rose-600'">{{ totalDiscount | currency:'Q ' }}</strong></span>
         }
         @if (customPriceCount > 0) {
           <span>•</span>
-          <span class="inline-flex items-center gap-1 text-teal-800">
+          <span class="inline-flex items-center gap-1"
+                [ngClass]="themeService.isDarkMode() ? 'text-teal-400' : 'text-teal-800'">
             <span class="w-1.5 h-1.5 rounded-full bg-teal-500"></span>
             Pactados: <strong class="font-bold">{{ customPriceCount }}</strong>
           </span>
         }
       </div>
       <div class="flex items-center justify-between sm:justify-end gap-2.5">
-        <span class="text-xs font-semibold text-[#48021C]">Subtotal Ítems:</span>
-        <span class="text-sm font-bold text-[#48021C] tabular-nums">
+        <span class="text-xs font-semibold"
+              [ngClass]="themeService.isDarkMode() ? 'text-[#8B949E]' : 'text-[#48021C]'">Subtotal Ítems:</span>
+        <span class="text-sm font-bold tabular-nums"
+              [ngClass]="themeService.isDarkMode() ? 'text-[#58A6FF]' : 'text-[#48021C]'">
           {{ totalEstimatedValue | currency:'Q ' }}
         </span>
       </div>
     </div>
   }
 </div>
+

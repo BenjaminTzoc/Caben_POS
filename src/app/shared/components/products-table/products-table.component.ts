@@ -1,7 +1,8 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Component, EventEmitter, Input, Output, inject } from '@angular/core';
 import { CommonModule, CurrencyPipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { environment } from '../../../../environments/environment';
+import { ThemeService } from '../../../core/services/theme.service';
 
 // PrimeNG
 import { ButtonModule } from 'primeng/button';
@@ -47,6 +48,8 @@ export interface QuotationItem {
   templateUrl: './products-table.component.html',
 })
 export class ProductsTableComponent {
+  public themeService = inject(ThemeService);
+
   /** Lista de ítems en la tabla */
   @Input() items: QuotationItem[] = [];
 

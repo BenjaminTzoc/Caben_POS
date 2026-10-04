@@ -10,6 +10,7 @@ import {
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Table, TableModule } from 'primeng/table';
+import { ThemeService } from '../../../core/services/theme.service';
 
 @Component({
   selector: 'app-standard-table',
@@ -37,7 +38,13 @@ export class StandardTableComponent {
   @Input() customClass: string = '';
   @Input() colorScheme: 'burgundy' | 'navy' | 'slate' | 'purple' = 'burgundy';
 
+  constructor(public themeService: ThemeService) {}
+
   get containerClass(): string {
+    if (this.themeService.isDarkMode()) {
+      return 'theme-dark bg-[#161B22] border-[#30363D] text-[#F0F6FC]';
+    }
+
     switch (this.colorScheme) {
       case 'purple':
         return 'theme-purple bg-white border-[#93679c]/30';

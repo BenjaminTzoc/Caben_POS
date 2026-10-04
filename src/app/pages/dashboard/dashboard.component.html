@@ -1,18 +1,34 @@
-  <div class="p-4 sm:p-6 bg-[#f8fafcf3] min-h-screen">
-  <header class="dash-head no-print">
+<div class="p-4 sm:p-6 min-h-screen transition-colors duration-300"
+  [ngClass]="themeService.isDarkMode() ? 'bg-[#0D1117]' : 'bg-[#f8fafcf3]'">
+  <header class="flex flex-col sm:flex-row sm:items-end justify-between gap-3 mb-4 sm:mb-6 no-print">
     <div class="min-w-0">
-      <h1 class="dash-head-title">Panel de control</h1>
-      <p class="dash-head-sub">Ventas, cobros y operación del día</p>
+      <h1 class="text-lg sm:text-xl font-medium tracking-tight m-0 leading-tight transition-colors duration-300"
+        [ngClass]="themeService.isDarkMode() ? 'text-[#F0F6FC]' : 'text-[#48021C]'">Panel de control</h1>
+      <p class="text-xs font-normal mt-0.5 mb-0 leading-relaxed transition-colors duration-300" 
+        [ngClass]="themeService.isDarkMode() ? 'text-[#8B949E]' : 'text-[#9f6587]'">Ventas,
+        cobros y operación del día</p>
     </div>
-    @if (canFilterByBranch()) {
-      <app-branch-select
-        [branches]="branches()"
-        [ngModel]="selectedBranchId()"
-        placeholder="Todas las sucursales"
-        [showClear]="true"
-        widthClass="w-full sm:w-[16.5rem]"
-        (selectionChange)="onBranchChange($event)"
-      />
+    @if (!isConsolidatedMode() && activeWorkingBranch()?.id) {
+    <div class="flex items-center gap-2.5 px-3 py-1.5 border rounded-xl shadow-2xs shrink-0 transition-all" [ngClass]="themeService.isDarkMode() 
+          ? 'bg-[#161B22] border-[#30363D] text-[#F0F6FC]' 
+          : 'bg-rose-50/40 border-[#48021C]/25 text-slate-800'">
+      <span class="w-6 h-6 rounded-lg flex items-center justify-center shrink-0 border"
+        [ngClass]="activeWorkingBranch()?.isPlant
+            ? (themeService.isDarkMode() ? 'bg-emerald-950/50 text-emerald-400 border-emerald-800/60' : 'bg-emerald-50 text-emerald-700 border-emerald-200')
+            : (themeService.isDarkMode() ? 'bg-[#1C2D42] text-[#58A6FF] border-[#58A6FF]/30' : 'bg-sky-50 text-sky-700 border-sky-200')">
+        <i [class]="activeWorkingBranch()?.isPlant ? 'pi pi-server' : 'pi pi-shop'" class="text-xs"></i>
+      </span>
+      <div class="flex flex-col min-w-0 pr-1">
+        <span class="text-sm font-medium truncate"
+          [ngClass]="themeService.isDarkMode() ? 'text-[#F0F6FC]' : 'text-slate-800'">{{ activeWorkingBranch()?.name
+          }}</span>
+        <span class="text-[11px] font-medium"
+          [ngClass]="themeService.isDarkMode() ? 'text-slate-400' : 'text-slate-500'">Sucursal activa</span>
+      </div>
+    </div>
+    } @else if (canFilterByBranch()) {
+    <app-branch-select [branches]="branches()" [ngModel]="selectedBranchId()" placeholder="Todas las sucursales"
+      [showClear]="true" widthClass="w-full sm:w-[16.5rem]" (selectionChange)="onBranchChange($event)" />
     }
   </header>
 

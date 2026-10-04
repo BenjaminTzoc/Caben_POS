@@ -1,7 +1,8 @@
-import { Component, EventEmitter, Input, Output, ViewEncapsulation } from '@angular/core';
+import { Component, EventEmitter, Input, Output, ViewEncapsulation, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { DialogModule } from 'primeng/dialog';
 import { ButtonModule } from 'primeng/button';
+import { ThemeService } from '../../../core/services/theme.service';
 
 export type ConfirmationType = 'warning' | 'danger' | 'success' | 'info' | 'primary';
 
@@ -14,6 +15,8 @@ export type ConfirmationType = 'warning' | 'danger' | 'success' | 'info' | 'prim
   encapsulation: ViewEncapsulation.None,
 })
 export class ConfirmationModalComponent {
+  public themeService = inject(ThemeService);
+
   @Input() visible = false;
   @Output() visibleChange = new EventEmitter<boolean>();
 

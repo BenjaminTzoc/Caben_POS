@@ -12,6 +12,7 @@ import { PrintService } from '../../../shared/services/print.service';
 import { OrdersService } from '../../services/orders.service';
 import { SalePaymentsService } from '../../services/sale-payments.service';
 import { CompanySettingService } from '../../../shared/services/company-setting.service';
+import { ThemeService } from '../../../core/services/theme.service';
 
 @Component({
   selector: 'app-ticket-preview',
@@ -30,6 +31,7 @@ import { CompanySettingService } from '../../../shared/services/company-setting.
   styleUrl: './ticket-preview.component.css',
 })
 export class TicketPreviewComponent implements OnInit, OnChanges {
+  public themeService = inject(ThemeService);
   private printService = inject(PrintService);
   private ordersService = inject(OrdersService);
   private salePaymentsService = inject(SalePaymentsService);

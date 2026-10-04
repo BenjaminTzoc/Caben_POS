@@ -1,155 +1,207 @@
-<div class="py-4 px-0 md:px-6 bg-slate-50/50 min-h-screen">
+<div class="py-4 px-0 md:px-6 min-h-screen transition-colors duration-200"
+     [ngClass]="themeService.isDarkMode() ? 'bg-[#0D1117]' : 'bg-slate-50/50'">
   <!-- Header Section -->
-  <div class="max-w-[1700px] mx-auto px-4 md:px-0 mb-6 md:mb-8">
-    <div class="flex flex-col md:flex-row md:items-end justify-between gap-4">
-      <div class="w-full md:max-w-[60%]">
-        <h1 class="text-2xl md:text-4xl font-semibold text-gray-900 tracking-tight">
-          {{ isEditMode ? 'Editar Categoría' : 'Nueva Categoría' }}
-        </h1>
-        <p class="hidden md:block text-[#627ca7] mt-1 md:mt-2 text-sm md:text-md font-medium">
-           Completa la información para {{ isEditMode ? 'actualizar' : 'añadir' }} una categoría al catálogo de clientes.
-        </p>
-      </div>
+  <app-page-header
+    [title]="isEditMode ? 'Editar Categoría' : 'Nueva Categoría'"
+    [subtitle]="isEditMode ? 'Actualiza los parámetros y beneficios de la categoría de clientes.' : 'Completa la información para configurar una categoría de clientes en el catálogo.'"
+    icon="pi pi-users"
+    colorScheme="burgundy"
+    [showBackButton]="true"
+    (onBack)="onCancel()"
+  >
+    <ng-container actions>
+      <app-secondary-button
+        label="Cancelar"
+        icon="pi pi-times"
+        colorScheme="burgundy"
+        (clicked)="onCancel()"
+      />
+      <app-primary-button
+        [label]="isEditMode ? 'Guardar Cambios' : 'Crear Categoría'"
+        [icon]="isSaving ? 'pi pi-spin pi-spinner' : (isEditMode ? 'pi pi-save' : 'pi pi-check')"
+        [disabled]="categoryForm.invalid || isSaving"
+        [loading]="isSaving"
+        (clicked)="onSave()"
+      />
+    </ng-container>
+  </app-page-header>
 
-      <div class="flex items-center gap-2 md:gap-4 w-full md:w-auto">
-        <div class="flex-1">
-          <p-button 
-            label="Cancelar" 
-            (onClick)="onCancel()" 
-            variant="outlined" 
-            severity="danger" 
-            icon="pi pi-times"
-            styleClass="border-rose-400! h-[44px] justify-center"
-            fluid
-          />
-        </div>
-        <div class="flex-1">
-          <p-button
-            (onClick)="onSave()"
-            [label]="isEditMode ? 'Guardar' : 'Crear'"
-            severity="success"
-            [raised]="true"
-            styleClass="shadow-lg h-[44px] justify-center font-bold"
-            [loading]="isSaving"
-            icon="pi pi-check"
-            [disabled]="categoryForm.invalid"
-            fluid
-          />
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <form class="max-w-[1100px] mx-auto pb-40" [formGroup]="categoryForm">
-    <div class="grid grid-cols-1 md:grid-cols-12 gap-6 md:gap-8">
-      <div class="col-span-12 flex flex-col gap-6">
-        <div class="p-5 md:p-8 rounded-none md:rounded-lg bg-white border-y md:border border-slate-300 shadow-sm relative overflow-hidden">
-          <!-- Background Decorative Icon -->
-          <div class="absolute top-0 right-0 p-4 opacity-[0.03]">
-            <i class="pi pi-id-card" style="font-size: 8rem"></i>
+  <form class="max-w-[1100px] mx-auto pb-32 px-4 md:px-0" [formGroup]="categoryForm">
+    <div class="rounded-2xl border shadow-sm p-6 md:p-8 flex flex-col gap-6 transition-colors"
+         [ngClass]="themeService.isDarkMode() ? 'bg-[#161B22] border-[#30363D]' : 'bg-white border-slate-200'">
+      
+      <div class="grid grid-cols-1 xl:grid-cols-12 gap-6 lg:gap-8">
+        <!-- Left Column: Name & Description -->
+        <div class="xl:col-span-7 flex flex-col gap-6">
+          <!-- Name Field -->
+          <div class="flex flex-col gap-1.5">
+            <label class="text-xs font-semibold"
+                   [ngClass]="themeService.isDarkMode() ? 'text-[#F0F6FC]' : 'text-[#48021C]'" for="name">
+              Nombre de la Categoría <span class="text-rose-500">*</span>
+            </label>
+            <input
+              pInputText
+              id="name"
+              formControlName="name"
+              class="w-full !rounded-xl h-10 text-xs font-medium"
+              [ngClass]="[
+                themeService.isDarkMode()
+                  ? '!bg-[#0D1117] !border-[#30363D] !text-[#F0F6FC] focus:!border-[#58A6FF]'
+                  : '!bg-white !border-slate-300 !text-slate-800 focus:!border-[#48021C]',
+                categoryForm.get('name')?.invalid && categoryForm.get('name')?.touched ? '!border-rose-400 ng-invalid ng-dirty' : ''
+              ]"
+              placeholder="Ej. VIP, Mayorista, Minorista, Regular..."
+              autocomplete="off"
+            />
+            @if (categoryForm.get('name')?.invalid && categoryForm.get('name')?.touched) {
+              <small class="text-rose-500 text-[10px] font-medium flex items-center mt-0.5">
+                <i class="pi pi-exclamation-circle mr-1 text-[10px]"></i>El nombre de la categoría es obligatorio.
+              </small>
+            }
           </div>
 
-          <div class="grid grid-cols-1 xl:grid-cols-12 gap-6 lg:gap-8 relative z-10">
-            <!-- Left Column: Name & Description -->
-            <div class="xl:col-span-7 flex flex-col gap-6 md:gap-8">
-              <!-- Name Field -->
-              <div class="flex flex-col gap-1.5 md:gap-1">
-                <label class="text-xs md:text-sm font-semibold text-[#3B5B8A]" for="name">
-                  <i class="pi pi-tag mr-1 text-xs! text-blue-500"></i>
-                  Nombre de la Categoría <span class="text-red-700">*</span>
+          <!-- Description Field -->
+          <div class="flex flex-col gap-1.5 flex-grow">
+            <label class="text-xs font-semibold"
+                   [ngClass]="themeService.isDarkMode() ? 'text-[#F0F6FC]' : 'text-[#48021C]'" for="description">
+              Descripción (Opcional)
+            </label>
+            <textarea
+              rows="6"
+              pTextarea
+              id="description"
+              formControlName="description"
+              class="w-full !rounded-xl p-3 text-xs font-medium resize-none transition-colors flex-grow"
+              [ngClass]="[
+                themeService.isDarkMode()
+                  ? '!bg-[#0D1117] !border-[#30363D] !text-[#F0F6FC] focus:!border-[#58A6FF]'
+                  : '!bg-white !border-slate-300 !text-slate-800 focus:!border-[#48021C]'
+              ]"
+              placeholder="Detalle los requisitos o beneficios adicionales de este nivel de clientes..."
+              autocomplete="off"
+            ></textarea>
+          </div>
+
+          <!-- Active Toggle -->
+          <div class="flex items-center justify-between p-3.5 rounded-xl border transition-colors"
+               [ngClass]="themeService.isDarkMode() ? 'bg-[#0D1117] border-[#30363D]' : 'bg-slate-50 border-slate-200'">
+            <div class="flex flex-col">
+              <span class="text-xs font-semibold"
+                    [ngClass]="themeService.isDarkMode() ? 'text-[#F0F6FC]' : 'text-slate-800'">
+                Estado de la Categoría
+              </span>
+              <span class="text-[11px]"
+                    [ngClass]="themeService.isDarkMode() ? 'text-[#8B949E]' : 'text-slate-500'">
+                {{ categoryForm.get('isActive')?.value ? 'La categoría está activa y disponible para asignar a clientes' : 'La categoría se encuentra inactiva' }}
+              </span>
+            </div>
+            <p-toggleswitch formControlName="isActive" />
+          </div>
+        </div>
+
+        <!-- Right Column: Benefits & Financial Config -->
+        <div class="xl:col-span-5 flex flex-col">
+          <div class="p-5 md:p-6 rounded-2xl border h-full flex flex-col justify-between transition-colors"
+               [ngClass]="themeService.isDarkMode() ? 'bg-[#0D1117] border-[#30363D]' : 'bg-[#48021C]/5 border-[#48021C]/15'">
+            
+            <div>
+              <div class="flex items-center gap-2 mb-2">
+                <div class="w-8 h-8 rounded-lg flex items-center justify-center"
+                     [ngClass]="themeService.isDarkMode() ? 'bg-[#58A6FF]/10 text-[#58A6FF]' : 'bg-[#48021C]/10 text-[#48021C]'">
+                  <i class="pi pi-percentage font-bold text-sm"></i>
+                </div>
+                <span class="text-sm font-bold"
+                      [ngClass]="themeService.isDarkMode() ? 'text-[#F0F6FC]' : 'text-[#48021C]'">
+                  Configuración de Beneficios
+                </span>
+              </div>
+              <p class="text-xs font-medium leading-relaxed mb-6"
+                 [ngClass]="themeService.isDarkMode() ? 'text-[#8B949E]' : 'text-slate-600'">
+                Determine los parámetros financieros automáticos para los clientes de este nivel. El porcentaje de descuento se sugerirá en cada venta realizada.
+              </p>
+            </div>
+
+            <div class="flex flex-col gap-4">
+              <!-- Discount Percentage -->
+              <div class="flex flex-col gap-1.5">
+                <label class="text-[11px] font-bold uppercase tracking-wider"
+                       [ngClass]="themeService.isDarkMode() ? 'text-[#8B949E]' : 'text-[#48021C]'"
+                       for="discountPercentage">
+                  Descuento Predeterminado (%)
                 </label>
-                <input
-                  pInputText
-                  id="name"
-                  formControlName="name"
-                  class="w-full !rounded-lg h-[44px] md:h-auto font-medium"
-                  [ngClass]="{'ng-invalid ng-dirty': categoryForm.get('name')?.invalid && categoryForm.get('name')?.touched}"
-                  placeholder="Ej. VIP, Mayorista, Minorista, Regular..."
-                  autocomplete="off"
+                <p-inputnumber
+                  id="discountPercentage"
+                  formControlName="discountPercentage"
+                  suffix="%"
+                  [min]="0"
+                  [max]="100"
+                  [minFractionDigits]="2"
+                  [inputStyleClass]="'!rounded-xl w-full h-10 font-semibold text-xs ' + (themeService.isDarkMode() ? '!bg-[#161B22] !border-[#30363D] !text-[#F0F6FC]' : '!bg-white !border-slate-300 !text-slate-800')"
+                  [fluid]="true"
                 />
-                @if (categoryForm.get('name')?.invalid && categoryForm.get('name')?.touched) {
-                  <small class="text-rose-500 text-[10px] font-medium flex items-center mt-1">
-                    <i class="pi pi-exclamation-circle mr-1 text-[10px]!"></i>El nombre es obligatorio.
-                  </small>
-                }
               </div>
 
-              <!-- Description Field -->
-              <div class="flex flex-col gap-1.5 md:gap-1 h-full">
-                <label class="text-xs md:text-sm font-semibold text-[#3B5B8A]" for="description">
-                  <i class="pi pi-align-left mr-1 text-xs! text-blue-500"></i>
-                  Descripción (Opcional)
+              <!-- Min Purchase Amount -->
+              <div class="flex flex-col gap-1.5">
+                <label class="text-[11px] font-bold uppercase tracking-wider"
+                       [ngClass]="themeService.isDarkMode() ? 'text-[#8B949E]' : 'text-[#48021C]'"
+                       for="minPurchaseAmount">
+                  Venta Mínima Requerida
                 </label>
-                <textarea
-                  rows="6"
-                  pTextarea
-                  id="description"
-                  formControlName="description"
-                  class="w-full !rounded-lg border-slate-300 p-4 font-medium resize-none text-sm md:text-base flex-grow"
-                  placeholder="Detalle los requisitos o beneficios adicionales de este nivel..."
-                  autocomplete="off"
-                ></textarea>
+                <p-inputnumber
+                  id="minPurchaseAmount"
+                  formControlName="minPurchaseAmount"
+                  mode="currency"
+                  currency="GTQ"
+                  locale="es-GT"
+                  [min]="0"
+                  [inputStyleClass]="'!rounded-xl w-full h-10 font-semibold text-xs ' + (themeService.isDarkMode() ? '!bg-[#161B22] !border-[#30363D] !text-[#F0F6FC]' : '!bg-white !border-slate-300 !text-slate-800')"
+                  [fluid]="true"
+                />
               </div>
-            </div>
 
-            <!-- Right Column: Discount & Benefits Section -->
-            <div class="xl:col-span-5 flex flex-col">
-              <div class="p-5 md:p-6 rounded-xl bg-[#D0E2F2] border border-[#4A7FA7] h-full flex flex-col">
-                <div class="flex items-center gap-2 mb-2">
-                   <i class="pi pi-percentage text-[#3B5B8A] font-bold"></i>
-                   <span class="text-sm font-bold text-[#3B5B8A]">Configuración de Beneficios</span>
-                </div>
-                <p class="text-[11px] text-[#3B5B8A] font-medium leading-relaxed opacity-80 mb-6">
-                  Determine los parámetros financieros automáticos para los clientes de este nivel. El descuento se sugerirá en cada venta realizada.
-                </p>
-                
-                <div class="flex flex-col gap-5 mt-auto">
-                  <div class="flex flex-col gap-1.5">
-                    <label class="text-[10px] font-bold text-[#3B5B8A] uppercase tracking-wider" for="discountPercentage">Descuento (%)</label>
-                    <p-inputnumber
-                      id="discountPercentage"
-                      formControlName="discountPercentage"
-                      prefix="%"
-                      [min]="0"
-                      [max]="100"
-                      [minFractionDigits]="2"
-                      inputStyleClass="!rounded-lg border-slate-300 w-full h-[40px] font-bold text-[#3B5B8A]"
-                      [fluid]="true"
-                    />
-                  </div>
-                  <div class="flex flex-col gap-1.5">
-                    <label class="text-[10px] font-bold text-[#3B5B8A] uppercase tracking-wider" for="minPurchaseAmount">Venta Mínima</label>
-                    <p-inputnumber
-                      id="minPurchaseAmount"
-                      formControlName="minPurchaseAmount"
-                      mode="currency"
-                      currency="GTQ"
-                      locale="es-GT"
-                      [min]="0"
-                      inputStyleClass="!rounded-lg border-slate-300 w-full h-[40px] font-bold text-[#3B5B8A]"
-                      [fluid]="true"
-                    />
-                  </div>
-                  <div class="flex flex-col gap-1.5">
-                    <label class="text-[10px] font-bold text-[#3B5B8A] uppercase tracking-wider" for="defaultCreditLimit">Límite Crédito</label>
-                    <p-inputnumber
-                      id="defaultCreditLimit"
-                      formControlName="defaultCreditLimit"
-                      mode="currency"
-                      currency="GTQ"
-                      locale="es-GT"
-                      [min]="0"
-                      inputStyleClass="!rounded-lg border-slate-300 w-full h-[40px] font-bold text-[#3B5B8A]"
-                      [fluid]="true"
-                    />
-                  </div>
-                </div>
+              <!-- Default Credit Limit -->
+              <div class="flex flex-col gap-1.5">
+                <label class="text-[11px] font-bold uppercase tracking-wider"
+                       [ngClass]="themeService.isDarkMode() ? 'text-[#8B949E]' : 'text-[#48021C]'"
+                       for="defaultCreditLimit">
+                  Límite de Crédito Sugerido
+                </label>
+                <p-inputnumber
+                  id="defaultCreditLimit"
+                  formControlName="defaultCreditLimit"
+                  mode="currency"
+                  currency="GTQ"
+                  locale="es-GT"
+                  [min]="0"
+                  [inputStyleClass]="'!rounded-xl w-full h-10 font-semibold text-xs ' + (themeService.isDarkMode() ? '!bg-[#161B22] !border-[#30363D] !text-[#F0F6FC]' : '!bg-white !border-slate-300 !text-slate-800')"
+                  [fluid]="true"
+                />
               </div>
             </div>
 
           </div>
         </div>
       </div>
+
+      <!-- Action buttons at bottom for convenience -->
+      <div class="flex items-center justify-end gap-3 pt-4 border-t"
+           [ngClass]="themeService.isDarkMode() ? 'border-[#30363D]' : 'border-slate-100'">
+        <app-secondary-button
+          label="Cancelar"
+          icon="pi pi-times"
+          colorScheme="burgundy"
+          (clicked)="onCancel()"
+        />
+        <app-primary-button
+          [label]="isEditMode ? 'Guardar Cambios' : 'Crear Categoría'"
+          [icon]="isSaving ? 'pi pi-spin pi-spinner' : (isEditMode ? 'pi pi-save' : 'pi pi-check')"
+          [disabled]="categoryForm.invalid || isSaving"
+          [loading]="isSaving"
+          (clicked)="onSave()"
+        />
+      </div>
+
     </div>
   </form>
 </div>

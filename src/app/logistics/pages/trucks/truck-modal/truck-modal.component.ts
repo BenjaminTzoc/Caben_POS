@@ -11,6 +11,7 @@ import { Truck, CreateTruckDto, UpdateTruckDto, TruckStatus } from '../../../int
 import { StandardModalComponent } from '../../../../shared/components/standard-modal/standard-modal.component';
 import { PrimaryButtonComponent } from '../../../../shared/components/primary-button/primary-button.component';
 import { SecondaryButtonComponent } from '../../../../shared/components/secondary-button/secondary-button.component';
+import { ThemeService } from '../../../../core/services/theme.service';
 
 @Component({
   selector: 'app-truck-modal',
@@ -27,6 +28,7 @@ import { SecondaryButtonComponent } from '../../../../shared/components/secondar
     SecondaryButtonComponent,
   ],
   templateUrl: './truck-modal.component.html',
+  styleUrl: './truck-modal.component.css',
 })
 export class TruckModalComponent implements OnInit, OnChanges {
   @Input() visible = false;
@@ -34,6 +36,7 @@ export class TruckModalComponent implements OnInit, OnChanges {
   @Output() visibleChange = new EventEmitter<boolean>();
   @Output() saved = new EventEmitter<Truck>();
 
+  public themeService = inject(ThemeService);
   private fb = inject(FormBuilder);
   private trucksService = inject(TrucksService);
   private messageService = inject(MessageService);

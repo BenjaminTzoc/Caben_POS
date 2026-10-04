@@ -1,40 +1,4 @@
-.dash-head {
-  display: flex;
-  flex-direction: column;
-  gap: 0.75rem;
-  margin-bottom: 1rem;
-}
-
-.dash-head-title {
-  margin: 0;
-  font-size: 1.15rem;
-  font-weight: 700;
-  letter-spacing: -0.02em;
-  color: #48021C;
-  line-height: 1.2;
-}
-
-.dash-head-sub {
-  margin: 0.2rem 0 0;
-  font-size: 12px;
-  font-weight: 600;
-  color: #9f6587;
-  line-height: 1.35;
-}
-
-@media (min-width: 640px) {
-  .dash-head {
-    flex-direction: row;
-    align-items: flex-end;
-    justify-content: space-between;
-  }
-
-  .dash-head-title {
-    font-size: 1.25rem;
-  }
-}
-
-:host ::ng-deep .p-datatable-sm .p-datatable-tbody > tr > td {
+:host ::ng-deep .p-datatable-sm .p-datatable-tbody>tr>td {
   padding: 0;
 }
 
@@ -63,8 +27,15 @@
 
 /* Animations */
 @keyframes fadeIn {
-  from { opacity: 0; transform: translateY(10px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .animate-in {
@@ -76,7 +47,7 @@
   overflow: visible !important;
 }
 
-.custom-dashboard-table ::ng-deep .p-datatable-thead > tr > th {
+.custom-dashboard-table ::ng-deep .p-datatable-thead>tr>th {
   background-color: #f8fafc50 !important;
 }
 
@@ -110,7 +81,7 @@
   padding: 2px !important;
 }
 
-.dashboard-inline-calendar ::ng-deep .p-datepicker-calendar td > span {
+.dashboard-inline-calendar ::ng-deep .p-datepicker-calendar td>span {
   width: 2.5rem !important;
   height: 2.5rem !important;
   border-radius: 12px !important;
@@ -126,6 +97,7 @@
 .scrollbar-hide::-webkit-scrollbar {
   display: none;
 }
+
 .scrollbar-hide {
   -ms-overflow-style: none;
   scrollbar-width: none;
@@ -136,7 +108,7 @@
   .no-print {
     display: none !important;
   }
-  
+
   .print-only {
     display: block !important;
   }
@@ -153,11 +125,16 @@
   }
 
   /* Clear backgrounds for ink saving */
-  .bg-white, .bg-slate-50, .bg-indigo-50, .bg-emerald-50 {
+  .bg-white,
+  .bg-slate-50,
+  .bg-indigo-50,
+  .bg-emerald-50 {
     background-color: transparent !important;
   }
 
-  .border, .border-slate-200, .border-slate-300 {
+  .border,
+  .border-slate-200,
+  .border-slate-300 {
     border-color: #e2e8f0 !important;
   }
 }
@@ -205,7 +182,7 @@ thead th.sticky {
     min-width: 16rem;
   }
 
-  .today-payments-slot > * {
+  .today-payments-slot>* {
     position: absolute;
     inset: 0;
   }

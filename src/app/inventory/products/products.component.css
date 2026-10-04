@@ -8,3 +8,13 @@
 :host ::ng-deep .burgundy-switch.p-toggleswitch:not(.p-disabled):has(.p-toggleswitch-input:focus-visible) .p-toggleswitch-slider {
   outline: 2px solid rgba(72, 2, 28, 0.25) !important;
 }
+
+/* Dark mode toggle switch styling */
+:host-context(.dark) ::ng-deep .burgundy-switch.p-toggleswitch:not(.p-toggleswitch-checked) .p-toggleswitch-slider {
+  background: #30363D !important;
+}
+
+:host-context(.dark) ::ng-deep .burgundy-switch.p-toggleswitch-checked .p-toggleswitch-slider,
+:host-context(.dark) ::ng-deep .burgundy-switch.p-toggleswitch.p-toggleswitch-checked .p-toggleswitch-slider {
+  background: #58A6FF !important;
+}

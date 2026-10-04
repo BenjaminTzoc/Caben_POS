@@ -1,5 +1,6 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { ThemeService } from '../../../core/services/theme.service';
 
 export type BadgeSeverity =
   | 'success'
@@ -21,6 +22,8 @@ export type BadgeSeverity =
   styleUrl: './status-badge.component.css'
 })
 export class StatusBadgeComponent {
+  public themeService = inject(ThemeService);
+
   @Input() value?: string | number | null = '';
   @Input() icon?: string = '';
   @Input() severity: BadgeSeverity = 'info';
@@ -30,17 +33,18 @@ export class StatusBadgeComponent {
   @Input() customClass: string = '';
 
   get dotClass(): string {
+    const isDark = this.themeService.isDarkMode();
     const dotColorClasses: Record<string, string> = {
-      success: 'bg-emerald-600',
-      danger: 'bg-rose-600',
-      warn: 'bg-amber-600',
-      warning: 'bg-amber-600',
-      info: 'bg-sky-600',
-      secondary: 'bg-slate-500',
-      slate: 'bg-slate-500',
-      burgundy: 'bg-[#48021C]',
-      purple: 'bg-purple-600',
-      contrast: 'bg-white'
+      success: isDark ? 'bg-emerald-400' : 'bg-emerald-600',
+      danger: isDark ? 'bg-rose-400' : 'bg-rose-600',
+      warn: isDark ? 'bg-amber-400' : 'bg-amber-600',
+      warning: isDark ? 'bg-amber-400' : 'bg-amber-600',
+      info: isDark ? 'bg-sky-400' : 'bg-sky-600',
+      secondary: isDark ? 'bg-slate-400' : 'bg-slate-500',
+      slate: isDark ? 'bg-slate-400' : 'bg-slate-500',
+      burgundy: isDark ? 'bg-[#58A6FF]' : 'bg-[#48021C]',
+      purple: isDark ? 'bg-purple-400' : 'bg-purple-600',
+      contrast: isDark ? 'bg-slate-900' : 'bg-white'
     };
 
     const dotSizeClasses: Record<string, string> = {
@@ -58,6 +62,7 @@ export class StatusBadgeComponent {
   }
 
   get badgeClasses(): string {
+    const isDark = this.themeService.isDarkMode();
     const sizeClasses = {
       xs: 'text-[10px] px-2 py-0.5 gap-1',
       sm: 'text-xs px-2.5 py-1 gap-1.5',
@@ -65,7 +70,18 @@ export class StatusBadgeComponent {
       lg: 'text-base px-3.5 py-2 gap-2'
     }[this.size] || 'text-xs px-2.5 py-1 gap-1.5';
 
-    const colorClasses: Record<string, string> = {
+    const colorClasses: Record<string, string> = isDark ? {
+      success: 'bg-emerald-950/50 text-emerald-300 border-emerald-800/60',
+      danger: 'bg-rose-950/50 text-rose-300 border-rose-800/60',
+      warn: 'bg-amber-950/50 text-amber-300 border-amber-800/60',
+      warning: 'bg-amber-950/50 text-amber-300 border-amber-800/60',
+      info: 'bg-sky-950/50 text-sky-300 border-sky-800/60',
+      secondary: 'bg-[#1C2128] text-slate-300 border-[#30363D]',
+      slate: 'bg-[#1C2128] text-slate-300 border-[#30363D]',
+      burgundy: 'bg-[#1C2D42] text-[#58A6FF] border-[#58A6FF]/30',
+      purple: 'bg-purple-950/50 text-purple-300 border-purple-800/60',
+      contrast: 'bg-slate-100 text-slate-900 border-white'
+    } : {
       success: 'bg-[#dcfce7] text-[#14532d] border-emerald-600/35',
       danger: 'bg-[#ffe4e6] text-[#9f1239] border-rose-600/35',
       warn: 'bg-[#fef3c7] text-[#92400e] border-amber-600/35',

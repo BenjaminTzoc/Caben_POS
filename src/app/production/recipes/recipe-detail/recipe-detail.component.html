@@ -1,54 +1,93 @@
-<div class="py-4 px-0 md:px-8 bg-slate-50/50 min-h-screen pb-[500px]">
-  <!-- Header -->
-  <div class="max-w-6xl mx-auto mb-6 md:mb-8 px-4 md:px-0">
-    <div class="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-4">
-      <div class="flex flex-col">
-        <h1 class="text-3xl font-bold text-slate-900 tracking-tight">Estructura de Receta</h1>
-        <p class="text-slate-500 text-sm mt-1">Configure los insumos base para la producción.</p>
-      </div>
-
-      <button
-        pButton
+<div class="py-4 pb-24 px-0 md:px-6 min-h-screen transition-colors duration-200" [ngClass]="themeService.isDarkMode() ? 'bg-[#0D1117]' : 'bg-[#9f6587]/[0.06]'">
+  <!-- Top Card: Header Estandarizado -->
+  <app-page-header
+    title="Estructura de Receta"
+    subtitle="Configure los insumos y proporciones base para la producción."
+    icon="pi pi-receipt"
+    colorScheme="burgundy"
+    [showBackButton]="true"
+    (onBack)="onBack()"
+    [badge]="product() ? product()!.name : ''"
+    badgeSeverity="burgundy"
+  >
+    <!-- Acciones -->
+    <div actions class="flex items-center gap-2 flex-wrap">
+      <app-secondary-button
         label="Regresar al Listado"
         icon="pi pi-arrow-left"
-        class="p-button-outlined p-button-danger !rounded-xl !px-6 shadow-sm hover:shadow-md transition-all justify-center"
-        (click)="onBack()"
-      ></button>
+        (clicked)="onBack()"
+      />
     </div>
-  </div>
+  </app-page-header>
 
-  <div class="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-6 md:gap-8 px-4 md:px-0">
-    
+  <div class="max-w-[1700px] mx-auto mt-4 px-4 md:px-0 grid grid-cols-1 lg:grid-cols-12 gap-6">
     <!-- Left Column: Product Info & Add Ingredient -->
-    <div class="lg:col-span-4 space-y-6">
+    <div class="lg:col-span-4 flex flex-col gap-6">
       <!-- Product Card -->
-      <div class="bg-white rounded-2xl md:rounded-xl border border-slate-300 p-6 shadow-sm">
-        <h3 class="text-xs font-medium text-slate-500 tracking-wide mb-4">Producto Terminado</h3>
+      <div
+        class="rounded-2xl border p-5 md:p-6 transition-colors shadow-sm"
+        [ngClass]="themeService.isDarkMode() ? 'bg-[#161B22] border-[#30363D]' : 'bg-white border-[#48021C]/20'"
+      >
+        <span class="text-[10px] font-bold uppercase tracking-wider block mb-4"
+              [ngClass]="themeService.isDarkMode() ? 'text-[#8B949E]' : 'text-slate-400'">
+          Producto a Producir
+        </span>
         <div class="flex flex-col items-center text-center">
-          <div class="w-24 h-24 rounded-2xl border border-slate-300 bg-slate-100 flex items-center justify-center overflow-hidden mb-4">
+          <div
+            class="w-24 h-24 rounded-2xl border flex items-center justify-center overflow-hidden mb-3.5 shadow-sm"
+            [ngClass]="themeService.isDarkMode() ? 'bg-[#0D1117] border-[#30363D]' : 'bg-slate-50 border-slate-200'"
+          >
             @if (product()?.imageUrl) {
               <img [src]="getProductImageUrl(product()?.imageUrl)" class="w-full h-full object-cover" />
             } @else {
-              <i class="pi pi-image text-4xl! text-slate-300"></i>
+              <i class="pi pi-box text-3xl" [ngClass]="themeService.isDarkMode() ? 'text-[#8B949E]' : 'text-slate-400'"></i>
             }
           </div>
-          <span class="text-xl font-bold text-slate-800 leading-tight">{{ product()?.name }}</span>
-          <span class="text-xs font-semibold text-indigo-500 uppercase mt-1">SKU: {{ product()?.sku }}</span>
-          <div class="mt-4 px-3 py-1 bg-indigo-50 text-indigo-600 rounded-[5px] text-[11px] font-semibold tracking-wide">
-            Medido por: {{ product()?.unit?.name }}
+          <span class="text-base font-bold leading-tight" [ngClass]="themeService.isDarkMode() ? 'text-[#F0F6FC]' : 'text-slate-800'">
+            {{ product()?.name }}
+          </span>
+          <span class="text-xs font-mono font-bold tracking-wider uppercase mt-1" [ngClass]="themeService.isDarkMode() ? 'text-[#58A6FF]' : 'text-[#6b3353]'">
+            {{ product()?.sku }}
+          </span>
+          <div
+            class="mt-3 px-3 py-1 rounded-lg text-xs font-semibold border"
+            [ngClass]="themeService.isDarkMode() ? 'bg-[#1C2128] border-[#30363D] text-[#8B949E]' : 'bg-rose-50 border-[#48021C]/20 text-[#48021C]'"
+          >
+            Unidad base: <strong>{{ product()?.unit?.name }} ({{ product()?.unit?.abbreviation }})</strong>
           </div>
         </div>
       </div>
 
-      <!-- Add Ingredient Form -->
-      <div class="bg-indigo-900 rounded-2xl md:rounded-xl p-5 md:p-6 text-white shadow-xl shadow-indigo-100 transition-all">
-        <h3 class="text-xs font-semibold text-indigo-300 uppercase tracking-widest mb-6">
-          {{ editingIngredientId() ? 'Editar Ingrediente' : 'Agregar Ingrediente' }}
-        </h3>
-        
-        <form [formGroup]="ingredientForm" class="space-y-5">
+      <!-- Add / Edit Ingredient Form Card -->
+      <div
+        class="rounded-2xl border p-5 md:p-6 transition-colors shadow-sm flex flex-col gap-4"
+        [ngClass]="themeService.isDarkMode() ? 'bg-[#161B22] border-[#30363D]' : 'bg-white border-[#48021C]/20'"
+      >
+        <div class="flex items-center gap-2.5 pb-3 border-b"
+             [ngClass]="themeService.isDarkMode() ? 'border-[#30363D]' : 'border-slate-100'">
+          <div
+            class="w-8 h-8 rounded-lg flex items-center justify-center border"
+            [ngClass]="editingIngredientId() ? (themeService.isDarkMode() ? 'bg-amber-950/60 border-amber-500/30 text-amber-400' : 'bg-amber-50 border-amber-200 text-amber-600') : (themeService.isDarkMode() ? 'bg-[#1C2128] border-[#30363D] text-[#58A6FF]' : 'bg-rose-50 border-[#48021C]/20 text-[#48021C]')"
+          >
+            <i class="pi" [ngClass]="editingIngredientId() ? 'pi-pencil' : 'pi-plus'"></i>
+          </div>
+          <div>
+            <h3 class="text-sm font-bold m-0" [ngClass]="themeService.isDarkMode() ? 'text-[#F0F6FC]' : 'text-slate-800'">
+              {{ editingIngredientId() ? 'Editar Ingrediente' : 'Agregar Ingrediente' }}
+            </h3>
+            <p class="text-[11px] m-0" [ngClass]="themeService.isDarkMode() ? 'text-[#8B949E]' : 'text-slate-500'">
+              Defina el insumo y su cantidad por unidad
+            </p>
+          </div>
+        </div>
+
+        <form [formGroup]="ingredientForm" class="flex flex-col gap-3.5">
+          <!-- Insumo Selection -->
           <div class="flex flex-col gap-1.5">
-            <label class="text-[11px] font-semibold text-indigo-300">Insumo / Componente</label>
+            <label class="text-xs font-bold uppercase tracking-wider"
+                   [ngClass]="themeService.isDarkMode() ? 'text-[#8B949E]' : 'text-slate-700'">
+              Insumo / Componente <span class="text-rose-500">*</span>
+            </label>
             <p-select
               formControlName="componentId"
               [options]="filteredComponents()"
@@ -56,27 +95,34 @@
               optionValue="id"
               placeholder="Buscar ingrediente..."
               [filter]="true"
+              filterBy="name,sku"
               class="w-full"
-              styleClass="!rounded-lg flex items-center"
+              [styleClass]="'!w-full !rounded-xl h-11 ' + (themeService.isDarkMode() ? '!bg-[#0D1117] !border-[#30363D] !text-[#F0F6FC]' : '!bg-white !border-slate-300 !text-slate-800')"
               appendTo="body"
             >
               <ng-template #item let-p>
-                <div class="flex flex-col">
-                  <span class="font-bold text-xs">{{ p.name }}</span>
-                  <span class="text-[9px] text-slate-400 font-mono">{{ p.sku }}</span>
+                <div class="flex flex-col py-1">
+                  <span class="font-bold text-xs" [ngClass]="themeService.isDarkMode() ? 'text-[#F0F6FC]' : 'text-slate-800'">{{ p.name }}</span>
+                  <span class="text-[10px] font-mono tracking-wider uppercase font-bold" [ngClass]="themeService.isDarkMode() ? 'text-[#58A6FF]' : 'text-[#6b3353]'">{{ p.sku }}</span>
                 </div>
               </ng-template>
             </p-select>
           </div>
 
+          <!-- Cantidad Sugerida con Conversor -->
           <div class="flex flex-col gap-1.5">
             <div class="flex items-center justify-between">
-              <label class="text-[11px] font-semibold text-indigo-300">Cantidad Sugerida</label>
-              <button 
-                type="button" 
-                pButton 
-                icon="pi pi-calculator" 
-                class="p-button-text p-button-xs !text-indigo-200 !p-0 !h-fit hover:!text-white"
+              <label class="text-xs font-bold uppercase tracking-wider"
+                     [ngClass]="themeService.isDarkMode() ? 'text-[#8B949E]' : 'text-slate-700'">
+                Cantidad Requerida <span class="text-rose-500">*</span>
+              </label>
+              <button
+                type="button"
+                pButton
+                icon="pi pi-calculator"
+                label="Convertir"
+                class="p-button-text p-button-xs !text-[11px] font-bold !p-0 !h-fit"
+                [ngClass]="themeService.isDarkMode() ? '!text-[#58A6FF]' : '!text-[#48021C]'"
                 pTooltip="Convertidor de unidades"
                 (click)="openConverter()"
               ></button>
@@ -89,39 +135,48 @@
               [placeholder]="getSelectedComponentAllowsDecimals() ? '0.0000' : '0'"
               [suffix]="' ' + getSelectedComponentUnit()"
               styleClass="w-full"
-              inputStyleClass="!rounded-lg px-4"
+              [inputStyleClass]="'!w-full !rounded-xl !h-11 !text-base !font-bold !px-3.5 ' + 
+                (themeService.isDarkMode() ? '!bg-[#0D1117] !border-[#30363D] !text-[#F0F6FC]' : '!bg-white !border-slate-300 !text-slate-800')"
             ></p-inputnumber>
-            <p class="text-[10px] text-indigo-200">* Cantidad necesaria por cada {{ product()?.unit?.abbreviation || 'Unidad' }}.</p>
+            <span class="text-[11px]" [ngClass]="themeService.isDarkMode() ? 'text-[#8B949E]' : 'text-slate-500'">
+              * Cantidad necesaria por cada {{ product()?.unit?.abbreviation || 'Unidad' }}.
+            </span>
           </div>
 
+          <!-- Notas Adicionales -->
           <div class="flex flex-col gap-1.5">
-            <label class="text-[11px] font-semibold text-indigo-300">Notas Adicionales</label>
-            <input 
-              pInputText 
+            <label class="text-xs font-bold uppercase tracking-wider"
+                   [ngClass]="themeService.isDarkMode() ? 'text-[#8B949E]' : 'text-slate-700'">
+              Notas / Instrucciones
+            </label>
+            <input
+              pInputText
               formControlName="notes"
-              class="!rounded-xl px-4"
-              placeholder="Opcional..."
+              class="!rounded-xl p-3 text-xs leading-relaxed transition-colors border w-full"
+              [ngClass]="themeService.isDarkMode() ? '!bg-[#0D1117] !border-[#30363D] !text-[#F0F6FC] placeholder:text-[#8B949E]' : '!bg-white !border-slate-300 !text-slate-800 placeholder:text-slate-400'"
+              placeholder="Ej: Agregar frío, tamizar, proporción..."
             />
           </div>
 
-          <div class="flex flex-col gap-3">
-            <button
-              pButton
-              [label]="editingIngredientId() ? 'Actualizar Ingrediente' : 'Incluir en Receta'"
-              [icon]="editingIngredientId() ? 'pi pi-save' : 'pi pi-plus'"
-              class="p-button-success w-full !rounded-lg !font-bold"
-              (click)="onAddIngredient()"
-              [loading]="adding()"
-            ></button>
-            
+          <!-- Form Buttons -->
+          <div class="flex flex-col gap-2 pt-2">
+            <div class="w-full [&_button]:w-full [&_.p-button]:w-full">
+              <app-primary-button
+                [label]="editingIngredientId() ? 'Actualizar Ingrediente' : 'Incluir en Receta'"
+                [icon]="editingIngredientId() ? 'pi pi-save' : 'pi pi-plus'"
+                [loading]="adding()"
+                (clicked)="onAddIngredient()"
+              />
+            </div>
+
             @if (editingIngredientId()) {
-              <button
-                pButton
-                label="Cancelar Edición"
-                icon="pi pi-times"
-                class="p-button-text p-button-sm p-button-danger w-full !rounded-lg"
-                (click)="onCancelEdit()"
-              ></button>
+              <div class="w-full [&_button]:w-full [&_.p-button]:w-full">
+                <app-secondary-button
+                  label="Cancelar Edición"
+                  icon="pi pi-times"
+                  (clicked)="onCancelEdit()"
+                />
+              </div>
             }
           </div>
         </form>
@@ -129,118 +184,194 @@
     </div>
 
     <!-- Right Column: Ingredients Table -->
-    <div class="lg:col-span-8">
-      <div class="bg-white rounded-2xl md:rounded-xl border border-slate-300 shadow-sm flex flex-col -mx-4 md:mx-0">
-        <div class="p-4 md:p-6 border-b border-slate-100 flex items-center justify-between bg-slate-50/50 rounded-t-2xl md:rounded-t-xl">
-          <div>
-            <h3 class="text-lg font-bold text-slate-800">Capa de Insumos</h3>
-            <p class="text-[11px] md:text-xs text-slate-500/90 leading-tight md:leading-normal mt-0.5">Listado de materiales requeridos para la transformación.</p>
+    <div class="lg:col-span-8 flex flex-col gap-6">
+      <div
+        class="rounded-2xl border transition-colors shadow-sm overflow-hidden flex flex-col"
+        [ngClass]="themeService.isDarkMode() ? 'bg-[#161B22] border-[#30363D]' : 'bg-white border-[#48021C]/20'"
+      >
+        <div
+          class="p-4 md:p-5 border-b flex items-center justify-between"
+          [ngClass]="themeService.isDarkMode() ? 'bg-[#1C2128] border-[#30363D]' : 'bg-rose-50/50 border-[#48021C]/15'"
+        >
+          <div class="flex items-center gap-2.5">
+            <div
+              class="w-9 h-9 rounded-xl flex items-center justify-center border"
+              [ngClass]="themeService.isDarkMode() ? 'bg-[#161B22] border-[#30363D] text-[#58A6FF]' : 'bg-white border-[#48021C]/20 text-[#48021C]'"
+            >
+              <i class="pi pi-list text-base"></i>
+            </div>
+            <div>
+              <h3 class="text-sm font-bold m-0" [ngClass]="themeService.isDarkMode() ? 'text-[#F0F6FC]' : 'text-slate-800'">
+                Capa de Insumos
+              </h3>
+              <p class="text-xs m-0" [ngClass]="themeService.isDarkMode() ? 'text-[#8B949E]' : 'text-slate-500'">
+                Listado de materiales requeridos para la transformación
+              </p>
+            </div>
           </div>
-          <p-tag [value]="ingredients().length + ' Insumos'" severity="info" styleClass="!text-[10px] md:!text-[12px] !px-3 font-semibold"></p-tag>
+
+          <span
+            class="text-xs font-bold uppercase tracking-wider px-3 py-1 rounded-lg border"
+            [ngClass]="themeService.isDarkMode() ? 'bg-[#1C2D42] text-[#58A6FF] border-[#58A6FF]/30' : 'bg-[#48021C]/10 text-[#48021C] border-[#48021C]/20'"
+          >
+            {{ ingredients().length }} Insumos
+          </span>
         </div>
 
-        <div class="flex-1 w-full overflow-x-auto">
-          <p-table [value]="ingredients()" styleClass="p-datatable-modern block lg:min-w-[700px] w-full" [responsiveLayout]="'scroll'">
+        <div class="overflow-x-auto w-full">
+          <p-table [value]="ingredients()" styleClass="p-datatable-modern w-full" [responsiveLayout]="'scroll'">
             <ng-template pTemplate="header">
-              <tr class="h-12! text-[12px]! hidden lg:table-row bg-slate-50/50">
-                <th class="!pl-8 tracking-widest text-slate-400 font-bold uppercase">Ingrediente</th>
-                <th class="text-center tracking-widest text-slate-400 font-bold uppercase">Cant. Requerida</th>
-                <th class="tracking-widest text-slate-400 font-bold uppercase">Notas</th>
-                <th class="!pr-8 w-12 text-right"></th>
+              <tr
+                class="h-10 text-xs font-bold border-b hidden lg:table-row"
+                [ngClass]="themeService.isDarkMode() ? 'bg-[#161B22] border-[#30363D] text-[#8B949E]' : 'bg-[#eddde1] border-[#762f41]/40 text-[#3b141e]'"
+              >
+                <th class="!pl-6 !text-left" [ngClass]="themeService.isDarkMode() ? 'border-r border-[#30363D]' : 'border-r border-[#762f41]/35'">Ingrediente</th>
+                <th class="!text-center !py-2 w-36" [ngClass]="themeService.isDarkMode() ? 'border-r border-[#30363D]' : 'border-r border-[#762f41]/35'">Cant. Requerida</th>
+                <th class="!text-left !pl-3" [ngClass]="themeService.isDarkMode() ? 'border-r border-[#30363D]' : 'border-r border-[#762f41]/35'">Notas</th>
+                <th class="!text-center !py-2 w-28">Acciones</th>
               </tr>
             </ng-template>
 
-            <ng-template pTemplate="body" let-ing>
-              <tr 
-                [ngClass]="{'!bg-amber-100/50 !border-l-4 !border-l-indigo-500': editingIngredientId() == ing.id}"
-                class="hover:bg-transparent lg:hover:bg-slate-50/50 transition-all border-b border-slate-100 last:border-0 duration-300 block lg:table-row bg-transparent"
+            <ng-template pTemplate="body" let-ing let-i="rowIndex">
+              <tr
+                [ngClass]="[
+                  themeService.isDarkMode()
+                    ? (i % 2 === 1 ? '!bg-[#161B22] border-[#30363D]' : '!bg-[#0D1117] border-[#30363D]')
+                    : (i % 2 === 1 ? 'bg-[#a65a6b]/[0.05] border-[#762f41]/18' : 'bg-white border-[#762f41]/18'),
+                  editingIngredientId() === ing.id ? (themeService.isDarkMode() ? '!bg-[#282117] !border-l-4 !border-l-amber-500' : '!bg-amber-50 !border-l-4 !border-l-amber-500') : ''
+                ]"
+                class="transition-colors border-b last:border-0 text-xs block lg:table-row"
               >
                 <!-- VISTA MÓVIL (Tarjeta) -->
                 <td class="lg:hidden block !p-0 border-none bg-transparent">
-                  <div class="bg-white rounded-2xl shadow-sm border border-slate-200 mx-4 my-3 p-5 flex flex-col gap-4 relative overflow-hidden"
-                       [ngClass]="{'border-indigo-400 bg-amber-50 shadow-md': editingIngredientId() == ing.id}">
-                    @if (editingIngredientId() == ing.id) {
-                       <div class="absolute left-0 top-0 bottom-0 w-1.5 bg-indigo-500"></div>
-                    }
-                    
+                  <div
+                    class="rounded-xl shadow-xs border mx-3 my-2.5 p-3 flex flex-col gap-2.5 relative"
+                    [ngClass]="themeService.isDarkMode() ? 'bg-[#161B22] border-[#30363D]' : 'bg-white border-[#48021C]/20'"
+                  >
                     <div class="flex items-start justify-between gap-3">
-                      <div class="flex items-center gap-3">
-                        <div class="w-12 h-12 rounded-lg overflow-hidden border border-slate-300 bg-slate-50 flex items-center justify-center shadow-sm flex-shrink-0">
+                      <div class="flex items-center gap-2.5">
+                        <div
+                          class="w-10 h-10 rounded border flex items-center justify-center overflow-hidden shrink-0"
+                          [ngClass]="themeService.isDarkMode() ? 'bg-[#0D1117] border-[#30363D]' : 'border-slate-200 bg-slate-50'"
+                        >
                           @if (ing.component?.imageUrl) {
                             <img [src]="getProductImageUrl(ing.component?.imageUrl)" class="w-full h-full object-cover" />
                           } @else {
-                            <i class="pi pi-image text-lg! text-slate-300"></i>
+                            <i class="pi pi-box text-sm" [ngClass]="themeService.isDarkMode() ? 'text-[#8B949E]' : 'text-slate-400'"></i>
                           }
                         </div>
-                        <div class="flex flex-col flex-1 min-w-0 pr-2">
-                          <span class="font-bold text-sm text-slate-800 leading-tight">{{ ing.component?.name }}</span>
-                          <span class="text-[10px] text-gray-400 font-mono tracking-widest mt-0.5">{{ ing.component?.sku }}</span>
+                        <div class="flex flex-col min-w-0">
+                          <span class="font-bold text-xs" [ngClass]="themeService.isDarkMode() ? 'text-[#F0F6FC]' : 'text-slate-800'">
+                            {{ ing.component?.name }}
+                          </span>
+                          <span class="text-[10px] font-mono tracking-wider uppercase font-bold" [ngClass]="themeService.isDarkMode() ? 'text-[#58A6FF]' : 'text-[#6b3353]'">
+                            {{ ing.component?.sku }}
+                          </span>
                         </div>
                       </div>
-                      
-                      <!-- Acción Móvil -->
-                      <div class="flex flex-col gap-1 items-end shrink-0 -mt-1 -mr-2">
-                        <button pButton icon="pi pi-pencil" class="p-button-rounded p-button-text p-button-warn !w-9 !h-9 !p-0" (click)="onEditIngredient(ing)"></button>
-                        <button pButton icon="pi pi-trash" class="p-button-rounded p-button-text p-button-danger !w-9 !h-9 !p-0" (click)="onDeleteIngredient(ing)"></button>
+
+                      <div class="flex items-center gap-1">
+                        <button
+                          pButton
+                          type="button"
+                          icon="pi pi-pencil"
+                          size="small"
+                          [outlined]="true"
+                          (click)="onEditIngredient(ing)"
+                          class="!w-7 !h-7 !p-0 !text-amber-500 hover:!bg-amber-500/10 !border-amber-500/30"
+                        ></button>
+                        <button
+                          pButton
+                          type="button"
+                          icon="pi pi-trash"
+                          size="small"
+                          [outlined]="true"
+                          (click)="onDeleteIngredient(ing)"
+                          class="!w-7 !h-7 !p-0 !text-rose-500 hover:!bg-rose-500/10 !border-rose-500/30"
+                        ></button>
                       </div>
                     </div>
 
-                    <div class="grid grid-cols-2 gap-4 border-t border-slate-100/80 pt-3 mt-1">
-                       <div class="flex flex-col gap-1">
-                          <span class="text-[9px] text-slate-400 font-bold uppercase tracking-widest">Cant. Requerida</span>
-                          <span class="text-sm font-bold text-[#1B768E] mt-0.5">
-                            {{ ing.quantity | number: '1.2-4' }}
-                            <span class="text-[11px] font-semibold">{{ ing.component?.unit?.abbreviation }}</span>
-                          </span>
-                       </div>
-                       <div class="flex flex-col gap-1 text-right">
-                          <span class="text-[9px] text-slate-400 font-bold uppercase tracking-widest">Notas</span>
-                          <span class="text-xs text-slate-500 font-medium italic mt-0.5 line-clamp-2" [class.opacity-50]="!ing.notes">{{ ing.notes || 'Ninguna' }}</span>
-                       </div>
+                    <div class="grid grid-cols-2 gap-2 border-t pt-2"
+                         [ngClass]="themeService.isDarkMode() ? 'border-[#30363D]' : 'border-slate-100'">
+                      <div>
+                        <span class="text-[9px] uppercase font-bold tracking-wider" [ngClass]="themeService.isDarkMode() ? 'text-[#8B949E]' : 'text-slate-400'">Cant. Requerida:</span>
+                        <p class="font-bold text-xs m-0" [ngClass]="themeService.isDarkMode() ? 'text-[#58A6FF]' : 'text-[#48021C]'">
+                          {{ ing.quantity | number: '1.2-4' }} {{ ing.component?.unit?.abbreviation }}
+                        </p>
+                      </div>
+                      <div class="text-right">
+                        <span class="text-[9px] uppercase font-bold tracking-wider" [ngClass]="themeService.isDarkMode() ? 'text-[#8B949E]' : 'text-slate-400'">Notas:</span>
+                        <p class="text-xs m-0 italic truncate" [ngClass]="themeService.isDarkMode() ? 'text-[#8B949E]' : 'text-slate-500'">
+                          {{ ing.notes || '---' }}
+                        </p>
+                      </div>
                     </div>
                   </div>
                 </td>
 
                 <!-- DESKTOP VIEW -->
-                <td class="!pl-8 py-4 hidden lg:table-cell">
-                  <div class="flex items-center gap-3">
-                    <div class="w-12 h-12 rounded-lg overflow-hidden border border-slate-300 bg-slate-50 flex items-center justify-center shadow-sm">
+                <td class="!pl-6 hidden lg:table-cell py-3" [ngClass]="themeService.isDarkMode() ? 'border-r border-[#30363D]' : 'border-r border-[#762f41]/15'">
+                  <div class="flex items-center gap-2.5">
+                    <div
+                      class="w-9 h-9 rounded border flex items-center justify-center overflow-hidden shrink-0"
+                      [ngClass]="themeService.isDarkMode() ? 'bg-[#0D1117] border-[#30363D]' : 'border-slate-200 bg-slate-50'"
+                    >
                       @if (ing.component?.imageUrl) {
                         <img [src]="getProductImageUrl(ing.component?.imageUrl)" class="w-full h-full object-cover" />
                       } @else {
-                        <i class="pi pi-image text-lg! text-slate-300"></i>
+                        <i class="pi pi-box text-xs" [ngClass]="themeService.isDarkMode() ? 'text-[#8B949E]' : 'text-slate-400'"></i>
                       }
                     </div>
-                    <div class="flex flex-col">
-                      <span class="font-semibold text-sm text-slate-700">{{ ing.component?.name }}</span>
-                      <span class="text-[11px] text-gray-500 font-mono">{{ ing.component?.sku }}</span>
+                    <div class="flex flex-col min-w-0">
+                      <span class="font-bold text-xs" [ngClass]="themeService.isDarkMode() ? 'text-[#F0F6FC]' : 'text-slate-800'">
+                        {{ ing.component?.name }}
+                      </span>
+                      <span class="text-[10px] font-mono tracking-wider uppercase font-bold" [ngClass]="themeService.isDarkMode() ? 'text-[#58A6FF]' : 'text-[#6b3353]'">
+                        {{ ing.component?.sku }}
+                      </span>
                     </div>
                   </div>
                 </td>
-                <td class="text-center hidden lg:table-cell">
-                  <span class="text-base font-semibold text-[#1B768E]">
+
+                <td class="text-center hidden lg:table-cell py-3" [ngClass]="themeService.isDarkMode() ? 'border-r border-[#30363D]' : 'border-r border-[#762f41]/15'">
+                  <span class="font-bold text-xs" [ngClass]="themeService.isDarkMode() ? 'text-[#58A6FF]' : 'text-[#48021C]'">
                     {{ ing.quantity | number: '1.2-4' }}
-                    <span class="text-[13px] font-semibold text-[#1B768E] ml-0.5">{{ ing.component?.unit?.abbreviation }}</span>
+                  </span>
+                  <span class="text-[10px] ml-1 font-medium" [ngClass]="themeService.isDarkMode() ? 'text-[#8B949E]' : 'text-slate-500'">
+                    {{ ing.component?.unit?.abbreviation }}
                   </span>
                 </td>
-                <td class="hidden lg:table-cell">
-                  <span class="text-sm text-slate-500 font-medium italic">{{ ing.notes || 'Ninguna' }}</span>
+
+                <td class="!pl-3 hidden lg:table-cell py-3" [ngClass]="themeService.isDarkMode() ? 'border-r border-[#30363D]' : 'border-r border-[#762f41]/15'">
+                  <span class="text-xs italic" [ngClass]="themeService.isDarkMode() ? 'text-[#8B949E]' : 'text-slate-600'">
+                    {{ ing.notes || '---' }}
+                  </span>
                 </td>
-                <td class="!pr-8 text-right hidden lg:table-cell">
-                  <div class="flex justify-end gap-1">
+
+                <td class="text-center hidden lg:table-cell py-3">
+                  <div class="flex items-center justify-center gap-1">
                     <button
                       pButton
+                      type="button"
                       icon="pi pi-pencil"
-                      class="p-button-rounded p-button-text p-button-warn !w-9 !h-9"
+                      pTooltip="Editar Ingrediente"
+                      tooltipPosition="bottom"
+                      size="small"
+                      [outlined]="true"
                       (click)="onEditIngredient(ing)"
-                      pTooltip="Editar"
+                      class="!w-7 !h-7 !p-0 !text-amber-500 hover:!bg-amber-500/10 !border-amber-500/30"
                     ></button>
                     <button
                       pButton
+                      type="button"
                       icon="pi pi-trash"
-                      class="p-button-rounded p-button-text p-button-danger !w-9 !h-9"
+                      pTooltip="Remover Ingrediente"
+                      tooltipPosition="bottom"
+                      size="small"
+                      [outlined]="true"
                       (click)="onDeleteIngredient(ing)"
-                      pTooltip="Remover"
+                      class="!w-7 !h-7 !p-0 !text-rose-500 hover:!bg-rose-500/10 !border-rose-500/30"
                     ></button>
                   </div>
                 </td>
@@ -249,91 +380,115 @@
 
             <ng-template pTemplate="emptymessage">
               <tr>
-                <td colspan="4" class="py-20 text-center">
-                  <div class="flex flex-col items-center gap-3 opacity-20">
-                    <i class="pi pi-receipt text-5xl"></i>
-                    <span class="text-xs font-black uppercase tracking-widest">Sin ingredientes definidos</span>
+                <td colspan="4" class="py-16 text-center">
+                  <div class="flex flex-col items-center justify-center gap-2.5">
+                    <div
+                      class="w-14 h-14 rounded-full flex items-center justify-center border"
+                      [ngClass]="themeService.isDarkMode() ? 'bg-[#1C2128] border-[#30363D]' : 'bg-slate-50 border-slate-200'"
+                    >
+                      <i class="pi pi-receipt text-2xl" [ngClass]="themeService.isDarkMode() ? 'text-[#8B949E]' : 'text-slate-400'"></i>
+                    </div>
+                    <span class="text-xs font-bold uppercase tracking-wider" [ngClass]="themeService.isDarkMode() ? 'text-[#8B949E]' : 'text-slate-500'">
+                      Sin ingredientes definidos
+                    </span>
+                    <p class="text-xs max-w-xs text-center m-0" [ngClass]="themeService.isDarkMode() ? 'text-[#8B949E]' : 'text-slate-400'">
+                      Utilice el formulario de la izquierda para agregar los insumos requeridos por esta receta.
+                    </p>
                   </div>
                 </td>
               </tr>
             </ng-template>
           </p-table>
         </div>
-        
-        <div class="p-6 bg-slate-50/50 border-t border-slate-100">
-           <div class="flex items-center gap-3">
-              <div class="w-1 h-10 bg-indigo-500 rounded-full"></div>
-              <p class="text-[12px] text-slate-500 font-medium leading-relaxed">
-                * Las cantidades definidas en esta receta se multiplicarán por la cantidad fabricada en una <b>Orden de Manufactura</b> para calcular el descuento de inventario.
-              </p>
-           </div>
+
+        <!-- Information Notice Footer -->
+        <div
+          class="p-4 border-t flex items-center gap-3 transition-colors"
+          [ngClass]="themeService.isDarkMode() ? 'bg-[#1C2128] border-[#30363D]' : 'bg-rose-50/50 border-[#48021C]/15'"
+        >
+          <div
+            class="w-8 h-8 rounded-lg flex items-center justify-center border shrink-0"
+            [ngClass]="themeService.isDarkMode() ? 'bg-[#161B22] border-[#30363D] text-[#58A6FF]' : 'bg-white border-[#48021C]/20 text-[#48021C]'"
+          >
+            <i class="pi pi-info-circle text-xs"></i>
+          </div>
+          <p class="text-xs leading-relaxed m-0" [ngClass]="themeService.isDarkMode() ? 'text-[#8B949E]' : 'text-slate-600'">
+            Las cantidades definidas en esta receta se multiplicarán automáticamente por el volumen planificado en cada <strong>Orden de Manufactura</strong> para calcular el descuento de inventario.
+          </p>
         </div>
       </div>
     </div>
-
   </div>
-</div>
 
-<!-- Diálogo de Conversión de Unidades -->
-<p-dialog 
-  [visible]="showConverter()" 
-  (onHide)="showConverter.set(false)"
-  header="Convertidor de Unidades" 
-  [modal]="true" 
-  [style]="{ width: '400px' }" 
-  [draggable]="false" 
-  [resizable]="false"
-  styleClass="custom-dialog"
->
-  <div class="flex flex-col gap-6 py-4">
-    <p class="text-[13px] text-slate-500 mb-2">
-      Convierta cualquier unidad a la medida base del componente: 
-      <b class="text-indigo-600 uppercase">{{ getSelectedComponentUnit() }}</b>
-    </p>
+  <!-- Standard Modal para Convertidor de Unidades -->
+  <app-standard-modal
+    [(visible)]="showConverter"
+    title="Convertidor de Unidades"
+    badge="Herramienta"
+    maxWidth="420px"
+  >
+    <div class="flex flex-col gap-4 py-1">
+      <p class="text-xs m-0 leading-relaxed" [ngClass]="themeService.isDarkMode() ? 'text-[#8B949E]' : 'text-slate-600'">
+        Convierta cualquier unidad de medida hacia la unidad base del componente: 
+        <strong [ngClass]="themeService.isDarkMode() ? 'text-[#58A6FF]' : 'text-[#48021C]'">{{ getSelectedComponentUnit() }}</strong>
+      </p>
 
-    <div class="flex flex-col gap-2">
-      <label class="text-xs font-bold text-slate-700 uppercase tracking-wider">Cantidad en otra unidad</label>
-      <p-inputnumber 
-        [ngModel]="convValue()" 
-        (ngModelChange)="convValue.set($event)"
-        [min]="0" 
-        [minFractionDigits]="2" 
-        [maxFractionDigits]="4"
-        placeholder="Ingrese cantidad..."
-        styleClass="w-full"
-        inputStyleClass="w-full !rounded-xl !border-slate-300"
-      ></p-inputnumber>
+      <div class="flex flex-col gap-1.5">
+        <label class="text-xs font-bold uppercase tracking-wider" [ngClass]="themeService.isDarkMode() ? 'text-[#8B949E]' : 'text-slate-700'">
+          Cantidad en otra unidad
+        </label>
+        <p-inputnumber
+          [ngModel]="convValue()"
+          (ngModelChange)="convValue.set($event)"
+          [min]="0"
+          [minFractionDigits]="2"
+          [maxFractionDigits]="4"
+          placeholder="0.00"
+          styleClass="w-full"
+          [inputStyleClass]="'!w-full !rounded-xl !h-11 !text-base !font-bold !px-3.5 ' + 
+            (themeService.isDarkMode() ? '!bg-[#0D1117] !border-[#30363D] !text-[#F0F6FC]' : '!bg-white !border-slate-300 !text-slate-800')"
+        ></p-inputnumber>
+      </div>
+
+      <div class="flex flex-col gap-1.5">
+        <label class="text-xs font-bold uppercase tracking-wider" [ngClass]="themeService.isDarkMode() ? 'text-[#8B949E]' : 'text-slate-700'">
+          Unidad de origen
+        </label>
+        <p-select
+          [ngModel]="convUnit()"
+          (ngModelChange)="convUnit.set($event)"
+          [options]="getCompatibleConvUnits()"
+          optionLabel="label"
+          optionValue="value"
+          placeholder="Seleccione unidad..."
+          class="w-full"
+          [styleClass]="'!w-full !rounded-xl h-11 ' + (themeService.isDarkMode() ? '!bg-[#0D1117] !border-[#30363D] !text-[#F0F6FC]' : '!bg-white !border-slate-300 !text-slate-800')"
+          appendTo="body"
+        ></p-select>
+      </div>
     </div>
 
-    <div class="flex flex-col gap-2">
-      <label class="text-xs font-bold text-slate-700 uppercase tracking-wider">Unidad de origen</label>
-      <p-select 
-        [ngModel]="convUnit()" 
-        (ngModelChange)="convUnit.set($event)"
-        [options]="getCompatibleConvUnits()" 
-        optionLabel="label" 
-        optionValue="value"
-        placeholder="Seleccione unidad..."
-        styleClass="w-full !rounded-xl !border-slate-300"
-        appendTo="body"
-      ></p-select>
-    </div>
-
-    <div class="pt-4 flex gap-3">
-      <button 
-        pButton 
-        label="Aplicar Conversión" 
-        icon="pi pi-check" 
-        class="flex-1 p-button-success !rounded-xl !py-3 font-bold"
-        (click)="applyConversion()"
+    <!-- Modal Footer Actions -->
+    <div footer class="flex items-center justify-end gap-2 w-full">
+      <app-secondary-button
+        label="Cerrar"
+        (clicked)="showConverter.set(false)"
+      />
+      <app-primary-button
+        label="Aplicar Conversión"
+        icon="pi pi-check"
         [disabled]="!convValue() || !convUnit()"
-      ></button>
-      <button 
-        pButton 
-        label="Cerrar" 
-        class="p-button-text p-button-secondary !rounded-xl"
-        (click)="showConverter.set(false)"
-      ></button>
+        (clicked)="applyConversion()"
+      />
     </div>
-  </div>
-</p-dialog>
+  </app-standard-modal>
+
+  <!-- Modal de Confirmación para Eliminar Ingrediente -->
+  <app-confirmation-modal
+    [(visible)]="showDeleteConfirmModal"
+    title="¿Remover ingrediente?"
+    [message]="'¿Está seguro que desea remover ' + (ingredientToDelete()?.component?.name || 'este ingrediente') + ' de la receta?'"
+    confirmLabel="Sí, remover"
+    (confirmed)="confirmDelete()"
+  />
+</div>

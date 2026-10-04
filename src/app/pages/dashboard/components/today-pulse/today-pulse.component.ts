@@ -5,6 +5,7 @@ import { Router } from '@angular/router';
 import { interval } from 'rxjs';
 import { ReportsService } from '../../../../core/services/reports.service';
 import { TodayPulseDto } from '../../../../core/models/reports.models';
+import { ThemeService } from '../../../../core/services/theme.service';
 import { DashboardFilterService } from '../../dashboard-filter.service';
 
 const REFRESH_MS = 45_000;
@@ -17,6 +18,7 @@ const REFRESH_MS = 45_000;
   styleUrl: './today-pulse.component.css',
 })
 export class TodayPulseComponent implements OnInit {
+  public themeService = inject(ThemeService);
   private reportsService = inject(ReportsService);
   private destroyRef = inject(DestroyRef);
   private dashboardFilter = inject(DashboardFilterService);

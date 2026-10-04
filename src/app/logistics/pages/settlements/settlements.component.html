@@ -1,4 +1,4 @@
-<div class="py-4 px-0 md:px-6 bg-slate-50/50 min-h-screen">
+<div class="py-4 px-0 md:px-6 min-h-screen transition-colors duration-200" [ngClass]="themeService.isDarkMode() ? 'bg-[#0D1117]' : 'bg-slate-50/50'">
   <app-page-header
     title="Liquidación diaria"
     subtitle="Cierre de producto por sucursal después de caja"
@@ -17,7 +17,7 @@
       />
 
       <div class="flex flex-col gap-1 w-full md:w-auto">
-        <label class="text-xs font-semibold text-[#48021C]">Estado</label>
+        <label class="text-xs font-semibold" [ngClass]="themeService.isDarkMode() ? 'text-[#F0F6FC]' : 'text-[#48021C]'">Estado</label>
         <p-select
           [options]="statusOptions"
           [ngModel]="selectedStatus()"
@@ -29,13 +29,13 @@
           appendTo="body"
           size="small"
           class="w-full md:w-auto"
-          styleClass="!rounded-lg !border-[#9f6587]/35 focus-within:!border-[#9f6587] focus-within:!ring-2 focus-within:!ring-[#9f6587]/20 w-full md:w-52 text-xs font-medium"
+          [styleClass]="'!rounded-lg w-full md:w-52 text-xs font-medium ' + (themeService.isDarkMode() ? '!bg-[#0D1117] !text-[#F0F6FC] !border-[#30363D] focus-within:!border-[#58A6FF] focus-within:!ring-2 focus-within:!ring-[#58A6FF]/20' : '!border-[#9f6587]/35 focus-within:!border-[#9f6587] focus-within:!ring-2 focus-within:!ring-[#9f6587]/20')"
         />
       </div>
 
       @if (isSuperAdmin) {
         <div class="flex flex-col gap-1 w-full md:w-auto">
-          <label class="text-xs font-semibold text-[#48021C]">Sucursal</label>
+          <label class="text-xs font-semibold" [ngClass]="themeService.isDarkMode() ? 'text-[#F0F6FC]' : 'text-[#48021C]'">Sucursal</label>
           <app-branch-select
             [branches]="branches"
             [ngModel]="selectedBranchId()"
@@ -61,45 +61,52 @@
         emptyIcon="pi pi-calculator"
         emptyMessage="No se encontraron liquidaciones."
         colorScheme="burgundy"
+        [customClass]="themeService.isDarkMode() ? 'theme-dark' : ''"
       >
         <ng-template #header>
-          <tr class="h-11 text-xs bg-[#eddde1] border-b border-[#762f41]/40 text-[#3b141e] font-bold sticky top-0 z-10">
-            <th class="!text-left !pl-4 border-r border-[#762f41]/35 w-[130px]">Estado</th>
-            <th class="!text-left !pl-3 border-r border-[#762f41]/35 w-[140px]">Fecha</th>
-            <th class="!text-left !pl-3 border-r border-[#762f41]/35 w-[160px]">Folio</th>
-            <th class="!text-left !pl-3 border-r border-[#762f41]/35">Sucursal</th>
-            <th class="!text-right !pr-4 border-r border-[#762f41]/35 w-[140px]">A planta</th>
-            <th class="!text-right !pr-4 border-r border-[#762f41]/35 w-[140px]">Merma</th>
-            <th class="!text-right !pr-4 w-[180px]">Acciones</th>
+          <tr class="h-11 text-xs font-bold sticky top-0 z-10"
+            [ngClass]="themeService.isDarkMode() ? 'bg-[#1C2128] border-b border-[#30363D] text-[#8B949E]' : 'bg-[#eddde1] border-b border-[#762f41]/40 text-[#3b141e]'">
+            <th class="!text-left !pl-4 w-[130px]" [ngClass]="themeService.isDarkMode() ? 'border-r border-[#30363D] text-[#F0F6FC]' : 'border-r border-[#762f41]/35'">Estado</th>
+            <th class="!text-left !pl-3 w-[140px]" [ngClass]="themeService.isDarkMode() ? 'border-r border-[#30363D] text-[#F0F6FC]' : 'border-r border-[#762f41]/35'">Fecha</th>
+            <th class="!text-left !pl-3 w-[160px]" [ngClass]="themeService.isDarkMode() ? 'border-r border-[#30363D] text-[#F0F6FC]' : 'border-r border-[#762f41]/35'">Folio</th>
+            <th class="!text-left !pl-3" [ngClass]="themeService.isDarkMode() ? 'border-r border-[#30363D] text-[#F0F6FC]' : 'border-r border-[#762f41]/35'">Sucursal</th>
+            <th class="!text-right !pr-4 w-[140px]" [ngClass]="themeService.isDarkMode() ? 'border-r border-[#30363D] text-[#F0F6FC]' : 'border-r border-[#762f41]/35'">A planta</th>
+            <th class="!text-right !pr-4 w-[140px]" [ngClass]="themeService.isDarkMode() ? 'border-r border-[#30363D] text-[#F0F6FC]' : 'border-r border-[#762f41]/35'">Merma</th>
+            <th class="!text-right !pr-4 w-[180px]" [ngClass]="themeService.isDarkMode() ? 'text-[#F0F6FC]' : ''">Acciones</th>
           </tr>
         </ng-template>
 
         <ng-template #body let-row>
-          <tr class="hover:!bg-[#eddde1]/45 transition-colors duration-150 border-b border-[#762f41]/18 last:border-0 text-xs">
-            <td class="!py-2.5 !pl-4 border-r border-[#762f41]/18">
+          <tr class="transition-colors duration-150 last:border-0 text-xs"
+            [ngClass]="themeService.isDarkMode() ? 'hover:!bg-[#21262D] border-b border-[#30363D]' : 'hover:!bg-[#eddde1]/45 border-b border-[#762f41]/18'">
+            <td class="!py-2.5 !pl-4" [ngClass]="themeService.isDarkMode() ? 'border-r border-[#30363D]' : 'border-r border-[#762f41]/18'">
               <app-status-badge
                 [value]="statusLabel(row.status)"
                 [severity]="statusSeverity(row.status)"
                 size="xs"
               />
             </td>
-            <td class="!py-2.5 !pl-3 border-r border-[#762f41]/18">
-              <p class="font-semibold text-slate-800">{{ row.businessDate | date: 'dd/MM/yyyy' }}</p>
+            <td class="!py-2.5 !pl-3" [ngClass]="themeService.isDarkMode() ? 'border-r border-[#30363D]' : 'border-r border-[#762f41]/18'">
+              <p class="font-semibold m-0" [ngClass]="themeService.isDarkMode() ? 'text-[#F0F6FC]' : 'text-slate-800'">{{ row.businessDate | date: 'dd/MM/yyyy' }}</p>
             </td>
-            <td class="!py-2.5 !pl-3 border-r border-[#762f41]/18">
-              <span class="px-1.5 py-0.5 bg-[#48021C]/10 text-[#48021C] rounded-md text-[11px] font-bold border border-[#48021C]/20 uppercase tracking-wide">
+            <td class="!py-2.5 !pl-3" [ngClass]="themeService.isDarkMode() ? 'border-r border-[#30363D]' : 'border-r border-[#762f41]/18'">
+              <span class="px-1.5 py-0.5 rounded-md text-[11px] font-bold border uppercase tracking-wide"
+                [ngClass]="themeService.isDarkMode() ? 'bg-[#1C2D42] text-[#58A6FF] border-[#58A6FF]/30' : 'bg-[#48021C]/10 text-[#48021C] border-[#48021C]/20'">
                 {{ row.settlementNumber }}
               </span>
             </td>
-            <td class="!py-2.5 !pl-3 border-r border-[#762f41]/18">
-              <p class="font-semibold text-slate-800 truncate">{{ row.branchName }}</p>
+            <td class="!py-2.5 !pl-3" [ngClass]="themeService.isDarkMode() ? 'border-r border-[#30363D]' : 'border-r border-[#762f41]/18'">
+              <p class="font-semibold truncate m-0" [ngClass]="themeService.isDarkMode() ? 'text-[#F0F6FC]' : 'text-slate-800'">{{ row.branchName }}</p>
             </td>
-            <td class="!py-2.5 !pr-4 border-r border-[#762f41]/18 !text-right tabular-nums font-semibold text-slate-800 whitespace-nowrap">
+            <td class="!py-2.5 !pr-4 !text-right tabular-nums font-semibold whitespace-nowrap"
+              [ngClass]="themeService.isDarkMode() ? 'border-r border-[#30363D] text-[#F0F6FC]' : 'border-r border-[#762f41]/18 text-slate-800'">
               {{ returnTotal(row) | number: '1.0-2' }}
             </td>
-            <td class="!py-2.5 !pr-4 border-r border-[#762f41]/18 !text-right tabular-nums font-semibold whitespace-nowrap"
-              [class.text-amber-700]="wasteTotal(row) > 0"
-              [class.text-slate-800]="wasteTotal(row) === 0"
+            <td class="!py-2.5 !pr-4 !text-right tabular-nums font-semibold whitespace-nowrap"
+              [ngClass]="themeService.isDarkMode() ? 'border-r border-[#30363D]' : 'border-r border-[#762f41]/18'"
+              [class.text-amber-500]="wasteTotal(row) > 0"
+              [class.text-[#F0F6FC]]="wasteTotal(row) === 0 && themeService.isDarkMode()"
+              [class.text-slate-800]="wasteTotal(row) === 0 && !themeService.isDarkMode()"
             >
               {{ wasteTotal(row) | number: '1.0-2' }}
             </td>
@@ -108,7 +115,8 @@
                 <button
                   type="button"
                   (click)="goToDetail(row)"
-                  class="px-2 py-1 rounded-md text-[11px] font-semibold inline-flex items-center gap-1 border border-[#48021C]/30 bg-[#48021C]/[0.06] text-[#48021C] hover:bg-[#48021C]/[0.12] cursor-pointer"
+                  class="px-2 py-1 rounded-md text-[11px] font-semibold inline-flex items-center gap-1 border cursor-pointer transition-colors"
+                  [ngClass]="themeService.isDarkMode() ? 'border-[#30363D] bg-[#161B22] text-[#58A6FF] hover:bg-[#21262D]' : 'border-[#48021C]/30 bg-[#48021C]/[0.06] text-[#48021C] hover:bg-[#48021C]/[0.12]'"
                 >
                   <i class="pi pi-eye text-[9px]"></i>
                   Ver
@@ -122,11 +130,12 @@
 
     <div class="lg:hidden space-y-3 px-4">
       @for (row of filteredRows(); track row.id) {
-        <div class="bg-white rounded-2xl border border-[#48021C]/20 shadow-xs overflow-hidden">
+        <div class="rounded-2xl shadow-xs overflow-hidden transition-colors"
+          [ngClass]="themeService.isDarkMode() ? 'bg-[#161B22] border border-[#30363D]' : 'bg-white border border-[#48021C]/20'">
           <div class="p-4 flex items-start justify-between gap-3">
             <div class="min-w-0">
-              <p class="font-bold text-slate-800 truncate">{{ row.branchName }}</p>
-              <p class="text-[11px] text-[#6e3757] font-medium mt-0.5">
+              <p class="font-bold truncate m-0" [ngClass]="themeService.isDarkMode() ? 'text-[#F0F6FC]' : 'text-slate-800'">{{ row.branchName }}</p>
+              <p class="text-[11px] font-medium mt-0.5 m-0" [ngClass]="themeService.isDarkMode() ? 'text-[#8B949E]' : 'text-[#6e3757]'">
                 {{ row.businessDate | date: 'dd/MM/yyyy' }}
                 · {{ row.settlementNumber }}
               </p>
@@ -137,14 +146,22 @@
               size="xs"
             />
           </div>
-          <div class="px-4 pb-4 grid grid-cols-2 gap-3 text-[11px] border-t border-[#48021C]/10 pt-3">
+          <div class="px-4 pb-4 grid grid-cols-2 gap-3 text-[11px] border-t pt-3"
+            [ngClass]="themeService.isDarkMode() ? 'border-[#30363D]' : 'border-[#48021C]/10'">
             <div>
-              <p class="text-[10px] font-bold uppercase tracking-wider text-[#9f6587]">A planta</p>
-              <p class="font-semibold text-slate-800 tabular-nums">{{ returnTotal(row) | number: '1.0-2' }}</p>
+              <p class="text-[10px] font-bold uppercase tracking-wider m-0"
+                [ngClass]="themeService.isDarkMode() ? 'text-[#8B949E]' : 'text-[#9f6587]'">A planta</p>
+              <p class="font-semibold tabular-nums m-0"
+                [ngClass]="themeService.isDarkMode() ? 'text-[#F0F6FC]' : 'text-slate-800'">{{ returnTotal(row) | number: '1.0-2' }}</p>
             </div>
             <div class="text-right">
-              <p class="text-[10px] font-bold uppercase tracking-wider text-[#9f6587]">Merma</p>
-              <p class="font-semibold tabular-nums" [class.text-amber-700]="wasteTotal(row) > 0">
+              <p class="text-[10px] font-bold uppercase tracking-wider m-0"
+                [ngClass]="themeService.isDarkMode() ? 'text-[#8B949E]' : 'text-[#9f6587]'">Merma</p>
+              <p class="font-semibold tabular-nums m-0"
+                [class.text-amber-500]="wasteTotal(row) > 0"
+                [class.text-[#F0F6FC]]="wasteTotal(row) === 0 && themeService.isDarkMode()"
+                [class.text-slate-800]="wasteTotal(row) === 0 && !themeService.isDarkMode()"
+              >
                 {{ wasteTotal(row) | number: '1.0-2' }}
               </p>
             </div>
@@ -152,7 +169,8 @@
               <button
                 type="button"
                 (click)="goToDetail(row)"
-                class="px-2 py-1 rounded-md text-[11px] font-semibold inline-flex items-center gap-1 border border-[#48021C]/30 bg-[#48021C]/[0.06] text-[#48021C] cursor-pointer"
+                class="px-2 py-1 rounded-md text-[11px] font-semibold inline-flex items-center gap-1 border cursor-pointer transition-colors"
+                [ngClass]="themeService.isDarkMode() ? 'border-[#30363D] bg-[#161B22] text-[#58A6FF] hover:bg-[#21262D]' : 'border-[#48021C]/30 bg-[#48021C]/[0.06] text-[#48021C]'"
               >
                 <i class="pi pi-eye text-[9px]"></i>
                 Ver
@@ -160,12 +178,6 @@
             </div>
           </div>
         </div>
-      } @empty {
-        @if (!loading()) {
-          <div class="bg-white rounded-2xl border border-[#48021C]/20 p-8 text-center text-sm text-slate-400">
-            No se encontraron liquidaciones.
-          </div>
-        }
       }
     </div>
   </div>

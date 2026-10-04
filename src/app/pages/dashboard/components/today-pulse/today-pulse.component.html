@@ -1,162 +1,211 @@
-<div class="pulse-rail">
-  <div class="pulse-head">
-    <h3 class="text-base font-semibold tracking-tight text-[#48021C]">Resumen de hoy</h3>
+<div class="flex flex-col gap-2 w-full flex-1 min-h-full min-w-0 p-4 rounded-xl overflow-hidden transition-all duration-300 border"
+  [ngClass]="themeService.isDarkMode() 
+    ? 'bg-[#161B22] border-[#30363D] shadow-2xl' 
+    : 'bg-gradient-to-b from-[#f8eef3] via-[#fdf7f9] to-white border-[#d9b8c8] shadow-[0_1px_0_rgb(72_2_28/0.08)]'">
+  
+  <div class="flex items-start justify-between gap-3 shrink-0 mb-4">
+    <div class="min-w-0">
+      <h3 class="text-base font-medium truncate"
+        [ngClass]="themeService.isDarkMode() ? 'text-[#F0F6FC]' : 'text-[#48021C]'">Resumen de hoy</h3>
+      <p class="text-[11px] font-medium leading-tight mt-0.5 truncate"
+        [ngClass]="themeService.isDarkMode() ? 'text-[#8B949E]' : 'text-[#9f6587]'">Pulso en tiempo real de la jornada
+      </p>
+    </div>
     @if (errorMessage()) {
-      <p class="text-[10px] font-medium text-rose-500">{{ errorMessage() }}</p>
+    <p class="text-[10px] font-medium text-rose-500">{{ errorMessage() }}</p>
     }
   </div>
 
   @if (isLoading() && !data()) {
-    <div class="pulse-empty">
-      <i class="pi pi-spin pi-spinner text-xl text-[#48021C]"></i>
-    </div>
+  <div class="flex-1 flex items-center justify-center min-h-[12rem]">
+    <i class="pi pi-spin pi-spinner text-xl"
+      [ngClass]="themeService.isDarkMode() ? 'text-[#58A6FF]' : 'text-[#48021C]'"></i>
+  </div>
   } @else {
-    <article class="pulse-card pulse-card-sales">
-      <div class="pulse-main">
-        <p class="pulse-label text-[#1B768E]">Ventas de hoy</p>
-        <p class="pulse-value text-[#1B768E]">{{ sales()?.total || 0 | currency:'GTQ':'symbol':'1.2-2' }}</p>
-        @if (salesTrend() === 'up') {
-          <p class="trend-up">
-            <i class="pi pi-arrow-up-right"></i>
-            {{ sales()?.changePercent }}% · {{ salesDelta() | currency:'GTQ':'symbol':'1.0-0' }} vs ayer
-          </p>
-        } @else if (salesTrend() === 'down') {
-          <p class="trend-down">
-            <i class="pi pi-arrow-down-left"></i>
-            {{ sales()?.changePercent }}% · {{ salesDelta() | currency:'GTQ':'symbol':'1.0-0' }} vs ayer
-          </p>
-        } @else {
-          <p class="trend-flat">0% vs ayer</p>
-        }
-      </div>
-      <dl class="pulse-side">
-        <div>
-          <dt>Pedidos</dt>
-          <dd>{{ sales()?.ticketCount || 0 }}</dd>
-        </div>
-        <div>
-          <dt>Prom. x pedido</dt>
-          <dd>{{ sales()?.averageTicket || 0 | currency:'GTQ':'symbol':'1.0-0' }}</dd>
-        </div>
-      </dl>
-      <dl class="pulse-foot is-wide">
-        <div>
-          <dt>Efectivo</dt>
-          <dd>{{ sales()?.cashToday || 0 | currency:'GTQ':'symbol':'1.0-0' }}</dd>
-        </div>
-        <div>
-          <dt>Crédito</dt>
-          <dd>{{ sales()?.creditToday || 0 | currency:'GTQ':'symbol':'1.0-0' }}</dd>
-        </div>
-        <div>
-          <dt>Otros</dt>
-          <dd>{{ sales()?.otherToday || 0 | currency:'GTQ':'symbol':'1.0-0' }}</dd>
-        </div>
-        <div>
-          <dt>Hora pico</dt>
-          <dd>{{ sales()?.peakHour?.label || '—' }}</dd>
-        </div>
-      </dl>
-    </article>
-
-    <article class="pulse-card pulse-card-pending">
-      <div class="pulse-main">
-        <p class="pulse-label text-amber-700">Órdenes pendientes</p>
-        <p class="pulse-value text-amber-700">{{ pending()?.total || 0 }}</p>
-        @if (pending()?.oldestMinutes != null) {
-          <p class="pulse-hint">Más antigua: {{ formatWait(pending()?.oldestMinutes) }}</p>
-        } @else {
-          <p class="pulse-hint">Sin cola</p>
-        }
-      </div>
-      <dl class="pulse-side">
-        <div>
-          <dt>Por preparar</dt>
-          <dd>{{ pending()?.preparing || 0 }}</dd>
-        </div>
-        <div>
-          <dt>Por entregar</dt>
-          <dd>{{ pending()?.delivery || 0 }}</dd>
-        </div>
-      </dl>
-      <dl class="pulse-foot is-next">
-        <div>
-          <dt>Preorden</dt>
-          <dd>{{ pending()?.preorder || 0 }}</dd>
-        </div>
-        <div>
-          <dt>Siguiente</dt>
-          @if (pending()?.nextCustomer?.saleId) {
-            <dd class="pulse-name">
-              <button
-                type="button"
-                class="pulse-link cursor-pointer"
-                (click)="openSale(pending()?.nextCustomer?.saleId)"
-              >
-                {{ pending()?.nextCustomer?.name }}
-              </button>
-            </dd>
-          } @else {
-            <dd class="pulse-name">{{ pending()?.nextCustomer?.name || '—' }}</dd>
-          }
-        </div>
-      </dl>
-    </article>
-
-    <article class="pulse-card pulse-card-alert">
-      <div class="pulse-main">
-        <p class="pulse-label text-rose-700">Por cobrar</p>
-        <p class="pulse-value text-rose-700">{{ receivable()?.total || 0 | currency:'GTQ':'symbol':'1.2-2' }}</p>
-        <p class="pulse-hint text-rose-500/80">{{ receivable()?.invoiceCount || 0 }} facturas abiertas</p>
-      </div>
-      <dl class="pulse-side">
-        <div>
-          <dt>Vencido</dt>
-          <dd class="text-rose-700">{{ receivable()?.overdue || 0 | currency:'GTQ':'symbol':'1.0-0' }}</dd>
-        </div>
-        <div>
-          <dt>Vence hoy</dt>
-          <dd>{{ receivable()?.dueToday || 0 | currency:'GTQ':'symbol':'1.0-0' }}</dd>
-        </div>
-      </dl>
-      <dl class="pulse-foot is-debtor">
-        <div>
-          <dt>Mayor saldo</dt>
-          <dd class="pulse-name">{{ receivable()?.topDebtor?.name || '—' }}</dd>
-        </div>
-        <div>
-          <dt>Monto</dt>
-          <dd>{{ receivable()?.topDebtor?.amount || 0 | currency:'GTQ':'symbol':'1.0-0' }}</dd>
-        </div>
-      </dl>
-    </article>
-
-    <article class="pulse-card pulse-card-attention">
-      <div class="pulse-main">
-        <p class="pulse-label text-sky-700">Atención</p>
-        <p class="pulse-value text-sky-800">{{ attention()?.lowStockCount || 0 }} SKUs bajos</p>
-        <p class="pulse-hint">{{ attention()?.preordersForToday || 0 }} preórdenes para hoy</p>
-      </div>
-      @if ((attention()?.lowStock?.length || 0) > 0) {
-        <ul class="pulse-side pulse-list">
-          @for (item of attention()!.lowStock.slice(0, 2); track item.productId) {
-            <li>
-              <span class="truncate">{{ item.name }}</span>
-              <span class="tabular-nums shrink-0">{{ stockLabel(item) }}</span>
-            </li>
-          }
-        </ul>
-        <ul class="pulse-foot pulse-list">
-          @for (item of attention()!.lowStock.slice(2); track item.productId) {
-            <li>
-              <span class="truncate">{{ item.name }}</span>
-              <span class="tabular-nums shrink-0">{{ stockLabel(item) }}</span>
-            </li>
-          }
-        </ul>
+  <!-- 1. Ventas de hoy (Cyan / Azul institucional) -->
+  <article class="flex-1 grid grid-cols-[minmax(7.5rem,10.5rem)_minmax(0,1fr)] [grid-template-areas:'main_side'_'foot_foot'] gap-x-3.5 gap-y-1.5 content-center min-w-0 min-h-0 overflow-hidden px-3.5 py-2.5 rounded-lg border transition-all duration-200"
+    [ngClass]="themeService.isDarkMode() ? 'border-none bg-cyan-950/40' : 'border-[#9ecad6] bg-[#e8f4f7]'">
+    <div class="[grid-area:main] min-w-0">
+      <p class="text-[10px] font-normal leading-tight" [ngClass]="themeService.isDarkMode() ? 'text-slate-400' : 'text-[#1B768E]'">
+        Ventas de hoy</p>
+      <p class="mt-0.5 text-sm font-semibold tabular-nums leading-tight" [ngClass]="themeService.isDarkMode() ? 'text-slate-100' : 'text-[#1B768E]'">{{
+        sales()?.total || 0 | currency:'GTQ':'symbol':'1.2-2' }}</p>
+      @if (salesTrend() === 'up') {
+      <p class="mt-0.5 inline-flex items-center gap-1 text-[10px] font-medium" [ngClass]="themeService.isDarkMode() ? 'text-emerald-400' : 'text-[#059669]'">
+        <i class="pi pi-arrow-up-right text-[10px]!"></i>
+        {{ sales()?.changePercent }}% · {{ salesDelta() | currency:'GTQ':'symbol':'1.0-0' }} vs ayer
+      </p>
+      } @else if (salesTrend() === 'down') {
+      <p class="mt-0.5 inline-flex items-center gap-1 text-[10px] font-medium" [ngClass]="themeService.isDarkMode() ? 'text-rose-400' : 'text-[#e11d48]'">
+        <i class="pi pi-arrow-down-left text-[10px]!"></i>
+        {{ sales()?.changePercent }}% · {{ salesDelta() | currency:'GTQ':'symbol':'1.0-0' }} vs ayer
+      </p>
       } @else {
-        <p class="pulse-side pulse-hint">Sin alertas de stock</p>
+      <p class="mt-0.5 text-[10px] font-normal" [ngClass]="themeService.isDarkMode() ? 'text-slate-400' : 'text-[#94a3b8]'">0% vs ayer</p>
       }
-    </article>
+    </div>
+    <dl class="[grid-area:side] grid grid-cols-2 content-center gap-x-3 gap-y-0.5 min-w-0">
+      <div class="contents">
+        <dt class="row-start-1 self-end text-[10px] font-normal leading-tight" [ngClass]="themeService.isDarkMode() ? 'text-slate-400' : 'text-[#64748b]'">Pedidos</dt>
+        <dd class="row-start-2 text-xs font-semibold tabular-nums leading-tight whitespace-nowrap" [ngClass]="themeService.isDarkMode() ? 'text-slate-100' : 'text-[#334155]'">{{ sales()?.ticketCount || 0 }}
+        </dd>
+      </div>
+      <div class="contents">
+        <dt class="row-start-1 self-end text-[10px] font-normal leading-tight" [ngClass]="themeService.isDarkMode() ? 'text-slate-400' : 'text-[#64748b]'">Prom. x pedido</dt>
+        <dd class="row-start-2 text-xs font-semibold tabular-nums leading-tight whitespace-nowrap" [ngClass]="themeService.isDarkMode() ? 'text-slate-100' : 'text-[#334155]'">{{ sales()?.averageTicket || 0 |
+          currency:'GTQ':'symbol':'1.0-0' }}</dd>
+      </div>
+    </dl>
+    <dl class="[grid-area:foot] grid grid-cols-4 gap-x-3 gap-y-0.5 min-w-0 pt-1.5 border-t"
+      [ngClass]="themeService.isDarkMode() ? 'border-[#30363D]/50' : 'border-[#9ecad6]'">
+      <div class="contents">
+        <dt class="row-start-1 self-end text-[10px] font-normal leading-tight" [ngClass]="themeService.isDarkMode() ? 'text-slate-400' : 'text-[#64748b]'">Efectivo</dt>
+        <dd class="row-start-2 text-xs font-semibold tabular-nums leading-tight whitespace-nowrap" [ngClass]="themeService.isDarkMode() ? 'text-slate-100' : 'text-[#334155]'">{{ sales()?.cashToday || 0 |
+          currency:'GTQ':'symbol':'1.0-0' }}</dd>
+      </div>
+      <div class="contents">
+        <dt class="row-start-1 self-end text-[10px] font-normal leading-tight" [ngClass]="themeService.isDarkMode() ? 'text-slate-400' : 'text-[#64748b]'">Crédito</dt>
+        <dd class="row-start-2 text-xs font-semibold tabular-nums leading-tight whitespace-nowrap" [ngClass]="themeService.isDarkMode() ? 'text-slate-100' : 'text-[#334155]'">{{ sales()?.creditToday || 0 |
+          currency:'GTQ':'symbol':'1.0-0' }}</dd>
+      </div>
+      <div class="contents">
+        <dt class="row-start-1 self-end text-[10px] font-normal leading-tight" [ngClass]="themeService.isDarkMode() ? 'text-slate-400' : 'text-[#64748b]'">Otros</dt>
+        <dd class="row-start-2 text-xs font-semibold tabular-nums leading-tight whitespace-nowrap" [ngClass]="themeService.isDarkMode() ? 'text-slate-100' : 'text-[#334155]'">{{ sales()?.otherToday || 0 |
+          currency:'GTQ':'symbol':'1.0-0' }}</dd>
+      </div>
+      <div class="contents">
+        <dt class="row-start-1 self-end text-[10px] font-normal leading-tight" [ngClass]="themeService.isDarkMode() ? 'text-slate-400' : 'text-[#64748b]'">Hora pico</dt>
+        <dd class="row-start-2 text-xs font-semibold tabular-nums leading-tight whitespace-nowrap" [ngClass]="themeService.isDarkMode() ? 'text-slate-100' : 'text-[#334155]'">{{ sales()?.peakHour?.label ||
+          '—' }}</dd>
+      </div>
+    </dl>
+  </article>
+
+  <!-- 2. Órdenes pendientes (Ámbar) -->
+  <article class="flex-1 grid grid-cols-[minmax(7.5rem,10.5rem)_minmax(0,1fr)] [grid-template-areas:'main_side'_'foot_foot'] gap-x-3.5 gap-y-1.5 content-center min-w-0 min-h-0 overflow-hidden px-3.5 py-2.5 rounded-lg border transition-all duration-200"
+    [ngClass]="themeService.isDarkMode() ? 'border-none bg-amber-950/40' : 'border-[#fde68a] bg-[#fffbeb]'">
+    <div class="[grid-area:main] min-w-0">
+      <p class="text-[10px] font-normal leading-tight" [ngClass]="themeService.isDarkMode() ? 'text-slate-400' : 'text-amber-700'">Órdenes
+        pendientes</p>
+      <p class="mt-0.5 text-sm font-semibold tabular-nums leading-tight" [ngClass]="themeService.isDarkMode() ? 'text-slate-100' : 'text-amber-700'">{{
+        pending()?.total || 0 }}</p>
+      @if (pending()?.oldestMinutes != null) {
+      <p class="mt-0.5 text-[10px] font-normal leading-tight" [ngClass]="themeService.isDarkMode() ? 'text-amber-400/80' : 'text-[#64748b]'">Más antigua:
+        {{ formatWait(pending()?.oldestMinutes) }}</p>
+      } @else {
+      <p class="mt-0.5 text-[10px] font-normal leading-tight" [ngClass]="themeService.isDarkMode() ? 'text-slate-400' : 'text-[#64748b]'">Sin cola</p>
+      }
+    </div>
+    <dl class="[grid-area:side] grid grid-cols-2 content-center gap-x-3 gap-y-0.5 min-w-0">
+      <div class="contents">
+        <dt class="row-start-1 self-end text-[10px] font-normal leading-tight" [ngClass]="themeService.isDarkMode() ? 'text-slate-400' : 'text-[#64748b]'">Por preparar</dt>
+        <dd class="row-start-2 text-xs font-semibold tabular-nums leading-tight whitespace-nowrap" [ngClass]="themeService.isDarkMode() ? 'text-slate-100' : 'text-[#334155]'">{{ pending()?.preparing || 0 }}
+        </dd>
+      </div>
+      <div class="contents">
+        <dt class="row-start-1 self-end text-[10px] font-normal leading-tight" [ngClass]="themeService.isDarkMode() ? 'text-slate-400' : 'text-[#64748b]'">Por entregar</dt>
+        <dd class="row-start-2 text-xs font-semibold tabular-nums leading-tight whitespace-nowrap" [ngClass]="themeService.isDarkMode() ? 'text-slate-100' : 'text-[#334155]'">{{ pending()?.delivery || 0 }}
+        </dd>
+      </div>
+    </dl>
+    <dl class="[grid-area:foot] grid grid-cols-[5.5rem_minmax(0,1fr)] gap-x-3 gap-y-0.5 min-w-0 pt-1.5 border-t"
+      [ngClass]="themeService.isDarkMode() ? 'border-[#30363D]/50' : 'border-[#fde68a]'">
+      <div class="contents">
+        <dt class="row-start-1 self-end text-[10px] font-normal leading-tight" [ngClass]="themeService.isDarkMode() ? 'text-slate-400' : 'text-[#64748b]'">Preorden</dt>
+        <dd class="row-start-2 text-xs font-semibold tabular-nums leading-tight whitespace-nowrap" [ngClass]="themeService.isDarkMode() ? 'text-slate-100' : 'text-[#334155]'">{{ pending()?.preorder || 0 }}
+        </dd>
+      </div>
+      <div class="contents">
+        <dt class="row-start-1 self-end text-[10px] font-normal leading-tight" [ngClass]="themeService.isDarkMode() ? 'text-slate-400' : 'text-[#64748b]'">Siguiente</dt>
+        @if (pending()?.nextCustomer?.saleId) {
+        <dd class="row-start-2 min-w-0 overflow-hidden text-ellipsis whitespace-nowrap text-xs font-semibold tabular-nums leading-tight">
+          <button type="button" class="block max-w-full overflow-hidden text-ellipsis whitespace-nowrap cursor-pointer underline underline-offset-2"
+            [ngClass]="themeService.isDarkMode() ? 'text-slate-100 hover:text-[#58A6FF]' : 'text-[#334155] hover:text-[#48021C]'"
+            (click)="openSale(pending()?.nextCustomer?.saleId)">
+            {{ pending()?.nextCustomer?.name }}
+          </button>
+        </dd>
+        } @else {
+        <dd class="row-start-2 min-w-0 overflow-hidden text-ellipsis whitespace-nowrap text-xs font-semibold tabular-nums leading-tight" [ngClass]="themeService.isDarkMode() ? 'text-slate-100' : 'text-[#334155]'">{{
+          pending()?.nextCustomer?.name || '—' }}</dd>
+        }
+      </div>
+    </dl>
+  </article>
+
+  <!-- 3. Por cobrar (Rosa / Vino) -->
+  <article class="flex-1 grid grid-cols-[minmax(7.5rem,10.5rem)_minmax(0,1fr)] [grid-template-areas:'main_side'_'foot_foot'] gap-x-3.5 gap-y-1.5 content-center min-w-0 min-h-0 overflow-hidden px-3.5 py-2.5 rounded-lg border transition-all duration-200"
+    [ngClass]="themeService.isDarkMode() ? 'border-none bg-rose-950/40' : 'border-[#fecdd3] bg-[#fff1f2]'">
+    <div class="[grid-area:main] min-w-0">
+      <p class="text-[10px] font-normal leading-tight" [ngClass]="themeService.isDarkMode() ? 'text-slate-400' : 'text-rose-700'">Por cobrar</p>
+      <p class="mt-0.5 text-sm font-semibold tabular-nums leading-tight" [ngClass]="themeService.isDarkMode() ? 'text-slate-100' : 'text-rose-700'">{{
+        receivable()?.total || 0 | currency:'GTQ':'symbol':'1.2-2' }}</p>
+      <p class="mt-0.5 text-[10px] font-normal leading-tight" [ngClass]="themeService.isDarkMode() ? 'text-rose-400/80' : 'text-rose-500/80'">{{
+        receivable()?.invoiceCount || 0 }} facturas abiertas</p>
+    </div>
+    <dl class="[grid-area:side] grid grid-cols-2 content-center gap-x-3 gap-y-0.5 min-w-0">
+      <div class="contents">
+        <dt class="row-start-1 self-end text-[10px] font-normal leading-tight" [ngClass]="themeService.isDarkMode() ? 'text-slate-400' : 'text-[#64748b]'">Vencido</dt>
+        <dd class="row-start-2 text-xs font-semibold tabular-nums leading-tight whitespace-nowrap" [ngClass]="themeService.isDarkMode() ? 'text-rose-400' : 'text-rose-700'">{{ receivable()?.overdue || 0 |
+          currency:'GTQ':'symbol':'1.0-0' }}</dd>
+      </div>
+      <div class="contents">
+        <dt class="row-start-1 self-end text-[10px] font-normal leading-tight" [ngClass]="themeService.isDarkMode() ? 'text-slate-400' : 'text-[#64748b]'">Vence hoy</dt>
+        <dd class="row-start-2 text-xs font-semibold tabular-nums leading-tight whitespace-nowrap" [ngClass]="themeService.isDarkMode() ? 'text-slate-100' : 'text-[#334155]'">{{ receivable()?.dueToday || 0 |
+          currency:'GTQ':'symbol':'1.0-0' }}</dd>
+      </div>
+    </dl>
+    <dl class="[grid-area:foot] grid grid-cols-[minmax(0,1fr)_6.5rem] gap-x-3 gap-y-0.5 min-w-0 pt-1.5 border-t"
+      [ngClass]="themeService.isDarkMode() ? 'border-[#30363D]/50' : 'border-[#fecdd3]'">
+      <div class="contents">
+        <dt class="row-start-1 self-end text-[10px] font-normal leading-tight" [ngClass]="themeService.isDarkMode() ? 'text-slate-400' : 'text-[#64748b]'">Mayor saldo</dt>
+        <dd class="row-start-2 min-w-0 overflow-hidden text-ellipsis whitespace-nowrap text-xs font-semibold tabular-nums leading-tight" [ngClass]="themeService.isDarkMode() ? 'text-slate-100' : 'text-[#334155]'">{{
+          receivable()?.topDebtor?.name || '—' }}</dd>
+      </div>
+      <div class="contents">
+        <dt class="row-start-1 self-end text-[10px] font-normal leading-tight" [ngClass]="themeService.isDarkMode() ? 'text-slate-400' : 'text-[#64748b]'">Monto</dt>
+        <dd class="row-start-2 text-xs font-semibold tabular-nums leading-tight whitespace-nowrap" [ngClass]="themeService.isDarkMode() ? 'text-slate-100' : 'text-[#334155]'">{{
+          receivable()?.topDebtor?.amount || 0 | currency:'GTQ':'symbol':'1.0-0' }}</dd>
+      </div>
+    </dl>
+  </article>
+
+  <!-- 4. Atención (Sky) -->
+  <article class="flex-1 grid grid-cols-[minmax(7.5rem,10.5rem)_minmax(0,1fr)] [grid-template-areas:'main_side'_'foot_foot'] gap-x-3.5 gap-y-1.5 content-center min-w-0 min-h-0 overflow-hidden px-3.5 py-2.5 rounded-lg border transition-all duration-200"
+    [ngClass]="themeService.isDarkMode() ? 'border-none bg-sky-950/40' : 'border-[#bae6fd] bg-[#f0f9ff]'">
+    <div class="[grid-area:main] min-w-0">
+      <p class="text-[10px] font-normal leading-tight" [ngClass]="themeService.isDarkMode() ? 'text-slate-400' : 'text-sky-700'">Atención</p>
+      <p class="mt-0.5 text-sm font-semibold tabular-nums leading-tight" [ngClass]="themeService.isDarkMode() ? 'text-slate-100' : 'text-sky-800'">{{
+        attention()?.lowStockCount || 0 }} SKUs bajos</p>
+      <p class="mt-0.5 text-[10px] font-normal leading-tight" [ngClass]="themeService.isDarkMode() ? 'text-sky-400/80' : 'text-slate-500'">{{
+        attention()?.preordersForToday || 0 }} preórdenes para hoy</p>
+    </div>
+    @if ((attention()?.lowStock?.length || 0) > 0) {
+    <ul class="[grid-area:side] flex flex-col justify-center gap-1 min-w-0">
+      @for (item of attention()!.lowStock.slice(0, 2); track item.productId) {
+      <li class="flex items-center justify-between gap-2 min-w-0 text-[11px] font-semibold">
+        <span class="truncate" [ngClass]="themeService.isDarkMode() ? 'text-emerald-400' : 'text-[#334155]'">{{
+          item.name }}</span>
+        <span class="tabular-nums shrink-0 text-xs font-semibold"
+          [ngClass]="themeService.isDarkMode() ? 'text-slate-300' : 'text-[#64748b]'">{{ stockLabel(item) }}</span>
+      </li>
+      }
+    </ul>
+    <ul class="[grid-area:foot] flex flex-row flex-wrap items-center gap-2 min-w-0 pt-1.5 border-t"
+      [ngClass]="themeService.isDarkMode() ? 'border-[#30363D]/50' : 'border-[#bae6fd]'">
+      @for (item of attention()!.lowStock.slice(2); track item.productId) {
+      <li class="flex items-center justify-between gap-2 min-w-0 text-[11px] font-semibold">
+        <span class="truncate" [ngClass]="themeService.isDarkMode() ? 'text-emerald-400' : 'text-[#334155]'">{{
+          item.name }}</span>
+        <span class="tabular-nums shrink-0 text-xs font-semibold"
+          [ngClass]="themeService.isDarkMode() ? 'text-slate-300' : 'text-[#64748b]'">{{ stockLabel(item) }}</span>
+      </li>
+      }
+    </ul>
+    } @else {
+    <p class="[grid-area:side] text-[10px] font-normal leading-tight self-center" [ngClass]="themeService.isDarkMode() ? 'text-slate-400' : 'text-slate-500'">Sin
+      alertas de stock</p>
+    }
+  </article>
   }
 </div>

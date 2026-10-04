@@ -1,513 +1,490 @@
-<div class="py-4 px-0 md:px-6 bg-slate-50 min-h-screen pb-[100px]">
-  <div class="max-w-[1400px] mx-auto px-4 md:px-0 grid grid-cols-1 md:grid-cols-12 gap-x-3 gap-y-6">
-  <!-- HEADER -->
-  <div class="col-span-1 md:col-span-12 flex flex-col md:flex-row justify-between gap-4 md:gap-0">
-    <div class="flex flex-col">
-      <h1 class="text-xl md:text-2xl font-bold text-slate-800 tracking-tight">
-        Nueva Orden de Compra #{{ orderForm.get('invoiceNumber')?.value || '...' }}
-      </h1>
-      <div class="flex items-center gap-2 mt-2">
-        <p-tag
-          value="PENDIENTE"
-          severity="warn"
-          styleClass="!text-[10px] md:!text-xs font-bold tracking-widest px-3"
-        />
-        @if (orderForm.get('invoiceNumber')?.value) {
-          <p-tag
-            [rounded]="true"
-            icon="pi pi-check"
-            value="LISTO"
-            severity="success"
-            styleClass="!text-[10px] md:!text-xs font-bold tracking-widest px-3"
-          />
-        }
-      </div>
-    </div>
-
-    <div class="flex items-center gap-2 md:gap-4 w-full md:w-auto">
-      <p-button
+<div class="py-4 pb-24 px-0 md:px-6 min-h-screen transition-colors duration-200" [ngClass]="themeService.isDarkMode() ? 'bg-[#0D1117]' : 'bg-[#9f6587]/[0.06]'">
+  <!-- Top Card: Header & Parámetros Estandarizados -->
+  <app-page-header
+    [title]="'Nueva Orden de Compra: #' + (orderForm.get('invoiceNumber')?.value || '...')"
+    subtitle="Registro y compra de insumos y mercadería con proveedores."
+    icon="pi pi-shopping-bag"
+    [showBackButton]="true"
+    backTooltip="Volver a órdenes de compra"
+    (onBack)="confirmCancelProcess()"
+    [badge]="orderForm.get('invoiceNumber')?.value ? 'Listo' : 'Borrador'"
+    badgeSeverity="burgundy"
+    colorScheme="burgundy"
+  >
+    <!-- Acciones Superiores -->
+    <div actions class="flex items-center gap-2 flex-wrap">
+      <app-secondary-button
         label="Cancelar"
-        variant="outlined"
-        severity="danger"
         icon="pi pi-times"
-        styleClass="!rounded-xl px-4 md:px-6 font-bold h-[44px] shadow-sm flex-1 md:flex-none justify-center hover:bg-slate-50 transition-all"
-        (onClick)="onCancelProccess()"
+        (clicked)="confirmCancelProcess()"
       />
-      <p-button
-        label="Generar"
-        (onClick)="onSaveOrder()"
-        severity="success"
+      <app-primary-button
+        label="Generar Orden"
         icon="pi pi-check"
-        styleClass="p-button-raised !rounded-xl px-4 md:px-6 shadow-lg flex-1 md:flex-none justify-center hover:shadow-indigo-200 transition-all font-bold h-[44px]"
+        [loading]="isSaving()"
+        (clicked)="onSaveOrder()"
       />
     </div>
-  </div>
 
-  <!-- SUPPLIER SECTION -->
-  <div class="col-span-1 md:col-span-8 flex flex-col gap-4">
-    <div class="bg-white px-5 py-6 md:px-10 md:py-8 rounded-2xl border border-slate-300 shadow-sm -mx-4 md:mx-0">
-      <h3 class="font-bold text-gray-400 uppercase tracking-widest text-xs mb-4 md:mb-6">Información del Proveedor</h3>
-      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 md:gap-8">
-        <section class="flex flex-col gap-5 md:gap-6">
-          <div class="flex flex-col gap-1.5 md:gap-2">
-            <label class="text-[10px] md:text-xs font-bold text-gray-400 uppercase tracking-wider pl-1" for="supplier">Proveedor</label>
+    <!-- Filtros / Parámetros (Proveedor, Comprobante y Fechas) -->
+    <ng-container filters>
+      <div class="grid grid-cols-1 md:grid-cols-12 gap-3.5 w-full items-start" [formGroup]="orderForm">
+        <!-- Columna 1: Proveedor y Comprobante (4 cols) -->
+        <div class="md:col-span-5 lg:col-span-4 flex flex-col gap-2">
+          <div class="flex flex-col gap-1">
+            <label class="text-xs font-semibold flex items-center gap-1" [ngClass]="themeService.isDarkMode() ? 'text-[#F0F6FC]' : 'text-[#48021C]'">
+              Proveedor <span class="text-rose-500 font-bold">*</span>
+            </label>
             <p-select
-              id="supplier"
               [options]="suppliers"
               (onChange)="onSupplierChange($event)"
-              [formControl]="$any(orderForm.get('supplierId'))"
+              formControlName="supplierId"
               optionLabel="name"
               optionValue="id"
-              placeholder="Seleccionar proveedor"
-              class="w-full"
+              placeholder="Seleccionar proveedor..."
               size="small"
               [filter]="true"
               filterBy="name"
               appendTo="body"
+              [fluid]="true"
+              class="w-full block min-h-[33px]"
+              [styleClass]="themeService.isDarkMode() 
+                ? 'w-full !rounded-lg !border-[#30363D] !bg-[#161B22] !text-[#F0F6FC] focus-within:!border-[#58A6FF] focus-within:!ring-2 focus-within:!ring-[#58A6FF]/20 text-xs font-medium' 
+                : 'w-full !rounded-lg !border-[#9f6587]/35 focus-within:!border-[#9f6587] focus-within:!ring-2 focus-within:!ring-[#9f6587]/20 text-xs font-medium'"
+              [panelStyleClass]="themeService.isDarkMode() ? '!bg-[#161B22] !border-[#30363D] !text-[#F0F6FC]' : ''"
             />
           </div>
-          
-          <div class="flex flex-col gap-1.5 md:gap-2">
-            <label class="text-[10px] md:text-xs font-bold text-gray-400 uppercase tracking-wider pl-1" for="invoiceNumberInput">No. Factura / Ref.</label>
+
+          <div class="flex flex-col gap-1">
+            <label class="text-xs font-semibold flex items-center gap-1" [ngClass]="themeService.isDarkMode() ? 'text-[#F0F6FC]' : 'text-[#48021C]'">
+              No. Factura / Referencia <span class="text-rose-500 font-bold">*</span>
+            </label>
             <input
               pInputText
-              id="invoiceNumberInput"
-              [formControl]="$any(orderForm.get('invoiceNumber'))"
-              placeholder="Ej: FAC-12345"
-              class="w-full"
-              size="small"
+              formControlName="invoiceNumber"
+              placeholder="Ej. FAC-12345"
+              class="w-full p-inputtext-sm !rounded-lg text-xs font-medium h-[33px] transition-all"
+              [ngClass]="themeService.isDarkMode() 
+                ? '!bg-[#161B22] !text-[#F0F6FC] !border-[#30363D] focus:!border-[#58A6FF] focus:!ring-2 focus:!ring-[#58A6FF]/20 placeholder:text-slate-500' 
+                : 'bg-white !border-[#9f6587]/35 focus:!border-[#9f6587] focus:!ring-2 focus:!ring-[#9f6587]/20'"
             />
           </div>
-        </section>
+        </div>
 
-        <section class="flex flex-col gap-4 pt-1">
+        <!-- Columna 2: Datos de Contacto del Proveedor (4 cols) -->
+        <div class="md:col-span-4 lg:col-span-4 flex flex-col gap-1">
+          <label class="text-xs font-semibold" [ngClass]="themeService.isDarkMode() ? 'text-[#8B949E]' : 'text-[#6e3757]'">
+            Información del Proveedor
+          </label>
           @if (purchaseData.supplier) {
-            <div class="flex items-center gap-3">
-              <i class="pi pi-file-edit text-indigo-500"></i>
-              <div class="flex flex-col">
-                <span class="text-[9px] md:text-[10px] text-gray-400 font-bold uppercase">NIT</span>
-                <p class="text-sm font-medium text-slate-700">{{ purchaseData.supplier.nit }}</p>
+            <div 
+              class="p-2.5 rounded-xl border flex flex-col gap-1.5 transition-colors h-[76px] justify-center"
+              [ngClass]="themeService.isDarkMode() ? 'bg-[#161B22] border-[#30363D]' : 'bg-[#9f6587]/[0.06] border-[#9f6587]/25'"
+            >
+              <div class="flex items-center justify-between">
+                <div class="flex items-center gap-1.5 truncate">
+                  <i class="pi pi-id-card text-[11px]" [ngClass]="themeService.isDarkMode() ? 'text-[#58A6FF]' : 'text-[#48021C]'"></i>
+                  <span class="text-xs font-bold truncate" [ngClass]="themeService.isDarkMode() ? 'text-[#F0F6FC]' : 'text-[#48021C]'">
+                    NIT: {{ purchaseData.supplier.nit || 'C/F' }}
+                  </span>
+                </div>
+                <div class="flex items-center gap-1.5 text-xs">
+                  <i class="pi pi-phone text-[11px]" [ngClass]="themeService.isDarkMode() ? 'text-[#58A6FF]' : 'text-[#48021C]'"></i>
+                  <span class="text-xs font-medium" [ngClass]="themeService.isDarkMode() ? 'text-[#8B949E]' : 'text-slate-700'">
+                    {{ purchaseData.supplier.phone || 'Sin tel.' }}
+                  </span>
+                </div>
               </div>
-            </div>
-            <div class="flex items-center gap-3">
-              <i class="pi pi-envelope text-indigo-500"></i>
-              <div class="flex flex-col">
-                <span class="text-[9px] md:text-[10px] text-gray-400 font-bold uppercase">Email</span>
-                <p class="text-sm font-medium text-slate-700">{{ purchaseData.supplier.email }}</p>
-              </div>
-            </div>
-            <div class="flex items-center gap-3">
-              <i class="pi pi-phone text-indigo-500"></i>
-              <div class="flex flex-col">
-                <span class="text-[9px] md:text-[10px] text-gray-400 font-bold uppercase">Teléfono</span>
-                <p class="text-sm font-medium text-slate-700">{{ purchaseData.supplier.phone }}</p>
+              <div class="flex items-center gap-1.5 truncate">
+                <i class="pi pi-envelope text-[11px]" [ngClass]="themeService.isDarkMode() ? 'text-[#58A6FF]' : 'text-[#48021C]'"></i>
+                <span class="text-xs truncate" [ngClass]="themeService.isDarkMode() ? 'text-[#8B949E]' : 'text-slate-600'">
+                  {{ purchaseData.supplier.email || 'Sin correo registrado' }}
+                </span>
               </div>
             </div>
           } @else {
-            <div class="flex flex-col items-center justify-center h-full border-2 border-dashed border-slate-100 rounded-xl bg-slate-50/50 p-6 min-h-[120px] md:min-h-0">
-              <i class="pi pi-info-circle text-slate-300 text-2xl mb-2"></i>
-              <p class="text-xs text-slate-400 font-medium text-center italic">Selecciona un proveedor para ver su información</p>
+            <div 
+              class="flex items-center justify-center h-[76px] border border-dashed rounded-xl p-3 text-center transition-colors"
+              [ngClass]="themeService.isDarkMode() ? 'border-[#30363D] bg-[#161B22]/50 text-[#8B949E]' : 'border-[#9f6587]/25 bg-white/60 text-slate-400'"
+            >
+              <div class="flex items-center gap-2">
+                <i class="pi pi-info-circle text-xs"></i>
+                <span class="text-xs italic">Selecciona un proveedor para ver sus datos fiscales y de contacto</span>
+              </div>
             </div>
           }
-        </section>
+        </div>
+
+        <!-- Columna 3: Fechas de la Orden (4 cols) -->
+        <div class="md:col-span-3 lg:col-span-4 flex flex-col gap-2">
+          <div class="flex flex-col gap-1">
+            <label class="text-xs font-semibold flex items-center gap-1" [ngClass]="themeService.isDarkMode() ? 'text-[#F0F6FC]' : 'text-[#48021C]'">
+              Fecha de Emisión <span class="text-rose-500 font-bold">*</span>
+            </label>
+            <p-datepicker
+              formControlName="date"
+              [iconDisplay]="'input'"
+              [showIcon]="true"
+              dateFormat="dd/mm/yy"
+              class="w-full block"
+              size="small"
+              appendTo="body"
+              [fluid]="true"
+              styleClass="w-full h-[33px]!"
+              [inputStyleClass]="themeService.isDarkMode() 
+                ? 'w-full h-[33px]! text-xs font-semibold !bg-[#161B22] !border-[#30363D] !text-[#F0F6FC] focus:!border-[#58A6FF] focus:!ring-2 focus:!ring-[#58A6FF]/20 !rounded-lg' 
+                : 'w-full h-[33px]! text-xs font-semibold !bg-white !border-[#9f6587]/35 focus:!border-[#9f6587] focus:!ring-2 focus:!ring-[#9f6587]/20 !rounded-lg'"
+              [panelStyleClass]="themeService.isDarkMode() ? '!bg-[#161B22] !border-[#30363D] !text-slate-200' : ''"
+            />
+          </div>
+
+          <div class="flex flex-col gap-1">
+            <label class="text-xs font-semibold" [ngClass]="themeService.isDarkMode() ? 'text-[#F0F6FC]' : 'text-[#48021C]'">
+              Fecha de Vencimiento
+            </label>
+            <p-datepicker
+              formControlName="dueDate"
+              [iconDisplay]="'input'"
+              [showIcon]="true"
+              dateFormat="dd/mm/yy"
+              placeholder="dd/mm/aaaa (opcional)"
+              class="w-full block"
+              size="small"
+              appendTo="body"
+              [fluid]="true"
+              styleClass="w-full h-[33px]!"
+              [inputStyleClass]="themeService.isDarkMode() 
+                ? 'w-full h-[33px]! text-xs font-semibold !bg-[#161B22] !border-[#30363D] !text-[#F0F6FC] focus:!border-[#58A6FF] focus:!ring-2 focus:!ring-[#58A6FF]/20 !rounded-lg' 
+                : 'w-full h-[33px]! text-xs font-semibold !bg-white !border-[#9f6587]/35 focus:!border-[#9f6587] focus:!ring-2 focus:!ring-[#9f6587]/20 !rounded-lg'"
+              [panelStyleClass]="themeService.isDarkMode() ? '!bg-[#161B22] !border-[#30363D] !text-slate-200' : ''"
+            />
+          </div>
+        </div>
       </div>
+    </ng-container>
+  </app-page-header>
+
+  <!-- MAIN CONTENT GRID -->
+  <div class="grid grid-cols-12 gap-4 max-w-[1700px] mx-auto mt-4 px-4 md:px-0">
+    <!-- COLUMNA IZQUIERDA: RIBBON Y TABLA DE PRODUCTOS -->
+    <div class="col-span-12 lg:col-span-8 flex flex-col gap-4">
+
+      <!-- CATÁLOGO RÁPIDO DE PRODUCTOS (Ribbon) -->
+      <app-product-ribbon
+        [products]="products()"
+        [loading]="loadingProducts()"
+        title="Catálogo Rápido de Insumos y Productos"
+        subtitle="Haz clic en un producto para agregarlo a la orden de compra"
+        emptyMessage="No hay productos disponibles en el catálogo."
+        [showStock]="false"
+        [showQuickQuantity]="true"
+        [isSelectedFn]="isProductSelected"
+        [getSelectedQuantityFn]="getItemQuantity"
+        (productSelect)="onProductSelectFromRibbon($event)"
+      />
+
+      <!-- TABLA ESTANDARIZADA DE PRODUCTOS -->
+      <app-products-table
+        [items]="tableItems"
+        title="Ítems de la Orden de Compra"
+        emptyTitle="Lista de productos vacía"
+        emptySubtitle="Haz clic en cualquier tarjeta del catálogo superior para agregar productos al detalle de la compra."
+        [showPrice]="true"
+        [showDiscount]="true"
+        [showTotals]="false"
+        (itemRemove)="removeDetail($event)"
+        (clearAll)="clearAllItems()"
+        (itemChange)="onTableItemChange($event)"
+      />
+
     </div>
-  </div>
 
-  <!-- DATES SECTION -->
-  <div class="col-span-1 md:col-span-4 flex flex-col gap-4">
-    <div class="bg-white rounded-2xl border border-slate-300 shadow-sm px-5 py-6 md:px-8 h-full -mx-4 md:mx-0">
-      <h3 class="font-bold text-gray-400 uppercase tracking-widest text-xs mb-4 md:mb-6">Fechas y Notas</h3>
-      <form [formGroup]="orderForm" class="grid grid-cols-2 md:grid-cols-1 lg:flex lg:flex-col gap-4 md:gap-6">
-        <div class="flex flex-col gap-1.5 md:gap-2">
-          <label class="text-[10px] md:text-xs font-bold text-gray-400 uppercase tracking-wider pl-1">Emisión</label>
-          <p-datepicker
-            formControlName="date"
-            [iconDisplay]="'input'"
-            [showIcon]="true"
-            class="w-full"
-            size="small"
-            appendTo="body"
-            fluid
-          />
-        </div>
-        <div class="flex flex-col gap-1.5 md:gap-2">
-          <label class="text-[10px] md:text-xs font-bold text-gray-400 uppercase tracking-wider pl-1">Pago (Venc.)</label>
-          <p-datepicker
-            formControlName="dueDate"
-            [iconDisplay]="'input'"
-            [showIcon]="true"
-            class="w-full"
-            size="small"
-            appendTo="body"
-            fluid
-          />
-        </div>
-      </form>
-    </div>
-  </div>
-
-  <!-- PRODUCTS SECTION -->
-  <div class="col-span-1 md:col-span-12 flex flex-col gap-4">
-    <div class="bg-white px-0 md:px-10 py-6 md:py-8 md:rounded-[2rem] border-y md:border border-slate-200 shadow-sm md:shadow-lg shadow-slate-100 -mx-4 md:mx-0">
-      <div class="flex flex-col sm:flex-row items-stretch sm:items-center justify-between mb-6 md:mb-8 px-4 md:px-0 gap-4">
-        <div>
-          <h2 class="text-xl md:text-2xl font-bold text-slate-800 tracking-tight">Detalle de Compra</h2>
-          <p class="text-sm md:text-base text-slate-400 font-medium italic mt-1">Materia prima e insumos</p>
-        </div>
-        <p-button
-          label="Añadir Producto"
-          icon="pi pi-plus"
-          severity="info"
-          styleClass="!rounded-xl px-4 md:px-6 shadow-md transition-all hover:scale-105 w-full sm:w-auto justify-center h-[44px]"
-          (onClick)="showDialog()"
-        />
-      </div>
-
-      <p-table
-        #orderDetailsTable
-        [value]="orderDetailsForTable"
-        dataKey="id"
-        styleClass="p-datatable-modern block lg:min-w-full"
-        [responsiveLayout]="'scroll'"
+    <!-- COLUMNA DERECHA: RESUMEN Y TOTALES COMPACTOS -->
+    <div class="col-span-12 lg:col-span-4">
+      <div
+        class="rounded-2xl border-2 p-4 shadow-xs flex flex-col gap-3.5 lg:sticky lg:top-4 transition-colors"
+        [ngClass]="themeService.isDarkMode() ? 'bg-[#161B22] border-[#30363D]' : 'bg-white border-[#48021C]/25'"
       >
-        <ng-template pTemplate="header">
-          <tr class="!bg-slate-50/50 hidden lg:table-row">
-            <th class="!py-5 !pl-8 text-slate-400 font-bold uppercase text-[10px] tracking-widest w-[100px]">Imagen</th>
-            <th class="!py-5 text-slate-400 font-bold uppercase text-[10px] tracking-widest">Producto</th>
-            <th class="!py-5 text-slate-400 font-bold uppercase text-[10px] tracking-widest text-center w-32">Cantidad</th>
-            <th class="!py-5 text-slate-400 font-bold uppercase text-[10px] tracking-widest text-right">Precio Unit.</th>
-            <th class="!py-5 text-slate-400 font-bold uppercase text-[10px] tracking-widest text-center">Descuento</th>
-            <th class="!py-5 text-slate-400 font-bold uppercase text-[10px] tracking-widest text-center">Impuesto</th>
-            <th class="!py-5 text-slate-400 font-bold uppercase text-[10px] tracking-widest text-right">Subtotal</th>
-            <th class="!py-5 !pr-8 text-slate-400 font-bold uppercase text-[10px] tracking-widest text-right w-20">Acciones</th>
-          </tr>
-        </ng-template>
+        <!-- Encabezado de la Tarjeta de Resumen -->
+        <div 
+          class="pb-2.5 border-b flex items-center justify-between transition-colors"
+          [ngClass]="themeService.isDarkMode() ? 'border-[#30363D]' : 'border-[#48021C]/15'"
+        >
+          <div class="flex items-center gap-2">
+            <div 
+              class="w-7 h-7 rounded-lg flex items-center justify-center shrink-0 border"
+              [ngClass]="themeService.isDarkMode() ? 'bg-[#1C2D42] text-[#58A6FF] border-[#58A6FF]/30' : 'bg-[#48021C]/10 text-[#48021C] border-[#48021C]/20'"
+            >
+              <i class="pi pi-calculator text-xs"></i>
+            </div>
+            <h3 class="font-bold text-sm leading-none m-0" [ngClass]="themeService.isDarkMode() ? 'text-[#F0F6FC]' : 'text-[#48021C]'">
+              Resumen de la Compra
+            </h3>
+          </div>
+          <span 
+            class="text-[10px] font-bold px-2 py-0.5 rounded-full border shadow-2xs"
+            [ngClass]="themeService.isDarkMode() ? 'bg-[#0D1117] text-[#8B949E] border-[#30363D]' : 'bg-rose-50 text-[#48021C] border-[#48021C]/20'"
+          >
+            {{ tableItems.length }} {{ tableItems.length === 1 ? 'producto' : 'productos' }}
+          </span>
+        </div>
 
-        <ng-template pTemplate="body" let-detail let-i="rowIndex">
-          <tr class="group hover:bg-transparent lg:hover:bg-slate-50 transition-colors border-b border-slate-100 block lg:table-row">
-            <!-- VISTA MÓVIL (Tarjeta) -->
-            <td class="lg:hidden block !p-0 border-none bg-transparent">
-               <div class="bg-white rounded-2xl shadow-sm border border-slate-200 mx-4 my-3 p-5 flex flex-col gap-4 relative">
-                  <div class="flex justify-between items-start gap-3 border-b border-slate-100 pb-3">
-                     <div class="w-12 h-12 shrink-0 rounded-xl border border-slate-200 flex items-center justify-center overflow-hidden bg-slate-50">
-                        @if (detail.data.product?.imageUrl) {
-                          <img [src]="getProductImageUrl(detail.data.product?.imageUrl)" [alt]="detail.data.product?.name" class="w-full h-full object-cover" />
-                        } @else {
-                          <i class="pi pi-image text-slate-300"></i>
-                        }
-                     </div>
-                     <div class="flex flex-col flex-1 pl-1">
-                        <span class="text-[10px] font-bold text-indigo-500 uppercase tracking-widest leading-none">{{ detail.data.product?.sku }}</span>
-                        <span class="font-bold text-slate-800 text-sm mt-1 leading-tight">{{ detail.data.product?.name }}</span>
-                        <span class="text-[9px] text-slate-400 font-bold uppercase tracking-wider mt-0.5">{{ detail.data.product?.category?.name }}</span>
-                     </div>
-                     <button
-                        pButton
-                        icon="pi pi-trash"
-                        class="p-button-rounded p-button-text p-button-danger !text-rose-400 hover:!bg-rose-50 -mt-1 -mr-2"
-                        (click)="removeDetail(i)"
-                      ></button>
-                  </div>
+        <!-- Switch de IVA (12%) -->
+        <div 
+          class="flex items-center justify-between px-3.5 py-2.5 rounded-xl border transition-colors shadow-2xs"
+          [ngClass]="themeService.isDarkMode() ? 'bg-[#0D1117] border-[#30363D]' : 'bg-rose-50/40 border-[#48021C]/20'"
+        >
+          <div class="flex items-center gap-2">
+            <i class="pi pi-percentage text-xs" [ngClass]="themeService.isDarkMode() ? 'text-[#58A6FF]' : 'text-[#48021C]'"></i>
+            <span class="text-xs font-bold" [ngClass]="themeService.isDarkMode() ? 'text-[#F0F6FC]' : 'text-[#48021C]'">
+              Aplicar IVA (12%)
+            </span>
+          </div>
+          <p-toggleswitch [(ngModel)]="applyTax" />
+        </div>
 
-                  <div class="flex items-center justify-between mt-1">
-                     <div class="flex flex-col">
-                        <span class="text-[9px] uppercase text-slate-400 font-bold tracking-widest mb-1 pl-1">Cant. Solicitada</span>
-                        <div class="bg-slate-100/50 inline-flex items-center px-4 py-2 border border-slate-200/60 rounded-xl">
-                          <span class="font-mono font-bold text-slate-700">{{ detail.data.quantity }}</span>
-                          <span class="text-[9px] text-slate-400 font-bold ml-2 uppercase">{{ detail.data.product?.unit?.abbreviation }}</span>
-                        </div>
-                     </div>
-                     <div class="flex flex-col text-right">
-                        <span class="text-[9px] uppercase text-indigo-500 font-bold tracking-widest mb-1 pr-1">Subtotal</span>
-                        <span class="font-mono font-black text-indigo-600 text-lg bg-indigo-50/50 px-3 py-1.5 rounded-lg border border-indigo-100 line-clamp-1">
-                           {{ detail.lineTotal | currency: 'Q ' }}
-                        </span>
-                     </div>
-                  </div>
-
-                  <!-- Mini Summary (Desc/Tax/Unit) -->
-                  <div class="flex justify-between border-t border-slate-100 pt-3 mt-1 text-[10px]">
-                     <span class="font-mono font-semibold text-slate-500">Unit: {{ detail.data.unitPrice | currency: 'Q ' }}</span>
-                     <div class="flex gap-2 font-bold">
-                        <span *ngIf="detail.data.discount > 0" class="text-rose-500">Desc: {{ detail.data.discount }}%</span>
-                        <span *ngIf="detail.data.taxPercentage > 0" class="text-indigo-500">Imp: {{ detail.data.taxPercentage }}%</span>
-                     </div>
-                  </div>
-               </div>
-            </td>
-
-            <!-- DESKTOP VIEW -->
-            <td class="hidden lg:table-cell !py-4 !pl-8">
-              <div class="w-14 h-14 rounded-xl border border-slate-200 flex items-center justify-center overflow-hidden shadow-sm bg-slate-50 ring-2 ring-slate-50 group-hover:ring-white transition-all">
-                @if (detail.data.product?.imageUrl) {
-                  <img
-                    [src]="getProductImageUrl(detail.data.product?.imageUrl)"
-                    [alt]="detail.data.product?.name"
-                    class="w-full h-full object-cover"
-                  />
-                } @else {
-                  <i class="pi pi-image text-xl! text-slate-300"></i>
-                }
-              </div>
-            </td>
-            <td class="hidden lg:table-cell !py-4 text-sm font-medium text-slate-700">
-              <div class="flex flex-col">
-                <span class="text-xs font-bold text-indigo-500 mb-0.5 tracking-tight uppercase">{{ detail.data.product?.sku }}</span>
-                <span class="text-base text-slate-800 tracking-tight">{{ detail.data.product?.name }}</span>
-                <span class="text-[10px] text-slate-400 font-bold uppercase tracking-wider">{{ detail.data.product?.category?.name }}</span>
-              </div>
-            </td>
-            <td class="hidden lg:table-cell !py-4 text-center">
-              <div class="bg-slate-100/50 inline-flex items-center px-4 py-2 rounded-xl border border-slate-200/60 shadow-inner">
-                <span class="font-mono font-bold text-slate-700">{{ detail.data.quantity }}</span>
-                <span class="text-[10px] text-slate-400 font-bold ml-2 uppercase">{{ detail.data.product?.unit?.abbreviation }}</span>
-              </div>
-            </td>
-            <td class="hidden lg:table-cell !py-4 text-right font-mono font-bold text-slate-600">
-              {{ detail.data.unitPrice | currency: 'Q ' }}
-            </td>
-            <td class="hidden lg:table-cell !py-4 text-center">
-              <span class="bg-rose-50 text-rose-600 px-3 py-1 rounded-lg text-xs font-bold border border-rose-100" *ngIf="detail.data.discount > 0">
-                -{{ detail.data.discount }}%
-              </span>
-              <span class="text-slate-300 font-mono text-xs" *ngIf="!detail.data.discount">-</span>
-            </td>
-            <td class="hidden lg:table-cell !py-4 text-center">
-              <span class="bg-indigo-50 text-indigo-600 px-3 py-1 rounded-lg text-xs font-bold border border-indigo-100" *ngIf="detail.data.taxPercentage > 0">
-                +{{ detail.data.taxPercentage }}%
-              </span>
-              <span class="text-slate-300 font-mono text-xs" *ngIf="!detail.data.taxPercentage">-</span>
-            </td>
-            <td class="hidden lg:table-cell !py-4 text-right font-mono font-bold text-indigo-600 text-base">
-              {{ detail.lineTotal | currency: 'Q ' }}
-            </td>
-            <td class="hidden lg:table-cell !py-4 !pr-8 text-right">
-              <button
-                pButton
-                icon="pi pi-trash"
-                class="p-button-rounded p-button-text p-button-danger !text-rose-400 hover:!bg-rose-50 !transition-all hover:scale-110"
-                (click)="removeDetail(i)"
-              ></button>
-            </td>
-          </tr>
-        </ng-template>
-
-        <ng-template pTemplate="emptymessage">
-          <tr>
-            <td colspan="8" class="text-center !py-24 hidden lg:table-cell">
-              <div class="flex flex-col items-center gap-4">
-                <div class="w-20 h-20 rounded-full bg-slate-50 flex items-center justify-center border-2 border-dashed border-slate-200">
-                  <i class="pi pi-shopping-cart text-slate-300 text-3xl"></i>
-                </div>
-                <div class="flex flex-col gap-1">
-                  <p class="text-slate-500 font-bold text-lg">Aún no hay productos</p>
-                  <p class="text-slate-400 text-sm">Empieza agregando materia prima o insumos.</p>
-                </div>
-              </div>
-            </td>
-            <td class="lg:hidden block !p-0 border-none bg-transparent">
-              <div class="bg-white rounded-2xl border border-slate-200 mx-4 my-8 p-10 flex flex-col items-center gap-4 text-center">
-                <i class="pi pi-shopping-cart text-slate-300 text-4xl"></i>
-                <div class="flex flex-col gap-1">
-                  <p class="text-slate-500 font-bold">Carrito vacío</p>
-                  <p class="text-slate-400 text-xs">Agrega productos a la orden.</p>
-                </div>
-              </div>
-            </td>
-          </tr>
-        </ng-template>
-      </p-table>
-
-      <!-- SUMARY SECTION -->
-      <div class="mt-8 md:mt-12 flex flex-col md:flex-row gap-6 md:gap-8 px-4 md:px-0">
-        <div class="flex-1">
-          <label class="text-[10px] md:text-xs font-bold text-gray-400 uppercase tracking-widest pl-1 mb-2 block">Notas Operativas</label>
+        <!-- Campo Notas / Observaciones -->
+        <div class="flex flex-col gap-1.5" [formGroup]="orderForm">
+          <label class="text-xs font-bold" [ngClass]="themeService.isDarkMode() ? 'text-[#F0F6FC]' : 'text-[#48021C]'">
+            Notas / Observaciones
+          </label>
           <textarea
             pTextarea
-            rows="5"
-            placeholder="Observaciones de la compra..."
-            [formControl]="$any(orderForm.get('notes'))"
-            class="w-full !rounded-2xl !bg-slate-50/50 !border-slate-200 focus:!border-indigo-300 focus:!ring-4 focus:!ring-indigo-50 !transition-all p-4"
+            formControlName="notes"
+            rows="3"
+            placeholder="Términos comerciales, tiempo estimado de entrega, observaciones..."
+            class="w-full text-xs !rounded-xl p-2.5 resize-none transition-colors"
+            [ngClass]="themeService.isDarkMode() ? '!bg-[#0D1117] !border-[#30363D] !text-[#F0F6FC] focus:!border-[#58A6FF]' : '!border-[#9f6587]/35 focus:!border-[#9f6587] focus:!ring-2 focus:!ring-[#9f6587]/20'"
           ></textarea>
         </div>
 
-        <div class="w-full md:w-[400px]">
-          <div class="bg-slate-50/80 rounded-[1.5rem] p-6 md:p-8 border border-slate-200/60 shadow-sm">
-            <div class="flex flex-col gap-3 md:gap-4">
-              <div class="flex justify-between items-center text-xs md:text-sm font-medium text-slate-500">
-                <span>Subtotal</span>
-                <span class="font-mono text-slate-800 font-bold">{{ calculateTotals().subtotal | currency: 'Q ' }}</span>
-              </div>
-              <div class="flex justify-between items-center text-xs md:text-sm font-medium text-slate-500">
-                <span>Total Descuentos</span>
-                <span class="font-mono text-rose-600 font-bold">- {{ calculateTotals().discountTotal | currency: 'Q ' }}</span>
-              </div>
-              <div class="flex justify-between items-center text-xs md:text-sm font-medium text-slate-500">
-                <span>Total Impuestos</span>
-                <span class="font-mono text-indigo-600 font-bold">+ {{ calculateTotals().taxTotal | currency: 'Q ' }}</span>
-              </div>
-              <div class="h-px bg-slate-200 my-1 md:my-2"></div>
-              <div class="flex justify-between items-center">
-                <span class="text-sm md:text-base font-bold text-slate-800">Total a Pagar</span>
-                <span class="text-xl md:text-2xl font-mono font-black text-indigo-600">{{ calculateTotals().total | currency: 'Q ' }}</span>
-              </div>
-            </div>
+        <!-- Desglose de Totales -->
+        <div 
+          class="p-3.5 rounded-xl border flex flex-col gap-2.5 transition-colors shadow-2xs"
+          [ngClass]="themeService.isDarkMode() ? 'bg-[#0D1117] border-[#30363D]' : 'bg-[#9f6587]/[0.05] border-[#9f6587]/20'"
+        >
+          <div class="flex justify-between items-center text-xs">
+            <span [ngClass]="themeService.isDarkMode() ? 'text-[#8B949E]' : 'text-slate-600'">Subtotal Bruto:</span>
+            <span class="font-bold tabular-nums" [ngClass]="themeService.isDarkMode() ? 'text-[#F0F6FC]' : 'text-slate-800'">
+              {{ calculatedTotals.subtotal | currency:'Q ' }}
+            </span>
           </div>
+
+          @if (calculatedTotals.discountTotal > 0) {
+            <div class="flex justify-between items-center text-xs">
+              <span class="text-rose-500 font-semibold">Descuentos:</span>
+              <span class="font-bold text-rose-500 tabular-nums">
+                - {{ calculatedTotals.discountTotal | currency:'Q ' }}
+              </span>
+            </div>
+            <div class="flex justify-between items-center text-xs">
+              <span [ngClass]="themeService.isDarkMode() ? 'text-[#8B949E]' : 'text-slate-600'">Subtotal con Descuento:</span>
+              <span class="font-bold tabular-nums" [ngClass]="themeService.isDarkMode() ? 'text-[#F0F6FC]' : 'text-slate-800'">
+                {{ calculatedTotals.subtotalWithDiscount | currency:'Q ' }}
+              </span>
+            </div>
+          }
+
+          <div class="flex justify-between items-center text-xs">
+            <span [ngClass]="themeService.isDarkMode() ? 'text-[#8B949E]' : 'text-slate-600'">
+              IVA {{ applyTax ? '(12%)' : '(0%)' }}:
+            </span>
+            <span class="font-bold tabular-nums" [ngClass]="themeService.isDarkMode() ? 'text-[#F0F6FC]' : 'text-slate-800'">
+              {{ calculatedTotals.taxTotal | currency:'Q ' }}
+            </span>
+          </div>
+
+          <div 
+            class="pt-2 border-t flex justify-between items-baseline"
+            [ngClass]="themeService.isDarkMode() ? 'border-[#30363D]' : 'border-[#9f6587]/20'"
+          >
+            <span class="text-sm font-bold" [ngClass]="themeService.isDarkMode() ? 'text-[#F0F6FC]' : 'text-[#48021C]'">
+              Total a Pagar:
+            </span>
+            <span class="text-xl font-black tabular-nums" [ngClass]="themeService.isDarkMode() ? 'text-[#58A6FF]' : 'text-[#48021C]'">
+              {{ calculatedTotals.total | currency:'Q ' }}
+            </span>
+          </div>
+        </div>
+
+        <!-- Botones de Acción -->
+        <div class="flex flex-col gap-2 pt-1 [&_button]:w-full [&_.p-button]:w-full">
+          <app-primary-button
+            label="Generar Orden de Compra"
+            icon="pi pi-check"
+            [loading]="isSaving()"
+            (clicked)="onSaveOrder()"
+          />
+          <app-secondary-button
+            label="Cancelar Proceso"
+            icon="pi pi-times"
+            (clicked)="confirmCancelProcess()"
+          />
         </div>
       </div>
     </div>
   </div>
-</div>
-</div>
 
-<!-- PRODUCT ADD DIALOG -->
-<p-dialog
-  header="Seleccionar Producto"
-  [modal]="true"
-  [(visible)]="dialogVisible"
-  [style]="{ width: '40rem' }"
-  [draggable]="false"
-  [resizable]="false"
-  class="custom-dialog"
-  appendTo="body"
->
-  <form [formGroup]="productForm" class="flex flex-col gap-8 pt-6">
-    <div class="flex flex-col gap-2">
-      <label class="text-xs font-bold text-gray-400 uppercase tracking-widest px-1">Producto <span class="text-rose-500">*</span></label>
-      <p-select
-        formControlName="productId"
-        [options]="products()"
-        [filter]="true"
-        [filterFields]="['name', 'sku']"
-        [showClear]="true"
-        (onChange)="onProductChange($event)"
-        optionLabel="name"
-        optionValue="id"
-        placeholder="Buscar materia prima o insumo..."
-        class="modern-select"
-        appendTo="body"
-      >
-        <ng-template #selectedItem let-selectedOption>
-          <div class="flex items-center gap-3" *ngIf="selectedOption">
-            <div class="w-8 h-8 rounded-lg overflow-hidden border border-slate-200 flex items-center justify-center shadow-sm bg-slate-50">
-              @if (selectedOption.imageUrl) {
-                <img [src]="getProductImageUrl(selectedOption.imageUrl)" alt="" class="w-full h-full object-cover" />
-              } @else {
-                <i class="pi pi-image text-xs! text-slate-300"></i>
-              }
-            </div>
-            <div class="flex flex-col">
-              <span class="text-xs font-bold text-indigo-500 uppercase leading-none">{{ selectedOption.sku }}</span>
-              <span class="text-sm font-semibold text-slate-700">{{ selectedOption.name }}</span>
-            </div>
-          </div>
-        </ng-template>
-        <ng-template let-product #item>
-          <div class="flex items-center gap-4 py-1">
-            <div class="w-10 h-10 rounded-xl overflow-hidden border border-slate-200 flex items-center justify-center shadow-sm bg-slate-50 ring-2 ring-slate-50">
-              @if (product.imageUrl) {
-                <img [src]="getProductImageUrl(product.imageUrl)" alt="" class="w-full h-full object-cover" />
-              } @else {
-                <i class="pi pi-image text-sm! text-slate-300"></i>
-              }
-            </div>
-            <div class="flex flex-col">
-              <span class="text-[10px] font-bold text-indigo-500 uppercase tracking-wider mb-0.5">{{ product.sku }}</span>
-              <span class="font-bold text-slate-800">{{ product.name }}</span>
-              <span class="text-[9px] text-slate-400 font-bold uppercase tracking-widest">{{ product.category?.name }}</span>
-            </div>
-          </div>
-        </ng-template>
-      </p-select>
-    </div>
-
-    <div class="grid grid-cols-2 gap-6">
-      <div class="flex flex-col gap-2">
-        <label class="text-xs font-bold text-gray-400 uppercase tracking-widest px-1">Cantidad <span class="text-rose-500">*</span></label>
-        <p-inputnumber
-          formControlName="quantity"
-          mode="decimal"
-          [min]="0.001"
-          [minFractionDigits]="selectedProduct?.unit?.allowsDecimals ? 2 : 0"
-          [maxFractionDigits]="selectedProduct?.unit?.allowsDecimals ? 2 : 0"
-          placeholder="0.00"
-          [suffix]="'  ' + (selectedProduct?.unit?.abbreviation || '')"
+  <!-- MODAL DE BÚSQUEDA DETALLADA / AÑADIR PRODUCTO -->
+  <app-standard-modal
+    [visible]="dialogVisible"
+    (visibleChange)="dialogVisible = $event"
+    title="Añadir Producto a la Orden"
+    icon="pi pi-box"
+    width="520px"
+  >
+    <form [formGroup]="productForm" class="flex flex-col gap-4">
+      <div class="flex flex-col gap-1">
+        <label 
+          class="text-xs font-semibold transition-colors"
+          [ngClass]="themeService.isDarkMode() ? 'text-[#F0F6FC]' : 'text-[#48021C]'"
+          for="modalProduct"
+        >
+          Producto / Insumo <span class="text-rose-500">*</span>
+        </label>
+        <p-select
+          id="modalProduct"
+          [options]="products()"
+          formControlName="productId"
+          optionLabel="name"
+          optionValue="id"
+          placeholder="Seleccionar producto..."
+          (onChange)="onProductChange($event)"
+          [filter]="true"
+          filterBy="name,sku"
+          appendTo="body"
+          class="w-full"
           size="small"
-          fluid
+          [styleClass]="themeService.isDarkMode()
+            ? '!rounded-lg !bg-[#0D1117] !text-[#F0F6FC] !border-[#30363D] focus-within:!border-[#58A6FF] focus-within:!ring-2 focus-within:!ring-[#58A6FF]/20 w-full text-xs font-medium'
+            : '!rounded-lg !border-[#9f6587]/35 focus-within:!border-[#9f6587] focus-within:!ring-2 focus-within:!ring-[#9f6587]/20 w-full text-xs font-medium'"
+          [panelStyleClass]="themeService.isDarkMode() ? '!bg-[#161B22] !border-[#30363D] !text-[#F0F6FC]' : ''"
         />
       </div>
-      <div class="flex flex-col gap-2">
-        <label class="text-xs font-bold text-gray-400 uppercase tracking-widest px-1">Costo Unitario <span class="text-rose-500">*</span></label>
-        <p-inputnumber
-          formControlName="unitPrice"
-          mode="decimal"
-          [min]="0"
-          [minFractionDigits]="2"
-          [maxFractionDigits]="2"
-          placeholder="0.00"
-          [prefix]="'Q '"
-          size="small"
-          fluid
-        />
-      </div>
-    </div>
 
-    <div class="grid grid-cols-2 gap-6">
-      <div class="flex flex-col gap-2">
-        <label class="text-xs font-bold text-gray-400 uppercase tracking-widest px-1">Descuento (%)</label>
-        <p-inputnumber
+      <!-- Preview del producto si está seleccionado -->
+      @if (selectedProduct) {
+        <div 
+          class="flex items-center gap-3 p-2.5 rounded-xl border transition-colors"
+          [ngClass]="themeService.isDarkMode() ? 'bg-[#0D1117] border-[#30363D]' : 'bg-slate-50 border-slate-200'"
+        >
+          <div 
+            class="w-11 h-11 shrink-0 rounded-lg border flex items-center justify-center overflow-hidden transition-colors"
+            [ngClass]="themeService.isDarkMode() ? 'bg-[#161B22] border-[#30363D]' : 'border-slate-200 bg-white'"
+          >
+            @if (selectedProduct.imageUrl) {
+              <img [src]="getProductImageUrl(selectedProduct.imageUrl)" [alt]="selectedProduct.name" class="w-full h-full object-cover" />
+            } @else {
+              <i class="pi pi-image text-sm" [ngClass]="themeService.isDarkMode() ? 'text-[#8B949E]' : 'text-slate-400'"></i>
+            }
+          </div>
+          <div class="flex flex-col min-w-0">
+            <span class="text-[10px] font-bold uppercase tracking-wider" [ngClass]="themeService.isDarkMode() ? 'text-[#58A6FF]' : 'text-[#6b3353]'">
+              SKU: {{ selectedProduct.sku || '---' }}
+            </span>
+            <span class="text-xs font-bold truncate" [ngClass]="themeService.isDarkMode() ? 'text-[#F0F6FC]' : 'text-slate-800'">
+              {{ selectedProduct.name }}
+            </span>
+            <span class="text-[10px]" [ngClass]="themeService.isDarkMode() ? 'text-[#8B949E]' : 'text-slate-500'">
+              Unidad: {{ selectedProduct.unit.name || 'Unidad' }} ({{ selectedProduct.unit.abbreviation || 'un' }})
+            </span>
+          </div>
+        </div>
+      }
+
+      <div class="grid grid-cols-2 gap-3">
+        <div class="flex flex-col gap-1">
+          <label 
+            class="text-xs font-semibold transition-colors"
+            [ngClass]="themeService.isDarkMode() ? 'text-[#F0F6FC]' : 'text-[#48021C]'"
+          >
+            Cantidad <span class="text-rose-500">*</span>
+          </label>
+          <p-inputNumber
+            formControlName="quantity"
+            mode="decimal"
+            [min]="0.01"
+            [minFractionDigits]="2"
+            [maxFractionDigits]="2"
+            placeholder="1.00"
+            class="w-full"
+            size="small"
+            [styleClass]="'w-full ' + (themeService.isDarkMode() ? '!bg-[#0D1117] !border-[#30363D]' : '')"
+            [inputStyleClass]="'w-full h-9! text-xs font-medium !rounded-lg ' + (themeService.isDarkMode() ? '!bg-[#0D1117] !text-[#F0F6FC] !border-[#30363D] focus:!border-[#58A6FF]' : '!border-[#9f6587]/35 focus:!border-[#9f6587]')"
+          />
+        </div>
+
+        <div class="flex flex-col gap-1">
+          <label 
+            class="text-xs font-semibold transition-colors"
+            [ngClass]="themeService.isDarkMode() ? 'text-[#F0F6FC]' : 'text-[#48021C]'"
+          >
+            Precio Unitario <span class="text-rose-500">*</span>
+          </label>
+          <p-inputNumber
+            formControlName="unitPrice"
+            mode="currency"
+            currency="GTQ"
+            locale="es-GT"
+            [min]="0"
+            placeholder="Q 0.00"
+            class="w-full"
+            size="small"
+            [styleClass]="'w-full ' + (themeService.isDarkMode() ? '!bg-[#0D1117] !border-[#30363D]' : '')"
+            [inputStyleClass]="'w-full h-9! text-xs font-medium !rounded-lg ' + (themeService.isDarkMode() ? '!bg-[#0D1117] !text-[#F0F6FC] !border-[#30363D] focus:!border-[#58A6FF]' : '!border-[#9f6587]/35 focus:!border-[#9f6587]')"
+          />
+        </div>
+      </div>
+
+      <div class="flex flex-col gap-1">
+        <label 
+          class="text-xs font-semibold transition-colors"
+          [ngClass]="themeService.isDarkMode() ? 'text-[#F0F6FC]' : 'text-[#48021C]'"
+        >
+          Descuento (%)
+        </label>
+        <p-inputNumber
           formControlName="discount"
           mode="decimal"
+          suffix="%"
           [min]="0"
           [max]="100"
-          [minFractionDigits]="2"
-          [maxFractionDigits]="2"
-          placeholder="0.00"
-          [suffix]="' %'"
+          placeholder="0%"
+          class="w-full"
           size="small"
-          fluid
+          [styleClass]="'w-full ' + (themeService.isDarkMode() ? '!bg-[#0D1117] !border-[#30363D]' : '')"
+          [inputStyleClass]="'w-full h-9! text-xs font-medium !rounded-lg ' + (themeService.isDarkMode() ? '!bg-[#0D1117] !text-[#F0F6FC] !border-[#30363D] focus:!border-[#58A6FF]' : '!border-[#9f6587]/35 focus:!border-[#9f6587]')"
         />
       </div>
-      <div class="flex flex-col gap-2">
-        <label class="text-xs font-bold text-gray-400 uppercase tracking-widest px-1">Impuesto (%)</label>
-        <p-inputnumber
-          formControlName="taxPercentage"
-          mode="decimal"
-          [min]="0"
-          [minFractionDigits]="2"
-          [maxFractionDigits]="2"
-          placeholder="12.00"
-          [suffix]="' %'"
-          size="small"
-          fluid
-        />
-      </div>
-    </div>
+    </form>
 
-    <div class="bg-indigo-50/50 p-4 rounded-2xl border border-indigo-100 flex gap-3 mt-2" *ngIf="productForm.valid">
-      <i class="pi pi-calculator text-indigo-500 mt-0.5"></i>
-      <div class="flex flex-col">
-        <p class="text-xs text-indigo-500 font-bold uppercase tracking-wider mb-1 text-left">Subtotal de Linea</p>
-        <p class="text-lg font-mono font-black text-indigo-600 leading-none">
-          {{ calculateLineTotal(productForm.value) | currency: 'Q ' }}
-        </p>
-      </div>
-    </div>
-
-    <div class="flex justify-end gap-3 mt-4 border-t border-slate-100 pt-8">
-      <p-button
+    <div modal-footer class="flex items-center justify-end gap-2 w-full">
+      <app-secondary-button
         label="Cancelar"
-        class="p-button-text !text-slate-400 !rounded-xl"
-        (click)="dialogVisible = false"
-      ></p-button>
-      <p-button
-        label="Agregar a la Lista"
+        icon="pi pi-times"
+        (clicked)="dialogVisible = false"
+      />
+      <app-primary-button
+        label="Añadir a la Orden"
         icon="pi pi-plus"
-        severity="success"
-        styleClass="!rounded-xl shadow-lg !px-8"
-        (onClick)="addDetail()"
-      ></p-button>
+        (clicked)="addDetail()"
+      />
     </div>
-  </form>
-</p-dialog>
+  </app-standard-modal>
+
+  <!-- MODAL DE CONFIRMACIÓN DE CANCELACIÓN -->
+  <app-confirmation-modal
+    [visible]="showCancelConfirmModal"
+    (visibleChange)="showCancelConfirmModal = $event"
+    type="danger"
+    icon="pi pi-times"
+    header="Confirmar cancelación"
+    title="¿Estás seguro de cancelar este proceso?"
+    message="Los cambios realizados no se guardarán y serás redirigido al listado de órdenes de compra."
+    note="Esta acción descartará la orden de compra y todos los productos que hayas añadido al detalle."
+    confirmLabel="Cancelar proceso"
+    confirmIcon="pi pi-times-circle"
+    cancelLabel="Regresar"
+    (onConfirm)="onBack()"
+  />
+</div>

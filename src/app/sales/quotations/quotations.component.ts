@@ -1,4 +1,4 @@
-import { Component, OnInit, inject, signal, computed } from '@angular/core';
+import { Component, OnInit, inject, signal, computed, effect } from '@angular/core';
 import { CommonModule, CurrencyPipe, DatePipe, DecimalPipe } from '@angular/common';
 import { ButtonModule } from 'primeng/button';
 import { TableModule } from 'primeng/table';
@@ -22,6 +22,7 @@ import { ApiResponse } from '../../core/models/api-response.model';
 import { AuthService } from '../../auth/auth.service';
 import { BranchesService } from '../../inventory/services/branches.service';
 import { Branch } from '../../inventory/interfaces/branch.interface';
+import { BranchContextService } from '../../core/services/branch-context.service';
 
 import { QuotationPreviewComponent } from './quotation-preview/quotation-preview.component';
 import { ConfirmationModalComponent } from '../../shared/components/confirmation-modal/confirmation-modal.component';
@@ -30,6 +31,7 @@ import { RefreshButtonComponent } from '../../shared/components/refresh-button/r
 import { PrimaryButtonComponent } from '../../shared/components/primary-button/primary-button.component';
 import { StandardTableComponent } from '../../shared/components/standard-table/standard-table.component';
 import { StatusBadgeComponent } from '../../shared/components/status-badge/status-badge.component';
+import { ThemeService } from '../../core/services/theme.service';
 
 @Component({
   selector: 'app-quotations',
@@ -67,11 +69,17 @@ import { StatusBadgeComponent } from '../../shared/components/status-badge/statu
   styleUrl: './quotations.component.css',
 })
 export class QuotationsComponent implements OnInit {
+  public themeService = inject(ThemeService);
+  public branchContext = inject(BranchContextService);
   private quotationsService = inject(QuotationsService);
   private messageService = inject(MessageService);
   private router = inject(Router);
   private authService = inject(AuthService);
   private branchesService = inject(BranchesService);
+
+  readonly isConsolidatedMode = computed(() => this.branchContext.isGlobalView);
+  readonly activeWorkingBranch = computed(() => this.branchContext.currentBranch());
+  readonly canFilterByBranch = computed(() => this.isSuperAdmin() && this.isConsolidatedMode());
 
   quotations: IQuotation[] = [];
   branches = signal<Branch[]>([]);
@@ -102,9 +110,22 @@ export class QuotationsComponent implements OnInit {
   showCancelConfirmDialog = false;
   quotationToCancel: IQuotation | null = null;
 
+  constructor() {
+    effect(() => {
+      const activeBranch = this.activeWorkingBranch();
+      const isConsolidated = this.isConsolidatedMode();
+      
+      if (!isConsolidated && activeBranch?.id) {
+        this.selectedBranch = activeBranch.id;
+      } else if (isConsolidated) {
+        this.selectedBranch = null;
+      }
+      this.loadQuotations();
+    });
+  }
+
   ngOnInit(): void {
     this.loadBranches();
-    this.loadQuotations();
   }
 
   loadBranches(): void {
@@ -121,7 +142,12 @@ export class QuotationsComponent implements OnInit {
     this.loading = true;
     const filters: any = {};
     if (this.searchTerm?.trim()) filters.search = this.searchTerm.trim();
-    if (this.selectedBranch) filters.branchId = this.selectedBranch;
+    
+    const effectiveBranchId = !this.isConsolidatedMode() && this.activeWorkingBranch()?.id
+      ? this.activeWorkingBranch()!.id
+      : this.selectedBranch;
+    if (effectiveBranchId) filters.branchId = effectiveBranchId;
+    
     if (this.selectedStatus) filters.status = this.selectedStatus;
 
     this.quotationsService.getQuotations(filters).subscribe({

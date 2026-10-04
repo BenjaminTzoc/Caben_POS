@@ -1,7 +1,9 @@
-import { Component, EventEmitter, forwardRef, Input, Output } from '@angular/core';
+import { Component, EventEmitter, forwardRef, inject, Input, OnInit, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ControlValueAccessor, FormsModule, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { SelectModule } from 'primeng/select';
+import { AuthService } from '../../../auth/auth.service';
+import { ThemeService } from '../../../core/services/theme.service';
 
 @Component({
   selector: 'app-branch-select',
@@ -15,8 +17,12 @@ import { SelectModule } from 'primeng/select';
     },
   ],
   templateUrl: './branch-select.component.html',
+  styleUrl: './branch-select.component.css',
 })
-export class BranchSelectComponent implements ControlValueAccessor {
+export class BranchSelectComponent implements ControlValueAccessor, OnInit {
+  public themeService = inject(ThemeService);
+  private authService = inject(AuthService);
+
   /** Lista de sucursales disponibles */
   @Input() branches: any[] = [];
 
@@ -54,7 +60,24 @@ export class BranchSelectComponent implements ControlValueAccessor {
   private onChange: (val: any) => void = () => {};
   private onTouched: () => void = () => {};
 
+  ngOnInit(): void {
+    const user = this.authService.currentUser;
+    // Si no es superadmin y tiene sucursal asignada, fijar y bloquear el selector
+    if (user && !this.authService.isSuperAdmin && user.branch?.id) {
+      this.value = user.branch.id;
+      this.disabled = true;
+      this.showClear = false;
+    }
+  }
+
   writeValue(val: string | null): void {
+    const user = this.authService.currentUser;
+    if (user && !this.authService.isSuperAdmin && user.branch?.id) {
+      this.value = user.branch.id;
+      this.disabled = true;
+      this.showClear = false;
+      return;
+    }
     this.value = val;
   }
 
@@ -67,6 +90,11 @@ export class BranchSelectComponent implements ControlValueAccessor {
   }
 
   setDisabledState(isDisabled: boolean): void {
+    const user = this.authService.currentUser;
+    if (user && !this.authService.isSuperAdmin && user.branch?.id) {
+      this.disabled = true;
+      return;
+    }
     this.disabled = isDisabled;
   }
 

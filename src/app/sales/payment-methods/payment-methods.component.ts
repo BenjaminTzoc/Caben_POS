@@ -1,4 +1,4 @@
-import { Component, inject, OnInit, signal } from '@angular/core';
+import { Component, computed, inject, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
@@ -14,10 +14,15 @@ import { InputIconModule } from 'primeng/inputicon';
 import { TagModule } from 'primeng/tag';
 import { TooltipModule } from 'primeng/tooltip';
 import { ToggleSwitchModule } from 'primeng/toggleswitch';
-
-// Services
 import { PaymentMethodsService } from '../services/payment-methods.service';
 import { AuthService } from '../../auth/auth.service';
+import { ThemeService } from '../../core/services/theme.service';
+import { PageHeaderComponent } from '../../shared/components/page-header/page-header.component';
+import { PrimaryButtonComponent } from '../../shared/components/primary-button/primary-button.component';
+import { RefreshButtonComponent } from '../../shared/components/refresh-button/refresh-button.component';
+import { SearchInputComponent } from '../../shared/components/search-input/search-input.component';
+import { StandardTableComponent } from '../../shared/components/standard-table/standard-table.component';
+import { StatusBadgeComponent } from '../../shared/components/status-badge/status-badge.component';
 
 @Component({
   selector: 'app-payment-methods',
@@ -32,11 +37,18 @@ import { AuthService } from '../../auth/auth.service';
     InputIconModule,
     TagModule,
     TooltipModule,
-    ToggleSwitchModule
+    ToggleSwitchModule,
+    PageHeaderComponent,
+    PrimaryButtonComponent,
+    RefreshButtonComponent,
+    SearchInputComponent,
+    StandardTableComponent,
+    StatusBadgeComponent,
   ],
   templateUrl: './payment-methods.component.html',
 })
 export class PaymentMethodsComponent implements OnInit {
+  public themeService = inject(ThemeService);
   private paymentService = inject(PaymentMethodsService);
   private messageService = inject(MessageService);
   private confirmService = inject(ConfirmService);
@@ -46,6 +58,19 @@ export class PaymentMethodsComponent implements OnInit {
   paymentMethods = signal<any[]>([]);
   loading = signal(false);
   showDeleted = false;
+  searchTerm = signal<string>('');
+
+  filteredMethods = computed(() => {
+    const term = this.searchTerm().toLowerCase().trim();
+    const list = this.paymentMethods();
+    if (!term) return list;
+    return list.filter(
+      (m) =>
+        m.name?.toLowerCase().includes(term) ||
+        m.code?.toLowerCase().includes(term) ||
+        m.description?.toLowerCase().includes(term)
+    );
+  });
 
   get canViewDeleted(): boolean {
     return this.authService.currentUser?.roles?.some(r => r.isSuperAdmin || r.name === 'Admin') ?? false;

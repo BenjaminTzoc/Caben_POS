@@ -1,6 +1,4 @@
-import { Component, inject, OnInit, signal } from '@angular/core';
-import { ButtonModule } from 'primeng/button';
-import { TableModule } from 'primeng/table';
+import { Component, computed, inject, OnInit, signal } from '@angular/core';
 import { IPurchaseOrderResponse } from '../interfaces/purchase-order.interface';
 import { OrdersService } from '../services/orders.service';
 import { MessageService } from 'primeng/api';
@@ -9,36 +7,46 @@ import { Router } from '@angular/router';
 import { PurchaseStatusPipe } from '../../shared/pipes/purchase-status.pipe';
 import { BranchesService } from '../../inventory/services/branches.service';
 import { Branch } from '../../inventory/interfaces/branch.interface';
-import { DialogModule } from 'primeng/dialog';
 import { Select } from 'primeng/select';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { TooltipModule } from 'primeng/tooltip';
 import { AuthService } from '../../auth/auth.service';
-import { InputTextModule } from 'primeng/inputtext';
-import { TagModule } from 'primeng/tag';
+import { ThemeService } from '../../core/services/theme.service';
+import { PageHeaderComponent } from '../../shared/components/page-header/page-header.component';
+import { RefreshButtonComponent } from '../../shared/components/refresh-button/refresh-button.component';
+import { PrimaryButtonComponent } from '../../shared/components/primary-button/primary-button.component';
+import { SecondaryButtonComponent } from '../../shared/components/secondary-button/secondary-button.component';
+import { SearchInputComponent } from '../../shared/components/search-input/search-input.component';
+import { StandardTableComponent } from '../../shared/components/standard-table/standard-table.component';
+import { StatusBadgeComponent, BadgeSeverity } from '../../shared/components/status-badge/status-badge.component';
+import { StandardModalComponent } from '../../shared/components/standard-modal/standard-modal.component';
 
 @Component({
   selector: 'app-purchase-orders',
   standalone: true,
   imports: [
-    ButtonModule,
-    TableModule,
+    CommonModule,
+    FormsModule,
     DatePipe,
     CurrencyPipe,
     PurchaseStatusPipe,
-    DialogModule,
     Select,
-    FormsModule,
-    CommonModule,
     TooltipModule,
-    InputTextModule,
-    TagModule
+    PageHeaderComponent,
+    RefreshButtonComponent,
+    PrimaryButtonComponent,
+    SecondaryButtonComponent,
+    SearchInputComponent,
+    StandardTableComponent,
+    StatusBadgeComponent,
+    StandardModalComponent,
   ],
   templateUrl: './purchase-orders.component.html',
   styleUrl: './purchase-orders.component.css',
 })
 export class PurchaseOrdersComponent implements OnInit {
+  public themeService = inject(ThemeService);
   private ordersService = inject(OrdersService);
   private messageService = inject(MessageService);
   private router = inject(Router);
@@ -48,6 +56,35 @@ export class PurchaseOrdersComponent implements OnInit {
   purchaseOrders = signal<IPurchaseOrderResponse[]>([]);
   branches = signal<Branch[]>([]);
   loading = signal<boolean>(false);
+  searchTerm = signal<string>('');
+  statusFilter = signal<string | null>(null);
+
+  statusOptions = [
+    { label: 'Todos los estados', value: null },
+    { label: 'Pendiente', value: 'pending' },
+    { label: 'Parcialmente Recibida', value: 'partially_received' },
+    { label: 'Recibida', value: 'received' },
+    { label: 'Cancelada', value: 'cancelled' },
+  ];
+
+  filteredOrders = computed(() => {
+    let list = this.purchaseOrders();
+    const search = this.searchTerm().toLowerCase().trim();
+    const status = this.statusFilter();
+
+    if (status) {
+      list = list.filter((o) => o.status === status);
+    }
+    if (search) {
+      list = list.filter(
+        (o) =>
+          (o.invoiceNumber && o.invoiceNumber.toLowerCase().includes(search)) ||
+          (o.supplier?.name && o.supplier.name.toLowerCase().includes(search)) ||
+          (o.supplier?.nit && o.supplier.nit.toLowerCase().includes(search))
+      );
+    }
+    return list;
+  });
 
   // Recepcion logic
   showReceiveDialog = signal<boolean>(false);
@@ -94,6 +131,10 @@ export class PurchaseOrdersComponent implements OnInit {
         this.loading.set(false);
       },
     });
+  }
+
+  onSearch(term: string): void {
+    this.searchTerm.set(term);
   }
 
   createPurchaseOrder(): void {
@@ -144,7 +185,7 @@ export class PurchaseOrdersComponent implements OnInit {
     });
   }
 
-  getStatusSeverity(status: string): "success" | "secondary" | "info" | "warn" | "danger" | "contrast" | undefined {
+  getStatusSeverity(status: string): BadgeSeverity {
     switch (status) {
       case 'received': return 'success';
       case 'pending': return 'warn';
@@ -153,5 +194,10 @@ export class PurchaseOrdersComponent implements OnInit {
       case 'cancelled': return 'danger';
       default: return 'secondary';
     }
+  }
+
+  hasPendingAmount(amount: string | number | undefined): boolean {
+    if (!amount) return false;
+    return Number(amount) > 0;
   }
 }

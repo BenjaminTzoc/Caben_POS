@@ -1,294 +1,405 @@
-<div class="py-4 px-0 md:px-6 bg-gray-50/30 min-h-screen">
-  <div class="max-w-[1700px] mx-auto mb-6 md:mb-8 px-4 md:px-0">
-    <div class="flex flex-col md:flex-row md:items-end justify-between gap-4 md:gap-6">
-      <div class="w-full md:max-w-[50%]">
-        <h1 class="text-3xl md:text-4xl font-bold text-gray-900 tracking-tight">Recetas de Producción</h1>
-        <p class="text-gray-500 mt-1 md:mt-2 text-sm md:text-md">
-          Defina los ingredientes y proporciones para sus productos terminados y componentes.
-        </p>
-      </div>
-
-      <div class="group w-full md:w-auto bg-white border border-slate-300 rounded-xl 
-                  py-1 px-4 shadow-sm flex items-center gap-3 transition-all 
-                  focus-within:border-indigo-300 focus-within:shadow-md h-[44px]">
-        <i class="pi pi-search text-gray-400"></i>
-        <input
-          pInputText
-          type="text"
-          (input)="dt.filterGlobal($event.target.value, 'contains')"
-          class="!border-none !shadow-none !bg-transparent w-full sm:w-48 md:w-64 text-sm"
-          placeholder="Buscar producto..."
-        />
-      </div>
+<div class="py-4 pb-24 px-0 md:px-6 min-h-screen transition-colors duration-200" [ngClass]="themeService.isDarkMode() ? 'bg-[#0D1117]' : 'bg-[#9f6587]/[0.06]'">
+  <!-- Top Card: Header & Filtros Estandarizados -->
+  <app-page-header
+    title="Recetas de Producción"
+    subtitle="Defina los ingredientes y proporciones para sus productos terminados y componentes."
+    icon="pi pi-receipt"
+    colorScheme="burgundy"
+    [badge]="products().length + ' productos'"
+    badgeSeverity="burgundy"
+  >
+    <!-- Acciones -->
+    <div actions class="flex items-center gap-2 flex-wrap">
+      <app-refresh-button [loading]="loading()" (refresh)="loadProducts()" />
     </div>
-  </div>
 
-  <div class="max-w-[1700px] mx-auto">
-    <div class="bg-transparent md:bg-white rounded-none md:rounded-xl md:border md:border-slate-300 overflow-hidden md:shadow-sm">
-      <p-table
-        #dt
-        [value]="products()"
+    <!-- Filtros de Búsqueda -->
+    <div filters class="w-full flex flex-col sm:flex-row items-center gap-3">
+      <app-search-input
+        [ngModel]="searchTerm()"
+        placeholder="Buscar por producto o SKU..."
+        (searchChange)="onSearch($event)"
+      />
+    </div>
+  </app-page-header>
+
+  <!-- Tabla Estándar y Tarjetas Móviles -->
+  <div class="max-w-[1700px] mx-auto mt-4 px-4 md:px-0">
+    <!-- VISTA ESCRITORIO (app-standard-table) -->
+    <div class="hidden lg:block">
+      <app-standard-table
+        #recipesTable
+        [value]="filteredProducts()"
         [loading]="loading()"
-        [paginator]="true"
+        [paginator]="filteredProducts().length > 10"
         [rows]="10"
-        [globalFilterFields]="['name', 'sku']"
+        [rowsPerPageOptions]="[10, 20, 50, 100]"
         dataKey="id"
-        [rowExpandMode]="'single'"
-        [expandedRowKeys]="expandedRows"
-        (expandedRowKeysChange)="onExpandedRowKeysChange($any($event))"
-        responsiveLayout="scroll"
+        colorScheme="burgundy"
+        emptyIcon="pi pi-receipt"
+        emptyMessage="No se encontraron productos para recetas. Verifique los filtros o asegúrese de que existan productos de tipo terminado o componente."
+        [customClass]="themeService.isDarkMode() ? 'theme-dark' : ''"
       >
+        <!-- HEADER -->
         <ng-template #header>
-          <tr class="h-16! text-sm! hidden lg:table-row">
-            <th class="w-[50px]"></th>
-            <th pSortableColumn="name">Producto <p-sortIcon field="name" /></th>
-            <th pSortableColumn="sku" class="w-[150px]">SKU <p-sortIcon field="sku" /></th>
-            <th pSortableColumn="type" class="w-[120px]">Tipo <p-sortIcon field="type" /></th>
-            <th class="text-center w-[100px]">Unidad</th>
-            <th class="text-right !pr-6 w-[160px]">Acciones</th>
+          <tr
+            class="h-11 text-xs border-b font-bold sticky top-0 z-10 transition-colors"
+            [ngClass]="themeService.isDarkMode() 
+              ? 'bg-[#161B22] border-[#30363D] text-[#8B949E]' 
+              : 'bg-[#eddde1] border-[#762f41]/40 text-[#3b141e]'"
+          >
+            <th class="w-12 !text-center" [ngClass]="themeService.isDarkMode() ? 'border-r border-[#30363D]' : 'border-r border-[#762f41]/35'"></th>
+            <th class="!text-left !pl-4" [ngClass]="themeService.isDarkMode() ? 'border-r border-[#30363D]' : 'border-r border-[#762f41]/35'">Producto</th>
+            <th class="!text-left !pl-3 w-40" [ngClass]="themeService.isDarkMode() ? 'border-r border-[#30363D]' : 'border-r border-[#762f41]/35'">SKU</th>
+            <th class="!text-left !pl-3 w-36" [ngClass]="themeService.isDarkMode() ? 'border-r border-[#30363D]' : 'border-r border-[#762f41]/35'">Tipo</th>
+            <th class="!text-center !py-2.5 w-28" [ngClass]="themeService.isDarkMode() ? 'border-r border-[#30363D]' : 'border-r border-[#762f41]/35'">Unidad</th>
+            <th class="!text-center !py-2.5 w-44">Acciones</th>
           </tr>
         </ng-template>
 
-        <ng-template #body let-product let-expanded="expanded">
-          <tr class="block lg:table-row bg-transparent hover:bg-transparent lg:hover:bg-slate-50/80 transition-colors border-b border-slate-100" [ngClass]="{ 'lg:bg-slate-50/50': expanded }">
-            
-            <!-- VISTA MÓVIL (Tarjeta) -->
-            <td class="lg:hidden block !p-0 border-none bg-transparent">
-              <div class="bg-white rounded-2xl shadow-sm border border-slate-200 mx-4 my-3 p-5 flex flex-col gap-4 relative">
-                @if (product.isMaster) {
-                  <p-tag 
-                    value="Maestro" 
-                    severity="secondary"
-                    [rounded]="true"
-                    styleClass="absolute top-4 right-4 !text-[9px] !px-2 !py-0.5 !h-fit bg-indigo-100! text-indigo-700! border-indigo-200!"
-                  />
-                }
-
-                <div class="flex items-center gap-3">
-                  <div class="w-12 h-12 rounded-lg overflow-hidden border border-slate-200 bg-slate-50 flex-shrink-0 flex items-center justify-center shadow-sm">
-                    @if (product.imageUrl) {
-                      <img [src]="getProductImageUrl(product.imageUrl)" class="w-full h-full object-cover" />
-                    } @else {
-                      <i class="pi pi-image text-lg! text-slate-300"></i>
-                    }
-                  </div>
-                  <div class="flex flex-col min-w-0 pr-14 flex-1">
-                    <span class="font-bold text-slate-800 text-sm leading-tight truncate">{{ product.name }}</span>
-                    <span class="text-[10px] font-mono text-slate-400 uppercase mt-0.5 tracking-widest">{{ product.sku }}</span>
-                  </div>
-                </div>
-
-                <div class="grid grid-cols-2 gap-4 border-t border-slate-100 pt-3 mt-1">
-                   <div class="flex flex-col gap-1">
-                     <span class="text-[10px] text-slate-400 font-bold uppercase tracking-widest">Tipo</span>
-                     <p-tag [severity]="getTypeSeverity(product.type)" [value]="getTypeLabel(product.type)" styleClass="!text-[9px] w-fit mt-0.5"></p-tag>
-                   </div>
-                   <div class="flex flex-col items-end gap-1 text-right">
-                     <span class="text-[10px] text-slate-400 font-bold uppercase tracking-widest">Unidad</span>
-                     <span class="text-sm font-semibold text-slate-700 mt-0.5">{{ product.unit?.abbreviation || 'und' }}</span>
-                   </div>
-                </div>
-
-                <div class="flex items-center justify-between mt-2 pt-2 border-t border-slate-100">
-                  @if (product.variants && product.variants.length > 0) {
-                    <button 
-                      type="button" 
-                      pButton 
-                      pRipple 
-                      [pRowToggler]="product" 
-                      class="p-button-text p-button-sm p-button-secondary font-bold !pl-0" 
-                      [icon]="expanded ? 'pi pi-chevron-up' : 'pi pi-chevron-down'"
-                      [label]="expanded ? 'Ocultar Variantes' : 'Ver Variantes'"
-                    ></button>
-                  } @else {
-                    <div></div>
-                  }
-                  @if (!product.isMaster) {
-                    <button
-                      pButton
-                      label="Gestionar Receta"
-                      icon="pi pi-receipt"
-                      class="p-button-text p-button-sm !text-indigo-600 font-bold !pr-0"
-                      (click)="manageRecipe(product.id)"
-                    ></button>
-                  }
-                </div>
-              </div>
-            </td>
-
-            <!-- DESKTOP VIEW -->
-            <td class="text-center hidden lg:table-cell">
+        <!-- BODY -->
+        <ng-template #body let-product let-expanded="expanded" let-i="rowIndex">
+          <tr
+            [ngClass]="[
+              themeService.isDarkMode()
+                ? (i % 2 === 1 ? '!bg-[#161B22] hover:!bg-[#1F242C] border-[#30363D]' : '!bg-[#0D1117] hover:!bg-[#1F242C] border-[#30363D]')
+                : (i % 2 === 1 ? 'bg-[#a65a6b]/[0.05] hover:bg-[#eddde1]/45 border-[#762f41]/18' : 'bg-white hover:bg-[#eddde1]/45 border-[#762f41]/18'),
+              expanded ? (themeService.isDarkMode() ? '!bg-[#1C2128]' : '!bg-rose-50/50') : ''
+            ]"
+            class="transition-colors duration-150 border-b last:border-0 text-xs"
+          >
+            <!-- Toggle Expander -->
+            <td class="text-center align-middle" [ngClass]="themeService.isDarkMode() ? 'border-r border-[#30363D]' : 'border-r border-[#762f41]/18'">
               @if (product.variants && product.variants.length > 0) {
-                <button 
-                  type="button" 
-                  pButton 
-                  pRipple 
-                  [pRowToggler]="product" 
-                  class="p-button-text p-button-secondary p-button-rounded !w-8 !h-8 !p-0" 
+                <button
+                  type="button"
+                  pButton
+                  pRipple
+                  [pRowToggler]="product"
+                  class="p-button-text p-button-rounded !w-7 !h-7 !p-0"
+                  [ngClass]="themeService.isDarkMode() ? '!text-[#58A6FF] hover:!bg-[#1C2128]' : '!text-[#48021C] hover:!bg-[#48021C]/10'"
                   [icon]="expanded ? 'pi pi-chevron-down' : 'pi pi-chevron-right'"
                 ></button>
               }
             </td>
-            <td class="!pl-0 hidden lg:table-cell">
+
+            <!-- Producto -->
+            <td class="!pl-4 align-middle" [ngClass]="themeService.isDarkMode() ? 'border-r border-[#30363D]' : 'border-r border-[#762f41]/18'">
               <div class="flex items-center gap-3">
-                <div class="w-10 h-10 rounded-lg overflow-hidden border border-slate-200 bg-slate-50 flex-shrink-0 flex items-center justify-center ml-2 shadow-sm">
+                <div
+                  class="w-10 h-10 rounded-lg border flex items-center justify-center overflow-hidden shrink-0 shadow-2xs"
+                  [ngClass]="themeService.isDarkMode() ? 'bg-[#0D1117] border-[#30363D]' : 'border-slate-200 bg-white'"
+                >
                   @if (product.imageUrl) {
                     <img [src]="getProductImageUrl(product.imageUrl)" class="w-full h-full object-cover" />
                   } @else {
-                    <i class="pi pi-image text-lg! text-slate-300"></i>
+                    <i class="pi pi-box text-sm" [ngClass]="themeService.isDarkMode() ? 'text-[#8B949E]' : 'text-slate-400'"></i>
                   }
                 </div>
-                <div class="flex flex-col min-w-0">
-                  <div class="flex items-center gap-2">
-                    <span class="font-semibold text-slate-800 truncate">{{ product.name }}</span>
-                    @if (product.isMaster) {
-                      <p-tag 
-                        value="Maestro" 
-                        severity="secondary"
-                        [rounded]="true"
-                        styleClass="!text-[9px] !px-2 !py-0.5 !h-fit bg-indigo-100! text-indigo-700! border-indigo-200!"
-                      />
-                    }
-                  </div>
+                <div class="flex items-center gap-2 min-w-0">
+                  <span class="font-bold text-xs truncate" [ngClass]="themeService.isDarkMode() ? 'text-[#F0F6FC]' : 'text-slate-800'">
+                    {{ product.name }}
+                  </span>
+                  @if (product.isMaster) {
+                    <span
+                      class="text-[9px] font-bold uppercase tracking-wider px-2 py-0.5 rounded border"
+                      [ngClass]="themeService.isDarkMode() ? 'bg-[#1C2D42] text-[#58A6FF] border-[#58A6FF]/30' : 'bg-[#48021C]/10 text-[#48021C] border-[#48021C]/20'"
+                    >
+                      Maestro
+                    </span>
+                  }
                 </div>
               </div>
             </td>
-            <td class="hidden lg:table-cell">
-              <span class="text-sm font-mono uppercase text-slate-500">{{ product.sku }}</span>
+
+            <!-- SKU -->
+            <td class="!pl-3 align-middle" [ngClass]="themeService.isDarkMode() ? 'border-r border-[#30363D]' : 'border-r border-[#762f41]/18'">
+              <span class="text-xs font-mono font-bold tracking-wider uppercase" [ngClass]="themeService.isDarkMode() ? 'text-[#58A6FF]' : 'text-[#6b3353]'">
+                {{ product.sku || '---' }}
+              </span>
             </td>
-            <td class="hidden lg:table-cell">
-              <p-tag [severity]="getTypeSeverity(product.type)" [value]="getTypeLabel(product.type)" styleClass="!text-[10px]"></p-tag>
+
+            <!-- Tipo -->
+            <td class="!pl-3 align-middle" [ngClass]="themeService.isDarkMode() ? 'border-r border-[#30363D]' : 'border-r border-[#762f41]/18'">
+              <app-status-badge
+                [severity]="getTypeSeverity(product.type)"
+                [value]="getTypeLabel(product.type)"
+              />
             </td>
-            <td class="text-center font-medium text-sm text-slate-600 hidden lg:table-cell">
+
+            <!-- Unidad -->
+            <td class="text-center align-middle font-semibold text-xs" [ngClass]="[themeService.isDarkMode() ? 'border-r border-[#30363D] text-[#8B949E]' : 'border-r border-[#762f41]/18 text-slate-600']">
               {{ product.unit?.abbreviation || 'und' }}
             </td>
-            <td class="text-right !pr-6 hidden lg:table-cell">
-              <!-- Solo mostramos Gestionar Receta si NO es maestro -->
+
+            <!-- Acciones -->
+            <td class="text-center !pr-4 align-middle">
               @if (!product.isMaster) {
                 <button
                   pButton
+                  type="button"
                   label="Gestionar Receta"
                   icon="pi pi-receipt"
-                  class="p-button-text p-button-sm !text-indigo-600 font-bold"
+                  size="small"
+                  [outlined]="true"
                   (click)="manageRecipe(product.id)"
+                  [ngClass]="themeService.isDarkMode()
+                    ? '!border-[#30363D] !text-[#58A6FF] hover:!bg-[#1F242C] !text-xs font-semibold'
+                    : '!border-[#48021C]/30 !text-[#48021C] hover:!bg-[#48021C]/10 !text-xs font-semibold'"
                 ></button>
               }
             </td>
           </tr>
         </ng-template>
 
+        <!-- EXPANDED ROW (VARIANTES) -->
         <ng-template #expandedrow let-product>
-          <tr class="block lg:table-row bg-slate-50/30 lg:bg-transparent">
-            <td colspan="6" class="!p-0 border-b border-slate-200 block lg:table-cell">
-              <div class="px-4 lg:px-12 py-4 bg-slate-50/50 border-l-4 border-indigo-400">
+          <tr>
+            <td colspan="6" class="!p-0 border-b" [ngClass]="themeService.isDarkMode() ? 'border-[#30363D] bg-[#0D1117]' : 'border-[#48021C]/20 bg-rose-50/30'">
+              <div class="px-4 lg:px-10 py-4 border-l-4" [ngClass]="themeService.isDarkMode() ? 'border-[#58A6FF]' : 'border-[#48021C]'">
                 <div class="flex items-center gap-2 mb-3">
-                  <i class="pi pi-sitemap text-indigo-500 text-sm"></i>
-                  <span class="text-xs font-bold text-indigo-900 uppercase tracking-widest">Variantes de {{ product.name }}</span>
+                  <i class="pi pi-sitemap text-sm" [ngClass]="themeService.isDarkMode() ? 'text-[#58A6FF]' : 'text-[#48021C]'"></i>
+                  <span class="text-xs font-bold uppercase tracking-wider" [ngClass]="themeService.isDarkMode() ? 'text-[#F0F6FC]' : 'text-[#48021C]'">
+                    Variantes de {{ product.name }}
+                  </span>
+                  <span 
+                    class="text-[10px] px-2 py-0.5 rounded-full font-bold border shadow-2xs"
+                    [ngClass]="themeService.isDarkMode() 
+                      ? 'bg-[#161B22] text-[#58A6FF] border-[#30363D]' 
+                      : 'bg-white text-[#762f41] border-[#762f41]/30'"
+                  >
+                    {{ product.variants?.length || 0 }}
+                  </span>
                 </div>
-                
-                <div class="bg-white rounded-lg border border-slate-200 shadow-sm overflow-hidden mb-2 lg:mb-0">
-                  <!-- Solo mostrar tabla real en escritorio para variantes, o card view si combinamos, pero por ahora en móvil mejor bloque sin table headers -->
-                  <div class="hidden lg:block">
-                    <p-table [value]="product.variants || []" class="p-datatable-sm">
-                      <ng-template #header>
-                        <tr class="bg-slate-50/80 text-[11px] uppercase text-slate-500 tracking-wider font-bold h-10!">
-                          <th class="!pl-6">Producto / Variante</th>
-                          <th class="w-[140px]">SKU</th>
-                          <th class="w-[120px]">Tipo</th>
-                          <th class="text-center w-[90px]">Unidad</th>
-                          <th class="text-right pr-6 w-[150px]">Acciones</th>
-                        </tr>
-                      </ng-template>
-                      <ng-template #body let-variant>
-                        <tr class="text-sm border-b border-slate-100 last:border-0 hover:bg-slate-50/80 transition-colors">
-                          <td class="!pl-6 py-2">
-                           <div class="flex items-center gap-3">
-                              <div class="w-8 h-8 rounded border border-slate-200 bg-slate-50 flex-shrink-0 flex items-center justify-center overflow-hidden">
+
+                <div
+                  class="rounded-xl border overflow-hidden shadow-xs"
+                  [ngClass]="themeService.isDarkMode() ? 'bg-[#161B22] border-[#30363D]' : 'bg-white border-[#48021C]/20'"
+                >
+                  <table class="w-full text-xs">
+                    <thead>
+                      <tr
+                        class="h-9 border-b font-bold uppercase tracking-wider text-[11px]"
+                        [ngClass]="themeService.isDarkMode() ? 'bg-[#1C2128] border-[#30363D] text-[#8B949E]' : 'bg-[#eddde1]/60 border-[#762f41]/30 text-[#3b141e]'"
+                      >
+                        <th class="text-left !pl-6">Variante</th>
+                        <th class="text-left w-36">SKU</th>
+                        <th class="text-left w-32">Tipo</th>
+                        <th class="text-center w-24">Unidad</th>
+                        <th class="text-center w-40 !pr-6">Acciones</th>
+                      </tr>
+                    </thead>
+                    <tbody class="divide-y" [ngClass]="themeService.isDarkMode() ? 'divide-[#30363D]' : 'divide-slate-100'">
+                      @for (variant of product.variants; track variant.id) {
+                        <tr class="transition-colors hover:bg-slate-500/5">
+                          <td class="!pl-6 py-2.5">
+                            <div class="flex items-center gap-2.5">
+                              <div
+                                class="w-8 h-8 rounded border flex items-center justify-center overflow-hidden shrink-0 shadow-2xs"
+                                [ngClass]="themeService.isDarkMode() ? 'bg-[#0D1117] border-[#30363D]' : 'border-slate-200 bg-white'"
+                              >
                                 @if (variant.imageUrl) {
                                   <img [src]="getProductImageUrl(variant.imageUrl)" class="w-full h-full object-cover" />
                                 } @else {
-                                  <i class="pi pi-image text-xs! text-slate-300"></i>
+                                  <i class="pi pi-box text-xs" [ngClass]="themeService.isDarkMode() ? 'text-[#8B949E]' : 'text-slate-400'"></i>
                                 }
                               </div>
-                              <span class="font-semibold text-slate-700 truncate">{{ variant.name }}</span>
-                           </div>
-                        </td>
-
-                        <!-- SKU -->
-                        <td class="py-2">
-                          <code class="px-1.5 py-0.5 bg-slate-100 text-slate-600 rounded text-[11px] font-mono border border-slate-200">
-                            {{ variant.sku }}
-                          </code>
-                        </td>
-
-                        <!-- TIPO -->
-                        <td class="py-2">
-                          <p-tag [severity]="getTypeSeverity(variant.type)" [value]="getTypeLabel(variant.type)" styleClass="!text-[9px]"></p-tag>
-                        </td>
-
-                        <!-- UNIDAD -->
-                        <td class="py-2 text-center text-slate-500 italic">
-                          {{ variant.unit?.abbreviation || 'und' }}
-                        </td>
-
-                          <td class="py-2 text-right pr-6">
-                             <button
-                               pButton
-                               label="Gestionar Receta"
-                               icon="pi pi-receipt"
-                               class="p-button-text p-button-sm !text-indigo-600 font-bold"
-                               (click)="manageRecipe(variant.id)"
-                             ></button>
+                              <span class="font-semibold" [ngClass]="themeService.isDarkMode() ? 'text-[#F0F6FC]' : 'text-slate-800'">
+                                {{ variant.name }}
+                              </span>
+                            </div>
+                          </td>
+                          <td class="py-2.5">
+                            <span class="font-mono text-xs font-bold" [ngClass]="themeService.isDarkMode() ? 'text-[#58A6FF]' : 'text-[#6b3353]'">
+                              {{ variant.sku || '---' }}
+                            </span>
+                          </td>
+                          <td class="py-2.5">
+                            <app-status-badge
+                              [severity]="getTypeSeverity(variant.type)"
+                              [value]="getTypeLabel(variant.type)"
+                            />
+                          </td>
+                          <td class="py-2.5 text-center font-medium" [ngClass]="themeService.isDarkMode() ? 'text-[#8B949E]' : 'text-slate-600'">
+                            {{ variant.unit?.abbreviation || 'und' }}
+                          </td>
+                          <td class="py-2.5 text-center !pr-6">
+                            <button
+                              pButton
+                              type="button"
+                              label="Gestionar Receta"
+                              icon="pi pi-receipt"
+                              size="small"
+                              [outlined]="true"
+                              (click)="manageRecipe(variant.id)"
+                              [ngClass]="themeService.isDarkMode()
+                                ? '!border-[#30363D] !text-[#58A6FF] hover:!bg-[#1F242C] !text-xs font-semibold'
+                                : '!border-[#48021C]/30 !text-[#48021C] hover:!bg-[#48021C]/10 !text-xs font-semibold'"
+                            ></button>
                           </td>
                         </tr>
-                      </ng-template>
-                    </p-table>
-                  </div>
-                  
-                  <!-- VISTA MÓVIL VARIANTES -->
-                  <div class="block lg:hidden">
-                    @for (variant of product.variants; track variant.id) {
-                      <div class="flex flex-col p-4 border-b border-slate-100 last:border-0">
-                        <div class="flex items-center gap-3 mb-3">
-                           <div class="w-10 h-10 rounded border border-slate-200 bg-slate-50 flex-shrink-0 flex items-center justify-center overflow-hidden">
-                             @if (variant.imageUrl) {
-                               <img [src]="getProductImageUrl(variant.imageUrl)" class="w-full h-full object-cover" />
-                             } @else {
-                               <i class="pi pi-image text-lg! text-slate-300"></i>
-                             }
-                           </div>
-                           <div class="flex flex-col flex-1">
-                             <span class="font-semibold text-slate-800 text-sm leading-tight">{{ variant.name }}</span>
-                             <span class="text-[10px] text-slate-500 font-mono mt-0.5 tracking-widest uppercase">{{ variant.sku }}</span>
-                           </div>
-                        </div>
-                        <div class="flex items-center justify-between border-t border-slate-100/50 pt-2">
-                          <p-tag [severity]="getTypeSeverity(variant.type)" [value]="getTypeLabel(variant.type)" styleClass="!text-[9px]"></p-tag>
-                          <button
-                            pButton
-                            label="Gestionar"
-                            icon="pi pi-receipt"
-                            class="p-button-text p-button-sm !text-indigo-600 font-bold"
-                            (click)="manageRecipe(variant.id)"
-                          ></button>
-                        </div>
-                      </div>
-                    }
-                  </div>
+                      }
+                    </tbody>
+                  </table>
                 </div>
               </div>
             </td>
           </tr>
         </ng-template>
+      </app-standard-table>
+    </div>
 
-        <ng-template #emptymessage>
-          <tr>
-            <td colspan="6" class="text-center !py-20 text-slate-400 italic">
-              No se encontraron productos para recetas.
-            </td>
-          </tr>
-        </ng-template>
-      </p-table>
+    <!-- VISTA MÓVIL (Tarjetas Responsivas) -->
+    <div class="lg:hidden block space-y-3">
+      @for (product of filteredProducts(); track product.id) {
+        <div
+          class="rounded-2xl shadow-xs border p-4 flex flex-col gap-3 relative transition-colors"
+          [ngClass]="themeService.isDarkMode() ? 'bg-[#161B22] border-[#30363D]' : 'bg-white border-[#48021C]/20'"
+        >
+          @if (product.isMaster) {
+            <span
+              class="absolute top-3.5 right-3.5 text-[9px] font-bold uppercase tracking-wider px-2 py-0.5 rounded border"
+              [ngClass]="themeService.isDarkMode() ? 'bg-[#1C2D42] text-[#58A6FF] border-[#58A6FF]/30' : 'bg-[#48021C]/10 text-[#48021C] border-[#48021C]/20'"
+            >
+              Maestro
+            </span>
+          }
+
+          <div class="flex items-center gap-3">
+            <div
+              class="w-12 h-12 rounded-lg border flex items-center justify-center overflow-hidden shrink-0 shadow-2xs"
+              [ngClass]="themeService.isDarkMode() ? 'bg-[#0D1117] border-[#30363D]' : 'border-slate-200 bg-slate-50'"
+            >
+              @if (product.imageUrl) {
+                <img [src]="getProductImageUrl(product.imageUrl)" class="w-full h-full object-cover" />
+              } @else {
+                <i class="pi pi-box text-base" [ngClass]="themeService.isDarkMode() ? 'text-[#8B949E]' : 'text-slate-400'"></i>
+              }
+            </div>
+            <div class="flex flex-col min-w-0 pr-16 flex-1">
+              <span class="font-bold text-xs leading-tight truncate" [ngClass]="themeService.isDarkMode() ? 'text-[#F0F6FC]' : 'text-slate-800'">
+                {{ product.name }}
+              </span>
+              <span class="text-[10px] font-mono tracking-wider uppercase font-bold mt-0.5" [ngClass]="themeService.isDarkMode() ? 'text-[#58A6FF]' : 'text-[#6b3353]'">
+                {{ product.sku || '---' }}
+              </span>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-2 gap-2 border-t pt-2.5"
+               [ngClass]="themeService.isDarkMode() ? 'border-[#30363D]' : 'border-slate-100'">
+            <div>
+              <span class="text-[9px] uppercase font-bold tracking-wider" [ngClass]="themeService.isDarkMode() ? 'text-[#8B949E]' : 'text-slate-400'">Tipo:</span>
+              <div class="mt-0.5">
+                <app-status-badge
+                  [severity]="getTypeSeverity(product.type)"
+                  [value]="getTypeLabel(product.type)"
+                />
+              </div>
+            </div>
+            <div class="text-right">
+              <span class="text-[9px] uppercase font-bold tracking-wider" [ngClass]="themeService.isDarkMode() ? 'text-[#8B949E]' : 'text-slate-400'">Unidad:</span>
+              <p class="font-semibold text-xs m-0 mt-0.5" [ngClass]="themeService.isDarkMode() ? 'text-[#F0F6FC]' : 'text-slate-700'">
+                {{ product.unit?.abbreviation || 'und' }}
+              </p>
+            </div>
+          </div>
+
+          <!-- Botones Móvil -->
+          <div class="flex items-center justify-between mt-1 pt-2 border-t"
+               [ngClass]="themeService.isDarkMode() ? 'border-[#30363D]' : 'border-slate-100'">
+            @if (product.variants && product.variants.length > 0) {
+              <button
+                type="button"
+                pButton
+                pRipple
+                (click)="toggleMobileVariants(product.id)"
+                class="p-button-text p-button-sm !text-xs font-semibold !p-0"
+                [ngClass]="themeService.isDarkMode() ? '!text-[#58A6FF]' : '!text-[#48021C]'"
+                [icon]="isMobileExpanded(product.id) ? 'pi pi-chevron-up' : 'pi pi-chevron-down'"
+                [label]="isMobileExpanded(product.id) ? 'Ocultar Variantes' : 'Ver Variantes (' + product.variants.length + ')'"
+              ></button>
+            } @else {
+              <div></div>
+            }
+
+            @if (!product.isMaster) {
+              <button
+                pButton
+                type="button"
+                label="Gestionar Receta"
+                icon="pi pi-receipt"
+                size="small"
+                [outlined]="true"
+                (click)="manageRecipe(product.id)"
+                [ngClass]="themeService.isDarkMode()
+                  ? '!border-[#30363D] !text-[#58A6FF] hover:!bg-[#1F242C] !text-xs font-semibold'
+                  : '!border-[#48021C]/30 !text-[#48021C] hover:!bg-[#48021C]/10 !text-xs font-semibold'"
+              ></button>
+            }
+          </div>
+
+          <!-- Variantes desplegables en móvil -->
+          @if (product.variants && product.variants.length > 0 && isMobileExpanded(product.id)) {
+            <div 
+              class="border-t pt-3 mt-1 space-y-2.5"
+              [ngClass]="themeService.isDarkMode() ? 'border-[#30363D]' : 'border-slate-100'"
+            >
+              <span class="text-[10px] font-bold uppercase tracking-wider" [ngClass]="themeService.isDarkMode() ? 'text-[#8B949E]' : 'text-[#6b3353]'">
+                Variantes ({{ product.variants.length }}):
+              </span>
+              @for (variant of product.variants; track variant.id) {
+                <div 
+                  class="p-2.5 rounded-xl border flex items-center justify-between gap-2 shadow-2xs"
+                  [ngClass]="themeService.isDarkMode() ? 'bg-[#0D1117] border-[#30363D]' : 'bg-slate-50 border-slate-200'"
+                >
+                  <div class="flex items-center gap-2 min-w-0">
+                    <div
+                      class="w-7 h-7 rounded border flex items-center justify-center overflow-hidden shrink-0 shadow-2xs"
+                      [ngClass]="themeService.isDarkMode() ? 'bg-[#161B22] border-[#30363D]' : 'border-slate-200 bg-white'"
+                    >
+                      @if (variant.imageUrl) {
+                        <img [src]="getProductImageUrl(variant.imageUrl)" class="w-full h-full object-cover" />
+                      } @else {
+                        <i class="pi pi-box text-[10px]" [ngClass]="themeService.isDarkMode() ? 'text-[#8B949E]' : 'text-slate-400'"></i>
+                      }
+                    </div>
+                    <div class="flex flex-col min-w-0">
+                      <span class="font-bold text-xs truncate" [ngClass]="themeService.isDarkMode() ? 'text-[#F0F6FC]' : 'text-slate-800'">
+                        {{ variant.name }}
+                      </span>
+                      <span class="text-[10px] font-mono font-bold" [ngClass]="themeService.isDarkMode() ? 'text-[#58A6FF]' : 'text-[#6b3353]'">
+                        {{ variant.sku || '---' }}
+                      </span>
+                    </div>
+                  </div>
+                  <button
+                    pButton
+                    type="button"
+                    label="Gestionar"
+                    icon="pi pi-receipt"
+                    size="small"
+                    [outlined]="true"
+                    (click)="manageRecipe(variant.id)"
+                    [ngClass]="themeService.isDarkMode()
+                      ? '!border-[#30363D] !text-[#58A6FF] hover:!bg-[#1F242C] !text-xs font-semibold'
+                      : '!border-[#48021C]/30 !text-[#48021C] hover:!bg-[#48021C]/10 !text-xs font-semibold'"
+                  ></button>
+                </div>
+              }
+            </div>
+          }
+        </div>
+      } @empty {
+        <div 
+          class="rounded-2xl border p-8 flex flex-col items-center gap-2 text-center transition-colors"
+          [ngClass]="themeService.isDarkMode() ? 'bg-[#161B22] border-[#30363D]' : 'bg-white border-slate-200'"
+        >
+          <i class="pi pi-receipt text-4xl" [ngClass]="themeService.isDarkMode() ? 'text-slate-600' : 'text-slate-300'"></i>
+          <p class="font-bold text-sm" [ngClass]="themeService.isDarkMode() ? 'text-[#F0F6FC]' : 'text-slate-700'">No se encontraron productos para recetas</p>
+          <p class="text-xs" [ngClass]="themeService.isDarkMode() ? 'text-[#8B949E]' : 'text-slate-400'">Verifique los filtros o asegúrese de que existan productos de tipo terminado o componente.</p>
+        </div>
+      }
     </div>
   </div>
 </div>

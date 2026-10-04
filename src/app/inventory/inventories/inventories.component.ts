@@ -1,4 +1,4 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, computed, effect, inject, OnInit } from '@angular/core';
 import { ButtonModule } from 'primeng/button';
 import { TableModule } from 'primeng/table';
 import { MessageService } from 'primeng/api';
@@ -26,6 +26,9 @@ import { SearchInputComponent } from '../../shared/components/search-input/searc
 import { StandardModalComponent } from '../../shared/components/standard-modal/standard-modal.component';
 import { InventoryMovementsComponent } from '../inventory-movements/inventory-movements.component';
 import { InventoryFormComponent } from './inventory-form/inventory-form.component';
+
+import { BranchContextService } from '../../core/services/branch-context.service';
+import { ThemeService } from '../../core/services/theme.service';
 
 @Component({
   selector: 'app-inventories',
@@ -56,23 +59,61 @@ import { InventoryFormComponent } from './inventory-form/inventory-form.componen
   styleUrl: './inventories.component.css',
 })
 export class InventoriesComponent implements OnInit {
+  public themeService = inject(ThemeService);
   private inventoryService = inject(InventoryService);
   private branchesService = inject(BranchesService);
   private authService = inject(AuthService);
+  public branchContext = inject(BranchContextService);
   private messageService = inject(MessageService);
   private router = inject(Router);
+
+  readonly isConsolidatedMode = computed(() => this.branchContext.isGlobalView);
+  readonly activeWorkingBranch = computed(() => this.branchContext.currentBranch());
+
+  readonly canFilterByBranch = computed(() => {
+    const user = this.authService.currentUser;
+    return (
+      this.authService.isSuperAdmin ||
+      this.authService.hasPermission('products.manage_global_stock') ||
+      (user?.roles?.some((r) => r.isSuperAdmin || r.name === 'Admin') ?? false)
+    );
+  });
+
+  get isSuperAdmin(): boolean {
+    return this.canFilterByBranch();
+  }
 
   inventories: Inventory[] = [];
   branches: Branch[] = [];
   selectedBranchId: string | undefined;
   searchTerm: string = '';
   loading = false;
-  isSuperAdmin = false;
   showMovementsModal = false;
   showNewInventoryModal = false;
   showDeleteConfirmModal = false;
   inventoryToDelete: Inventory | null = null;
   isDeletingInventory = false;
+
+  constructor() {
+    this.applyWorkingBranchFromMemory();
+
+    effect(() => {
+      // Sincroniza y reacciona a cambios en la sucursal activa en memoria
+      const workingBranch = this.branchContext.currentBranch();
+      if (workingBranch && workingBranch.id) {
+        this.selectedBranchId = workingBranch.id;
+      } else if (this.branchContext.isGlobalView) {
+        this.selectedBranchId = undefined;
+      } else if (!this.canFilterByBranch()) {
+        const user = this.authService.currentUser as any;
+        this.selectedBranchId = user?.branchId || user?.branch?.id || undefined;
+      } else {
+        this.selectedBranchId = undefined;
+      }
+
+      this.loadInventories();
+    });
+  }
 
   get groupedInventories() {
     const filtered = this.inventories.filter(
@@ -102,30 +143,28 @@ export class InventoriesComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.checkUserRole();
-    this.loadBranches();
-    this.loadInventories();
+    if (this.canFilterByBranch()) {
+      this.loadBranches();
+    }
   }
 
-  checkUserRole() {
-    this.isSuperAdmin = this.authService.hasPermission('products.manage_global_stock'); // O la lógica que defina superadmin
-    // Alternativamente usar la lógica que vimos en AuthService
-    const user = this.authService.currentUser;
-    if (user?.roles?.some((r) => r.isSuperAdmin)) {
-      this.isSuperAdmin = true;
+  private applyWorkingBranchFromMemory(): void {
+    const workingBranch = this.branchContext.currentBranch();
+    if (workingBranch && workingBranch.id) {
+      this.selectedBranchId = workingBranch.id;
+    } else if (this.branchContext.isGlobalView) {
+      this.selectedBranchId = undefined;
+    } else if (!this.canFilterByBranch()) {
+      const user = this.authService.currentUser as any;
+      this.selectedBranchId = user?.branchId || user?.branch?.id || undefined;
+    } else {
+      this.selectedBranchId = undefined;
     }
+  }
 
-    if (!this.isSuperAdmin) {
-      // Intentar obtener la sucursal del usuario
-      // Asumiendo que user tiene branchId o similar. Si no, esto podría fallar si no ajustamos el modelo.
-      // Usaremos 'any' para evitar error de compilación si la interfaz no está al día
-      const userAny = user as any;
-      if (userAny.branchId) {
-        this.selectedBranchId = userAny.branchId;
-      } else if (userAny.branch?.id) {
-        this.selectedBranchId = userAny.branch.id;
-      }
-    }
+  onBranchChange(branchId: string | null): void {
+    this.selectedBranchId = branchId || undefined;
+    this.loadInventories();
   }
 
   loadBranches() {
@@ -244,11 +283,12 @@ export class InventoriesComponent implements OnInit {
   }
 
   getStockStatus(inventory: Inventory): { textClass: string; label: string; iconClass: string; icon: string } {
+    const isDark = this.themeService.isDarkMode();
     if (inventory.product?.manageStock === false) {
       return {
-        textClass: 'text-slate-600',
+        textClass: isDark ? 'text-slate-400' : 'text-slate-600',
         label: 'Sin Control',
-        iconClass: 'text-slate-400 bg-white border-[#48021C]/15',
+        iconClass: isDark ? 'text-slate-400 bg-[#0D1117] border-[#30363D]' : 'text-slate-400 bg-white border-[#48021C]/15',
         icon: 'pi pi-ban'
       };
     }
@@ -258,26 +298,26 @@ export class InventoriesComponent implements OnInit {
 
     if (stock <= 0) {
       return {
-        textClass: 'text-[#9f1239]',
+        textClass: isDark ? 'text-rose-400' : 'text-[#9f1239]',
         label: 'Agotado',
-        iconClass: 'text-[#9f1239] bg-rose-50 border-[#9f1239]/30',
+        iconClass: isDark ? 'text-rose-400 bg-rose-950/40 border-rose-800/60' : 'text-[#9f1239] bg-rose-50 border-[#9f1239]/30',
         icon: 'pi pi-exclamation-circle'
       };
     }
 
     if (stock <= minStock) {
       return {
-        textClass: 'text-[#92400e]',
+        textClass: isDark ? 'text-amber-400' : 'text-[#92400e]',
         label: 'Stock Bajo',
-        iconClass: 'text-[#92400e] bg-amber-50 border-[#92400e]/30',
+        iconClass: isDark ? 'text-amber-400 bg-amber-950/40 border-amber-800/60' : 'text-[#92400e] bg-amber-50 border-[#92400e]/30',
         icon: 'pi pi-exclamation-triangle'
       };
     }
 
     return {
-      textClass: 'text-[#14532d]',
+      textClass: isDark ? 'text-emerald-400' : 'text-[#14532d]',
       label: 'En stock',
-      iconClass: 'text-[#14532d] bg-emerald-50/70 border-[#14532d]/30',
+      iconClass: isDark ? 'text-emerald-400 bg-emerald-950/40 border-emerald-800/60' : 'text-[#14532d] bg-emerald-50/70 border-[#14532d]/30',
       icon: 'pi pi-box'
     };
   }

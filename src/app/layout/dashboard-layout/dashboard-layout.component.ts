@@ -1,16 +1,19 @@
 import { Component, inject, OnDestroy, signal } from '@angular/core';
+import { CommonModule } from '@angular/common';
 import { NavigationCancel, NavigationEnd, NavigationError, NavigationStart, Router, RouterOutlet } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { HeaderComponent } from '../header/header.component';
 import { ModernSidebarComponent } from '../modern-sidebar/modern-sidebar.component';
+import { ThemeService } from '../../core/services/theme.service';
 
 @Component({
   selector: 'app-dashboard-layout',
-  imports: [HeaderComponent, ModernSidebarComponent, RouterOutlet],
+  imports: [CommonModule, HeaderComponent, ModernSidebarComponent, RouterOutlet],
   templateUrl: './dashboard-layout.component.html',
   styleUrl: './dashboard-layout.component.css',
 })
 export class DashboardLayoutComponent implements OnDestroy {
+  public themeService = inject(ThemeService);
   private router = inject(Router);
   private routerSub: Subscription;
 

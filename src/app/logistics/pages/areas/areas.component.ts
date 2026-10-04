@@ -20,6 +20,14 @@ import { TagModule } from 'primeng/tag';
 import { IconFieldModule } from 'primeng/iconfield';
 import { InputIconModule } from 'primeng/inputicon';
 
+import { ThemeService } from '../../../core/services/theme.service';
+import { PageHeaderComponent } from '../../../shared/components/page-header/page-header.component';
+import { PrimaryButtonComponent } from '../../../shared/components/primary-button/primary-button.component';
+import { RefreshButtonComponent } from '../../../shared/components/refresh-button/refresh-button.component';
+import { SearchInputComponent } from '../../../shared/components/search-input/search-input.component';
+import { StandardTableComponent } from '../../../shared/components/standard-table/standard-table.component';
+import { StatusBadgeComponent } from '../../../shared/components/status-badge/status-badge.component';
+
 @Component({
   selector: 'app-areas',
   standalone: true,
@@ -36,11 +44,18 @@ import { InputIconModule } from 'primeng/inputicon';
     TagModule,
     IconFieldModule,
     InputIconModule,
+    PageHeaderComponent,
+    PrimaryButtonComponent,
+    RefreshButtonComponent,
+    SearchInputComponent,
+    StandardTableComponent,
+    StatusBadgeComponent,
   ],
   templateUrl: './areas.component.html',
   styleUrl: './areas.component.css'
 })
 export class AreasComponent implements OnInit {
+  public themeService = inject(ThemeService);
   private areasService = inject(AreasService);
   private branchesService = inject(BranchesService);
   private messageService = inject(MessageService);
@@ -51,6 +66,19 @@ export class AreasComponent implements OnInit {
   areas = signal<Area[]>([]);
   loading = signal<boolean>(false);
   showDeleted = signal<boolean>(false);
+  searchTerm = signal<string>('');
+
+  filteredAreas = computed(() => {
+    const term = this.searchTerm().toLowerCase().trim();
+    const list = this.areas();
+    if (!term) return list;
+    return list.filter(
+      (a) =>
+        a.name?.toLowerCase().includes(term) ||
+        a.description?.toLowerCase().includes(term) ||
+        a.previousArea?.name?.toLowerCase().includes(term)
+    );
+  });
 
   activeAreas = computed(() => this.areas().filter(a => !a.deletedAt));
   

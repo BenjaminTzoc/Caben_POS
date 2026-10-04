@@ -44,11 +44,9 @@ export class AuthService {
   }
 
   loadMenu(): void {
-    console.log('AuthService: Intentando cargar menú...', { isAuthenticated: this.isAuthenticated });
     if (!this.isAuthenticated) return;
     this.http.get<ApiResponse<MenuResponse>>(`${this.API_URL}/users/profile/menu`).subscribe({
       next: (res) => {
-        console.log('AuthService: Menú cargado con éxito', res.data);
         this.saveMenuToStorage(res.data);
         this.recurrentMenuSignal.set(res.data.recurrent);
         this.mainMenuSignal.set(res.data.main);
@@ -70,6 +68,7 @@ export class AuthService {
     localStorage.removeItem('accessToken');
     localStorage.removeItem('user');
     localStorage.removeItem('sidebarMenu');
+    localStorage.removeItem('activeWorkingBranch');
     this.authSubject.next(null);
     this.recurrentMenuSignal.set([]);
     this.mainMenuSignal.set([]);
@@ -117,7 +116,6 @@ export class AuthService {
 
     try {
       const decodedToken: any = jwtDecode(token);
-
       const currentTime = Date.now() / 1000;
 
       if (decodedToken.exp < currentTime) {
@@ -170,12 +168,18 @@ export class AuthService {
   }
 
   get postLoginRoute(): string {
-    return this.isPilot ? '/piloto' : '/dashboard';
+    if (this.isPilot) return '/piloto';
+    if (this.isSuperAdmin) return '/select-branch';
+    return '/dashboard';
   }
 
   resolvePostLoginRoute(returnUrl?: string | null): string {
     if (this.isPilot) {
       return returnUrl?.startsWith('/piloto') ? returnUrl : '/piloto';
+    }
+    if (this.isSuperAdmin) {
+      const hasStoredBranch = !!localStorage.getItem('activeWorkingBranch');
+      if (!hasStoredBranch) return '/select-branch';
     }
     if (returnUrl?.startsWith('/piloto')) return '/dashboard';
     return returnUrl || '/dashboard';

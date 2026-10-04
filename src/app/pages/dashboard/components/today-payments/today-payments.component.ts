@@ -8,6 +8,7 @@ import { ReportsService } from '../../../../core/services/reports.service';
 import { TodayPaymentItemDto, TodayPaymentsDto, TodayPaymentsSummaryDto } from '../../../../core/models/reports.models';
 import { DashboardFilterService } from '../../dashboard-filter.service';
 import { StatusBadgeComponent } from '../../../../shared/components/status-badge/status-badge.component';
+import { ThemeService } from '../../../../core/services/theme.service';
 
 const REFRESH_MS = 45_000;
 const EMPTY_SUMMARY: TodayPaymentsSummaryDto = {
@@ -27,6 +28,7 @@ const EMPTY_SUMMARY: TodayPaymentsSummaryDto = {
   styleUrl: './today-payments.component.css',
 })
 export class TodayPaymentsComponent implements OnInit {
+  themeService = inject(ThemeService);
   private reportsService = inject(ReportsService);
   private dashboardFilter = inject(DashboardFilterService);
   private router = inject(Router);

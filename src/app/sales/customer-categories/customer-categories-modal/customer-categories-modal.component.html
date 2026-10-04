@@ -32,20 +32,21 @@
       emptyIcon="pi pi-id-card"
       emptyMessage="No hay categorías de cliente."
       colorScheme="burgundy"
+      [customClass]="themeService.isDarkMode() ? 'theme-dark' : ''"
     >
       <ng-template #header>
-        <tr class="h-11 text-xs bg-[#eddde1] border-b border-[#762f41]/40 text-[#3b141e] font-bold sticky top-0 z-10">
-          <th class="!text-left !pl-4 border-r border-[#762f41]/35 w-[120px]">Estado</th>
-          <th class="!text-left !pl-3 border-r border-[#762f41]/35">Nombre</th>
-          <th class="!text-center border-r border-[#762f41]/35 w-[100px]">Descuento</th>
-          <th class="!text-right !pr-3 border-r border-[#762f41]/35 w-[120px]">Venta mín.</th>
-          <th class="!text-right !pr-3 border-r border-[#762f41]/35 w-[130px]">Crédito</th>
+        <tr class="h-11 text-xs bg-[#eddde1] dark:bg-[#161B22] border-b border-[#762f41]/40 dark:border-[#30363D] text-[#3b141e] dark:text-[#F0F6FC] font-bold sticky top-0 z-10">
+          <th class="!text-left !pl-4 border-r border-[#762f41]/35 dark:border-[#30363D] w-[120px]">Estado</th>
+          <th class="!text-left !pl-3 border-r border-[#762f41]/35 dark:border-[#30363D]">Nombre</th>
+          <th class="!text-center border-r border-[#762f41]/35 dark:border-[#30363D] w-[100px]">Descuento</th>
+          <th class="!text-right !pr-3 border-r border-[#762f41]/35 dark:border-[#30363D] w-[120px]">Venta mín.</th>
+          <th class="!text-right !pr-3 border-r border-[#762f41]/35 dark:border-[#30363D] w-[130px]">Crédito</th>
           <th class="!text-right !pr-3 w-[100px]">Acciones</th>
         </tr>
       </ng-template>
       <ng-template #body let-category>
-        <tr class="hover:!bg-[#eddde1]/45 transition-colors duration-150 border-b border-[#762f41]/18 last:border-0 text-xs">
-          <td class="!py-2.5 !pl-4 border-r border-[#762f41]/18">
+        <tr class="hover:!bg-[#eddde1]/45 dark:hover:!bg-[#1F242C] transition-colors duration-150 border-b border-[#762f41]/18 dark:border-[#30363D] last:border-0 text-xs dark:text-[#C9D1D9]">
+          <td class="!py-2.5 !pl-4 border-r border-[#762f41]/18 dark:border-[#30363D]">
             <div class="flex items-center gap-2">
               <p-toggleSwitch
                 [ngModel]="category.isActive"
@@ -59,17 +60,17 @@
               />
             </div>
           </td>
-          <td class="!py-2.5 !pl-3 border-r border-[#762f41]/18">
-            <p class="font-semibold text-slate-800 truncate">{{ category.name }}</p>
-            <p class="text-[10px] text-slate-500 truncate">{{ category.description || 'Sin descripción' }}</p>
+          <td class="!py-2.5 !pl-3 border-r border-[#762f41]/18 dark:border-[#30363D]">
+            <p class="font-semibold text-slate-800 dark:text-[#F0F6FC] truncate">{{ category.name }}</p>
+            <p class="text-[10px] text-slate-500 dark:text-[#8B949E] truncate">{{ category.description || 'Sin descripción' }}</p>
           </td>
-          <td class="!py-2.5 border-r border-[#762f41]/18 text-center font-bold text-[#48021C] tabular-nums">
+          <td class="!py-2.5 border-r border-[#762f41]/18 dark:border-[#30363D] text-center font-bold text-[#48021C] dark:text-[#58A6FF] tabular-nums">
             {{ category.discountPercentage | number:'1.2-2' }}%
           </td>
-          <td class="!py-2.5 !pr-3 border-r border-[#762f41]/18 text-right font-semibold text-slate-700 tabular-nums">
+          <td class="!py-2.5 !pr-3 border-r border-[#762f41]/18 dark:border-[#30363D] text-right font-semibold text-slate-700 dark:text-[#C9D1D9] tabular-nums">
             {{ category.minPurchaseAmount | currency:'Q ' }}
           </td>
-          <td class="!py-2.5 !pr-3 border-r border-[#762f41]/18 text-right font-semibold text-slate-700 tabular-nums">
+          <td class="!py-2.5 !pr-3 border-r border-[#762f41]/18 dark:border-[#30363D] text-right font-semibold text-slate-700 dark:text-[#C9D1D9] tabular-nums">
             {{ category.defaultCreditLimit | currency:'Q ' }}
           </td>
           <td class="!py-2.5 !pr-3 text-right">
@@ -77,7 +78,7 @@
               <button
                 type="button"
                 (click)="openEdit(category)"
-                class="w-7 h-7 rounded-lg inline-flex items-center justify-center border border-amber-500/40 bg-amber-500/[0.08] text-amber-700 hover:bg-amber-500/[0.2] transition-all cursor-pointer"
+                class="w-7 h-7 rounded-lg inline-flex items-center justify-center border border-amber-500/40 bg-amber-500/[0.08] text-amber-700 dark:text-amber-400 hover:bg-amber-500/[0.2] transition-all cursor-pointer"
                 pTooltip="Editar"
                 tooltipPosition="top"
               >
@@ -86,7 +87,7 @@
               <button
                 type="button"
                 (click)="askDelete(category)"
-                class="w-7 h-7 rounded-lg inline-flex items-center justify-center border border-rose-500/40 bg-rose-500/[0.08] text-rose-600 hover:bg-rose-500/[0.2] transition-all cursor-pointer"
+                class="w-7 h-7 rounded-lg inline-flex items-center justify-center border border-rose-500/40 bg-rose-500/[0.08] text-rose-600 dark:text-rose-400 hover:bg-rose-500/[0.2] transition-all cursor-pointer"
                 pTooltip="Eliminar"
                 tooltipPosition="top"
               >
@@ -101,36 +102,36 @@
     <form [formGroup]="categoryForm" class="flex flex-col gap-4 overflow-y-auto min-h-0 pr-0.5">
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div class="flex flex-col gap-1.5 md:col-span-2">
-          <label class="text-xs font-semibold text-[#48021C]" for="categoryName">
-            Nombre <span class="text-red-700">*</span>
+          <label class="text-xs font-semibold text-[#48021C] dark:text-[#F0F6FC]" for="categoryName">
+            Nombre <span class="text-red-700 dark:text-red-400">*</span>
           </label>
           <input
             pInputText
             id="categoryName"
             formControlName="name"
-            class="w-full !rounded-lg h-[40px] font-medium"
+            class="w-full !rounded-lg h-[40px] font-medium dark:!bg-[#161B22] dark:!border-[#30363D] dark:!text-[#F0F6FC]"
             placeholder="Ej. VIP, Mayorista, Regular..."
             autocomplete="off"
           />
           @if (categoryForm.get('name')?.invalid && categoryForm.get('name')?.touched) {
-            <small class="text-rose-500 text-[10px] font-medium">El nombre es obligatorio.</small>
+            <small class="text-rose-500 dark:text-rose-400 text-[10px] font-medium">El nombre es obligatorio.</small>
           }
         </div>
 
         <div class="flex flex-col gap-1.5 md:col-span-2">
-          <label class="text-xs font-semibold text-[#48021C]" for="categoryDescription">Descripción</label>
+          <label class="text-xs font-semibold text-[#48021C] dark:text-[#F0F6FC]" for="categoryDescription">Descripción</label>
           <textarea
             pTextarea
             id="categoryDescription"
             formControlName="description"
             rows="3"
-            class="w-full !rounded-lg font-medium text-sm resize-none"
+            class="w-full !rounded-lg font-medium text-sm resize-none dark:!bg-[#161B22] dark:!border-[#30363D] dark:!text-[#F0F6FC]"
             placeholder="Beneficios o requisitos de este nivel..."
           ></textarea>
         </div>
 
         <div class="flex flex-col gap-1.5">
-          <label class="text-xs font-semibold text-[#48021C]" for="discountPercentage">Descuento (%)</label>
+          <label class="text-xs font-semibold text-[#48021C] dark:text-[#F0F6FC]" for="discountPercentage">Descuento (%)</label>
           <p-inputnumber
             id="discountPercentage"
             formControlName="discountPercentage"
@@ -140,12 +141,12 @@
             [minFractionDigits]="2"
             [maxFractionDigits]="2"
             [fluid]="true"
-            inputStyleClass="!rounded-lg h-[40px] font-bold text-[#48021C]"
+            inputStyleClass="!rounded-lg h-[40px] font-bold text-[#48021C] dark:text-[#58A6FF] dark:!bg-[#161B22] dark:!border-[#30363D]"
           />
         </div>
 
         <div class="flex flex-col gap-1.5">
-          <label class="text-xs font-semibold text-[#48021C]" for="minPurchaseAmount">Venta mínima</label>
+          <label class="text-xs font-semibold text-[#48021C] dark:text-[#F0F6FC]" for="minPurchaseAmount">Venta mínima</label>
           <p-inputnumber
             id="minPurchaseAmount"
             formControlName="minPurchaseAmount"
@@ -154,12 +155,12 @@
             locale="es-GT"
             [min]="0"
             [fluid]="true"
-            inputStyleClass="!rounded-lg h-[40px] font-bold text-[#48021C]"
+            inputStyleClass="!rounded-lg h-[40px] font-bold text-[#48021C] dark:text-[#58A6FF] dark:!bg-[#161B22] dark:!border-[#30363D]"
           />
         </div>
 
         <div class="flex flex-col gap-1.5">
-          <label class="text-xs font-semibold text-[#48021C]" for="defaultCreditLimit">Límite de crédito</label>
+          <label class="text-xs font-semibold text-[#48021C] dark:text-[#F0F6FC]" for="defaultCreditLimit">Límite de crédito</label>
           <p-inputnumber
             id="defaultCreditLimit"
             formControlName="defaultCreditLimit"
@@ -168,12 +169,12 @@
             locale="es-GT"
             [min]="0"
             [fluid]="true"
-            inputStyleClass="!rounded-lg h-[40px] font-bold text-[#48021C]"
+            inputStyleClass="!rounded-lg h-[40px] font-bold text-[#48021C] dark:text-[#58A6FF] dark:!bg-[#161B22] dark:!border-[#30363D]"
           />
         </div>
 
-        <div class="flex items-center justify-between px-3 h-[40px] rounded-lg border border-[#48021C]/20 bg-[#48021C]/[0.04] mt-auto">
-          <span class="text-xs font-semibold text-[#48021C]">Activa</span>
+        <div class="flex items-center justify-between px-3 h-[40px] rounded-lg border border-[#48021C]/20 dark:border-[#30363D] bg-[#48021C]/[0.04] dark:bg-[#161B22] mt-auto">
+          <span class="text-xs font-semibold text-[#48021C] dark:text-[#F0F6FC]">Activa</span>
           <p-toggleSwitch formControlName="isActive" />
         </div>
       </div>
@@ -188,7 +189,7 @@
         [outlined]="true"
         icon="pi pi-arrow-left"
         (onClick)="backToList()"
-        styleClass="!rounded-lg !px-3.5 font-semibold h-9! !bg-white hover:!bg-slate-50 !border !border-[#9f6587]/40 !text-[#6e3757] shadow-2xs text-xs cursor-pointer"
+        styleClass="!rounded-lg !px-3.5 font-semibold h-9! !bg-white dark:!bg-[#161B22] hover:!bg-slate-50 dark:hover:!bg-[#1F242C] !border !border-[#9f6587]/40 dark:!border-[#30363D] !text-[#6e3757] dark:!text-[#F0F6FC] shadow-2xs text-xs cursor-pointer"
       />
       <app-primary-button
         [label]="editingId ? 'Guardar cambios' : 'Crear categoría'"

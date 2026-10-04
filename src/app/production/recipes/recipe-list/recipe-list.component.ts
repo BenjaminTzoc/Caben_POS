@@ -1,36 +1,79 @@
-import { Component, inject, OnInit, signal } from '@angular/core';
+import { Component, inject, OnInit, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { TableModule } from 'primeng/table';
 import { ButtonModule } from 'primeng/button';
-import { InputTextModule } from 'primeng/inputtext';
 import { TagModule } from 'primeng/tag';
 import { Ripple } from 'primeng/ripple';
 
 import { ProductsService } from '../../../inventory/services/products.service';
 import { Product, ProductType } from '../../../inventory/interfaces/product.interface';
 import { environment } from '../../../../environments/environment';
+import { ThemeService } from '../../../core/services/theme.service';
+import { PageHeaderComponent } from '../../../shared/components/page-header/page-header.component';
+import { RefreshButtonComponent } from '../../../shared/components/refresh-button/refresh-button.component';
+import { FormsModule } from '@angular/forms';
+import { SearchInputComponent } from '../../../shared/components/search-input/search-input.component';
+import { StatusBadgeComponent, BadgeSeverity } from '../../../shared/components/status-badge/status-badge.component';
+import { StandardTableComponent } from '../../../shared/components/standard-table/standard-table.component';
 
 @Component({
   selector: 'app-recipe-list',
   standalone: true,
   imports: [
     CommonModule,
+    FormsModule,
     TableModule,
     ButtonModule,
-    InputTextModule,
     TagModule,
-    Ripple
+    Ripple,
+    PageHeaderComponent,
+    RefreshButtonComponent,
+    SearchInputComponent,
+    StatusBadgeComponent,
+    StandardTableComponent,
   ],
-  templateUrl: './recipe-list.component.html'
+  templateUrl: './recipe-list.component.html',
 })
 export class RecipeListComponent implements OnInit {
+  public themeService = inject(ThemeService);
   private productsService = inject(ProductsService);
   private router = inject(Router);
 
   products = signal<Product[]>([]);
   loading = signal<boolean>(false);
+  searchTerm = signal<string>('');
   expandedRows: { [key: string]: boolean } = {};
+  mobileExpandedProducts = signal<Set<string>>(new Set<string>());
+
+  toggleMobileVariants(productId: string): void {
+    const current = new Set(this.mobileExpandedProducts());
+    if (current.has(productId)) {
+      current.delete(productId);
+    } else {
+      current.add(productId);
+    }
+    this.mobileExpandedProducts.set(current);
+  }
+
+  isMobileExpanded(productId: string): boolean {
+    return this.mobileExpandedProducts().has(productId);
+  }
+
+  filteredProducts = computed(() => {
+    const term = this.searchTerm().trim().toLowerCase();
+    const list = this.products();
+    if (!term) return list;
+
+    return list.filter((p) => {
+      const name = p.name?.toLowerCase() || '';
+      const sku = p.sku?.toLowerCase() || '';
+      const hasMatchingVariant = p.variants?.some(
+        (v) => (v.name?.toLowerCase() || '').includes(term) || (v.sku?.toLowerCase() || '').includes(term)
+      );
+      return name.includes(term) || sku.includes(term) || hasMatchingVariant;
+    });
+  });
 
   onExpandedRowKeysChange(event: { [key: string]: boolean }) {
     this.expandedRows = event;
@@ -42,22 +85,19 @@ export class RecipeListComponent implements OnInit {
 
   loadProducts(): void {
     this.loading.set(true);
-    // Excluimos componentes, materias primas e insumos, y también maestros (familias) 
-    // directamente desde el endpoint usando isMaster=false
-    // Quitamos el filtro de isMaster=false para traer también los maestros
-    // El filtro de tipos para excluir componentes si lo quitamos ya que las recetas pueden ser para componentes también
-    // Pero dejamos la exclusión de insumos y materias primas según lo solicitado
     this.productsService.getProducts(undefined, false, undefined, undefined, undefined, 'raw_material,insumo').subscribe({
       next: (res) => {
         if (res.statusCode === 200) {
-          // Filtramos para mostrar solo productos maestros o normales (no variantes)
-          // Las variantes se verán dentro de los maestros
           this.products.set(res.data.filter((p: Product) => !p.isVariant));
         }
         this.loading.set(false);
       },
-      error: () => this.loading.set(false)
+      error: () => this.loading.set(false),
     });
+  }
+
+  onSearch(query: string): void {
+    this.searchTerm.set(query);
   }
 
   manageRecipe(productId: string): void {
@@ -70,23 +110,35 @@ export class RecipeListComponent implements OnInit {
     return `${environment.baseUrl}${imageUrl}`;
   }
 
-  getTypeLabel(type: string): string {
+  getTypeLabel(type?: string | ProductType): string {
+    if (!type) return '---';
     switch (type) {
-      case ProductType.FINISHED_PRODUCT: return 'Terminado';
-      case ProductType.RAW_MATERIAL: return 'Materia Prima';
-      case ProductType.INSUMO: return 'Insumo';
-      case ProductType.COMPONENT: return 'Componente';
-      default: return type;
+      case ProductType.FINISHED_PRODUCT:
+        return 'Terminado';
+      case ProductType.RAW_MATERIAL:
+        return 'Materia Prima';
+      case ProductType.INSUMO:
+        return 'Insumo';
+      case ProductType.COMPONENT:
+        return 'Componente';
+      default:
+        return String(type);
     }
   }
 
-  getTypeSeverity(type: string): 'success' | 'secondary' | 'info' | 'warn' | 'danger' | 'contrast' {
+  getTypeSeverity(type?: string | ProductType): BadgeSeverity {
+    if (!type) return 'secondary';
     switch (type) {
-      case ProductType.FINISHED_PRODUCT: return 'success';
-      case ProductType.RAW_MATERIAL: return 'contrast';
-      case ProductType.INSUMO: return 'info';
-      case ProductType.COMPONENT: return 'warn';
-      default: return 'secondary';
+      case ProductType.FINISHED_PRODUCT:
+        return 'success';
+      case ProductType.COMPONENT:
+        return 'warn';
+      case ProductType.RAW_MATERIAL:
+        return 'info';
+      case ProductType.INSUMO:
+        return 'purple';
+      default:
+        return 'secondary';
     }
   }
 }

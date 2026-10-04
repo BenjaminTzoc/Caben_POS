@@ -8,22 +8,33 @@
       optionValue="id"
       [filter]="true"
       filterBy="name,nit"
-      [showClear]="showClear && !!value"
+      [showClear]="showClear && !disabled && !!value"
       [placeholder]="placeholder"
       [disabled]="disabled"
       [size]="size"
       appendTo="body"
       class="shadow-2xs w-full group"
-      [styleClass]="(size === 'small' ? '!rounded-lg h-8! text-xs' : '!rounded-xl h-9! text-xs') + ' ' + (disabled ? '!bg-slate-100/90 !border-slate-300/80 !text-slate-400 !cursor-not-allowed opacity-75 grayscale-30 shadow-none' : '!bg-rose-50/40 !border-[#48021C]/25 hover:!border-[#48021C]/60 hover:!bg-white focus:!border-[#48021C] focus:!ring-2 focus:!ring-[#48021C]/10') + ' w-full transition-all duration-200'"
+      [styleClass]="(size === 'small' ? '!rounded-lg h-8! text-xs' : '!rounded-xl h-9! text-xs') + ' ' + (disabled 
+        ? (themeService.isDarkMode() ? '!bg-[#161B22]/70 !border-[#30363D] !text-slate-500 !cursor-not-allowed opacity-75 grayscale-30 shadow-none' : '!bg-slate-100/90 !border-slate-300/80 !text-slate-400 !cursor-not-allowed opacity-75 grayscale-30 shadow-none') 
+        : (themeService.isDarkMode() 
+            ? '!bg-[#161B22] !border-[#30363D] hover:!border-[#58A6FF]/60 hover:!bg-[#1C2128] focus:!border-[#58A6FF] focus:!ring-2 focus:!ring-[#58A6FF]/20 !text-[#F0F6FC]' 
+            : '!bg-rose-50/40 !border-[#48021C]/25 hover:!border-[#48021C]/60 hover:!bg-white focus:!border-[#48021C] focus:!ring-2 focus:!ring-[#48021C]/10 !text-[#48021C]')) + ' w-full transition-all duration-200'"
+      [panelStyleClass]="themeService.isDarkMode() ? '!bg-[#161B22] !border-[#30363D] !text-slate-200 shadow-2xl' : '!bg-white !border-slate-200 shadow-xl'"
     >
-      <!-- Plantilla de Valor Seleccionado sin icono forzado -->
+      <!-- Plantilla de Valor Seleccionado -->
       <ng-template #selectedItem let-selectedOption>
         @if (selectedOption) {
-          <div class="flex items-center gap-2 text-xs font-semibold min-w-0 w-full" [ngClass]="disabled ? 'text-slate-500' : 'text-slate-800'">
+          <div class="flex items-center gap-2 text-xs font-semibold min-w-0 w-full" 
+               [ngClass]="disabled 
+                 ? (themeService.isDarkMode() ? 'text-slate-500' : 'text-slate-400') 
+                 : (themeService.isDarkMode() ? 'text-[#F0F6FC]' : 'text-slate-800')">
             <span class="truncate flex-1">{{ selectedOption.name }}</span>
           </div>
         } @else {
-          <div class="flex items-center gap-2 text-xs text-slate-400 min-w-0 w-full">
+          <div class="flex items-center gap-2 text-xs min-w-0 w-full"
+               [ngClass]="disabled 
+                 ? (themeService.isDarkMode() ? '!text-slate-500' : '!text-slate-400') 
+                 : (themeService.isDarkMode() ? '!text-[#8B949E]' : '!text-slate-400')">
             <span class="truncate flex-1 italic">{{ placeholder }}</span>
           </div>
         }
@@ -31,12 +42,15 @@
 
       <!-- Plantilla de Opciones en Dropdown -->
       <ng-template #item let-customer>
-        <div class="flex items-center justify-between gap-2 py-0.5 text-xs w-full">
+        <div class="flex items-center justify-between gap-2 py-1 text-xs w-full">
           <div class="flex flex-col min-w-0">
-            <span class="font-semibold text-slate-800 truncate text-xs">{{ customer.name }}</span>
-            <span *ngIf="customer.nit" class="text-[10px] text-slate-400">NIT: {{ customer.nit }}</span>
+            <span class="font-semibold truncate text-xs"
+                  [ngClass]="themeService.isDarkMode() ? 'text-[#F0F6FC]' : 'text-slate-800'">{{ customer.name }}</span>
+            <span *ngIf="customer.nit" class="text-[10px]"
+                  [ngClass]="themeService.isDarkMode() ? 'text-[#8B949E]' : 'text-slate-400'">NIT: {{ customer.nit }}</span>
           </div>
-          <span *ngIf="customer.phone" class="text-[10px] font-medium text-slate-400 shrink-0">
+          <span *ngIf="customer.phone" class="text-[10px] font-medium shrink-0"
+                [ngClass]="themeService.isDarkMode() ? 'text-[#8B949E]' : 'text-slate-400'">
             {{ customer.phone }}
           </span>
         </div>
@@ -44,3 +58,4 @@
     </p-select>
   </div>
 </div>
+

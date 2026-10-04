@@ -1,4 +1,4 @@
-<div class="py-4 pb-24 px-0 md:px-6 bg-[#9f6587]/[0.06] min-h-screen">
+<div class="py-4 pb-24 px-0 md:px-6 min-h-screen transition-colors" [ngClass]="themeService.isDarkMode() ? 'bg-[#0D1117]' : 'bg-[#9f6587]/[0.06]'">
   <!-- Top Card: Header & Parameters (Branch & Client) -->
   <app-page-header
     [title]="(isEditMode ? 'Orden: #' : 'Nueva orden: #') + (orderForm.get('invoiceNumber')?.value || '...')"
@@ -12,14 +12,16 @@
     <!-- Acciones Superiores -->
     <div actions class="flex items-center gap-2 flex-wrap">
       @if (isPreorder) {
-        <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-violet-100 text-violet-800 border border-violet-300 text-[10px] font-bold uppercase tracking-wide">
+        <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-bold uppercase tracking-wide border"
+              [ngClass]="themeService.isDarkMode() ? 'bg-purple-950/50 text-purple-300 border-purple-800/60' : 'bg-violet-100 text-violet-800 border-violet-300'">
           Preorden
         </span>
       }
       @if (isCashClosed) {
-        <div class="bg-rose-50 border border-rose-200 rounded-lg py-1 px-2.5 flex items-center gap-1.5 shadow-2xs">
-          <i class="pi pi-lock text-rose-500 text-xs"></i>
-          <span class="font-bold text-rose-700 text-[10px] tracking-wider">Caja Cerrada</span>
+        <div class="rounded-lg py-1 px-2.5 flex items-center gap-1.5 shadow-2xs border"
+             [ngClass]="themeService.isDarkMode() ? 'bg-rose-950/40 border-rose-800/60' : 'bg-rose-50 border-rose-200'">
+          <i class="pi pi-lock text-xs" [ngClass]="themeService.isDarkMode() ? 'text-rose-400' : 'text-rose-500'"></i>
+          <span class="font-bold text-[10px] tracking-wider" [ngClass]="themeService.isDarkMode() ? 'text-rose-300' : 'text-rose-700'">Caja Cerrada</span>
         </div>
       }
       @if (isEditMode) {
@@ -29,7 +31,9 @@
           size="small"
           [outlined]="true"
           [disabled]="!sale"
-          styleClass="!rounded-lg !px-3 font-semibold h-7 text-xs shadow-xs !text-[#48021C] !border-[#48021C]/50 hover:!bg-[#48021C]/10"
+          [styleClass]="themeService.isDarkMode() 
+            ? '!rounded-lg !px-3 font-semibold h-7 text-xs shadow-xs !text-[#F0F6FC] !border-[#30363D] hover:!bg-[#1C2128]' 
+            : '!rounded-lg !px-3 font-semibold h-7 text-xs shadow-xs !text-[#48021C] !border-[#48021C]/50 hover:!bg-[#48021C]/10'"
           (onClick)="onPreviewTicket()"
         />
       }
@@ -38,7 +42,9 @@
           label="Ver pagos"
           icon="pi pi-receipt"
           size="small"
-          styleClass="!rounded-lg !px-3 font-semibold h-7 text-xs shadow-xs !bg-[#48021C] !border-[#48021C] !text-white hover:!bg-[#350114]"
+          [styleClass]="themeService.isDarkMode() 
+            ? '!rounded-lg !px-3 font-semibold h-7 text-xs shadow-xs !bg-[#1C2D42] !border-[#388BFD]/40 !text-[#58A6FF] hover:!bg-[#1C2D42]/80' 
+            : '!rounded-lg !px-3 font-semibold h-7 text-xs shadow-xs !bg-[#48021C] !border-[#48021C] !text-white hover:!bg-[#350114]'"
           (onClick)="openPaymentsPanel()"
         />
       }
@@ -51,43 +57,81 @@
         <!-- Columna Izquierda: Sucursal con label alineado a la barra de tabs -->
         <div class="md:col-span-3 lg:col-span-3 flex flex-col gap-1.5">
           <div class="h-[28px] flex items-center">
-            <label class="text-xs font-semibold text-[#48021C] flex items-center gap-1">
+            <label class="text-xs font-semibold flex items-center gap-1" [ngClass]="themeService.isDarkMode() ? 'text-[#F0F6FC]' : 'text-[#48021C]'">
               Sucursal <span class="text-rose-500 font-bold">*</span>
             </label>
           </div>
-          <div class="min-h-[33px] w-full">
-            <p-select
-              [options]="branches"
-              formControlName="branchId"
-              optionLabel="name"
-              optionValue="id"
-              placeholder="Seleccionar sucursal..."
-              [filter]="true"
-              filterBy="name"
-              size="small"
-              appendTo="body"
-              [fluid]="true"
-              class="w-full block min-h-[33px]"
-              styleClass="w-full !rounded-lg !border-[#9f6587]/35 focus-within:!border-[#9f6587] focus-within:!ring-2 focus-within:!ring-[#9f6587]/20 text-xs font-medium"
-              (onChange)="onBranchChange($event)"
-            />
-          </div>
+          @if (!isEditing && hasActiveWorkingBranch) {
+            <div 
+              class="flex items-center gap-2.5 px-3 py-1.5 border rounded-xl shadow-2xs transition-all w-full min-h-[33px]" 
+              [ngClass]="themeService.isDarkMode() 
+                ? 'bg-[#161B22] border-[#30363D] text-[#F0F6FC]' 
+                : 'bg-rose-50/40 border-[#48021C]/25 text-slate-800'"
+            >
+              <span 
+                class="w-6 h-6 rounded-lg flex items-center justify-center shrink-0 border"
+                [ngClass]="activeWorkingBranch()?.isPlant
+                  ? (themeService.isDarkMode() ? 'bg-emerald-950/50 text-emerald-400 border-emerald-800/60' : 'bg-emerald-50 text-emerald-700 border-emerald-200')
+                  : (themeService.isDarkMode() ? 'bg-[#1C2D42] text-[#58A6FF] border-[#58A6FF]/30' : 'bg-sky-50 text-sky-700 border-sky-200')"
+              >
+                <i [class]="activeWorkingBranch()?.isPlant ? 'pi pi-server' : 'pi pi-shop'" class="text-xs"></i>
+              </span>
+              <div class="flex flex-col min-w-0 pr-1">
+                <span 
+                  class="text-xs md:text-sm font-semibold truncate"
+                  [ngClass]="themeService.isDarkMode() ? 'text-[#F0F6FC]' : 'text-slate-800'"
+                >
+                  {{ activeWorkingBranch()?.name }}
+                </span>
+                <span 
+                  class="text-[10px] md:text-[11px] font-medium"
+                  [ngClass]="themeService.isDarkMode() ? 'text-slate-400' : 'text-slate-500'"
+                >
+                  Sucursal activa
+                </span>
+              </div>
+            </div>
+          } @else {
+            <div class="min-h-[33px] w-full">
+              <p-select
+                [options]="branches"
+                formControlName="branchId"
+                optionLabel="name"
+                optionValue="id"
+                placeholder="Seleccionar sucursal..."
+                [filter]="true"
+                filterBy="name"
+                size="small"
+                appendTo="body"
+                [fluid]="true"
+                class="w-full block min-h-[33px]"
+                [styleClass]="themeService.isDarkMode() 
+                  ? 'w-full !rounded-lg !border-[#30363D] !bg-[#161B22] !text-[#F0F6FC] focus-within:!border-[#58A6FF] focus-within:!ring-2 focus-within:!ring-[#58A6FF]/20 text-xs font-medium' 
+                  : 'w-full !rounded-lg !border-[#9f6587]/35 focus-within:!border-[#9f6587] focus-within:!ring-2 focus-within:!ring-[#9f6587]/20 text-xs font-medium'"
+                [panelStyleClass]="themeService.isDarkMode() ? '!bg-[#161B22] !border-[#30363D] !text-slate-200' : ''"
+                (onChange)="onBranchChange($event)"
+              />
+            </div>
+          }
         </div>
 
         <!-- Columna central: Tipo y Selección de Cliente -->
         <div class="md:col-span-5 lg:col-span-6 flex flex-col gap-1.5">
           <div class="h-[28px] flex items-center justify-between flex-wrap gap-2">
-            <label class="text-xs font-semibold text-[#48021C] flex items-center gap-1">
+            <label class="text-xs font-semibold flex items-center gap-1" [ngClass]="themeService.isDarkMode() ? 'text-[#F0F6FC]' : 'text-[#48021C]'">
               Cliente <span class="text-rose-500 font-bold">*</span>
             </label>
 
             @if (isCreateMode) {
-              <!-- Tabs de Tipo de Cliente con Color Vino Institucional -->
-              <div class="inline-flex p-0.5 bg-[#9f6587]/10 rounded-lg border border-[#9f6587]/25 text-xs">
+              <!-- Tabs de Tipo de Cliente -->
+              <div class="inline-flex p-0.5 rounded-lg border text-xs transition-colors"
+                   [ngClass]="themeService.isDarkMode() ? 'bg-[#161B22] border-[#30363D]' : 'bg-[#9f6587]/10 border-[#9f6587]/25'">
                 <button 
                   type="button" 
                   (click)="setCustomerType('registered')" 
-                  [class]="selectedCustomerType?.value === 'R' ? 'bg-[#48021C] text-white font-medium shadow-xs' : 'text-[#48021C]/80 hover:text-[#48021C] hover:bg-[#9f6587]/15'" 
+                  [class]="selectedCustomerType?.value === 'R' 
+                    ? (themeService.isDarkMode() ? 'bg-[#238636] text-white font-medium shadow-xs' : 'bg-[#48021C] text-white font-medium shadow-xs') 
+                    : (themeService.isDarkMode() ? 'text-[#8B949E] hover:text-[#F0F6FC] hover:bg-[#30363D]/50' : 'text-[#48021C]/80 hover:text-[#48021C] hover:bg-[#9f6587]/15')" 
                   class="px-2.5 py-1 rounded-md text-xs transition-all cursor-pointer"
                 >
                   Registrado
@@ -95,7 +139,9 @@
                 <button 
                   type="button" 
                   (click)="setCustomerType('guest')" 
-                  [class]="selectedCustomerType?.value === 'Q' ? 'bg-[#48021C] text-white font-medium shadow-xs' : 'text-[#48021C]/80 hover:text-[#48021C] hover:bg-[#9f6587]/15'" 
+                  [class]="selectedCustomerType?.value === 'Q' 
+                    ? (themeService.isDarkMode() ? 'bg-[#238636] text-white font-medium shadow-xs' : 'bg-[#48021C] text-white font-medium shadow-xs') 
+                    : (themeService.isDarkMode() ? 'text-[#8B949E] hover:text-[#F0F6FC] hover:bg-[#30363D]/50' : 'text-[#48021C]/80 hover:text-[#48021C] hover:bg-[#9f6587]/15')" 
                   class="px-2.5 py-1 rounded-md text-xs transition-all cursor-pointer"
                 >
                   Consumidor Final / Invitado
@@ -125,7 +171,10 @@
                     appendTo="body"
                     [fluid]="true"
                     class="flex-1 min-w-0"
-                    styleClass="w-full !rounded-lg !border-[#9f6587]/35 focus-within:!border-[#9f6587] focus-within:!ring-2 focus-within:!ring-[#9f6587]/20 text-xs font-medium"
+                    [styleClass]="themeService.isDarkMode() 
+                      ? 'w-full !rounded-lg !border-[#30363D] !bg-[#161B22] !text-[#F0F6FC] focus-within:!border-[#58A6FF] focus-within:!ring-2 focus-within:!ring-[#58A6FF]/20 text-xs font-medium' 
+                      : 'w-full !rounded-lg !border-[#9f6587]/35 focus-within:!border-[#9f6587] focus-within:!ring-2 focus-within:!ring-[#9f6587]/20 text-xs font-medium'"
+                    [panelStyleClass]="themeService.isDarkMode() ? '!bg-[#161B22] !border-[#30363D] !text-slate-200' : ''"
                     (onClear)="onCustomerChange({ value: null })"
                   />
                   <button
@@ -133,7 +182,10 @@
                     type="button"
                     icon="pi pi-book"
                     (click)="openCustomerManager()"
-                    class="p-button-outlined !border-[#9f6587]/35 !text-[#6e3757] hover:!text-[#48021C] !rounded-lg hover:!bg-[#9f6587]/15 !h-[33px] !w-[33px] flex items-center justify-center shrink-0 shadow-2xs"
+                    class="p-button-outlined !rounded-lg !h-[33px] !w-[33px] flex items-center justify-center shrink-0 shadow-2xs transition-colors"
+                    [ngClass]="themeService.isDarkMode() 
+                      ? '!border-[#30363D] !bg-[#161B22] !text-[#58A6FF] hover:!bg-[#1C2128]' 
+                      : '!border-[#9f6587]/35 !text-[#6e3757] hover:!text-[#48021C] hover:!bg-[#9f6587]/15'"
                     pTooltip="Gestionar clientes"
                     tooltipPosition="top"
                   ></button>
@@ -142,12 +194,14 @@
                 <!-- Campo NIT alineado con el selector (50%) -->
                 <div 
                   class="flex items-center justify-between px-3 h-[33px] rounded-lg border text-xs transition-all duration-200"
-                  [class]="customer ? 'bg-sky-50/75 border-sky-200 text-sky-900 shadow-2xs' : 'bg-slate-50 rounded-lg border-slate-200 text-slate-400'"
+                  [ngClass]="themeService.isDarkMode()
+                    ? (customer ? 'bg-[#1C2D42] border-[#388BFD]/40 text-[#58A6FF]' : 'bg-[#161B22] border-[#30363D] text-[#8B949E]')
+                    : (customer ? 'bg-sky-50/75 border-sky-200 text-sky-900 shadow-2xs' : 'bg-slate-50 rounded-lg border-slate-200 text-slate-400')"
                 >
-                  <span class="text-xs font-bold" [class]="customer ? 'text-sky-700' : 'text-slate-500'">
+                  <span class="text-xs font-bold" [ngClass]="themeService.isDarkMode() ? (customer ? 'text-[#79B8FF]' : 'text-[#8B949E]') : (customer ? 'text-sky-700' : 'text-slate-500')">
                     NIT:
                   </span>
-                  <span [class]="customer?.nit ? 'font-bold text-sky-950 text-xs truncate max-w-[180px]' : (customer ? 'text-sky-700/80 italic text-xs' : 'text-slate-400 italic text-xs')">
+                  <span [class]="customer?.nit ? (themeService.isDarkMode() ? 'font-bold text-[#F0F6FC] text-xs truncate max-w-[180px]' : 'font-bold text-sky-950 text-xs truncate max-w-[180px]') : 'text-xs italic opacity-75'">
                     {{ customer?.nit || 'Sin NIT' }}
                   </span>
                 </div>
@@ -157,24 +211,28 @@
               <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
                 <div 
                   class="flex items-center justify-between px-3 h-[31px] rounded-lg border text-xs transition-all duration-200"
-                  [class]="customer ? 'bg-sky-50/65 border-sky-200 text-sky-900 shadow-2xs' : 'bg-slate-50/80 border-slate-200/80 text-slate-400'"
+                  [ngClass]="themeService.isDarkMode()
+                    ? (customer ? 'bg-[#1C2D42] border-[#388BFD]/40 text-[#58A6FF]' : 'bg-[#161B22] border-[#30363D] text-[#8B949E]')
+                    : (customer ? 'bg-sky-50/65 border-sky-200 text-sky-900 shadow-2xs' : 'bg-slate-50/80 border-slate-200/80 text-slate-400')"
                 >
-                  <span class="text-xs font-bold" [class]="customer ? 'text-sky-700' : 'text-slate-500'">
+                  <span class="text-xs font-bold" [ngClass]="themeService.isDarkMode() ? (customer ? 'text-[#79B8FF]' : 'text-[#8B949E]') : (customer ? 'text-sky-700' : 'text-slate-500')">
                     Correo:
                   </span>
-                  <span [class]="customer?.email ? 'font-semibold text-sky-950 text-xs truncate max-w-[200px]' : (customer ? 'text-sky-700/80 italic text-xs' : 'text-slate-400 italic text-xs')">
+                  <span [class]="customer?.email ? (themeService.isDarkMode() ? 'font-semibold text-[#F0F6FC] text-xs truncate max-w-[200px]' : 'font-semibold text-sky-950 text-xs truncate max-w-[200px]') : 'text-xs italic opacity-75'">
                     {{ customer?.email || 'Sin correo registrado' }}
                   </span>
                 </div>
 
                 <div 
                   class="flex items-center justify-between px-3 h-[31px] rounded-lg border text-xs transition-all duration-200"
-                  [class]="customer ? 'bg-sky-50/65 border-sky-200 text-sky-900 shadow-2xs' : 'bg-slate-50/80 border-slate-200/80 text-slate-400'"
+                  [ngClass]="themeService.isDarkMode()
+                    ? (customer ? 'bg-[#1C2D42] border-[#388BFD]/40 text-[#58A6FF]' : 'bg-[#161B22] border-[#30363D] text-[#8B949E]')
+                    : (customer ? 'bg-sky-50/65 border-sky-200 text-sky-900 shadow-2xs' : 'bg-slate-50/80 border-slate-200/80 text-slate-400')"
                 >
-                  <span class="text-xs font-bold" [class]="customer ? 'text-sky-700' : 'text-slate-500'">
+                  <span class="text-xs font-bold" [ngClass]="themeService.isDarkMode() ? (customer ? 'text-[#79B8FF]' : 'text-[#8B949E]') : (customer ? 'text-sky-700' : 'text-slate-500')">
                     Teléfono:
                   </span>
-                  <span [class]="customer?.phone ? 'font-semibold text-sky-950 text-xs truncate max-w-[180px]' : (customer ? 'text-sky-700/80 italic text-xs' : 'text-slate-400 italic text-xs')">
+                  <span [class]="customer?.phone ? (themeService.isDarkMode() ? 'font-semibold text-[#F0F6FC] text-xs truncate max-w-[180px]' : 'font-semibold text-sky-950 text-xs truncate max-w-[180px]') : 'text-xs italic opacity-75'">
                     {{ customer?.phone || 'Sin teléfono registrado' }}
                   </span>
                 </div>
@@ -184,79 +242,91 @@
             <!-- Cliente Invitado: Campos en Card con estilo institucional en 2 filas con ancho contenido -->
             <div 
               *ngIf="selectedCustomerType?.value === 'Q'" 
-              class="p-3 bg-[#9f6587]/[0.06] rounded-xl border border-[#9f6587]/30 shadow-2xs max-w-2xl animate-in fade-in duration-150" 
+              class="p-3 rounded-xl border shadow-2xs max-w-2xl animate-in fade-in duration-150 transition-colors" 
+              [ngClass]="themeService.isDarkMode() ? 'bg-[#161B22] border-[#30363D]' : 'bg-[#9f6587]/[0.06] border-[#9f6587]/30'"
               formGroupName="guestCustomer"
             >
               <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
                 <div class="flex flex-col gap-1">
-                  <label class="text-xs font-bold text-[#6e3757]">
+                  <label class="text-xs font-bold" [ngClass]="themeService.isDarkMode() ? 'text-[#F0F6FC]' : 'text-[#6e3757]'">
                     Nombre completo <span class="text-rose-500 font-bold">*</span>
                   </label>
-                  <input pInputText formControlName="name" placeholder="Ej. Juan Pérez" size="small" class="w-full p-inputtext-sm bg-white !rounded-lg !border-[#9f6587]/35 focus:!border-[#9f6587] focus:!ring-2 focus:!ring-[#9f6587]/20 text-xs font-medium" />
+                  <input pInputText formControlName="name" placeholder="Ej. Juan Pérez" size="small" 
+                         class="w-full p-inputtext-sm !rounded-lg text-xs font-medium transition-colors"
+                         [ngClass]="themeService.isDarkMode() ? '!bg-[#0D1117] !border-[#30363D] !text-[#F0F6FC] focus:!border-[#58A6FF]' : 'bg-white !border-[#9f6587]/35 focus:!border-[#9f6587] focus:!ring-2 focus:!ring-[#9f6587]/20'" />
                 </div>
                 <div class="flex flex-col gap-1">
-                  <label class="text-xs font-bold text-[#6e3757]">
+                  <label class="text-xs font-bold" [ngClass]="themeService.isDarkMode() ? 'text-[#F0F6FC]' : 'text-[#6e3757]'">
                     NIT / Facturación
                   </label>
-                  <input pInputText formControlName="nit" placeholder="C/F o número" size="small" class="w-full p-inputtext-sm bg-white !rounded-lg !border-[#9f6587]/35 focus:!border-[#9f6587] focus:!ring-2 focus:!ring-[#9f6587]/20 text-xs font-medium" />
+                  <input pInputText formControlName="nit" placeholder="C/F o número" size="small" 
+                         class="w-full p-inputtext-sm !rounded-lg text-xs font-medium transition-colors"
+                         [ngClass]="themeService.isDarkMode() ? '!bg-[#0D1117] !border-[#30363D] !text-[#F0F6FC] focus:!border-[#58A6FF]' : 'bg-white !border-[#9f6587]/35 focus:!border-[#9f6587] focus:!ring-2 focus:!ring-[#9f6587]/20'" />
                 </div>
                 <div class="flex flex-col gap-1">
-                  <label class="text-xs font-bold text-[#6e3757]">
+                  <label class="text-xs font-bold" [ngClass]="themeService.isDarkMode() ? 'text-[#F0F6FC]' : 'text-[#6e3757]'">
                     Correo electrónico
                   </label>
-                  <input pInputText formControlName="email" placeholder="cliente@correo.com" size="small" class="w-full p-inputtext-sm bg-white !rounded-lg !border-[#9f6587]/35 focus:!border-[#9f6587] focus:!ring-2 focus:!ring-[#9f6587]/20 text-xs font-medium" />
+                  <input pInputText formControlName="email" placeholder="cliente@correo.com" size="small" 
+                         class="w-full p-inputtext-sm !rounded-lg text-xs font-medium transition-colors"
+                         [ngClass]="themeService.isDarkMode() ? '!bg-[#0D1117] !border-[#30363D] !text-[#F0F6FC] focus:!border-[#58A6FF]' : 'bg-white !border-[#9f6587]/35 focus:!border-[#9f6587] focus:!ring-2 focus:!ring-[#9f6587]/20'" />
                 </div>
                 <div class="flex flex-col gap-1">
-                  <label class="text-xs font-bold text-[#6e3757]">
+                  <label class="text-xs font-bold" [ngClass]="themeService.isDarkMode() ? 'text-[#F0F6FC]' : 'text-[#6e3757]'">
                     Teléfono <span class="text-rose-500 font-bold">*</span>
                   </label>
-                  <input pInputText formControlName="phone" placeholder="7766-5544" size="small" class="w-full p-inputtext-sm bg-white !rounded-lg !border-[#9f6587]/35 focus:!border-[#9f6587] focus:!ring-2 focus:!ring-[#9f6587]/20 text-xs font-medium" />
+                  <input pInputText formControlName="phone" placeholder="7766-5544" size="small" 
+                         class="w-full p-inputtext-sm !rounded-lg text-xs font-medium transition-colors"
+                         [ngClass]="themeService.isDarkMode() ? '!bg-[#0D1117] !border-[#30363D] !text-[#F0F6FC] focus:!border-[#58A6FF]' : 'bg-white !border-[#9f6587]/35 focus:!border-[#9f6587] focus:!ring-2 focus:!ring-[#9f6587]/20'" />
                 </div>
                 <div class="flex flex-col gap-1 sm:col-span-2">
-                  <label class="text-xs font-bold text-[#6e3757]">
+                  <label class="text-xs font-bold" [ngClass]="themeService.isDarkMode() ? 'text-[#F0F6FC]' : 'text-[#6e3757]'">
                     Dirección física
                   </label>
-                  <input pInputText formControlName="address" placeholder="Dirección del invitado" size="small" class="w-full p-inputtext-sm bg-white !rounded-lg !border-[#9f6587]/35 focus:!border-[#9f6587] focus:!ring-2 focus:!ring-[#9f6587]/20 text-xs font-medium" />
+                  <input pInputText formControlName="address" placeholder="Dirección del invitado" size="small" 
+                         class="w-full p-inputtext-sm !rounded-lg text-xs font-medium transition-colors"
+                         [ngClass]="themeService.isDarkMode() ? '!bg-[#0D1117] !border-[#30363D] !text-[#F0F6FC] focus:!border-[#58A6FF]' : 'bg-white !border-[#9f6587]/35 focus:!border-[#9f6587] focus:!ring-2 focus:!ring-[#9f6587]/20'" />
                 </div>
               </div>
             </div>
           } @else {
             <!-- Edit Mode: Static Client Info -->
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-3 p-3 bg-[#9f6587]/[0.06] rounded-xl border border-[#9f6587]/25 shadow-2xs">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-3 p-3 rounded-xl border shadow-2xs transition-colors"
+                 [ngClass]="themeService.isDarkMode() ? 'bg-[#161B22] border-[#30363D]' : 'bg-[#9f6587]/[0.06] border-[#9f6587]/25'">
               @if (selectedCustomer) {
                 <div class="flex flex-col gap-0.5">
-                  <span class="text-[10px] font-bold text-[#6e3757] uppercase tracking-wider">Cliente</span>
-                  <span class="text-xs font-bold text-[#48021C]">{{ selectedCustomer.name }}</span>
+                  <span class="text-[10px] font-bold uppercase tracking-wider" [ngClass]="themeService.isDarkMode() ? 'text-[#8B949E]' : 'text-[#6e3757]'">Cliente</span>
+                  <span class="text-xs font-bold" [ngClass]="themeService.isDarkMode() ? 'text-[#F0F6FC]' : 'text-[#48021C]'">{{ selectedCustomer.name }}</span>
                 </div>
                 <div class="flex flex-col gap-0.5">
-                  <span class="text-[10px] font-bold text-[#6e3757] uppercase tracking-wider">NIT</span>
-                  <span class="text-xs font-bold text-[#48021C]">{{ selectedCustomer.nit || '---' }}</span>
+                  <span class="text-[10px] font-bold uppercase tracking-wider" [ngClass]="themeService.isDarkMode() ? 'text-[#8B949E]' : 'text-[#6e3757]'">NIT</span>
+                  <span class="text-xs font-bold" [ngClass]="themeService.isDarkMode() ? 'text-[#F0F6FC]' : 'text-[#48021C]'">{{ selectedCustomer.nit || '---' }}</span>
                 </div>
                 <div class="flex flex-col gap-0.5">
-                  <span class="text-[10px] font-bold text-[#6e3757] uppercase tracking-wider">Correo</span>
-                  <span class="text-xs font-semibold text-[#48021C] truncate">{{ selectedCustomer.email || '---' }}</span>
+                  <span class="text-[10px] font-bold uppercase tracking-wider" [ngClass]="themeService.isDarkMode() ? 'text-[#8B949E]' : 'text-[#6e3757]'">Correo</span>
+                  <span class="text-xs font-semibold truncate" [ngClass]="themeService.isDarkMode() ? 'text-[#F0F6FC]' : 'text-[#48021C]'">{{ selectedCustomer.email || '---' }}</span>
                 </div>
                 <div class="flex flex-col gap-0.5">
-                  <span class="text-[10px] font-bold text-[#6e3757] uppercase tracking-wider">Teléfono</span>
-                  <span class="text-xs font-semibold text-[#48021C]">{{ selectedCustomer.phone || '---' }}</span>
+                  <span class="text-[10px] font-bold uppercase tracking-wider" [ngClass]="themeService.isDarkMode() ? 'text-[#8B949E]' : 'text-[#6e3757]'">Teléfono</span>
+                  <span class="text-xs font-semibold" [ngClass]="themeService.isDarkMode() ? 'text-[#F0F6FC]' : 'text-[#48021C]'">{{ selectedCustomer.phone || '---' }}</span>
                 </div>
               } @else if (orderForm.get('guestCustomer')?.value) {
                 @let guest = orderForm.get('guestCustomer')?.value;
                 <div class="flex flex-col gap-0.5">
-                  <span class="text-[10px] font-bold text-[#6e3757] uppercase tracking-wider">Cliente Invitado</span>
-                  <span class="text-xs font-bold text-[#48021C]">{{ guest?.name || '---' }}</span>
+                  <span class="text-[10px] font-bold uppercase tracking-wider" [ngClass]="themeService.isDarkMode() ? 'text-[#8B949E]' : 'text-[#6e3757]'">Cliente Invitado</span>
+                  <span class="text-xs font-bold" [ngClass]="themeService.isDarkMode() ? 'text-[#F0F6FC]' : 'text-[#48021C]'">{{ guest?.name || '---' }}</span>
                 </div>
                 <div class="flex flex-col gap-0.5">
-                  <span class="text-[10px] font-bold text-[#6e3757] uppercase tracking-wider">NIT</span>
-                  <span class="text-xs font-bold text-[#48021C]">{{ guest?.nit || '---' }}</span>
+                  <span class="text-[10px] font-bold uppercase tracking-wider" [ngClass]="themeService.isDarkMode() ? 'text-[#8B949E]' : 'text-[#6e3757]'">NIT</span>
+                  <span class="text-xs font-bold" [ngClass]="themeService.isDarkMode() ? 'text-[#F0F6FC]' : 'text-[#48021C]'">{{ guest?.nit || '---' }}</span>
                 </div>
                 <div class="flex flex-col gap-0.5">
-                  <span class="text-[10px] font-bold text-[#6e3757] uppercase tracking-wider">Correo</span>
-                  <span class="text-xs font-semibold text-[#48021C] truncate">{{ guest?.email || '---' }}</span>
+                  <span class="text-[10px] font-bold uppercase tracking-wider" [ngClass]="themeService.isDarkMode() ? 'text-[#8B949E]' : 'text-[#6e3757]'">Correo</span>
+                  <span class="text-xs font-semibold truncate" [ngClass]="themeService.isDarkMode() ? 'text-[#F0F6FC]' : 'text-[#48021C]'">{{ guest?.email || '---' }}</span>
                 </div>
                 <div class="flex flex-col gap-0.5">
-                  <span class="text-[10px] font-bold text-[#6e3757] uppercase tracking-wider">Teléfono</span>
-                  <span class="text-xs font-semibold text-[#48021C]">{{ guest?.phone || '---' }}</span>
+                  <span class="text-[10px] font-bold uppercase tracking-wider" [ngClass]="themeService.isDarkMode() ? 'text-[#8B949E]' : 'text-[#6e3757]'">Teléfono</span>
+                  <span class="text-xs font-semibold" [ngClass]="themeService.isDarkMode() ? 'text-[#F0F6FC]' : 'text-[#48021C]'">{{ guest?.phone || '---' }}</span>
                 </div>
               }
             </div>
@@ -266,7 +336,7 @@
 
         <div class="md:col-span-4 lg:col-span-3 flex flex-col gap-1.5">
           <div class="h-[28px] flex items-center">
-            <label class="text-xs font-semibold text-[#48021C]">
+            <label class="text-xs font-semibold" [ngClass]="themeService.isDarkMode() ? 'text-[#F0F6FC]' : 'text-[#48021C]'">
               Dirección de entrega
             </label>
           </div>
@@ -275,7 +345,8 @@
             formControlName="deliveryAddress"
             rows="3"
             placeholder="Se copia del cliente si la dejas vacía. No cambia el maestro."
-            class="w-full min-h-[72px] p-inputtext-sm !text-xs !font-medium !rounded-lg !border-[#9f6587]/35 focus:!border-[#9f6587] focus:!ring-2 focus:!ring-[#9f6587]/20 p-2 resize-none"
+            class="w-full min-h-[72px] p-inputtext-sm !text-xs !font-medium !rounded-lg p-2 resize-none transition-colors"
+            [ngClass]="themeService.isDarkMode() ? '!bg-[#161B22] !border-[#30363D] !text-[#F0F6FC] focus:!border-[#58A6FF]' : '!border-[#9f6587]/35 focus:!border-[#9f6587] focus:!ring-2 focus:!ring-[#9f6587]/20'"
             [disabled]="!canModifyProducts"
           ></textarea>
         </div>
@@ -319,15 +390,17 @@
     <!-- RIGHT COLUMN: COMPACT SUMMARY -->
     <div class="col-span-12 lg:col-span-4">
       <div
-        class="bg-white rounded-2xl border-2 border-[#48021C]/25 p-4 shadow-xs flex flex-col gap-3.5 lg:sticky lg:top-4"
+        class="rounded-2xl border-2 p-4 shadow-xs flex flex-col gap-3.5 lg:sticky lg:top-4 transition-colors"
+        [ngClass]="themeService.isDarkMode() ? 'bg-[#161B22] border-[#30363D]' : 'bg-white border-[#48021C]/25'"
         [formGroup]="orderForm"
       >
         @if (canModifyProducts || isPreorder) {
-          <div class="flex flex-col gap-2 bg-violet-50/70 px-3 py-2.5 rounded-xl border border-violet-200">
+          <div class="flex flex-col gap-2 px-3 py-2.5 rounded-xl border transition-colors"
+               [ngClass]="themeService.isDarkMode() ? 'bg-purple-950/30 border-purple-800/60' : 'bg-violet-50/70 border-violet-200'">
             <div class="flex items-center justify-between gap-2">
               <div class="flex flex-col min-w-0">
-                <span class="text-xs font-bold text-violet-900">Preorden</span>
-                <span class="text-[10px] text-violet-700/80 leading-tight">
+                <span class="text-xs font-bold" [ngClass]="themeService.isDarkMode() ? 'text-purple-300' : 'text-violet-900'">Preorden</span>
+                <span class="text-[10px] leading-tight" [ngClass]="themeService.isDarkMode() ? 'text-purple-400' : 'text-violet-700/80'">
                   Pedido a futuro: no reserva stock hasta confirmar.
                 </span>
               </div>
@@ -338,8 +411,9 @@
               />
             </div>
             @if (isPreorder) {
-              <div class="flex flex-col gap-1.5 pt-1 border-t border-violet-200/80">
-                <label class="text-xs font-bold text-violet-900">
+              <div class="flex flex-col gap-1.5 pt-1 border-t"
+                   [ngClass]="themeService.isDarkMode() ? 'border-purple-800/60' : 'border-violet-200/80'">
+                <label class="text-xs font-bold" [ngClass]="themeService.isDarkMode() ? 'text-purple-300' : 'text-violet-900'">
                   Fecha de entrega <span class="text-rose-500">*</span>
                 </label>
                 <p-datepicker
@@ -350,13 +424,16 @@
                   [readonlyInput]="true"
                   placeholder="Cuándo se entrega"
                   styleClass="w-full h-9!"
-                  inputStyleClass="w-full h-9! text-xs font-semibold !bg-white !border-violet-300 hover:!border-violet-500 focus:!border-violet-600 focus:!ring-2 focus:!ring-violet-200 !rounded-xl"
+                  [inputStyleClass]="themeService.isDarkMode() 
+                    ? 'w-full h-9! text-xs font-semibold !bg-[#0D1117] !border-[#30363D] !text-[#F0F6FC] focus:!border-[#58A6FF] focus:!ring-2 focus:!ring-[#58A6FF]/20 !rounded-xl' 
+                    : 'w-full h-9! text-xs font-semibold !bg-white !border-violet-300 hover:!border-violet-500 focus:!border-violet-600 focus:!ring-2 focus:!ring-violet-200 !rounded-xl'"
+                  [panelStyleClass]="themeService.isDarkMode() ? '!bg-[#161B22] !border-[#30363D] !text-slate-200' : ''"
                   size="small"
                   [fluid]="true"
                   appendTo="body"
                   [disabled]="!canModifyProducts"
                 />
-                <p class="text-[10px] text-violet-700/90 leading-tight m-0">
+                <p class="text-[10px] leading-tight m-0" [ngClass]="themeService.isDarkMode() ? 'text-purple-400' : 'text-violet-700/90'">
                   El inventario se descuenta al confirmar, cuando ya haya stock en la sucursal.
                 </p>
               </div>
@@ -365,7 +442,7 @@
         }
 
         <div class="flex flex-col gap-1 billing-range">
-          <label class="text-xs font-bold text-[#48021C]">
+          <label class="text-xs font-bold" [ngClass]="themeService.isDarkMode() ? 'text-[#F0F6FC]' : 'text-[#48021C]'">
             Gestión de cobro
           </label>
           <p-datepicker
@@ -379,77 +456,87 @@
             [readonlyInput]="true"
             placeholder="Inicio de cobro — Fecha límite de pago"
             styleClass="billing-range-picker w-full h-9!"
-            inputStyleClass="w-full h-9! text-xs font-semibold text-center !bg-rose-50/40 !border-[#48021C]/25 hover:!border-[#48021C]/60 hover:!bg-white focus:!border-[#48021C] focus:!ring-2 focus:!ring-[#48021C]/10 !rounded-xl transition-all duration-200"
+            [inputStyleClass]="themeService.isDarkMode() 
+              ? 'w-full h-9! text-xs font-semibold text-center !bg-[#0D1117] !border-[#30363D] !text-[#F0F6FC] hover:!border-[#58A6FF]/60 focus:!border-[#58A6FF] focus:!ring-2 focus:!ring-[#58A6FF]/20 !rounded-xl transition-all duration-200' 
+              : 'w-full h-9! text-xs font-semibold text-center !bg-rose-50/40 !border-[#48021C]/25 hover:!border-[#48021C]/60 hover:!bg-white focus:!border-[#48021C] focus:!ring-2 focus:!ring-[#48021C]/10 !rounded-xl transition-all duration-200'"
+            [panelStyleClass]="themeService.isDarkMode() ? '!bg-[#161B22] !border-[#30363D] !text-slate-200' : ''"
             size="small"
             [fluid]="true"
             appendTo="body"
             [disabled]="!canModifyProducts"
           />
           <div class="billing-range-labels grid grid-cols-2">
-            <span class="text-[10px] font-semibold text-[#6e3757] text-center leading-tight">Inicio de cobro</span>
-            <span class="text-[10px] font-semibold text-[#6e3757] text-center leading-tight">Límite de pago</span>
+            <span class="text-[10px] font-semibold text-center leading-tight" [ngClass]="themeService.isDarkMode() ? 'text-[#8B949E]' : 'text-[#6e3757]'">Inicio de cobro</span>
+            <span class="text-[10px] font-semibold text-center leading-tight" [ngClass]="themeService.isDarkMode() ? 'text-[#8B949E]' : 'text-[#6e3757]'">Límite de pago</span>
           </div>
         </div>
 
         @if (canModifyProducts) {
-          <div class="flex items-center justify-between bg-rose-50/40 px-3 py-2 rounded-xl border border-[#48021C]/20">
-            <span class="text-xs font-bold text-[#48021C]">IVA (12%)</span>
+          <div class="flex items-center justify-between px-3 py-2 rounded-xl border transition-colors"
+               [ngClass]="themeService.isDarkMode() ? 'bg-[#0D1117] border-[#30363D]' : 'bg-rose-50/40 border-[#48021C]/20'">
+            <span class="text-xs font-bold" [ngClass]="themeService.isDarkMode() ? 'text-[#F0F6FC]' : 'text-[#48021C]'">IVA (12%)</span>
             <p-toggleswitch [ngModel]="applyTax" [ngModelOptions]="{standalone: true}" (onChange)="toggleTax()" />
           </div>
         }
 
         <div class="flex flex-col gap-1">
-          <label class="text-xs font-bold text-[#48021C]">Observaciones</label>
+          <label class="text-xs font-bold" [ngClass]="themeService.isDarkMode() ? 'text-[#F0F6FC]' : 'text-[#48021C]'">Observaciones</label>
           <textarea
             pTextarea
             formControlName="notes"
             rows="2"
             placeholder="Nota o instrucción para el pedido..."
-            class="w-full text-xs font-medium !bg-rose-50/40 !border-[#48021C]/25 hover:!border-[#48021C]/60 hover:!bg-white focus:!border-[#48021C] focus:!ring-2 focus:!ring-[#48021C]/10 !rounded-xl p-2 transition-all duration-200 resize-none"
+            class="w-full text-xs font-medium !rounded-xl p-2 transition-all duration-200 resize-none"
+            [ngClass]="themeService.isDarkMode() 
+              ? '!bg-[#0D1117] !border-[#30363D] !text-[#F0F6FC] hover:!border-[#58A6FF]/60 focus:!border-[#58A6FF] focus:!ring-2 focus:!ring-[#58A6FF]/20' 
+              : '!bg-rose-50/40 !border-[#48021C]/25 hover:!border-[#48021C]/60 hover:!bg-white focus:!border-[#48021C] focus:!ring-2 focus:!ring-[#48021C]/10'"
             [disabled]="!canModifyProducts"
           ></textarea>
         </div>
 
-        <div class="bg-rose-50/60 border border-[#48021C]/20 p-3 rounded-xl flex flex-col gap-1.5">
-          <div class="flex justify-between text-xs font-medium text-slate-600">
+        <div class="border p-3 rounded-xl flex flex-col gap-1.5 transition-colors"
+             [ngClass]="themeService.isDarkMode() ? 'bg-[#1C2128] border-[#30363D]' : 'bg-rose-50/60 border-[#48021C]/20'">
+          <div class="flex justify-between text-xs font-medium" [ngClass]="themeService.isDarkMode() ? 'text-[#8B949E]' : 'text-slate-600'">
             <span>Subtotal:</span>
-            <span class="text-slate-900 font-bold tabular-nums">{{ totals.subtotal | currency: 'Q ' }}</span>
+            <span class="font-bold tabular-nums" [ngClass]="themeService.isDarkMode() ? 'text-[#F0F6FC]' : 'text-slate-900'">{{ totals.subtotal | currency: 'Q ' }}</span>
           </div>
-          <div class="flex justify-between text-xs font-medium text-slate-600">
+          <div class="flex justify-between text-xs font-medium" [ngClass]="themeService.isDarkMode() ? 'text-[#8B949E]' : 'text-slate-600'">
             <span>Ajustes:</span>
             <span class="font-bold tabular-nums">
-              <span class="text-emerald-600">+{{ totals.lineSurchargeTotal | currency: 'Q' }}</span>
-              <span class="text-slate-400 mx-1">|</span>
-              <span class="text-rose-600">-{{ totals.lineDiscountTotal | currency: 'Q' }}</span>
+              <span class="text-emerald-500">+{{ totals.lineSurchargeTotal | currency: 'Q' }}</span>
+              <span class="mx-1" [ngClass]="themeService.isDarkMode() ? 'text-slate-600' : 'text-slate-400'">|</span>
+              <span class="text-rose-500">-{{ totals.lineDiscountTotal | currency: 'Q' }}</span>
             </span>
           </div>
-          <div class="flex justify-between text-xs font-medium text-slate-600">
+          <div class="flex justify-between text-xs font-medium" [ngClass]="themeService.isDarkMode() ? 'text-[#8B949E]' : 'text-slate-600'">
             @if (canModifyProducts) {
-              <span class="text-[#48021C] hover:underline cursor-pointer font-bold" (click)="showDiscountDialog = true">Desc. global:</span>
+              <span class="hover:underline cursor-pointer font-bold" 
+                    [ngClass]="themeService.isDarkMode() ? 'text-[#58A6FF]' : 'text-[#48021C]'"
+                    (click)="showDiscountDialog = true">Desc. global:</span>
             } @else {
               <span>Desc. global:</span>
             }
-            <span class="text-rose-600 font-bold tabular-nums">-{{ totals.globalDiscountTotal | currency: 'Q ' }}</span>
+            <span class="text-rose-500 font-bold tabular-nums">-{{ totals.globalDiscountTotal | currency: 'Q ' }}</span>
           </div>
-          <div class="flex justify-between text-xs font-medium text-slate-600">
+          <div class="flex justify-between text-xs font-medium" [ngClass]="themeService.isDarkMode() ? 'text-[#8B949E]' : 'text-slate-600'">
             <span>IVA (12%):</span>
-            <span class="text-slate-900 font-bold tabular-nums">+{{ totals.taxTotal | currency: 'Q ' }}</span>
+            <span class="font-bold tabular-nums" [ngClass]="themeService.isDarkMode() ? 'text-[#F0F6FC]' : 'text-slate-900'">+{{ totals.taxTotal | currency: 'Q ' }}</span>
           </div>
-          <div class="h-px bg-[#48021C]/15 my-0.5"></div>
+          <div class="h-px my-0.5" [ngClass]="themeService.isDarkMode() ? 'bg-[#30363D]' : 'bg-[#48021C]/15'"></div>
           <div class="flex justify-between items-center">
-            <span class="text-sm font-bold text-[#48021C]">Total:</span>
-            <span class="text-lg font-extrabold text-[#48021C] tabular-nums">{{ totals.total | currency: 'Q ' }}</span>
+            <span class="text-sm font-bold" [ngClass]="themeService.isDarkMode() ? 'text-[#F0F6FC]' : 'text-[#48021C]'">Total:</span>
+            <span class="text-lg font-extrabold tabular-nums" [ngClass]="themeService.isDarkMode() ? 'text-[#58A6FF]' : 'text-[#48021C]'">{{ totals.total | currency: 'Q ' }}</span>
           </div>
 
           @if (showPaymentSection) {
-            <div class="pt-2 mt-0.5 border-t border-[#48021C]/15 flex flex-col gap-1.5">
-              <div class="flex justify-between text-xs font-medium text-slate-600">
+            <div class="pt-2 mt-0.5 border-t flex flex-col gap-1.5" [ngClass]="themeService.isDarkMode() ? 'border-[#30363D]' : 'border-[#48021C]/15'">
+              <div class="flex justify-between text-xs font-medium" [ngClass]="themeService.isDarkMode() ? 'text-[#8B949E]' : 'text-slate-600'">
                 <span>Cobrado:</span>
-                <span class="text-emerald-700 font-bold tabular-nums">{{ sale?.paidAmount | currency: 'Q ' }}</span>
+                <span class="text-emerald-500 font-bold tabular-nums">{{ sale?.paidAmount | currency: 'Q ' }}</span>
               </div>
-              <div class="flex justify-between text-xs font-medium text-slate-600">
+              <div class="flex justify-between text-xs font-medium" [ngClass]="themeService.isDarkMode() ? 'text-[#8B949E]' : 'text-slate-600'">
                 <span>Pendiente:</span>
-                <span class="text-amber-700 font-bold tabular-nums">{{ sale?.pendingAmount | currency: 'Q ' }}</span>
+                <span class="text-amber-500 font-bold tabular-nums">{{ sale?.pendingAmount | currency: 'Q ' }}</span>
               </div>
             </div>
           }
@@ -474,7 +561,8 @@
     </ng-container>
 
     @if (sale?.status === 'cancelled') {
-      <div class="mb-3 p-3 bg-rose-50 border border-rose-200 rounded-xl flex items-center gap-2 text-rose-700 text-xs">
+      <div class="mb-3 p-3 border rounded-xl flex items-center gap-2 text-xs"
+           [ngClass]="themeService.isDarkMode() ? 'bg-rose-950/30 border-rose-800/60 text-rose-300' : 'bg-rose-50 border-rose-200 text-rose-700'">
         <i class="pi pi-times-circle"></i>
         <span class="font-semibold">Venta cancelada — no se admiten más pagos</span>
       </div>
@@ -491,18 +579,21 @@
       colorScheme="burgundy"
     >
       <ng-template #header>
-        <tr class="h-11 text-xs bg-[#eddde1] border-b border-[#762f41]/40 text-[#3b141e] font-bold sticky top-0 z-10">
-          <th class="!text-left !pl-3 border-r border-[#762f41]/35">Método</th>
-          <th class="!text-right !pr-3 border-r border-[#762f41]/35 w-28">Monto</th>
-          <th class="!text-left !pl-3 border-r border-[#762f41]/35 w-28">Fecha</th>
-          <th class="!text-left !pl-3 border-r border-[#762f41]/35">Referencia</th>
-          <th class="!text-center border-r border-[#762f41]/35 w-28">Estado</th>
+        <tr class="h-11 text-xs border-b font-bold sticky top-0 z-10 transition-colors"
+            [ngClass]="themeService.isDarkMode() ? 'bg-[#1C2128] border-[#30363D] text-[#F0F6FC]' : 'bg-[#eddde1] border-[#762f41]/40 text-[#3b141e]'">
+          <th class="!text-left !pl-3 border-r w-36" [ngClass]="themeService.isDarkMode() ? 'border-[#30363D]' : 'border-[#762f41]/35'">Método</th>
+          <th class="!text-right !pr-3 border-r w-28" [ngClass]="themeService.isDarkMode() ? 'border-[#30363D]' : 'border-[#762f41]/35'">Monto</th>
+          <th class="!text-left !pl-3 border-r w-28" [ngClass]="themeService.isDarkMode() ? 'border-[#30363D]' : 'border-[#762f41]/35'">Fecha</th>
+          <th class="!text-left !pl-3 border-r" [ngClass]="themeService.isDarkMode() ? 'border-[#30363D]' : 'border-[#762f41]/35'">Referencia</th>
+          <th class="!text-center border-r w-28" [ngClass]="themeService.isDarkMode() ? 'border-[#30363D]' : 'border-[#762f41]/35'">Estado</th>
           <th class="!text-center w-16"></th>
         </tr>
       </ng-template>
       <ng-template #body let-payment>
-        <tr class="hover:!bg-[#eddde1]/45 transition-colors duration-150 border-b border-[#762f41]/18 last:border-0 text-xs">
-          <td class="!py-2.5 !pl-3 border-r border-[#762f41]/18 font-semibold text-slate-700">
+        <tr class="transition-colors duration-150 border-b last:border-0 text-xs"
+            [ngClass]="themeService.isDarkMode() ? 'hover:!bg-[#1C2128] border-[#30363D]' : 'hover:!bg-[#eddde1]/45 border-[#762f41]/18'">
+          <td class="!py-2.5 !pl-3 border-r font-semibold"
+              [ngClass]="themeService.isDarkMode() ? 'border-[#30363D] text-[#F0F6FC]' : 'border-[#762f41]/18 text-slate-700'">
             <div class="flex items-center gap-1.5 flex-wrap">
               <span>{{ payment.paymentMethod.name }}</span>
               @if (payment.isDownPayment) {
@@ -510,33 +601,37 @@
               }
             </div>
           </td>
-          <td class="!py-2.5 !pr-3 border-r border-[#762f41]/18 text-right font-bold text-[#48021C] tabular-nums">
+          <td class="!py-2.5 !pr-3 border-r text-right font-bold tabular-nums"
+              [ngClass]="themeService.isDarkMode() ? 'border-[#30363D] text-[#58A6FF]' : 'border-[#762f41]/18 text-[#48021C]'">
             {{ payment.amount | currency: 'Q ' }}
           </td>
-          <td class="!py-2.5 !pl-3 border-r border-[#762f41]/18 text-slate-500 font-medium">
+          <td class="!py-2.5 !pl-3 border-r font-medium"
+              [ngClass]="themeService.isDarkMode() ? 'border-[#30363D] text-[#8B949E]' : 'border-[#762f41]/18 text-slate-500'">
             {{ payment.date | date: 'dd/MM/yyyy' }}
           </td>
-          <td class="!py-2.5 !pl-3 border-r border-[#762f41]/18 text-slate-600">
+          <td class="!py-2.5 !pl-3 border-r"
+              [ngClass]="themeService.isDarkMode() ? 'border-[#30363D] text-[#8B949E]' : 'border-[#762f41]/18 text-slate-600'">
             <div class="flex flex-col gap-0.5 min-w-0">
               @if (payment.referenceNumber) {
-                <div><span class="font-semibold text-[#48021C]">Ref:</span> {{ payment.referenceNumber }}</div>
+                <div><span class="font-semibold" [ngClass]="themeService.isDarkMode() ? 'text-[#F0F6FC]' : 'text-[#48021C]'">Ref:</span> {{ payment.referenceNumber }}</div>
               }
               @if (payment.bankAccount) {
-                <div class="text-[10px] text-slate-500">
+                <div class="text-[10px]" [ngClass]="themeService.isDarkMode() ? 'text-[#8B949E]' : 'text-slate-500'">
                   {{ payment.bankAccount.alias }} ({{ payment.bankAccount.bankName }})
                 </div>
               } @else if (payment.manualBankAccount) {
-                <div class="text-[10px] text-slate-500">{{ payment.manualBankAccount }}</div>
+                <div class="text-[10px]" [ngClass]="themeService.isDarkMode() ? 'text-[#8B949E]' : 'text-slate-500'">{{ payment.manualBankAccount }}</div>
               }
               @if (payment.notes) {
-                <div class="text-[10px] italic text-slate-400 truncate">"{{ payment.notes }}"</div>
+                <div class="text-[10px] italic truncate" [ngClass]="themeService.isDarkMode() ? 'text-[#8B949E]' : 'text-slate-400'">"{{ payment.notes }}"</div>
               }
               @if (!payment.referenceNumber && !payment.bankAccount && !payment.manualBankAccount && !payment.notes) {
                 <span class="text-slate-400">—</span>
               }
             </div>
           </td>
-          <td class="!py-2.5 border-r border-[#762f41]/18 text-center">
+          <td class="!py-2.5 border-r text-center"
+              [ngClass]="themeService.isDarkMode() ? 'border-[#30363D]' : 'border-[#762f41]/18'">
             <app-status-badge
               [value]="payment.status | paymentStatus"
               [severity]="paymentStatusSeverity(payment.status)"
@@ -558,8 +653,8 @@
 
     <ng-container footer>
       <div class="flex items-center gap-4 mr-auto text-xs font-semibold">
-        <span class="text-slate-500">Cobrado <span class="text-emerald-700 tabular-nums">{{ sale?.paidAmount | currency: 'Q ' }}</span></span>
-        <span class="text-slate-500">Pendiente <span class="text-amber-700 tabular-nums">{{ sale?.pendingAmount | currency: 'Q ' }}</span></span>
+        <span [ngClass]="themeService.isDarkMode() ? 'text-[#8B949E]' : 'text-slate-500'">Cobrado <span class="text-emerald-500 tabular-nums">{{ sale?.paidAmount | currency: 'Q ' }}</span></span>
+        <span [ngClass]="themeService.isDarkMode() ? 'text-[#8B949E]' : 'text-slate-500'">Pendiente <span class="text-amber-500 tabular-nums">{{ sale?.pendingAmount | currency: 'Q ' }}</span></span>
       </div>
     </ng-container>
   </app-standard-modal>
@@ -567,11 +662,12 @@
 
   <!-- FLOATING BOTTOM-RIGHT ACTION BAR -->
   <div class="fixed bottom-6 right-6 z-40 animate-in fade-in slide-in-from-bottom-3 duration-200">
-    <div class="bg-white/95 backdrop-blur-md px-4 py-2.5 rounded-2xl border border-slate-300/80 shadow-xl flex items-center gap-3.5">
+    <div class="px-4 py-2.5 rounded-2xl border shadow-xl flex items-center gap-3.5 backdrop-blur-md transition-colors"
+         [ngClass]="themeService.isDarkMode() ? 'bg-[#161B22]/95 border-[#30363D]' : 'bg-white/95 border-slate-300/80'">
       <!-- Resumen rápido del total -->
-      <div class="flex flex-col pr-3 border-r border-slate-200">
-        <span class="text-[10px] font-medium text-slate-500 leading-tight">Total</span>
-        <span class="text-sm font-bold text-emerald-600 leading-none">{{ totals.total | currency: 'Q ' }}</span>
+      <div class="flex flex-col pr-3 border-r" [ngClass]="themeService.isDarkMode() ? 'border-[#30363D]' : 'border-slate-200'">
+        <span class="text-[10px] font-medium leading-tight" [ngClass]="themeService.isDarkMode() ? 'text-[#8B949E]' : 'text-slate-500'">Total</span>
+        <span class="text-sm font-bold text-emerald-500 leading-none">{{ totals.total | currency: 'Q ' }}</span>
       </div>
 
       <!-- Botón Cancelar (salir de la pantalla) -->
@@ -581,7 +677,7 @@
         severity="danger" 
         (onClick)="onCancel()" 
         icon="pi pi-times"
-        styleClass="!rounded-lg !px-3.5 font-semibold h-9! hover:bg-cancel-red/5 transition-all text-xs border-cancel-red! text-cancel-red!"
+        styleClass="!rounded-lg !px-3.5 font-semibold h-9! transition-all text-xs"
       />
 
       <!-- Botones de Acción según Modo y Estado -->
@@ -591,7 +687,7 @@
           (onClick)="onSaveOrder()" 
           [disabled]="!canGenerateOrder"
           icon="pi pi-check" 
-          styleClass="!rounded-lg !px-5 shadow-sm transition-all font-semibold h-9! justify-center text-xs !bg-[#48021C] !text-white !border-[#48021C] hover:!bg-[#350114] disabled:!opacity-40 disabled:!cursor-not-allowed"
+          [styleClass]="(themeService.isDarkMode() ? '!bg-[#238636] !border-[#238636] hover:!bg-[#2ea043]' : '!bg-[#48021C] !border-[#48021C] hover:!bg-[#350114]') + ' !rounded-lg !px-5 shadow-sm transition-all font-semibold h-9! justify-center text-xs !text-white disabled:!opacity-40 disabled:!cursor-not-allowed'"
         />
       } @else {
         @if (orderForm.get('status')?.value === 'pending') {
@@ -601,13 +697,13 @@
               [outlined]="true" 
               (onClick)="resetChanges()" 
               icon="pi pi-refresh" 
-              styleClass="!rounded-lg !px-3.5 font-semibold h-9! text-xs border-slate-300! text-slate-700! hover:bg-slate-50"
+              [styleClass]="themeService.isDarkMode() ? '!rounded-lg !px-3.5 font-semibold h-9! text-xs border-[#30363D]! text-[#F0F6FC]! hover:bg-[#30363D]/50' : '!rounded-lg !px-3.5 font-semibold h-9! text-xs border-slate-300! text-slate-700! hover:bg-slate-50'"
             />
             <p-button 
               label="Guardar cambios" 
               (onClick)="onSaveChanges()" 
               icon="pi pi-save" 
-              styleClass="!rounded-lg !px-4 shadow-sm font-semibold h-9! text-xs !bg-[#48021C] !text-white !border-[#48021C] hover:!bg-[#350114]"
+              [styleClass]="(themeService.isDarkMode() ? '!bg-[#238636] !border-[#238636] hover:!bg-[#2ea043]' : '!bg-[#48021C] !border-[#48021C] hover:!bg-[#350114]') + ' !rounded-lg !px-4 shadow-sm font-semibold h-9! text-xs !text-white'"
             />
           } @else {
             <p-button 
@@ -646,6 +742,7 @@
     </div>
   </div>
 </div>
+
 
 <!-- MODAL DE CONFIRMACIÓN: CANCELAR / SALIR -->
 <app-confirmation-modal

@@ -1,8 +1,11 @@
 import { Routes } from '@angular/router';
+import { permissionGuard } from '../auth/permission.guard';
 
 export const PRODUCTION_ROUTES: Routes = [
   {
     path: 'decomposition',
+    canActivate: [permissionGuard],
+    data: { permission: 'production.decomposition' },
     children: [
       {
         path: '',
@@ -20,6 +23,8 @@ export const PRODUCTION_ROUTES: Routes = [
   },
   {
     path: 'orders',
+    canActivate: [permissionGuard],
+    data: { permission: 'production.orders' },
     children: [
       {
         path: '',
@@ -37,6 +42,8 @@ export const PRODUCTION_ROUTES: Routes = [
   },
   {
     path: 'recipes',
+    canActivate: [permissionGuard],
+    data: { permission: 'production.recipes' },
     children: [
       {
         path: '',
@@ -50,10 +57,14 @@ export const PRODUCTION_ROUTES: Routes = [
   },
   {
     path: 'butchery',
+    canActivate: [permissionGuard],
+    data: { permission: 'production.decomposition' },
     loadComponent: () => import('./pages/butchery/butchery.component').then(m => m.ButcheryComponent),
   },
   {
     path: 'manufacturing',
+    canActivate: [permissionGuard],
+    data: { permission: 'production.orders' },
     loadComponent: () => import('./pages/manufacturing/manufacturing.component').then(m => m.ManufacturingComponent),
   },
 ];

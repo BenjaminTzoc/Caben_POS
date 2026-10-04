@@ -3,7 +3,7 @@ import { ButtonModule } from 'primeng/button';
 import { TableModule, TableLazyLoadEvent } from 'primeng/table';
 import { InventoryMovement } from '../interfaces/inventory-movement.interface';
 import { InventoryMovementsService } from '../services/inventory-movements.service';
-import { DatePipe, DecimalPipe, Location } from '@angular/common';
+import { CommonModule, DatePipe, DecimalPipe, Location } from '@angular/common';
 import { InventoryMovementTypePipe } from '../../shared/pipes/inventory-movement-type.pipe';
 import { TagModule } from 'primeng/tag';
 import { environment } from '../../../environments/environment';
@@ -15,16 +15,19 @@ import { Dialog } from 'primeng/dialog';
 import { FormsModule } from '@angular/forms';
 import { TextareaModule } from 'primeng/textarea';
 import { ConfirmationModalComponent } from '../../shared/components/confirmation-modal/confirmation-modal.component';
+import { StandardModalComponent } from '../../shared/components/standard-modal/standard-modal.component';
 import { RefreshButtonComponent } from '../../shared/components/refresh-button/refresh-button.component';
 import { PrimaryButtonComponent } from '../../shared/components/primary-button/primary-button.component';
 import { StandardTableComponent } from '../../shared/components/standard-table/standard-table.component';
 import { StatusBadgeComponent } from '../../shared/components/status-badge/status-badge.component';
 import { MovementFormComponent } from './movement-form/movement-form.component';
+import { ThemeService } from '../../core/services/theme.service';
 
 @Component({
   selector: 'app-inventory-movements',
   standalone: true,
   imports: [
+    CommonModule,
     ButtonModule,
     TableModule,
     DatePipe,
@@ -38,6 +41,7 @@ import { MovementFormComponent } from './movement-form/movement-form.component';
     FormsModule,
     TextareaModule,
     ConfirmationModalComponent,
+    StandardModalComponent,
     RefreshButtonComponent,
     PrimaryButtonComponent,
     StandardTableComponent,
@@ -82,7 +86,8 @@ export class InventoryMovementsComponent implements OnInit {
   constructor(
     private inventoryMovementsService: InventoryMovementsService,
     private messageService: MessageService,
-    private location: Location
+    private location: Location,
+    public themeService: ThemeService
   ) {}
 
   ngOnInit(): void {

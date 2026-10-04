@@ -1,4 +1,7 @@
-<div class="py-4 px-0 md:px-6 bg-slate-50/50 min-h-screen">
+<div 
+  class="py-4 px-0 md:px-6 min-h-screen transition-colors duration-200"
+  [ngClass]="themeService.isDarkMode() ? 'bg-[#0D1117]' : 'bg-slate-50/50'"
+>
   <!-- Top Card: Reusable Page Header -->
   <app-page-header
     title="Traslados de Inventario"
@@ -20,7 +23,12 @@
     <ng-container filters>
       <!-- Date Picker Filter -->
       <div class="flex flex-col gap-1 w-full md:w-auto">
-        <label class="text-xs font-semibold text-[#48021C]">Rango de Fechas</label>
+        <label 
+          class="text-xs font-semibold"
+          [ngClass]="themeService.isDarkMode() ? 'text-[#F0F6FC]' : 'text-[#48021C]'"
+        >
+          Rango de Fechas
+        </label>
         <p-datePicker
           [(ngModel)]="dateRange"
           selectionMode="range"
@@ -31,13 +39,24 @@
           appendTo="body"
           size="small"
           class="w-full md:w-auto"
-          styleClass="!rounded-lg !border-[#9f6587]/35 focus-within:!border-[#9f6587] focus-within:!ring-2 focus-within:!ring-[#9f6587]/20 w-full md:w-64 text-xs font-medium"
+          [styleClass]="themeService.isDarkMode()
+            ? '!rounded-lg !bg-[#161B22] !text-[#F0F6FC] !border-[#30363D] focus-within:!border-[#58A6FF] focus-within:!ring-2 focus-within:!ring-[#58A6FF]/20 w-full md:w-64 text-xs font-medium'
+            : '!rounded-lg !border-[#9f6587]/35 focus-within:!border-[#9f6587] focus-within:!ring-2 focus-within:!ring-[#9f6587]/20 w-full md:w-64 text-xs font-medium'"
+          [inputStyleClass]="themeService.isDarkMode()
+            ? '!bg-[#161B22] !text-[#F0F6FC] !border-[#30363D] text-xs font-medium'
+            : 'text-xs font-medium'"
+          [panelStyleClass]="themeService.isDarkMode() ? '!bg-[#161B22] !border-[#30363D] !text-[#F0F6FC] shadow-2xl' : '!bg-white !border-slate-200 shadow-xl'"
         />
       </div>
 
       <!-- Status Filter -->
       <div class="flex flex-col gap-1 w-full md:w-auto">
-        <label class="text-xs font-semibold text-[#48021C]">Estado</label>
+        <label 
+          class="text-xs font-semibold"
+          [ngClass]="themeService.isDarkMode() ? 'text-[#F0F6FC]' : 'text-[#48021C]'"
+        >
+          Estado
+        </label>
         <p-select
           [options]="statusOptions"
           [(ngModel)]="statusFilter"
@@ -49,15 +68,23 @@
           appendTo="body"
           size="small"
           class="w-full md:w-auto"
-          styleClass="!rounded-lg !border-[#9f6587]/35 focus-within:!border-[#9f6587] focus-within:!ring-2 focus-within:!ring-[#9f6587]/20 w-full md:w-56 text-xs font-medium"
+          [styleClass]="themeService.isDarkMode()
+            ? '!rounded-lg !bg-[#161B22] !text-[#F0F6FC] !border-[#30363D] focus-within:!border-[#58A6FF] focus-within:!ring-2 focus-within:!ring-[#58A6FF]/20 w-full md:w-56 text-xs font-medium'
+            : '!rounded-lg !border-[#9f6587]/35 focus-within:!border-[#9f6587] focus-within:!ring-2 focus-within:!ring-[#9f6587]/20 w-full md:w-56 text-xs font-medium'"
+          [panelStyleClass]="themeService.isDarkMode() ? '!bg-[#161B22] !border-[#30363D] !text-[#F0F6FC] shadow-2xl' : '!bg-white !border-slate-200 shadow-xl'"
         />
       </div>
 
       <!-- Search Input -->
       <div class="flex flex-col gap-1 w-full md:w-80">
-        <label class="text-xs font-semibold text-[#48021C]">Búsqueda rápida</label>
+        <label 
+          class="text-xs font-semibold"
+          [ngClass]="themeService.isDarkMode() ? 'text-[#F0F6FC]' : 'text-[#48021C]'"
+        >
+          Búsqueda rápida
+        </label>
         <p-iconfield class="w-full">
-          <p-inputicon class="pi pi-search text-xs text-[#9f6587]" />
+          <p-inputicon class="pi pi-search text-xs" [ngClass]="themeService.isDarkMode() ? 'text-[#58A6FF]' : 'text-[#9f6587]'" />
           <input 
             [(ngModel)]="searchTerm"
             (input)="loadTransfers()"
@@ -66,7 +93,10 @@
             pSize="small"
             placeholder="Buscar por correlativo o sucursal..."
             autocomplete="off"
-            class="w-full !rounded-lg font-medium p-inputtext-sm !border-[#9f6587]/35 focus:!border-[#9f6587] focus:!ring-2 focus:!ring-[#9f6587]/20 text-xs"
+            class="w-full !rounded-lg font-medium p-inputtext-sm text-xs transition-all"
+            [ngClass]="themeService.isDarkMode()
+              ? '!bg-[#161B22] !text-[#F0F6FC] !border-[#30363D] focus:!border-[#58A6FF] focus:!ring-2 focus:!ring-[#58A6FF]/20'
+              : '!border-[#9f6587]/35 focus:!border-[#9f6587] focus:!ring-2 focus:!ring-[#9f6587]/20'"
           />
         </p-iconfield>
       </div>
@@ -77,7 +107,10 @@
           pButton
           icon="pi pi-filter-slash"
           (click)="clearFilters()"
-          class="!w-[33px] !h-[33px] !p-0 !border-[#9f6587]/35 !text-[#48021C] !bg-white hover:!bg-[#48021C]/5 hover:!border-[#9f6587] !rounded-lg flex items-center justify-center cursor-pointer transition-all shadow-2xs shrink-0 self-end md:self-auto"
+          class="!w-[33px] !h-[33px] !p-0 !rounded-lg flex items-center justify-center cursor-pointer transition-all shadow-2xs shrink-0 self-end md:self-auto border"
+          [ngClass]="themeService.isDarkMode()
+            ? '!border-[#30363D] !text-[#58A6FF] !bg-[#161B22] hover:!bg-[#1C2128] hover:!border-[#58A6FF]/60'
+            : '!border-[#9f6587]/35 !text-[#48021C] !bg-white hover:!bg-[#48021C]/5 hover:!border-[#9f6587]'"
           pTooltip="Limpiar filtros"
           tooltipPosition="bottom"
         ></button>
@@ -87,11 +120,16 @@
 
   <div class="max-w-[1700px] mx-auto">
     <!-- Informative Notice -->
-    <div class="mb-3.5 px-4 py-2.5 rounded-xl bg-[#eddde1]/35 border border-[#762f41]/25 flex items-center gap-2.5 text-xs text-[#3b141e] shadow-2xs">
-      <i class="pi pi-info-circle text-sm text-[#762f41] shrink-0"></i>
+    <div 
+      class="mb-3.5 px-4 py-2.5 rounded-xl border flex items-center gap-2.5 text-xs shadow-2xs transition-colors"
+      [ngClass]="themeService.isDarkMode()
+        ? 'bg-[#161B22] border-[#30363D] text-[#8B949E]'
+        : 'bg-[#eddde1]/35 border-[#762f41]/25 text-[#3b141e]'"
+    >
+      <i class="pi pi-info-circle text-sm shrink-0" [ngClass]="themeService.isDarkMode() ? 'text-[#58A6FF]' : 'text-[#762f41]'"></i>
       <div class="leading-relaxed">
-        <span class="font-bold text-[#48021C]">Edición de traslados:</span>
-        Los traslados en estado <span class="font-semibold text-amber-700">Pendiente</span> pueden modificarse antes de su despacho en viaje. Traslados enviados o recibidos no admiten cambios.
+        <span class="font-bold" [ngClass]="themeService.isDarkMode() ? 'text-[#F0F6FC]' : 'text-[#48021C]'">Edición de traslados:</span>
+        Los traslados en estado <span class="font-semibold text-amber-400">Pendiente</span> pueden modificarse antes de su despacho en viaje. Traslados enviados o recibidos no admiten cambios.
       </div>
     </div>
 
@@ -107,62 +145,71 @@
       colorScheme="navy"
       emptyIcon="pi pi-truck"
       emptyMessage="No se encontraron traslados. Ajusta los filtros de búsqueda o el rango de fechas para ver registros."
+      [customClass]="themeService.isDarkMode() ? 'theme-dark' : ''"
     >
       <ng-template #header>
-        <tr class="h-11 text-xs bg-[#eddde1] border-b border-[#762f41]/40 text-[#3b141e] font-bold sticky top-0 z-10">
-          <th class="!text-center border-r border-[#762f41]/35 w-10 !px-0.5"></th>
-          <th class="!text-left !pl-3 border-r border-[#762f41]/35 text-[#3b141e]">Documento / Ruta</th>
-          <th class="!text-left !pl-3 border-r border-[#762f41]/35 w-[125px] text-[#3b141e]">Creado</th>
-          <th class="!text-left !pl-3 border-r border-[#762f41]/35 w-[125px] text-[#3b141e]">Últ. Cambio</th>
-          <th class="!text-left !pl-3 border-r border-[#762f41]/35 w-[150px] text-[#3b141e]">Registrado por</th>
-          <th class="!text-left !pl-3 border-r border-[#762f41]/35 w-[140px] text-[#3b141e]">Estado</th>
-          <th class="!text-right !pr-4 w-[220px] text-[#3b141e]">Acciones</th>
+        <tr 
+          class="h-11 text-xs border-b font-bold sticky top-0 z-10 transition-colors"
+          [ngClass]="themeService.isDarkMode() 
+            ? 'bg-[#161B22] border-[#30363D] text-[#8B949E]' 
+            : 'bg-[#eddde1] border-[#762f41]/40 text-[#3b141e]'"
+        >
+          <th class="!text-center w-10 !px-0.5" [ngClass]="themeService.isDarkMode() ? 'border-r border-[#30363D]' : 'border-r border-[#762f41]/35'"></th>
+          <th class="!text-left !pl-3" [ngClass]="themeService.isDarkMode() ? 'border-r border-[#30363D]' : 'border-r border-[#762f41]/35'">Documento / Ruta</th>
+          <th class="!text-left !pl-3 w-[125px]" [ngClass]="themeService.isDarkMode() ? 'border-r border-[#30363D]' : 'border-r border-[#762f41]/35'">Creado</th>
+          <th class="!text-left !pl-3 w-[125px]" [ngClass]="themeService.isDarkMode() ? 'border-r border-[#30363D]' : 'border-r border-[#762f41]/35'">Últ. Cambio</th>
+          <th class="!text-left !pl-3 w-[150px]" [ngClass]="themeService.isDarkMode() ? 'border-r border-[#30363D]' : 'border-r border-[#762f41]/35'">Registrado por</th>
+          <th class="!text-left !pl-3 w-[140px]" [ngClass]="themeService.isDarkMode() ? 'border-r border-[#30363D]' : 'border-r border-[#762f41]/35'">Estado</th>
+          <th class="!text-right !pr-4 w-[220px]">Acciones</th>
         </tr>
       </ng-template>
 
-      <ng-template #body let-transfer let-expanded="expanded">
+      <ng-template #body let-transfer let-expanded="expanded" let-rowIndex="rowIndex">
         <tr 
-          [ngClass]="{ 
-            'bg-[#eddde1]/25': expanded, 
-            'odd:bg-[#a65a6b]/[0.05]': !expanded
-          }"
+          [ngClass]="themeService.isDarkMode() 
+            ? (expanded ? '!bg-[#1F242C] border-[#30363D]' : (rowIndex % 2 === 1 ? '!bg-[#161B22] hover:!bg-[#1F242C] border-[#30363D]' : '!bg-[#0D1117] hover:!bg-[#1F242C] border-[#30363D]'))
+            : (expanded ? 'bg-[#eddde1]/25 border-[#762f41]/18' : (rowIndex % 2 === 1 ? 'bg-[#a65a6b]/[0.05] hover:bg-[#eddde1]/45 border-[#762f41]/18' : 'bg-white hover:bg-[#eddde1]/45 border-[#762f41]/18'))"
           (click)="toggleRowExpansion(transfer, transfersDesktopTable, $event)"
-          class="hover:!bg-[#eddde1]/45 transition-colors duration-150 border-b border-[#762f41]/18 last:border-0 text-xs cursor-pointer"
+          class="transition-colors duration-150 border-b last:border-0 text-xs cursor-pointer select-none"
         >
-          <td class="!text-center !py-2.5 border-r border-[#762f41]/18 w-10 !px-0.5">
+          <td class="!text-center !py-2.5 w-10 !px-0.5" [ngClass]="themeService.isDarkMode() ? 'border-r border-[#30363D]' : 'border-r border-[#762f41]/18'">
             <button
               type="button"
               pButton
               [icon]="expanded ? 'pi pi-chevron-down' : 'pi pi-chevron-right'"
-              class="p-button-text p-button-rounded !w-7 !h-7 !p-0 hover:!bg-[#eddde1]/60 !text-[#762f41] inline-flex items-center justify-center cursor-pointer"
+              class="p-button-text p-button-rounded !w-7 !h-7 !p-0 inline-flex items-center justify-center cursor-pointer transition-colors"
+              [ngClass]="themeService.isDarkMode() ? '!text-[#58A6FF] hover:!bg-[#30363D]' : '!text-[#762f41] hover:!bg-[#eddde1]/60'"
               (click)="toggleRowExpansion(transfer, transfersDesktopTable, $event)"
               [pTooltip]="expanded ? 'Ocultar detalles' : 'Ver productos'"
             ></button>
           </td>
-          <td class="!py-2.5 !pl-3 border-r border-[#762f41]/18 text-xs font-medium">
+          <td class="!py-2.5 !pl-3 text-xs font-medium" [ngClass]="themeService.isDarkMode() ? 'border-r border-[#30363D]' : 'border-r border-[#762f41]/18'">
             <div class="flex flex-col">
-              <span class="text-[#48021C] text-[11px] font-bold uppercase tracking-wider mb-0.5">
+              <span 
+                class="text-[11px] font-bold uppercase tracking-wider mb-0.5"
+                [ngClass]="themeService.isDarkMode() ? 'text-[#58A6FF]' : 'text-[#48021C]'"
+              >
                 {{ transfer.transferNumber }}
               </span>
-              <div class="flex items-center gap-1.5 text-slate-700 font-semibold">
+              <div class="flex items-center gap-1.5 font-semibold" [ngClass]="themeService.isDarkMode() ? 'text-[#F0F6FC]' : 'text-slate-700'">
                 <span class="truncate max-w-[130px]">{{ transfer.originBranchName }}</span>
-                <i class="pi pi-arrow-right text-[10px] text-emerald-600"></i>
+                <i class="pi pi-arrow-right text-[10px]" [ngClass]="themeService.isDarkMode() ? 'text-[#58A6FF]' : 'text-emerald-600'"></i>
                 <span class="truncate max-w-[130px]">{{ transfer.destinationBranchName }}</span>
               </div>
             </div>
           </td>
-          <td class="!py-2.5 !pl-3 text-xs font-medium text-left text-slate-600 border-r border-[#762f41]/18">
-            <div class="text-slate-700">{{ transfer.createdAt | date: 'dd/MM/yyyy' }}</div>
-            <div class="text-[10px] text-slate-400 font-normal">{{ transfer.createdAt | date: 'hh:mm a' }}</div>
+          <td class="!py-2.5 !pl-3 text-xs font-medium text-left" [ngClass]="themeService.isDarkMode() ? 'border-r border-[#30363D]' : 'border-r border-[#762f41]/18 text-slate-600'">
+            <div [ngClass]="themeService.isDarkMode() ? 'text-[#F0F6FC]' : 'text-slate-700'">{{ transfer.createdAt | date: 'dd/MM/yyyy' }}</div>
+            <div class="text-[10px] font-normal" [ngClass]="themeService.isDarkMode() ? 'text-[#8B949E]' : 'text-slate-400'">{{ transfer.createdAt | date: 'hh:mm a' }}</div>
           </td>
-          <td class="!py-2.5 !pl-3 text-xs font-medium text-left text-slate-600 border-r border-[#762f41]/18">
-            <div class="text-slate-700">{{ transfer.updatedAt | date: 'dd/MM/yyyy' }}</div>
-            <div class="text-[10px] text-slate-400 font-normal">{{ transfer.updatedAt | date: 'hh:mm a' }}</div>
+          <td class="!py-2.5 !pl-3 text-xs font-medium text-left" [ngClass]="themeService.isDarkMode() ? 'border-r border-[#30363D]' : 'border-r border-[#762f41]/18 text-slate-600'">
+            <div [ngClass]="themeService.isDarkMode() ? 'text-[#F0F6FC]' : 'text-slate-700'">{{ transfer.updatedAt | date: 'dd/MM/yyyy' }}</div>
+            <div class="text-[10px] font-normal" [ngClass]="themeService.isDarkMode() ? 'text-[#8B949E]' : 'text-slate-400'">{{ transfer.updatedAt | date: 'hh:mm a' }}</div>
           </td>
-          <td class="!py-2.5 !pl-3 text-xs font-medium border-r border-[#762f41]/18">
-            <span class="truncate max-w-[140px] text-slate-700 block font-medium">{{ transfer.createdBy || '---' }}</span>
+          <td class="!py-2.5 !pl-3 text-xs font-medium" [ngClass]="themeService.isDarkMode() ? 'border-r border-[#30363D]' : 'border-r border-[#762f41]/18'">
+            <span class="truncate max-w-[140px] block font-medium" [ngClass]="themeService.isDarkMode() ? 'text-[#F0F6FC]' : 'text-slate-700'">{{ transfer.createdBy || '---' }}</span>
           </td>
-          <td class="!py-2.5 !pl-3 border-r border-[#762f41]/18">
+          <td class="!py-2.5 !pl-3" [ngClass]="themeService.isDarkMode() ? 'border-r border-[#30363D]' : 'border-r border-[#762f41]/18'">
             <app-status-badge
               [severity]="getSeverity(transfer.status)"
               [value]="transfer.status | transferStatus"
@@ -176,7 +223,10 @@
                 <button
                   type="button"
                   (click)="editTransfer(transfer)"
-                  class="px-2 py-1 rounded-md text-[11px] font-semibold inline-flex items-center gap-1 border border-amber-600/45 bg-amber-500/[0.08] text-amber-700 hover:bg-amber-500/[0.18] hover:border-amber-600/85 hover:text-amber-800 transition-all cursor-pointer shadow-2xs active:scale-95"
+                  class="px-2 py-1 rounded-md text-[11px] font-semibold inline-flex items-center gap-1 border transition-all cursor-pointer shadow-2xs active:scale-95"
+                  [ngClass]="themeService.isDarkMode() 
+                    ? 'border-amber-800/60 bg-amber-950/30 text-amber-300 hover:bg-amber-900/40 hover:border-amber-600' 
+                    : 'border-amber-600/45 bg-amber-500/[0.08] text-amber-700 hover:bg-amber-500/[0.18] hover:border-amber-600/85 hover:text-amber-800'"
                 >
                   <i class="pi pi-pencil text-[9px]"></i>
                   <span>Editar</span>
@@ -186,7 +236,10 @@
                 <button
                   type="button"
                   (click)="openReceiveTransfer(transfer)"
-                  class="px-2 py-1 rounded-md text-[11px] font-semibold inline-flex items-center gap-1 border border-emerald-500/45 bg-emerald-500/[0.08] text-emerald-600 hover:bg-emerald-500/[0.18] hover:border-emerald-500/85 hover:text-emerald-700 transition-all cursor-pointer shadow-2xs active:scale-95"
+                  class="px-2 py-1 rounded-md text-[11px] font-semibold inline-flex items-center gap-1 border transition-all cursor-pointer shadow-2xs active:scale-95"
+                  [ngClass]="themeService.isDarkMode() 
+                    ? 'border-emerald-800/60 bg-emerald-950/30 text-emerald-300 hover:bg-emerald-900/40 hover:border-emerald-600' 
+                    : 'border-emerald-500/45 bg-emerald-500/[0.08] text-emerald-600 hover:bg-emerald-500/[0.18] hover:border-emerald-500/85 hover:text-emerald-700'"
                 >
                   <i class="pi pi-check text-[9px]"></i>
                   <span>Recibir</span>
@@ -196,7 +249,10 @@
                 <button
                   type="button"
                   (click)="confirmStatusChange(transfer, 'CANCELLED')"
-                  class="px-2 py-1 rounded-md text-[11px] font-semibold inline-flex items-center gap-1 border border-rose-500/45 bg-rose-500/[0.08] text-rose-600 hover:bg-rose-500/[0.18] hover:border-rose-500/85 hover:text-rose-700 transition-all cursor-pointer shadow-2xs active:scale-95"
+                  class="px-2 py-1 rounded-md text-[11px] font-semibold inline-flex items-center gap-1 border transition-all cursor-pointer shadow-2xs active:scale-95"
+                  [ngClass]="themeService.isDarkMode() 
+                    ? 'border-rose-800/60 bg-rose-950/30 text-rose-300 hover:bg-rose-900/40 hover:border-rose-600' 
+                    : 'border-rose-500/45 bg-rose-500/[0.08] text-rose-600 hover:bg-rose-500/[0.18] hover:border-rose-500/85 hover:text-rose-700'"
                 >
                   <i class="pi pi-trash text-[9px]"></i>
                   <span>Anular</span>
@@ -210,49 +266,82 @@
       <!-- Expanded Row Details -->
       <ng-template #expandedrow let-transfer>
         <tr>
-          <td colspan="7" class="!p-0 border-b border-[#7c5aac]/25 bg-transparent">
-            <div class="px-4 sm:px-7 py-4 bg-[#7c5aac]/[0.06] border-l-4 border-[#7c5aac]">
+          <td colspan="7" class="!p-0 border-b bg-transparent" [ngClass]="themeService.isDarkMode() ? 'border-[#30363D]' : 'border-[#7c5aac]/25'">
+            <div 
+              class="px-4 sm:px-7 py-4 border-l-4 transition-colors"
+              [ngClass]="themeService.isDarkMode() 
+                ? 'bg-[#0D1117]/80 border-[#58A6FF]' 
+                : 'bg-[#7c5aac]/[0.06] border-[#7c5aac]'"
+            >
               <div class="flex flex-col lg:grid lg:grid-cols-12 gap-4 max-w-[1500px] mx-auto">
                 
                 <!-- Tabla de Productos (8 cols) -->
                 <div class="w-full lg:col-span-8 flex flex-col gap-2.5">
-                  <div class="bg-white rounded-xl border border-[#7c5aac]/35 shadow-2xs overflow-hidden flex flex-col">
+                  <div 
+                    class="rounded-xl border shadow-2xs overflow-hidden flex flex-col transition-colors"
+                    [ngClass]="themeService.isDarkMode() ? 'bg-[#161B22] border-[#30363D]' : 'bg-white border-[#7c5aac]/35'"
+                  >
                     <!-- Scrollable Table Container -->
                     <div class="max-h-[340px] overflow-y-auto overflow-x-auto">
                       <table class="w-full text-left text-xs border-collapse">
-                        <thead class="sticky top-0 bg-[#7c5aac]/15 text-[#48021C] border-b border-[#7c5aac]/30 z-10">
-                          <tr class="h-9 text-[11.5px] font-bold">
-                            <th class="px-3.5 py-2 text-left border-r border-[#7c5aac]/20 w-[110px]">SKU</th>
-                            <th class="px-3.5 py-2 text-left border-r border-[#7c5aac]/20 max-w-[220px]">Producto</th>
-                            <th class="px-3.5 py-2 text-right border-r border-[#7c5aac]/20 w-[105px]">Precio Unit.</th>
-                            <th class="px-3.5 py-2 text-right border-r border-[#7c5aac]/20 w-[105px]">Cantidad</th>
+                        <thead 
+                          class="sticky top-0 border-b z-10 font-bold"
+                          [ngClass]="themeService.isDarkMode() 
+                            ? 'bg-[#1C2128] text-[#8B949E] border-[#30363D]' 
+                            : 'bg-[#7c5aac]/15 text-[#48021C] border-[#7c5aac]/30'"
+                        >
+                          <tr class="h-9 text-[11.5px]">
+                            <th class="px-3.5 py-2 text-left w-[110px]" [ngClass]="themeService.isDarkMode() ? 'border-r border-[#30363D]' : 'border-r border-[#7c5aac]/20'">SKU</th>
+                            <th class="px-3.5 py-2 text-left max-w-[220px]" [ngClass]="themeService.isDarkMode() ? 'border-r border-[#30363D]' : 'border-r border-[#7c5aac]/20'">Producto</th>
+                            <th class="px-3.5 py-2 text-right w-[105px]" [ngClass]="themeService.isDarkMode() ? 'border-r border-[#30363D]' : 'border-r border-[#7c5aac]/20'">Precio Unit.</th>
+                            <th class="px-3.5 py-2 text-right w-[105px]" [ngClass]="themeService.isDarkMode() ? 'border-r border-[#30363D]' : 'border-r border-[#7c5aac]/20'">Cantidad</th>
                             <th class="px-4 py-2 text-right w-[140px]">Subtotal</th>
                           </tr>
                         </thead>
-                        <tbody class="divide-y divide-[#7c5aac]/15 bg-white">
+                        <tbody class="divide-y" [ngClass]="themeService.isDarkMode() ? 'divide-[#30363D] bg-[#161B22]' : 'divide-[#7c5aac]/15 bg-white'">
                           @for (item of transfer.items; track item.productId || $index) {
-                            <tr class="hover:bg-[#7c5aac]/[0.08] transition-colors border-b border-[#7c5aac]/15 text-xs">
-                              <td class="px-3.5 py-2.5 border-r border-[#7c5aac]/15">
-                                <span class="px-1.5 py-0.5 bg-[#7c5aac]/15 text-[#7c5aac] rounded text-[10.5px] font-bold border border-[#7c5aac]/30">
+                            <tr 
+                              class="transition-colors border-b text-xs"
+                              [ngClass]="themeService.isDarkMode() ? 'hover:bg-[#1F242C] border-[#30363D]' : 'hover:bg-[#7c5aac]/[0.08] border-[#7c5aac]/15'"
+                            >
+                              <td class="px-3.5 py-2.5" [ngClass]="themeService.isDarkMode() ? 'border-r border-[#30363D]' : 'border-r border-[#7c5aac]/15'">
+                                <span 
+                                  class="px-1.5 py-0.5 rounded text-[10.5px] font-bold border"
+                                  [ngClass]="themeService.isDarkMode() 
+                                    ? 'bg-[#1C2D42] text-[#58A6FF] border-[#58A6FF]/30' 
+                                    : 'bg-[#7c5aac]/15 text-[#7c5aac] border-[#7c5aac]/30'"
+                                >
                                   {{ item.sku || '---' }}
                                 </span>
                               </td>
-                              <td class="px-3.5 py-2.5 border-r border-[#7c5aac]/15 font-semibold text-slate-800 break-words max-w-[220px]">
+                              <td 
+                                class="px-3.5 py-2.5 font-semibold break-words max-w-[220px]"
+                                [ngClass]="themeService.isDarkMode() ? 'border-r border-[#30363D] text-[#F0F6FC]' : 'border-r border-[#7c5aac]/15 text-slate-800'"
+                              >
                                 {{ item.productName }}
                               </td>
-                              <td class="px-3.5 py-2.5 text-right border-r border-[#7c5aac]/15 font-medium text-slate-600 tabular-nums">
+                              <td 
+                                class="px-3.5 py-2.5 text-right font-medium tabular-nums"
+                                [ngClass]="themeService.isDarkMode() ? 'border-r border-[#30363D] text-[#8B949E]' : 'border-r border-[#7c5aac]/15 text-slate-600'"
+                              >
                                 {{ item.price | currency: 'Q ' : 'symbol' : '1.2-2' }}
                               </td>
-                              <td class="px-3.5 py-2.5 text-right border-r border-[#7c5aac]/15 font-bold text-slate-800 tabular-nums">
+                              <td 
+                                class="px-3.5 py-2.5 text-right font-bold tabular-nums"
+                                [ngClass]="themeService.isDarkMode() ? 'border-r border-[#30363D] text-[#F0F6FC]' : 'border-r border-[#7c5aac]/15 text-slate-800'"
+                              >
                                 {{ item.quantity }} {{ item.unitAbbreviation || '' }}
                               </td>
-                              <td class="px-4 py-2.5 text-right font-bold text-[#48021C] tabular-nums">
+                              <td 
+                                class="px-4 py-2.5 text-right font-bold tabular-nums"
+                                [ngClass]="themeService.isDarkMode() ? 'text-[#58A6FF]' : 'text-[#48021C]'"
+                              >
                                 {{ item.subtotal | currency: 'Q ' : 'symbol' : '1.2-2' }}
                               </td>
                             </tr>
                           } @empty {
                             <tr>
-                              <td colspan="5" class="px-4 py-6 text-center text-xs text-slate-400">
+                              <td colspan="5" class="px-4 py-6 text-center text-xs" [ngClass]="themeService.isDarkMode() ? 'text-[#8B949E]' : 'text-slate-400'">
                                 No hay productos registrados en este traslado.
                               </td>
                             </tr>
@@ -262,15 +351,18 @@
                     </div>
 
                     <!-- Footer Summary -->
-                    <div class="bg-[#7c5aac]/10 border-t border-[#7c5aac]/30 p-2.5 px-5 flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2">
-                      <div class="flex items-center gap-3 text-[11px] text-slate-700">
-                        <span>Líneas: <strong class="text-slate-900 font-bold">{{ transfer.items?.length || 0 }}</strong></span>
+                    <div 
+                      class="border-t p-2.5 px-5 flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2 transition-colors"
+                      [ngClass]="themeService.isDarkMode() ? 'bg-[#1C2128] border-[#30363D]' : 'bg-[#7c5aac]/10 border-[#7c5aac]/30'"
+                    >
+                      <div class="flex items-center gap-3 text-[11px]" [ngClass]="themeService.isDarkMode() ? 'text-[#8B949E]' : 'text-slate-700'">
+                        <span>Líneas: <strong [ngClass]="themeService.isDarkMode() ? 'text-[#F0F6FC]' : 'text-slate-900'">{{ transfer.items?.length || 0 }}</strong></span>
                         <span>•</span>
-                        <span>Total Piezas: <strong class="text-slate-900 font-bold">{{ getTotalUnits(transfer) }}</strong></span>
+                        <span>Total Piezas: <strong [ngClass]="themeService.isDarkMode() ? 'text-[#F0F6FC]' : 'text-slate-900'">{{ getTotalUnits(transfer) }}</strong></span>
                       </div>
                       <div class="flex items-center justify-between sm:justify-end gap-2">
-                        <span class="text-xs font-medium text-[#48021C]">Total del Traslado:</span>
-                        <span class="text-xs font-bold text-[#48021C] tabular-nums">
+                        <span class="text-xs font-medium" [ngClass]="themeService.isDarkMode() ? 'text-[#8B949E]' : 'text-[#48021C]'">Total del Traslado:</span>
+                        <span class="text-xs font-bold tabular-nums" [ngClass]="themeService.isDarkMode() ? 'text-[#58A6FF]' : 'text-[#48021C]'">
                           {{ transfer.totalValue | currency: 'Q ' : 'symbol' : '1.2-2' }}
                         </span>
                       </div>
@@ -282,42 +374,54 @@
                 <div class="w-full lg:col-span-4 flex flex-col gap-3">
                   
                   <!-- Panel de Ruta -->
-                  <div class="bg-white rounded-xl border border-[#7c5aac]/35 shadow-2xs p-3.5 flex flex-col gap-2.5">
-                    <span class="text-xs font-bold text-[#48021C]">
+                  <div 
+                    class="rounded-xl border shadow-2xs p-3.5 flex flex-col gap-2.5 transition-colors"
+                    [ngClass]="themeService.isDarkMode() ? 'bg-[#161B22] border-[#30363D]' : 'bg-white border-[#7c5aac]/35'"
+                  >
+                    <span class="text-xs font-bold" [ngClass]="themeService.isDarkMode() ? 'text-[#F0F6FC]' : 'text-[#48021C]'">
                       Trazabilidad de Ruta
                     </span>
 
-                    <div class="bg-[#7c5aac]/10 rounded-lg p-2.5 border border-[#7c5aac]/25 flex flex-col gap-1.5 text-xs">
+                    <div 
+                      class="rounded-lg p-2.5 border flex flex-col gap-1.5 text-xs transition-colors"
+                      [ngClass]="themeService.isDarkMode() ? 'bg-[#0D1117] border-[#30363D]' : 'bg-[#7c5aac]/10 border-[#7c5aac]/25'"
+                    >
                       <div class="flex items-center justify-between">
-                        <span class="text-slate-700 font-semibold">Origen:</span>
-                        <span class="text-slate-950 font-bold truncate max-w-[170px]">{{ transfer.originBranchName }}</span>
+                        <span [ngClass]="themeService.isDarkMode() ? 'text-[#8B949E]' : 'text-slate-700'" class="font-semibold">Origen:</span>
+                        <span [ngClass]="themeService.isDarkMode() ? 'text-[#F0F6FC]' : 'text-slate-950'" class="font-bold truncate max-w-[170px]">{{ transfer.originBranchName }}</span>
                       </div>
-                      <div class="h-px bg-[#7c5aac]/20 my-0.5"></div>
+                      <div class="h-px my-0.5" [ngClass]="themeService.isDarkMode() ? 'bg-[#30363D]' : 'bg-[#7c5aac]/20'"></div>
                       <div class="flex items-center justify-between">
-                        <span class="text-slate-700 font-semibold">Destino:</span>
-                        <span class="text-slate-950 font-bold truncate max-w-[170px]">{{ transfer.destinationBranchName }}</span>
+                        <span [ngClass]="themeService.isDarkMode() ? 'text-[#8B949E]' : 'text-slate-700'" class="font-semibold">Destino:</span>
+                        <span [ngClass]="themeService.isDarkMode() ? 'text-[#F0F6FC]' : 'text-slate-950'" class="font-bold truncate max-w-[170px]">{{ transfer.destinationBranchName }}</span>
                       </div>
                     </div>
 
-                    <div class="flex flex-col gap-1 text-[11.5px] pt-1 border-t border-slate-100">
+                    <div class="flex flex-col gap-1 text-[11.5px] pt-1 border-t" [ngClass]="themeService.isDarkMode() ? 'border-[#30363D]' : 'border-slate-100'">
                       <div class="flex justify-between items-center">
-                        <span class="text-slate-700 font-semibold">Registrado por:</span>
-                        <strong class="text-slate-900 font-bold truncate max-w-[150px]">{{ transfer.createdBy || 'Sistema' }}</strong>
+                        <span [ngClass]="themeService.isDarkMode() ? 'text-[#8B949E]' : 'text-slate-700'" class="font-semibold">Registrado por:</span>
+                        <strong [ngClass]="themeService.isDarkMode() ? 'text-[#F0F6FC]' : 'text-slate-900'" class="font-bold truncate max-w-[150px]">{{ transfer.createdBy || 'Sistema' }}</strong>
                       </div>
                       <div class="flex justify-between items-center">
-                        <span class="text-slate-700 font-semibold">Fecha y hora:</span>
-                        <span class="text-slate-900 font-semibold">{{ transfer.createdAt | date: 'dd/MM/yyyy hh:mm a' }}</span>
+                        <span [ngClass]="themeService.isDarkMode() ? 'text-[#8B949E]' : 'text-slate-700'" class="font-semibold">Fecha y hora:</span>
+                        <span [ngClass]="themeService.isDarkMode() ? 'text-[#8B949E]' : 'text-slate-900'" class="font-semibold">{{ transfer.createdAt | date: 'dd/MM/yyyy hh:mm a' }}</span>
                       </div>
                     </div>
                   </div>
 
                   <!-- Panel de Observaciones -->
-                  <div class="bg-white rounded-xl border border-[#7c5aac]/35 shadow-2xs p-3.5 flex flex-col gap-1.5">
-                    <span class="text-xs font-bold text-[#48021C]">
+                  <div 
+                    class="rounded-xl border shadow-2xs p-3.5 flex flex-col gap-1.5 transition-colors"
+                    [ngClass]="themeService.isDarkMode() ? 'bg-[#161B22] border-[#30363D]' : 'bg-white border-[#7c5aac]/35'"
+                  >
+                    <span class="text-xs font-bold" [ngClass]="themeService.isDarkMode() ? 'text-[#F0F6FC]' : 'text-[#48021C]'">
                       Observaciones
                     </span>
-                    <div class="p-2.5 bg-[#7c5aac]/10 rounded-lg border border-[#7c5aac]/25 min-h-[50px] flex items-center">
-                      <p class="text-xs leading-relaxed text-slate-700" [ngClass]="{ 'italic text-slate-400': !transfer.notes }">
+                    <div 
+                      class="p-2.5 rounded-lg border min-h-[50px] flex items-center transition-colors"
+                      [ngClass]="themeService.isDarkMode() ? 'bg-[#0D1117] border-[#30363D]' : 'bg-[#7c5aac]/10 border-[#7c5aac]/25'"
+                    >
+                      <p class="text-xs leading-relaxed" [ngClass]="themeService.isDarkMode() ? (transfer.notes ? 'text-[#F0F6FC]' : 'italic text-[#8B949E]') : (transfer.notes ? 'text-slate-700' : 'italic text-slate-400')">
                         {{ transfer.notes ? ('"' + transfer.notes + '"') : 'Sin observaciones registradas.' }}
                       </p>
                     </div>
@@ -331,17 +435,7 @@
         </tr>
       </ng-template>
 
-        <ng-template #emptymessage>
-          <tr>
-            <td colspan="7" class="text-center !py-20">
-              <div class="flex flex-col items-center justify-center gap-2">
-                <i class="pi pi-truck text-slate-300" style="font-size: 3.5rem"></i>
-                <h3 class="text-slate-700 font-bold text-base">No se encontraron traslados</h3>
-                <p class="text-slate-400 text-xs">Ajusta los filtros de búsqueda o el rango de fechas para ver registros.</p>
-              </div>
-            </td>
-          </tr>
-        </ng-template>
+
     </app-standard-table>
   </div>
 </div>
@@ -354,20 +448,20 @@
   [draggable]="false"
   [resizable]="false"
   (onHide)="closeReceiveModal()"
-  styleClass="!rounded-2xl shadow-2xl"
+  [styleClass]="themeService.isDarkMode() ? '!rounded-2xl shadow-2xl bg-[#161B22] border border-[#30363D] text-[#F0F6FC]' : '!rounded-2xl shadow-2xl'"
 >
   <div class="p-1 space-y-4">
     @if (receiveStep === 'quantities') {
-      <p class="text-xs text-slate-500">
+      <p class="text-xs" [ngClass]="themeService.isDarkMode() ? 'text-[#8B949E]' : 'text-slate-500'">
         Indica cuánto llegó de cada producto. No se puede recibir de más. Si falta algo, el traslado queda en discrepancia.
       </p>
     } @else {
-      <p class="text-xs text-slate-500">
+      <p class="text-xs" [ngClass]="themeService.isDarkMode() ? 'text-[#8B949E]' : 'text-slate-500'">
         Revisa las cantidades. Esta lista ya no se puede editar. Al confirmar, entra a inventario solo lo recibido.
       </p>
     }
 
-    <div class="hidden sm:grid grid-cols-[minmax(0,1fr)_6.5rem_8.5rem_6.5rem] gap-2 px-1 text-[10px] font-bold uppercase tracking-wide text-slate-500">
+    <div class="hidden sm:grid grid-cols-[minmax(0,1fr)_6.5rem_8.5rem_6.5rem] gap-2 px-1 text-[10px] font-bold uppercase tracking-wide" [ngClass]="themeService.isDarkMode() ? 'text-[#8B949E]' : 'text-slate-500'">
       <span>Producto</span>
       <span class="text-center">Enviado</span>
       <span class="text-center">Recibido</span>
@@ -376,19 +470,25 @@
 
     <div class="space-y-2 max-h-72 overflow-y-auto">
       @for (item of receiveItems; track item.transferItemId || item.productId) {
-        <div class="p-3 bg-slate-50 rounded-xl border border-slate-200 grid grid-cols-1 sm:grid-cols-[minmax(0,1fr)_6.5rem_8.5rem_6.5rem] gap-2 items-center">
+        <div 
+          class="p-3 rounded-xl border grid grid-cols-1 sm:grid-cols-[minmax(0,1fr)_6.5rem_8.5rem_6.5rem] gap-2 items-center transition-colors"
+          [ngClass]="themeService.isDarkMode() ? 'bg-[#0D1117] border-[#30363D]' : 'bg-slate-50 border-slate-200'"
+        >
           <div class="min-w-0">
-            <span class="text-xs font-bold text-slate-800 block truncate">{{ item.name }}</span>
-            <span class="text-[10px] text-slate-500 font-mono">SKU: {{ item.sku }}</span>
+            <span class="text-xs font-bold block truncate" [ngClass]="themeService.isDarkMode() ? 'text-[#F0F6FC]' : 'text-slate-800'">{{ item.name }}</span>
+            <span class="text-[10px] font-mono" [ngClass]="themeService.isDarkMode() ? 'text-[#8B949E]' : 'text-slate-500'">SKU: {{ item.sku }}</span>
           </div>
           <div class="text-left sm:text-center">
-            <span class="sm:hidden text-[10px] font-bold uppercase text-slate-400">Enviado</span>
-            <p class="text-xs font-bold text-slate-700 m-0">{{ qtyLabel(item.requestedQuantity, item.unit) }}</p>
+            <span class="sm:hidden text-[10px] font-bold uppercase" [ngClass]="themeService.isDarkMode() ? 'text-[#8B949E]' : 'text-slate-400'">Enviado</span>
+            <p class="text-xs font-bold m-0" [ngClass]="themeService.isDarkMode() ? 'text-[#F0F6FC]' : 'text-slate-700'">{{ qtyLabel(item.requestedQuantity, item.unit) }}</p>
           </div>
           @if (receiveStep === 'quantities') {
             <div>
-              <label class="sm:hidden text-[10px] font-bold uppercase text-slate-400">Recibido</label>
-              <div class="flex items-stretch rounded-lg border border-slate-300 bg-white overflow-hidden">
+              <label class="sm:hidden text-[10px] font-bold uppercase" [ngClass]="themeService.isDarkMode() ? 'text-[#8B949E]' : 'text-slate-400'">Recibido</label>
+              <div 
+                class="flex items-stretch rounded-lg border overflow-hidden transition-all"
+                [ngClass]="themeService.isDarkMode() ? 'border-[#30363D] bg-[#161B22]' : 'border-slate-300 bg-white'"
+              >
                 <p-inputNumber
                   [(ngModel)]="item.receivedQuantity"
                   [min]="0"
@@ -397,25 +497,34 @@
                   [minFractionDigits]="item.allowsDecimals ? 2 : 0"
                   [maxFractionDigits]="item.allowsDecimals ? 2 : 0"
                   [showButtons]="false"
-                  inputStyleClass="!w-full !text-center !text-xs !h-9 !border-0 !rounded-none"
+                  [inputStyleClass]="themeService.isDarkMode() 
+                    ? '!w-full !text-center !text-xs !h-9 !border-0 !rounded-none !bg-[#161B22] !text-[#F0F6FC]' 
+                    : '!w-full !text-center !text-xs !h-9 !border-0 !rounded-none'"
                 ></p-inputNumber>
                 @if (item.unit) {
-                  <span class="shrink-0 px-2 inline-flex items-center text-[10px] font-extrabold text-slate-600 bg-slate-100 border-l border-slate-200">{{ item.unit }}</span>
+                  <span 
+                    class="shrink-0 px-2 inline-flex items-center text-[10px] font-extrabold border-l"
+                    [ngClass]="themeService.isDarkMode() ? 'bg-[#1C2128] border-[#30363D] text-[#58A6FF]' : 'text-slate-600 bg-slate-100 border-slate-200'"
+                  >
+                    {{ item.unit }}
+                  </span>
                 }
               </div>
             </div>
           } @else {
             <div class="text-left sm:text-center">
-              <span class="sm:hidden text-[10px] font-bold uppercase text-slate-400">Recibido</span>
-              <p class="text-xs font-bold text-slate-800 m-0">{{ qtyLabel(item.receivedQuantity, item.unit) }}</p>
+              <span class="sm:hidden text-[10px] font-bold uppercase" [ngClass]="themeService.isDarkMode() ? 'text-[#8B949E]' : 'text-slate-400'">Recibido</span>
+              <p class="text-xs font-bold m-0" [ngClass]="themeService.isDarkMode() ? 'text-[#58A6FF]' : 'text-slate-800'">{{ qtyLabel(item.receivedQuantity, item.unit) }}</p>
             </div>
           }
           <div class="text-left sm:text-center">
-            <span class="sm:hidden text-[10px] font-bold uppercase text-slate-400">Faltante</span>
+            <span class="sm:hidden text-[10px] font-bold uppercase" [ngClass]="themeService.isDarkMode() ? 'text-[#8B949E]' : 'text-slate-400'">Faltante</span>
             <p
               class="text-xs font-bold m-0"
-              [class.text-amber-700]="missingQty(item) > 0"
-              [class.text-emerald-700]="missingQty(item) === 0"
+              [class.text-amber-400]="missingQty(item) > 0 && themeService.isDarkMode()"
+              [class.text-amber-700]="missingQty(item) > 0 && !themeService.isDarkMode()"
+              [class.text-emerald-400]="missingQty(item) === 0 && themeService.isDarkMode()"
+              [class.text-emerald-700]="missingQty(item) === 0 && !themeService.isDarkMode()"
             >
               {{ qtyLabel(missingQty(item), item.unit) }}
             </p>
@@ -426,25 +535,29 @@
 
     @if (receiveStep === 'quantities') {
       <div>
-        <label class="text-xs font-semibold text-slate-700 block mb-1">Notas</label>
+        <label class="text-xs font-semibold block mb-1" [ngClass]="themeService.isDarkMode() ? 'text-[#F0F6FC]' : 'text-slate-700'">Notas</label>
         <textarea
           pTextarea
           [(ngModel)]="receiveNotes"
           rows="2"
           [placeholder]="hasReceiveShortage() ? 'Indica qué faltó o llegó dañado' : 'Opcional'"
-          class="!w-full !rounded-xl !border-slate-300 text-xs"
+          class="!w-full !rounded-xl text-xs"
+          [ngClass]="themeService.isDarkMode() ? '!bg-[#0D1117] !text-[#F0F6FC] !border-[#30363D]' : '!border-slate-300'"
         ></textarea>
       </div>
     } @else if (receiveNotes.trim()) {
-      <div class="p-3 rounded-xl bg-slate-50 border border-slate-200">
-        <p class="text-[10px] font-bold uppercase tracking-wide text-slate-500 m-0 mb-1">Notas</p>
-        <p class="text-xs text-slate-700 m-0 whitespace-pre-wrap">{{ receiveNotes }}</p>
+      <div 
+        class="p-3 rounded-xl border"
+        [ngClass]="themeService.isDarkMode() ? 'bg-[#0D1117] border-[#30363D]' : 'bg-slate-50 border-slate-200'"
+      >
+        <p class="text-[10px] font-bold uppercase tracking-wide m-0 mb-1" [ngClass]="themeService.isDarkMode() ? 'text-[#8B949E]' : 'text-slate-500'">Notas</p>
+        <p class="text-xs m-0 whitespace-pre-wrap" [ngClass]="themeService.isDarkMode() ? 'text-[#F0F6FC]' : 'text-slate-700'">{{ receiveNotes }}</p>
       </div>
     }
   </div>
 
   <ng-template #footer>
-    <div class="flex items-center justify-end gap-2 pt-2 border-t border-slate-100">
+    <div class="flex items-center justify-end gap-2 pt-2 border-t" [ngClass]="themeService.isDarkMode() ? 'border-[#30363D]' : 'border-slate-100'">
       @if (receiveStep === 'quantities') {
         <p-button
           label="Cancelar"

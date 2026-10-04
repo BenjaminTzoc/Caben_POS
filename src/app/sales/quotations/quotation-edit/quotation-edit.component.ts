@@ -1,4 +1,4 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, computed, effect } from '@angular/core';
 import { CommonModule, CurrencyPipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -19,6 +19,7 @@ import { ICustomer } from '../../interfaces/customer.interface';
 import { Product } from '../../../inventory/interfaces/product.interface';
 import { CreateQuotationDto } from '../../interfaces/quotation.interface';
 import { environment } from '../../../../environments/environment';
+import { BranchContextService } from '../../../core/services/branch-context.service';
 
 // PrimeNG
 import { ButtonModule } from 'primeng/button';
@@ -32,6 +33,7 @@ import { InputGroupModule } from 'primeng/inputgroup';
 import { InputGroupAddonModule } from 'primeng/inputgroupaddon';
 import { ToggleSwitchModule } from 'primeng/toggleswitch';
 import { TextareaModule } from 'primeng/textarea';
+import { ThemeService } from '../../../core/services/theme.service';
 
 export type { QuotationItem };
 
@@ -64,6 +66,8 @@ export type { QuotationItem };
   styleUrl: './quotation-edit.component.css'
 })
 export class QuotationEditComponent implements OnInit {
+  public themeService = inject(ThemeService);
+  public branchContext = inject(BranchContextService);
   private router = inject(Router);
   private route = inject(ActivatedRoute);
   private branchesService = inject(BranchesService);
@@ -72,6 +76,13 @@ export class QuotationEditComponent implements OnInit {
   private productsService = inject(ProductsService);
   private quotationsService = inject(QuotationsService);
   private messageService = inject(MessageService);
+
+  readonly isConsolidatedMode = computed(() => this.branchContext.isGlobalView);
+  readonly activeWorkingBranch = computed(() => this.branchContext.currentBranch());
+
+  get hasActiveWorkingBranch(): boolean {
+    return !this.branchContext.isGlobalView && !!this.branchContext.currentBranch()?.id;
+  }
 
   isEditMode = false;
   correlative = '';
@@ -105,6 +116,23 @@ export class QuotationEditComponent implements OnInit {
   pendingBranchId: string | null = null;
 
   items: QuotationItem[] = [];
+
+  constructor() {
+    effect(() => {
+      const workingBranch = this.activeWorkingBranch();
+      const isGlobal = this.isConsolidatedMode();
+
+      if (!this.isEditMode) {
+        if (!isGlobal && workingBranch?.id) {
+          if (this.selectedBranchId !== workingBranch.id) {
+            this.selectedBranchId = workingBranch.id;
+            this.previousBranchId = workingBranch.id;
+            this.loadProducts(workingBranch.id);
+          }
+        }
+      }
+    });
+  }
 
   getItemDiscountAmount(item: QuotationItem): number {
     const gross = (item.quantity || 0) * (item.price || 0);
@@ -149,6 +177,13 @@ export class QuotationEditComponent implements OnInit {
     if (id) {
       this.isEditMode = true;
       this.loadQuotation(id);
+    } else if (this.hasActiveWorkingBranch) {
+      const workingBranch = this.branchContext.currentBranch();
+      if (workingBranch?.id) {
+        this.selectedBranchId = workingBranch.id;
+        this.previousBranchId = workingBranch.id;
+        this.loadProducts(workingBranch.id);
+      }
     }
     this.loadBranches();
     this.loadCustomers();
@@ -159,7 +194,16 @@ export class QuotationEditComponent implements OnInit {
     this.branchesService.getBranches().subscribe({
       next: (res) => {
         this.branches = res.data || [];
-        if (!this.isEditMode && !this.selectedBranchId && this.branches.length > 0) {
+        if (!this.isEditMode && this.hasActiveWorkingBranch) {
+          const workingBranch = this.branchContext.currentBranch();
+          if (workingBranch?.id) {
+            this.selectedBranchId = workingBranch.id;
+            this.previousBranchId = workingBranch.id;
+            if (this.products.length === 0) {
+              this.loadProducts(workingBranch.id);
+            }
+          }
+        } else if (!this.isEditMode && !this.selectedBranchId && this.branches.length > 0) {
           const plantBranch = this.branches.find(b => b.isPlant);
           this.selectedBranchId = plantBranch ? plantBranch.id : this.branches[0].id;
           this.previousBranchId = this.selectedBranchId;
@@ -286,6 +330,15 @@ export class QuotationEditComponent implements OnInit {
   }
 
   onBranchChange(branchId: string | null): void {
+    if (!this.isEditMode && this.hasActiveWorkingBranch) {
+      const workingBranch = this.branchContext.currentBranch();
+      if (workingBranch?.id && branchId !== workingBranch.id) {
+        this.selectedBranchId = workingBranch.id;
+        this.previousBranchId = workingBranch.id;
+      }
+      return;
+    }
+
     if (this.items.length > 0 && branchId !== this.previousBranchId) {
       this.pendingBranchId = branchId;
       this.showBranchChangeConfirmModal = true;

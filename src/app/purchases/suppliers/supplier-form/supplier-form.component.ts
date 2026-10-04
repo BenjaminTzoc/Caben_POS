@@ -11,6 +11,11 @@ import { Supplier } from '../../interfaces/supplier.interface';
 import { InputMaskModule } from 'primeng/inputmask';
 import { CommonModule } from '@angular/common';
 
+import { ThemeService } from '../../../core/services/theme.service';
+import { PageHeaderComponent } from '../../../shared/components/page-header/page-header.component';
+import { PrimaryButtonComponent } from '../../../shared/components/primary-button/primary-button.component';
+import { SecondaryButtonComponent } from '../../../shared/components/secondary-button/secondary-button.component';
+
 @Component({
   selector: 'app-supplier-form',
   standalone: true,
@@ -21,11 +26,15 @@ import { CommonModule } from '@angular/common';
     TextareaModule,
     InputMaskModule,
     CommonModule,
+    PageHeaderComponent,
+    PrimaryButtonComponent,
+    SecondaryButtonComponent,
   ],
   templateUrl: './supplier-form.component.html',
   styleUrl: './supplier-form.component.css',
 })
 export class SupplierFormComponent implements OnInit {
+  public themeService = inject(ThemeService);
   private fb = inject(FormBuilder);
   private confirmService = inject(ConfirmService);
   private router = inject(Router);

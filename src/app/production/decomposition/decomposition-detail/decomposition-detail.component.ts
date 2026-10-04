@@ -1,33 +1,38 @@
 import { Component, inject, OnInit, signal } from '@angular/core';
-import { CommonModule, CurrencyPipe, DatePipe } from '@angular/common';
+import { CommonModule, CurrencyPipe, DatePipe, DecimalPipe } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ButtonModule } from 'primeng/button';
-import { CardModule } from 'primeng/card';
 import { TableModule } from 'primeng/table';
 import { TagModule } from 'primeng/tag';
-import { DividerModule } from 'primeng/divider';
 import { MessageService } from 'primeng/api';
-
 import { environment } from '../../../../environments/environment';
-
 import { DecompositionService } from '../../services/decomposition.service';
 import { IDecompositionResponse } from '../../interfaces/decomposition.interface';
+import { ThemeService } from '../../../core/services/theme.service';
+import { PageHeaderComponent } from '../../../shared/components/page-header/page-header.component';
+import { PrimaryButtonComponent } from '../../../shared/components/primary-button/primary-button.component';
+import { SecondaryButtonComponent } from '../../../shared/components/secondary-button/secondary-button.component';
+import { StatusBadgeComponent } from '../../../shared/components/status-badge/status-badge.component';
 
 @Component({
   selector: 'app-decomposition-detail',
   standalone: true,
   imports: [
     CommonModule,
+    CurrencyPipe,
+    DatePipe,
+    DecimalPipe,
     ButtonModule,
-    CardModule,
     TableModule,
     TagModule,
-    DividerModule,
-    CurrencyPipe
+    PageHeaderComponent,
+    PrimaryButtonComponent,
+    SecondaryButtonComponent,
   ],
-  templateUrl: './decomposition-detail.component.html'
+  templateUrl: './decomposition-detail.component.html',
 })
 export class DecompositionDetailComponent implements OnInit {
+  public themeService = inject(ThemeService);
   private route = inject(ActivatedRoute);
   private router = inject(Router);
   private decompositionService = inject(DecompositionService);
@@ -54,15 +59,15 @@ export class DecompositionDetailComponent implements OnInit {
         }
         this.loading.set(false);
       },
-      error: (err) => {
+      error: () => {
         this.messageService.add({
           severity: 'error',
           summary: 'Error',
-          detail: 'No se pudo cargar el detalle del despiece'
+          detail: 'No se pudo cargar el detalle del despiece',
         });
         this.loading.set(false);
         this.router.navigate(['/production/decomposition']);
-      }
+      },
     });
   }
 
@@ -77,7 +82,7 @@ export class DecompositionDetailComponent implements OnInit {
   getYieldPercentage(): number {
     const decomp = this.decomposition();
     if (!decomp || decomp.inputQuantity <= 0) return 0;
-    const outputWeight = decomp.items.reduce((acc, item) => acc + item.quantity, 0);
+    const outputWeight = (decomp.items || []).reduce((acc, item) => acc + item.quantity, 0);
     return (outputWeight / decomp.inputQuantity) * 100;
   }
 

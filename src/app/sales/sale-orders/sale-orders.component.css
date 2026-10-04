@@ -15,6 +15,12 @@
   background: #fff;
   border: 1px solid rgb(72 2 28 / 0.2);
   border-radius: 0.75rem;
+  transition: background-color 0.2s, border-color 0.2s;
+}
+
+:host-context(.dark) .folder-bar {
+  background: #161B22;
+  border-color: #30363D;
 }
 
 .folder-bar-label {
@@ -24,6 +30,10 @@
   letter-spacing: 0.06em;
   text-transform: uppercase;
   color: #48021C;
+}
+
+:host-context(.dark) .folder-bar-label {
+  color: #58A6FF;
 }
 
 .folder-strip {
@@ -52,10 +62,23 @@
   font-size: 11px;
   font-weight: 700;
   white-space: nowrap;
+  transition: all 0.15s;
 }
 
 .folder-add:hover {
   background: rgb(159 101 135 / 0.15);
+}
+
+:host-context(.dark) .folder-add {
+  background: #1C2128;
+  border-color: #30363D;
+  color: #F0F6FC;
+}
+
+:host-context(.dark) .folder-add:hover {
+  background: #30363D;
+  border-color: #58A6FF;
+  color: #58A6FF;
 }
 
 .folder-item-wrap {
@@ -76,6 +99,7 @@
   cursor: pointer;
   text-align: left;
   white-space: nowrap;
+  transition: all 0.15s;
 }
 
 .folder-item:hover,
@@ -88,6 +112,25 @@
   background: rgb(72 2 28 / 0.08);
   border-color: rgb(72 2 28 / 0.2);
   color: #48021C;
+}
+
+:host-context(.dark) .folder-item {
+  background: #0D1117;
+  border-color: #30363D;
+  color: #8B949E;
+}
+
+:host-context(.dark) .folder-item:hover,
+:host-context(.dark) .folder-item-wrap.cdk-drop-list-dragging .folder-item,
+:host-context(.dark) .folder-item-wrap.cdk-drop-list-receiving .folder-item {
+  background: #1C2128;
+  color: #F0F6FC;
+}
+
+:host-context(.dark) .folder-item.is-active {
+  background: #1C2D42;
+  border-color: #58A6FF;
+  color: #58A6FF;
 }
 
 .folder-dot {
@@ -103,6 +146,10 @@
   gap: 0.35rem;
   color: #9f6587;
   font-size: 10px;
+}
+
+:host-context(.dark) .folder-actions {
+  color: #8B949E;
 }
 
 .folder-item:hover .folder-actions {
@@ -140,6 +187,14 @@
   background: #64748b;
 }
 
+:host-context(.dark) .row-drag-handle span {
+  background: #484F58;
+}
+
+:host-context(.dark) .row-drag-handle:hover span {
+  background: #58A6FF;
+}
+
 .drag-preview {
   padding: 0.4rem 0.7rem;
   border-radius: 0.5rem;
@@ -151,22 +206,11 @@
   box-shadow: 0 8px 20px rgb(15 23 42 / 0.12);
 }
 
-:host ::ng-deep .p-datatable-modern .p-datatable-thead > tr > th {
-    padding: 0.5rem 1rem;
-    font-size: 0.75rem;
+:host-context(.dark) .drag-preview {
+  background: #161B22;
+  border-color: #58A6FF;
+  color: #F0F6FC;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
 }
 
-:host ::ng-deep .p-datatable-modern .p-datatable-tbody > tr > td {
-    padding: 0.5rem 1rem;
-    transition: background-color 0.15s ease-in-out;
-}
-
-:host ::ng-deep .p-datatable-modern .p-datatable-tbody > tr {
-    cursor: pointer;
-}
-
-:host ::ng-deep .p-datatable-modern .p-datatable-tbody > tr:hover,
-:host ::ng-deep .p-datatable-modern .p-datatable-tbody > tr:hover > td {
-    background-color: #f1f5f9 !important;
-}
 

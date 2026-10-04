@@ -1,4 +1,4 @@
-<div class="py-4 px-0 md:px-6 bg-slate-50/50 min-h-screen">
+<div class="py-4 px-0 md:px-6 min-h-screen transition-colors duration-300" [ngClass]="themeService.isDarkMode() ? 'bg-[#0D1117]' : 'bg-slate-50/50'">
   <app-page-header
     title="Vehículos"
     icon="pi pi-truck"
@@ -22,7 +22,12 @@
       />
 
       <div class="flex flex-col gap-1 w-full md:w-auto">
-        <label class="text-xs font-semibold text-[#48021C]">Estado</label>
+        <label 
+          class="text-xs font-semibold transition-colors"
+          [ngClass]="themeService.isDarkMode() ? 'text-[#F0F6FC]' : 'text-[#48021C]'"
+        >
+          Estado
+        </label>
         <p-select
           [options]="statusOptions"
           [ngModel]="statusFilter()"
@@ -34,7 +39,9 @@
           appendTo="body"
           size="small"
           class="w-full md:w-auto"
-          styleClass="!rounded-lg !border-[#9f6587]/35 focus-within:!border-[#9f6587] focus-within:!ring-2 focus-within:!ring-[#9f6587]/20 w-full md:w-48 text-xs font-medium"
+          [styleClass]="themeService.isDarkMode()
+            ? '!rounded-lg !bg-[#161B22] !text-[#F0F6FC] !border-[#30363D] focus-within:!border-[#58A6FF] focus-within:!ring-2 focus-within:!ring-[#58A6FF]/20 w-full md:w-48 text-xs font-medium'
+            : '!rounded-lg !border-[#9f6587]/35 focus-within:!border-[#9f6587] focus-within:!ring-2 focus-within:!ring-[#9f6587]/20 w-full md:w-48 text-xs font-medium'"
         />
       </div>
     </ng-container>
@@ -52,57 +59,106 @@
         colorScheme="navy"
         emptyIcon="pi pi-truck"
         emptyMessage="No se encontraron vehículos. Prueba ajustando los filtros o registra uno nuevo."
+        [customClass]="themeService.isDarkMode() ? 'theme-dark' : ''"
       >
         <ng-template #header>
-          <tr class="h-11 text-xs bg-[#eddde1] border-b border-[#762f41]/40 text-[#3b141e] font-bold sticky top-0 z-10">
-            <th class="!text-left !pl-3 border-r border-[#762f41]/35 w-[140px] text-[#3b141e]">Estado</th>
-            <th class="!text-left !pl-3 border-r border-[#762f41]/35 w-[140px] text-[#3b141e]">Placa</th>
-            <th class="!text-left !pl-3 border-r border-[#762f41]/35 min-w-[180px] text-[#3b141e]">Nombre / Descripción</th>
-            <th class="!text-left !pl-3 border-r border-[#762f41]/35 w-[180px] text-[#3b141e]">Marca / Modelo</th>
-            <th class="!text-left !pl-3 border-r border-[#762f41]/35 min-w-[180px] text-[#3b141e]">Conductor asignado</th>
-            <th class="!text-right !pr-4 border-r border-[#762f41]/35 w-[130px] text-[#3b141e]">Capacidad</th>
-            <th class="!text-right !pr-4 w-[190px] text-[#3b141e]">Acciones</th>
+          <tr 
+            class="h-11 text-xs border-b font-bold sticky top-0 z-10 transition-colors"
+            [ngClass]="themeService.isDarkMode() 
+              ? 'bg-[#161B22] border-[#30363D] text-[#8B949E]' 
+              : 'bg-[#eddde1] border-[#762f41]/40 text-[#3b141e]'"
+          >
+            <th class="!text-left !pl-3 w-[140px]" [ngClass]="themeService.isDarkMode() ? 'border-r border-[#30363D]' : 'border-r border-[#762f41]/35'">Estado</th>
+            <th class="!text-left !pl-3 w-[140px]" [ngClass]="themeService.isDarkMode() ? 'border-r border-[#30363D]' : 'border-r border-[#762f41]/35'">Placa</th>
+            <th class="!text-left !pl-3 min-w-[180px]" [ngClass]="themeService.isDarkMode() ? 'border-r border-[#30363D]' : 'border-r border-[#762f41]/35'">Nombre / Descripción</th>
+            <th class="!text-left !pl-3 w-[180px]" [ngClass]="themeService.isDarkMode() ? 'border-r border-[#30363D]' : 'border-r border-[#762f41]/35'">Marca / Modelo</th>
+            <th class="!text-left !pl-3 min-w-[180px]" [ngClass]="themeService.isDarkMode() ? 'border-r border-[#30363D]' : 'border-r border-[#762f41]/35'">Conductor asignado</th>
+            <th class="!text-right !pr-4 w-[130px]" [ngClass]="themeService.isDarkMode() ? 'border-r border-[#30363D]' : 'border-r border-[#762f41]/35'">Capacidad</th>
+            <th class="!text-right !pr-4 w-[190px]">Acciones</th>
           </tr>
         </ng-template>
 
-        <ng-template #body let-truck>
-          <tr class="hover:!bg-[#eddde1]/45 transition-colors duration-150 border-b border-[#762f41]/18 last:border-0 text-xs odd:bg-[#a65a6b]/[0.05]">
-            <td class="!py-2.5 !pl-3 border-r border-[#762f41]/18 w-[140px]">
+        <ng-template #body let-truck let-rowIndex="rowIndex">
+          <tr 
+            [ngClass]="[
+              themeService.isDarkMode()
+                ? (rowIndex % 2 === 1 ? '!bg-[#161B22] hover:!bg-[#1F242C] border-[#30363D]' : '!bg-[#0D1117] hover:!bg-[#1F242C] border-[#30363D]')
+                : (rowIndex % 2 === 1 ? 'bg-[#a65a6b]/[0.05] hover:bg-[#eddde1]/45 border-[#762f41]/18' : 'bg-white hover:bg-[#eddde1]/45 border-[#762f41]/18')
+            ]"
+            class="transition-colors duration-150 border-b last:border-0 text-xs"
+          >
+            <td class="!py-2.5 !pl-3 w-[140px]" [ngClass]="themeService.isDarkMode() ? 'border-r border-[#30363D]' : 'border-r border-[#762f41]/18'">
               <app-status-badge
                 [severity]="getStatusSeverity(truck.status)"
                 [value]="getStatusLabel(truck.status)"
                 size="xs"
               />
             </td>
-            <td class="!py-2.5 !pl-3 border-r border-[#762f41]/18 w-[140px]">
-              <span class="px-1.5 py-0.5 bg-[#93c5fd]/50 text-[#172554] rounded-md text-[11px] font-bold border border-[#2563eb]/60 uppercase tracking-wide">
+            <td class="!py-2.5 !pl-3 w-[140px]" [ngClass]="themeService.isDarkMode() ? 'border-r border-[#30363D]' : 'border-r border-[#762f41]/18'">
+              <span 
+                class="px-1.5 py-0.5 rounded-md text-[11px] font-bold border uppercase tracking-wide inline-flex items-center"
+                [ngClass]="themeService.isDarkMode() 
+                  ? 'bg-[#1C2D42] text-[#58A6FF] border-[#58A6FF]/30' 
+                  : 'bg-[#93c5fd]/50 text-[#172554] border-[#2563eb]/60'"
+              >
                 {{ truck.licensePlate }}
               </span>
             </td>
-            <td class="!py-2.5 !pl-3 border-r border-[#762f41]/18">
-              <span class="font-semibold text-slate-800 leading-tight">{{ truck.name }}</span>
+            <td class="!py-2.5 !pl-3" [ngClass]="themeService.isDarkMode() ? 'border-r border-[#30363D]' : 'border-r border-[#762f41]/18'">
+              <span 
+                class="font-semibold leading-tight text-sm"
+                [ngClass]="themeService.isDarkMode() ? 'text-[#F0F6FC]' : 'text-slate-800'"
+              >
+                {{ truck.name }}
+              </span>
             </td>
-            <td class="!py-2.5 !pl-3 border-r border-[#762f41]/18">
+            <td class="!py-2.5 !pl-3" [ngClass]="themeService.isDarkMode() ? 'border-r border-[#30363D]' : 'border-r border-[#762f41]/18'">
               <div class="flex flex-col">
-                <span class="font-medium text-slate-700">
+                <span 
+                  class="font-medium"
+                  [ngClass]="themeService.isDarkMode() ? 'text-[#8B949E]' : 'text-slate-700'"
+                >
                   {{ truck.brand || '---' }}{{ truck.model ? ' • ' + truck.model : '' }}
                 </span>
                 @if (truck.year) {
-                  <span class="text-[10.5px] text-slate-500 font-medium">Año {{ truck.year }}</span>
+                  <span 
+                    class="text-[10.5px] font-medium"
+                    [ngClass]="themeService.isDarkMode() ? 'text-slate-500' : 'text-slate-500'"
+                  >
+                    Año {{ truck.year }}
+                  </span>
                 }
               </div>
             </td>
-            <td class="!py-2.5 !pl-3 border-r border-[#762f41]/18">
+            <td class="!py-2.5 !pl-3" [ngClass]="themeService.isDarkMode() ? 'border-r border-[#30363D]' : 'border-r border-[#762f41]/18'">
               @if (truck.defaultDriver) {
                 <div class="flex flex-col min-w-0">
-                  <span class="font-semibold text-slate-800 leading-tight truncate">{{ truck.defaultDriver.name }}</span>
-                  <span class="text-[11px] font-medium text-slate-500 mt-0.5 truncate">{{ truck.defaultDriver.email }}</span>
+                  <span 
+                    class="font-semibold leading-tight truncate text-sm"
+                    [ngClass]="themeService.isDarkMode() ? 'text-[#F0F6FC]' : 'text-slate-800'"
+                  >
+                    {{ truck.defaultDriver.name }}
+                  </span>
+                  <span 
+                    class="text-[11px] font-medium mt-0.5 truncate"
+                    [ngClass]="themeService.isDarkMode() ? 'text-[#8B949E]' : 'text-slate-500'"
+                  >
+                    {{ truck.defaultDriver.email }}
+                  </span>
                 </div>
               } @else {
-                <span class="text-slate-400 italic">Sin asignar</span>
+                <span 
+                  class="italic text-xs"
+                  [ngClass]="themeService.isDarkMode() ? 'text-slate-600' : 'text-slate-400'"
+                >
+                  Sin asignar
+                </span>
               }
             </td>
-            <td class="!py-2.5 !pr-4 text-right border-r border-[#762f41]/18 tabular-nums font-semibold text-slate-800">
+            <td 
+              class="!py-2.5 !pr-4 text-right tabular-nums font-semibold"
+              [ngClass]="themeService.isDarkMode() ? 'border-r border-[#30363D] text-[#8B949E]' : 'border-r border-[#762f41]/18 text-slate-800'"
+            >
               {{ truck.capacity ? (truck.capacity + ' kg') : '---' }}
             </td>
             <td class="!pr-4 !text-right !py-2.5">
@@ -110,7 +166,10 @@
                 <button
                   type="button"
                   (click)="openEditModal(truck)"
-                  class="px-2 py-1 rounded-md text-[11px] font-semibold inline-flex items-center gap-1 border border-amber-600/45 bg-amber-500/[0.08] text-amber-700 hover:bg-amber-500/[0.18] hover:border-amber-600/85 hover:text-amber-800 transition-all cursor-pointer shadow-2xs active:scale-95"
+                  class="px-2 py-1 rounded-md text-[11px] font-semibold inline-flex items-center gap-1 border transition-all cursor-pointer shadow-2xs active:scale-95"
+                  [ngClass]="themeService.isDarkMode() 
+                    ? 'border-amber-800/60 bg-amber-950/30 text-amber-300 hover:bg-amber-900/40 hover:border-amber-600' 
+                    : 'border-amber-600/45 bg-amber-500/[0.08] text-amber-700 hover:bg-amber-500/[0.18] hover:border-amber-600/85 hover:text-amber-800'"
                 >
                   <i class="pi pi-pencil text-[9px]"></i>
                   <span>Editar</span>
@@ -118,7 +177,10 @@
                 <button
                   type="button"
                   (click)="confirmDelete(truck)"
-                  class="px-2 py-1 rounded-md text-[11px] font-semibold inline-flex items-center gap-1 border border-rose-500/45 bg-rose-500/[0.08] text-rose-600 hover:bg-rose-500/[0.18] hover:border-rose-500/85 hover:text-rose-700 transition-all cursor-pointer shadow-2xs active:scale-95"
+                  class="px-2 py-1 rounded-md text-[11px] font-semibold inline-flex items-center gap-1 border transition-all cursor-pointer shadow-2xs active:scale-95"
+                  [ngClass]="themeService.isDarkMode() 
+                    ? 'border-rose-800/60 bg-rose-950/30 text-rose-300 hover:bg-rose-900/40 hover:border-rose-600' 
+                    : 'border-rose-500/45 bg-rose-500/[0.08] text-rose-600 hover:bg-rose-500/[0.18] hover:border-rose-500/85 hover:text-rose-700'"
                 >
                   <i class="pi pi-trash text-[9px]"></i>
                   <span>Eliminar</span>
@@ -132,18 +194,37 @@
 
     <div class="lg:hidden block space-y-3">
       @for (truck of filteredTrucks(); track truck.id) {
-        <div class="bg-white rounded-2xl shadow-xs border border-[#48021C]/20 p-4 flex flex-col gap-3">
+        <div 
+          class="rounded-2xl shadow-xs border p-4 flex flex-col gap-3 transition-colors"
+          [ngClass]="themeService.isDarkMode() ? 'bg-[#161B22] border-[#30363D]' : 'bg-white border-[#48021C]/20'"
+        >
           <div class="flex justify-between items-start gap-2">
             <div class="flex items-start gap-3 min-w-0">
-              <div class="w-11 h-11 rounded-lg flex-shrink-0 flex items-center justify-center border border-[#48021C]/20 bg-[#48021C]/10 text-[#48021C]">
+              <div 
+                class="w-11 h-11 rounded-lg flex-shrink-0 flex items-center justify-center border shadow-xs transition-colors"
+                [ngClass]="themeService.isDarkMode() ? 'border-[#30363D] bg-[#0D1117] text-[#58A6FF]' : 'border-[#48021C]/20 bg-[#48021C]/10 text-[#48021C]'"
+              >
                 <i class="pi pi-truck text-sm"></i>
               </div>
               <div class="flex flex-col min-w-0">
-                <span class="inline-flex text-[11px] bg-[#93c5fd]/50 text-[#172554] font-bold px-2 py-0.5 rounded border border-[#2563eb]/60 w-fit uppercase">
+                <span 
+                  class="inline-flex text-[11px] font-bold px-2 py-0.5 rounded border w-fit uppercase"
+                  [ngClass]="themeService.isDarkMode() 
+                    ? 'bg-[#1C2D42] text-[#58A6FF] border-[#58A6FF]/30' 
+                    : 'bg-[#93c5fd]/50 text-[#172554] border-[#2563eb]/60'"
+                >
                   {{ truck.licensePlate }}
                 </span>
-                <h3 class="font-bold text-slate-800 text-sm leading-tight truncate mt-1.5">{{ truck.name }}</h3>
-                <span class="text-[11px] text-slate-500 mt-0.5">
+                <h3 
+                  class="font-bold text-sm leading-tight truncate mt-1.5"
+                  [ngClass]="themeService.isDarkMode() ? 'text-[#F0F6FC]' : 'text-slate-800'"
+                >
+                  {{ truck.name }}
+                </h3>
+                <span 
+                  class="text-[11px] mt-0.5 truncate"
+                  [ngClass]="themeService.isDarkMode() ? 'text-[#8B949E]' : 'text-slate-500'"
+                >
                   {{ truck.brand || 'Sin marca' }}{{ truck.model ? ' • ' + truck.model : '' }}
                 </span>
               </div>
@@ -155,14 +236,21 @@
             />
           </div>
 
-          <div class="flex items-center justify-between pt-2 border-t border-slate-100 text-xs">
+          <div 
+            class="flex items-center justify-between pt-2 border-t text-xs transition-colors"
+            [ngClass]="themeService.isDarkMode() ? 'border-[#30363D]' : 'border-slate-100'"
+          >
             <div class="flex flex-col">
-              <span class="text-[10.5px] text-slate-400">Conductor</span>
-              <span class="font-semibold text-slate-700 truncate max-w-[160px]">{{ truck.defaultDriver?.name || 'Sin asignar' }}</span>
+              <span class="text-[10.5px]" [ngClass]="themeService.isDarkMode() ? 'text-[#8B949E]' : 'text-slate-400'">Conductor</span>
+              <span class="font-semibold truncate max-w-[160px]" [ngClass]="themeService.isDarkMode() ? 'text-[#F0F6FC]' : 'text-slate-700'">
+                {{ truck.defaultDriver?.name || 'Sin asignar' }}
+              </span>
             </div>
             <div class="flex flex-col text-right">
-              <span class="text-[10.5px] text-slate-400">Capacidad</span>
-              <span class="font-bold text-slate-900 tabular-nums">{{ truck.capacity ? (truck.capacity + ' kg') : '---' }}</span>
+              <span class="text-[10.5px]" [ngClass]="themeService.isDarkMode() ? 'text-[#8B949E]' : 'text-slate-400'">Capacidad</span>
+              <span class="font-bold tabular-nums" [ngClass]="themeService.isDarkMode() ? 'text-[#58A6FF]' : 'text-slate-900'">
+                {{ truck.capacity ? (truck.capacity + ' kg') : '---' }}
+              </span>
             </div>
           </div>
 
@@ -170,24 +258,33 @@
             <button
               type="button"
               (click)="openEditModal(truck)"
-              class="px-2.5 py-1 rounded-lg text-xs font-semibold border border-amber-500/40 bg-amber-50 text-amber-700 hover:bg-amber-100"
+              class="px-2.5 py-1 rounded-lg text-xs font-semibold border transition-all cursor-pointer shadow-2xs active:scale-95"
+              [ngClass]="themeService.isDarkMode() 
+                ? 'border-amber-800/60 bg-amber-950/30 text-amber-300 hover:bg-amber-900/40 hover:border-amber-600' 
+                : 'border-amber-500/40 bg-amber-50 text-amber-700 hover:bg-amber-100'"
             >
               Editar
             </button>
             <button
               type="button"
               (click)="confirmDelete(truck)"
-              class="px-2.5 py-1 rounded-lg text-xs font-semibold border border-rose-500/40 bg-rose-50 text-rose-700 hover:bg-rose-100"
+              class="px-2.5 py-1 rounded-lg text-xs font-semibold border transition-all cursor-pointer shadow-2xs active:scale-95"
+              [ngClass]="themeService.isDarkMode() 
+                ? 'border-rose-800/60 bg-rose-950/30 text-rose-300 hover:bg-rose-900/40 hover:border-rose-600' 
+                : 'border-rose-500/40 bg-rose-50 text-rose-700 hover:bg-rose-100'"
             >
               Eliminar
             </button>
           </div>
         </div>
       } @empty {
-        <div class="bg-white rounded-2xl border border-slate-200 p-8 flex flex-col items-center gap-2 text-center">
-          <i class="pi pi-truck text-slate-300 text-4xl"></i>
-          <p class="font-bold text-slate-700 text-sm">No se encontraron vehículos</p>
-          <p class="text-xs text-slate-400">Prueba ajustando los filtros o registra uno nuevo.</p>
+        <div 
+          class="rounded-2xl border p-8 flex flex-col items-center gap-2 text-center transition-colors"
+          [ngClass]="themeService.isDarkMode() ? 'bg-[#161B22] border-[#30363D]' : 'bg-white border-slate-200'"
+        >
+          <i class="pi pi-truck text-4xl" [ngClass]="themeService.isDarkMode() ? 'text-slate-600' : 'text-slate-300'"></i>
+          <p class="font-bold text-sm" [ngClass]="themeService.isDarkMode() ? 'text-[#F0F6FC]' : 'text-slate-700'">No se encontraron vehículos</p>
+          <p class="text-xs" [ngClass]="themeService.isDarkMode() ? 'text-[#8B949E]' : 'text-slate-400'">Prueba ajustando los filtros o registra uno nuevo.</p>
         </div>
       }
     </div>

@@ -1,6 +1,6 @@
 import { Component, inject, OnInit, signal, computed } from '@angular/core';
 import { CommonModule, DecimalPipe, CurrencyPipe } from '@angular/common';
-import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
+import { FormBuilder, FormGroup, Validators, ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { ButtonModule } from 'primeng/button';
 import { SelectModule } from 'primeng/select';
@@ -9,18 +9,22 @@ import { MessageService } from 'primeng/api';
 import { TooltipModule } from 'primeng/tooltip';
 import { TagModule } from 'primeng/tag';
 import { TableModule } from 'primeng/table';
+import { TextareaModule } from 'primeng/textarea';
 
 import { ProductionOrderService } from '../../services/production-order.service';
 import { ProductsService } from '../../../inventory/services/products.service';
 import { BranchesService } from '../../../inventory/services/branches.service';
 import { RecipeService } from '../../services/recipe.service';
 import { InventoryService } from '../../../inventory/services/inventory.service';
-import { Product, ProductType } from '../../../inventory/interfaces/product.interface';
+import { Product } from '../../../inventory/interfaces/product.interface';
 import { IRecipeIngredient } from '../../interfaces/recipe.interface';
 import { Branch } from '../../../inventory/interfaces/branch.interface';
-import { Inventory } from '../../../inventory/interfaces/inventory.interface';
 import { environment } from '../../../../environments/environment';
-import { TextareaModule } from 'primeng/textarea';
+import { ThemeService } from '../../../core/services/theme.service';
+import { PageHeaderComponent } from '../../../shared/components/page-header/page-header.component';
+import { PrimaryButtonComponent } from '../../../shared/components/primary-button/primary-button.component';
+import { SecondaryButtonComponent } from '../../../shared/components/secondary-button/secondary-button.component';
+import { ConfirmationModalComponent } from '../../../shared/components/confirmation-modal/confirmation-modal.component';
 
 @Component({
   selector: 'app-production-order-form',
@@ -28,19 +32,25 @@ import { TextareaModule } from 'primeng/textarea';
   imports: [
     CommonModule,
     ReactiveFormsModule,
+    FormsModule,
     ButtonModule,
     SelectModule,
     InputNumberModule,
     TooltipModule,
     TagModule,
     TableModule,
+    TextareaModule,
     DecimalPipe,
     CurrencyPipe,
-    TextareaModule
+    PageHeaderComponent,
+    PrimaryButtonComponent,
+    SecondaryButtonComponent,
+    ConfirmationModalComponent,
   ],
-  templateUrl: './order-form.component.html'
+  templateUrl: './order-form.component.html',
 })
 export class ProductionOrderFormComponent implements OnInit {
+  public themeService = inject(ThemeService);
   private fb = inject(FormBuilder);
   private productionService = inject(ProductionOrderService);
   private productsService = inject(ProductsService);
@@ -53,11 +63,12 @@ export class ProductionOrderFormComponent implements OnInit {
   orderForm: FormGroup;
   saving = signal<boolean>(false);
   loadingData = signal<boolean>(false);
+  showCancelConfirmModal = signal<boolean>(false);
 
   products = signal<Product[]>([]);
   groupedProducts = signal<any[]>([]);
   branches = signal<Branch[]>([]);
-  
+
   selectedProduct = signal<Product | undefined>(undefined);
   selectedBranchId = signal<string | null>(null);
   mainProductStock = signal<number>(0);
@@ -75,28 +86,27 @@ export class ProductionOrderFormComponent implements OnInit {
 
     if (!recipe.length) return [];
 
-    return recipe.map(ing => {
+    return recipe.map((ing) => {
       const required = ing.quantity * plannedQty;
       const componentId = ing.componentId || (ing as any).component_id || ing.component?.id;
       const stock = stocks[componentId] || 0;
-      
+
       return {
         ...ing,
         required,
         available: stock,
-        isOk: branchId ? (stock >= required) : true
+        isOk: branchId ? stock >= required : true,
       };
     });
   });
 
   totalEstimatedCost = computed(() => {
     const check = this.preFlightCheck();
-    const plannedQty = this.plannedQuantity();
-    return check.reduce((acc, item) => acc + (item.required * Number(item.component?.cost || 0)), 0);
+    return check.reduce((acc, item) => acc + item.required * Number(item.component?.cost || 0), 0);
   });
 
   hasShortage = computed(() => {
-    return this.preFlightCheck().some(item => !item.isOk);
+    return this.preFlightCheck().some((item) => !item.isOk);
   });
 
   constructor() {
@@ -104,7 +114,7 @@ export class ProductionOrderFormComponent implements OnInit {
       productId: [null, Validators.required],
       branchId: [null, Validators.required],
       plannedQuantity: [0, [Validators.required, Validators.min(0.01)]],
-      notes: ['']
+      notes: [''],
     });
   }
 
@@ -115,14 +125,13 @@ export class ProductionOrderFormComponent implements OnInit {
 
   loadInitialData(): void {
     this.loadingData.set(true);
-    
-    // Solo productos que se pueden "manufacturar" (terminados o componentes con receta)
+
+    // Solo productos que se pueden "manufacturar"
     this.productsService.getProducts(undefined, false, undefined, true).subscribe({
       next: (res) => {
         if (res.statusCode === 200) {
-          // Lista plana para lógica interna y búsquedas (incluyendo variantes)
           const allFlat: Product[] = [];
-          res.data.forEach(p => {
+          res.data.forEach((p) => {
             allFlat.push(p);
             if (p.variants && p.variants.length > 0) {
               allFlat.push(...p.variants);
@@ -130,30 +139,31 @@ export class ProductionOrderFormComponent implements OnInit {
           });
           this.products.set(allFlat);
 
-          // Estructura agrupada para el Selector de la UI
           const clusters: any[] = [];
           const standalone: Product[] = [];
 
-          res.data.filter(p => !p.isVariant).forEach(p => {
-            if (p.isMaster && p.variants && p.variants.length > 0) {
-              clusters.push({
-                label: p.name,
-                items: p.variants
-              });
-            } else {
-              standalone.push(p);
-            }
-          });
+          res.data
+            .filter((p) => !p.isVariant)
+            .forEach((p) => {
+              if (p.isMaster && p.variants && p.variants.length > 0) {
+                clusters.push({
+                  label: p.name,
+                  items: p.variants,
+                });
+              } else {
+                standalone.push(p);
+              }
+            });
 
           if (standalone.length > 0) {
             clusters.push({
               label: 'Productos',
-              items: standalone
+              items: standalone,
             });
           }
           this.groupedProducts.set(clusters);
         }
-      }
+      },
     });
 
     this.branchesService.getBranches({ isPlant: true }).subscribe({
@@ -166,23 +176,23 @@ export class ProductionOrderFormComponent implements OnInit {
         }
         this.loadingData.set(false);
       },
-      error: () => this.loadingData.set(false)
+      error: () => this.loadingData.set(false),
     });
   }
 
   setupFormListeners(): void {
-    this.orderForm.get('productId')?.valueChanges.subscribe(id => {
-      const product = this.products().find(p => p.id === id);
+    this.orderForm.get('productId')?.valueChanges.subscribe((id) => {
+      const product = this.products().find((p) => p.id === id);
       this.selectedProduct.set(product);
       this.loadRecipeAndStocks(id, this.orderForm.get('branchId')?.value);
     });
 
-    this.orderForm.get('branchId')?.valueChanges.subscribe(branchId => {
+    this.orderForm.get('branchId')?.valueChanges.subscribe((branchId) => {
       this.selectedBranchId.set(branchId);
       this.loadRecipeAndStocks(this.orderForm.get('productId')?.value, branchId);
     });
 
-    this.orderForm.get('plannedQuantity')?.valueChanges.subscribe(qty => {
+    this.orderForm.get('plannedQuantity')?.valueChanges.subscribe((qty) => {
       this.plannedQuantity.set(qty || 0);
     });
   }
@@ -196,14 +206,13 @@ export class ProductionOrderFormComponent implements OnInit {
     }
 
     if (branchId) {
-      // Consultar stock del producto principal
       this.inventoryService.getInventoryByProductAndBranch(productId, branchId).subscribe({
         next: (res) => {
           if (res.statusCode === 200) {
             this.mainProductStock.set(res.data.stock);
           }
         },
-        error: () => this.mainProductStock.set(0)
+        error: () => this.mainProductStock.set(0),
       });
     }
 
@@ -215,7 +224,7 @@ export class ProductionOrderFormComponent implements OnInit {
             this.loadIngredientsStock(res.data, branchId);
           }
         }
-      }
+      },
     });
   }
 
@@ -223,12 +232,11 @@ export class ProductionOrderFormComponent implements OnInit {
     const newStocks: Record<string, number> = {};
     let loadedCount = 0;
 
-    // Limpiar stocks previos para evitar datos obsoletos mientras carga
     this.ingredientStocks.set({});
 
     if (ingredients.length === 0) return;
 
-    ingredients.forEach(ing => {
+    ingredients.forEach((ing) => {
       const componentId = ing.componentId || (ing as any).component_id || ing.component?.id;
       if (!componentId) {
         loadedCount++;
@@ -254,7 +262,7 @@ export class ProductionOrderFormComponent implements OnInit {
           if (loadedCount === ingredients.length) {
             this.ingredientStocks.set(newStocks);
           }
-        }
+        },
       });
     });
   }
@@ -271,7 +279,7 @@ export class ProductionOrderFormComponent implements OnInit {
         this.messageService.add({
           severity: 'success',
           summary: 'Éxito',
-          detail: 'Orden de producción creada correctamente'
+          detail: 'Orden de producción creada correctamente',
         });
         this.router.navigate(['/production/orders']);
       },
@@ -279,14 +287,23 @@ export class ProductionOrderFormComponent implements OnInit {
         this.messageService.add({
           severity: 'error',
           summary: 'Error',
-          detail: err.error?.message || 'Error al crear la orden'
+          detail: err.error?.message || 'Error al crear la orden',
         });
         this.saving.set(false);
-      }
+      },
     });
   }
 
   onCancel(): void {
+    if (this.orderForm.dirty) {
+      this.showCancelConfirmModal.set(true);
+    } else {
+      this.router.navigate(['/production/orders']);
+    }
+  }
+
+  confirmCancel(): void {
+    this.showCancelConfirmModal.set(false);
     this.router.navigate(['/production/orders']);
   }
 

@@ -13,6 +13,11 @@ import { TextareaModule } from 'primeng/textarea';
 // Services
 import { PaymentMethodsService } from '../../services/payment-methods.service';
 
+import { ThemeService } from '../../../core/services/theme.service';
+import { PageHeaderComponent } from '../../../shared/components/page-header/page-header.component';
+import { PrimaryButtonComponent } from '../../../shared/components/primary-button/primary-button.component';
+import { SecondaryButtonComponent } from '../../../shared/components/secondary-button/secondary-button.component';
+
 @Component({
   selector: 'app-payment-method-form',
   standalone: true,
@@ -22,11 +27,15 @@ import { PaymentMethodsService } from '../../services/payment-methods.service';
     ButtonModule,
     InputTextModule,
     ToggleSwitchModule,
-    TextareaModule
+    TextareaModule,
+    PageHeaderComponent,
+    PrimaryButtonComponent,
+    SecondaryButtonComponent,
   ],
   templateUrl: './payment-method-form.component.html',
 })
 export class PaymentMethodFormComponent implements OnInit {
+  public themeService = inject(ThemeService);
   private fb = inject(FormBuilder);
   private paymentService = inject(PaymentMethodsService);
   private messageService = inject(MessageService);

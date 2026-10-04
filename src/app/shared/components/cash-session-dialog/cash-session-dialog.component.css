@@ -1,1 +1,97 @@
 /* Estilos para el diálogo de caja modal */
+
+/* PRIME NG DIALOG CONTAINER OVERRIDES */
+:host ::ng-deep .cash-session-main-dialog.is-dark {
+  border: 1px solid #30363D !important;
+  background-color: #0D1117 !important;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7) !important;
+}
+
+:host ::ng-deep .cash-session-main-dialog.is-dark .p-dialog-content {
+  background-color: transparent !important;
+  border: none !important;
+  padding: 0 !important;
+}
+
+/* LEFT SIDE DARK */
+.cash-dialog-left-dark {
+  background-color: #161b22 !important;
+  border-color: #30363d !important;
+  color: #c9d1d9;
+}
+
+.cash-dialog-left-dark .step-badge-dark {
+  background-color: rgba(56, 139, 253, 0.15) !important;
+  color: #58a6ff !important;
+}
+
+.cash-dialog-left-dark .alert-banner-dark {
+  background-color: rgba(187, 128, 9, 0.15) !important;
+  border-color: rgba(187, 128, 9, 0.4) !important;
+  color: #e3b341 !important;
+}
+
+.cash-dialog-left-dark .summary-card-dark {
+  background-color: #0d1117 !important;
+  border-color: #30363d !important;
+}
+
+/* RIGHT SIDE DARK */
+.cash-dialog-right-dark {
+  background-color: #0D1117 !important;
+  color: #c9d1d9;
+}
+
+.cash-dialog-right-dark label {
+  color: #8b949e !important;
+}
+
+.cash-dialog-right-dark textarea {
+  background-color: #161b22 !important;
+  color: #e6edf3 !important;
+  border-color: #30363d !important;
+}
+
+.cash-dialog-right-dark textarea:focus {
+  border-color: #58a6ff !important;
+}
+
+.cash-dialog-right-dark .border-slate-100 {
+  border-color: #21262d !important;
+}
+
+.cash-dialog-right-dark .p-button-secondary {
+  background-color: #2B2C2E !important;
+  color: #ffffff !important;
+  border: none !important;
+}
+
+.cash-dialog-right-dark .p-button-secondary:hover {
+  background-color: #38393C !important;
+  color: #ffffff !important;
+}
+
+/* PrimeNG InputNumber & Select Overrides in Dark Side */
+.cash-dialog-right-dark ::ng-deep .p-inputnumber input {
+  background-color: #161b22 !important;
+  color: #e6edf3 !important;
+  border-color: #30363d !important;
+}
+
+.cash-dialog-right-dark ::ng-deep .p-inputnumber input:focus {
+  border-color: #58a6ff !important;
+}
+
+.cash-dialog-right-dark ::ng-deep .p-select {
+  background-color: #161b22 !important;
+  border-color: #30363d !important;
+}
+
+.cash-dialog-right-dark ::ng-deep .p-select .p-select-label {
+  color: #e6edf3 !important;
+}
+
+.cash-dialog-right-dark .branch-card-dark {
+  background-color: #161b22 !important;
+  border-color: #30363d !important;
+}

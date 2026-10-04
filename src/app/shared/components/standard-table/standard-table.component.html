@@ -57,10 +57,29 @@
         <ng-container *ngTemplateOutlet="emptyMessageTemplate"></ng-container>
       } @else {
         <tr>
-          <td colspan="100" class="text-center py-12">
-            <div class="flex flex-col items-center justify-center gap-2 text-slate-400">
-              <i [class]="emptyIcon + ' text-3xl'"></i>
-              <span class="text-xs font-medium">{{ emptyMessage }}</span>
+          <td colspan="100" class="text-center !py-12 !px-4 bg-transparent border-0">
+            <div class="flex flex-col items-center justify-center max-w-sm mx-auto select-none gap-2">
+              <!-- Icon directly without box/card -->
+              <i 
+                [class]="emptyIcon + ' !text-4xl transition-colors'"
+                [ngClass]="themeService.isDarkMode() ? 'text-[#58A6FF]/80' : 'text-slate-400'"
+              ></i>
+
+              <!-- Primary Title -->
+              <h4 
+                class="text-sm font-semibold tracking-tight m-0 transition-colors"
+                [ngClass]="themeService.isDarkMode() ? 'text-[#F0F6FC]' : 'text-slate-700'"
+              >
+                Sin registros disponibles
+              </h4>
+
+              <!-- Descriptive Message -->
+              <p 
+                class="text-xs font-normal leading-relaxed text-center m-0 max-w-xs transition-colors" 
+                [ngClass]="themeService.isDarkMode() ? 'text-[#8B949E]' : 'text-slate-500'"
+              >
+                {{ emptyMessage }}
+              </p>
             </div>
           </td>
         </tr>

@@ -12,6 +12,7 @@ import { StatusBadgeComponent } from '../../../shared/components/status-badge/st
 import { BranchSettlementsService } from '../../services/branch-settlements.service';
 import { BranchSettlement, BranchSettlementItem } from '../../interfaces/branch-settlement.interface';
 import { AuthService } from '../../../auth/auth.service';
+import { ThemeService } from '../../../core/services/theme.service';
 
 @Component({
   selector: 'app-settlement-detail',
@@ -30,8 +31,10 @@ import { AuthService } from '../../../auth/auth.service';
     StatusBadgeComponent,
   ],
   templateUrl: './settlement-detail.component.html',
+  styleUrl: './settlement-detail.component.css',
 })
 export class SettlementDetailComponent implements OnInit {
+  public themeService = inject(ThemeService);
   private api = inject(BranchSettlementsService);
   private route = inject(ActivatedRoute);
   private messages = inject(MessageService);

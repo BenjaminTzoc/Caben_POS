@@ -1,4 +1,4 @@
-import { Component, inject, OnInit, signal, computed, OnDestroy } from '@angular/core';
+import { Component, inject, OnInit, signal, computed, effect, OnDestroy } from '@angular/core';
 import { ButtonModule } from 'primeng/button';
 import { TableModule } from 'primeng/table';
 import { OrdersService, SaleFilterDto } from '../services/orders.service';
@@ -15,6 +15,7 @@ import { DatePickerModule } from 'primeng/datepicker';
 import { FormsModule } from '@angular/forms';
 import { environment } from '../../../environments/environment';
 import { AuthService } from '../../auth/auth.service';
+import { ThemeService } from '../../core/services/theme.service';
 import { BranchesService } from '../../inventory/services/branches.service';
 import { Branch } from '../../inventory/interfaces/branch.interface';
 import { RippleModule } from 'primeng/ripple';
@@ -40,6 +41,7 @@ import { StandardModalComponent } from '../../shared/components/standard-modal/s
 import { ConfirmationModalComponent } from '../../shared/components/confirmation-modal/confirmation-modal.component';
 import { BranchSelectComponent } from '../../shared/components/branch-select/branch-select.component';
 import { CdkDrag, CdkDragDrop, CdkDragHandle, CdkDragPreview, CdkDropList, moveItemInArray } from '@angular/cdk/drag-drop';
+import { BranchContextService } from '../../core/services/branch-context.service';
 
 const FOLDER_COLORS = ['#48021C', '#c2410c', '#1B768E', '#15803d', '#7c3aed', '#d97706', '#be123c', '#0f766e'];
 
@@ -84,6 +86,8 @@ const FOLDER_COLORS = ['#48021C', '#c2410c', '#1B768E', '#15803d', '#7c3aed', '#
   styleUrl: './sale-orders.component.css',
 })
 export class SaleOrdersComponent implements OnInit, OnDestroy {
+  public themeService = inject(ThemeService);
+  public branchContext = inject(BranchContextService);
   private ordersService = inject(OrdersService);
   private foldersService = inject(SaleFoldersService);
   private messageService = inject(MessageService);
@@ -92,6 +96,10 @@ export class SaleOrdersComponent implements OnInit, OnDestroy {
   private branchesService = inject(BranchesService);
   private areasService = inject(AreasService);
   private saleWsService = inject(SaleOrderWsService);
+
+  readonly isConsolidatedMode = computed(() => this.branchContext.isGlobalView);
+  readonly activeWorkingBranch = computed(() => this.branchContext.currentBranch());
+  readonly canFilterByBranch = computed(() => this.isSuperAdmin() && this.isConsolidatedMode());
 
   readonly folderColors = FOLDER_COLORS;
   canManageFolders = computed(() => this.authService.hasPermission('orders.update'));
@@ -134,6 +142,21 @@ export class SaleOrdersComponent implements OnInit, OnDestroy {
     { label: 'Sin preórdenes', value: 'regular' },
   ];
   selectedStatus = signal<string | null>(null);
+
+  constructor() {
+    effect(() => {
+      const activeBranch = this.activeWorkingBranch();
+      const isConsolidated = this.isConsolidatedMode();
+      
+      if (!isConsolidated && activeBranch?.id) {
+        this.selectedBranch.set(activeBranch.id);
+      } else if (isConsolidated) {
+        this.selectedBranch.set(null);
+      }
+      this.first.set(0);
+      this.loadOrders();
+    });
+  }
   statusFilterOptions = [
     { label: 'Pendiente', value: 'pending' },
     { label: 'Confirmado', value: 'confirmed' },
@@ -265,8 +288,12 @@ export class SaleOrdersComponent implements OnInit, OnDestroy {
     const preorderFilter = this.preorderFilter();
     const deliveryRange = this.promisedDeliveryRange();
     
+    const effectiveBranchId = !this.isConsolidatedMode() && this.activeWorkingBranch()?.id
+      ? this.activeWorkingBranch()!.id
+      : (this.selectedBranch() ?? undefined);
+
     const filters: SaleFilterDto = {
-      branchId: this.selectedBranch(),
+      branchId: effectiveBranchId,
       areaId: currentAreaId ?? undefined,
       onlyAreaDetails: currentOnlyAreaDetails,
       status: this.selectedStatus() ?? undefined,

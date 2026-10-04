@@ -1,21 +1,37 @@
 @if (!isModal) {
   <!-- Top Bar / Page Header when viewed as standalone full page -->
-  <div class="flex flex-col sm:flex-row justify-between sm:items-center py-2.5 px-4 md:px-6 bg-rose-50/60 border-b border-[#48021C]/15 rounded-t-2xl gap-3 flex-shrink-0">
+  <div 
+    class="flex flex-col sm:flex-row justify-between sm:items-center py-2.5 px-4 md:px-6 border-b rounded-t-2xl gap-3 flex-shrink-0 transition-colors"
+    [ngClass]="themeService.isDarkMode() 
+      ? 'bg-[#161B22] border-[#30363D]' 
+      : 'bg-rose-50/60 border-[#48021C]/15'"
+  >
     <div class="flex items-center gap-2.5">
       <button 
         type="button" 
         (click)="goBack()" 
-        class="w-8 h-8 rounded-lg bg-[#48021C]/10 hover:bg-[#48021C]/20 text-[#48021C] border border-[#48021C]/20 hover:border-[#48021C]/40 flex items-center justify-center shadow-xs transition-all active:scale-95 cursor-pointer"
+        class="w-8 h-8 rounded-lg flex items-center justify-center shadow-xs transition-all active:scale-95 cursor-pointer border"
+        [ngClass]="themeService.isDarkMode()
+          ? 'bg-[#0D1117] hover:bg-[#30363D] text-[#58A6FF] border-[#30363D]'
+          : 'bg-[#48021C]/10 hover:bg-[#48021C]/20 text-[#48021C] border-[#48021C]/20 hover:border-[#48021C]/40'"
         title="Regresar"
       >
         <i class="pi pi-arrow-left text-xs font-semibold"></i>
       </button>
 
       <div class="flex items-center gap-2">
-        <h1 class="text-base md:text-lg font-semibold text-gray-900 tracking-tight leading-none m-0">
+        <h1 
+          class="text-base md:text-lg font-semibold tracking-tight leading-none m-0 transition-colors"
+          [ngClass]="themeService.isDarkMode() ? 'text-[#F0F6FC]' : 'text-gray-900'"
+        >
           Movimientos de Inventario
         </h1>
-        <span class="text-[11px] font-bold px-2 py-0.5 rounded-md bg-[#48021C]/10 text-[#48021C] border border-[#48021C]/20">
+        <span 
+          class="text-[11px] font-bold px-2 py-0.5 rounded-md border transition-colors"
+          [ngClass]="themeService.isDarkMode()
+            ? 'bg-[#1C2D42] text-[#58A6FF] border-[#30363D]'
+            : 'bg-[#48021C]/10 text-[#48021C] border-[#48021C]/20'"
+        >
           {{ totalRecords }} registros
         </span>
       </div>
@@ -35,7 +51,10 @@
   </div>
 }
 
-<section [class]="isModal ? 'p-0 flex flex-col h-full overflow-hidden bg-transparent' : 'px-4 md:px-16 py-6 md:py-10 overflow-x-hidden'">
+<section 
+  [class]="isModal ? 'p-0 flex flex-col h-full overflow-hidden bg-transparent' : 'px-4 md:px-16 py-6 md:py-10 overflow-x-hidden transition-colors min-h-screen'"
+  [ngClass]="!isModal ? (themeService.isDarkMode() ? 'bg-[#0D1117]' : 'bg-slate-50/50') : ''"
+>
   <!-- Table Container -->
   <div class="flex-1 flex flex-col min-h-0 overflow-hidden">
     <app-standard-table
@@ -55,18 +74,24 @@
       [scrollable]="true"
       [scrollHeight]="isModal ? 'calc(90vh - 250px)' : '520px'"
       emptyMessage="Aún no hay movimientos registrados"
+      [customClass]="themeService.isDarkMode() ? 'theme-dark' : ''"
     >
       <ng-template #header>
-        <tr class="h-11 text-xs bg-rose-50/30 border-b border-[#48021C]/25 text-[#48021C] font-semibold sticky top-0 z-10">
-          <th style="width: 2.25rem" class="!text-center border-r border-[#48021C]/20 !px-1"></th>
-          <th class="!text-center border-r border-[#48021C]/20 !px-3">Fecha y hora</th>
-          <th class="!text-center border-r border-[#48021C]/20 !px-3">Usuario</th>
-          <th class="!text-left !pl-4 border-r border-[#48021C]/20">Producto</th>
-          <th class="!text-right !pr-4 border-r border-[#48021C]/20">Cantidad</th>
-          <th class="!text-center border-r border-[#48021C]/20 !px-3">Sucursal</th>
-          <th class="!text-center border-r border-[#48021C]/20">Tipo</th>
-          <th class="!text-center border-r border-[#48021C]/20">Concepto</th>
-          <th class="!text-center border-r border-[#48021C]/20">Estado</th>
+        <tr 
+          class="h-11 text-xs border-b font-semibold sticky top-0 z-10 transition-colors"
+          [ngClass]="themeService.isDarkMode() 
+            ? 'bg-[#161B22] border-[#30363D] text-[#8B949E]' 
+            : 'bg-rose-50/30 border-[#48021C]/25 text-[#48021C]'"
+        >
+          <th style="width: 2.25rem" class="!text-center !px-1" [ngClass]="themeService.isDarkMode() ? 'border-r border-[#30363D]' : 'border-r border-[#48021C]/20'"></th>
+          <th class="!text-center !px-3" [ngClass]="themeService.isDarkMode() ? 'border-r border-[#30363D]' : 'border-r border-[#48021C]/20'">Fecha y hora</th>
+          <th class="!text-center !px-3" [ngClass]="themeService.isDarkMode() ? 'border-r border-[#30363D]' : 'border-r border-[#48021C]/20'">Usuario</th>
+          <th class="!text-left !pl-4" [ngClass]="themeService.isDarkMode() ? 'border-r border-[#30363D]' : 'border-r border-[#48021C]/20'">Producto</th>
+          <th class="!text-right !pr-4" [ngClass]="themeService.isDarkMode() ? 'border-r border-[#30363D]' : 'border-r border-[#48021C]/20'">Cantidad</th>
+          <th class="!text-center !px-3" [ngClass]="themeService.isDarkMode() ? 'border-r border-[#30363D]' : 'border-r border-[#48021C]/20'">Sucursal</th>
+          <th class="!text-center" [ngClass]="themeService.isDarkMode() ? 'border-r border-[#30363D]' : 'border-r border-[#48021C]/20'">Tipo</th>
+          <th class="!text-center" [ngClass]="themeService.isDarkMode() ? 'border-r border-[#30363D]' : 'border-r border-[#48021C]/20'">Concepto</th>
+          <th class="!text-center" [ngClass]="themeService.isDarkMode() ? 'border-r border-[#30363D]' : 'border-r border-[#48021C]/20'">Estado</th>
           <th class="!text-right !pr-6">Evolución de Stock</th>
         </tr>
       </ng-template>
@@ -75,20 +100,49 @@
           <!-- Fila Escritorio -->
           <tr 
             (click)="inventoryMovementsDataTable.toggleRow(movement, $event)"
-            class="hidden md:table-row transition-colors border-b border-[#48021C]/25 last:border-0 text-xs cursor-pointer select-none"
-            [class.row-odd]="rowIndex % 2 === 1"
-            [class.row-even]="rowIndex % 2 === 0"
+            class="hidden md:table-row transition-colors border-b last:border-0 text-xs cursor-pointer select-none"
+            [ngClass]="themeService.isDarkMode() 
+              ? (rowIndex % 2 === 1 ? '!bg-[#161B22] hover:!bg-[#1F242C] border-[#30363D]' : '!bg-[#0D1117] hover:!bg-[#1F242C] border-[#30363D]') 
+              : (rowIndex % 2 === 1 ? 'row-odd border-[#48021C]/25' : 'row-even border-[#48021C]/25')"
           >
             <td class="!text-center !py-2 !px-1">
               <div class="w-6 h-6 rounded-md inline-flex items-center justify-center pointer-events-none">
-                <i [class]="expanded ? 'pi pi-chevron-down text-xs font-bold text-[#48021C]' : 'pi pi-chevron-right text-xs font-semibold text-[#48021C]'"></i>
+                <i 
+                  [class]="expanded ? 'pi pi-chevron-down text-xs font-bold' : 'pi pi-chevron-right text-xs font-semibold'"
+                  [ngClass]="themeService.isDarkMode() ? 'text-[#58A6FF]' : 'text-[#48021C]'"
+                ></i>
               </div>
             </td>
-            <td class="!text-center font-medium text-slate-600 tabular-nums !px-3">{{ movement.movementDate | date : 'dd/MM/yyyy HH:mm' }}</td>
-            <td class="!text-center font-medium text-slate-700 !px-3">{{ movement.createdBy?.name ?? 'Sistema' }}</td>
-            <td class="!text-left !pl-4 font-semibold text-slate-800">{{ movement.product?.name }}</td>
-            <td class="!text-right !pr-4 font-bold text-slate-800 tabular-nums">{{ movement.quantity | number : '1.0-2' }} {{ movement.product?.unit?.abbreviation || '' }}</td>
-            <td class="!text-center font-medium text-slate-800 !px-3">{{ movement.branch?.name }}</td>
+            <td 
+              class="!text-center font-medium tabular-nums !px-3"
+              [ngClass]="themeService.isDarkMode() ? 'text-[#8B949E]' : 'text-slate-600'"
+            >
+              {{ movement.movementDate | date : 'dd/MM/yyyy HH:mm' }}
+            </td>
+            <td 
+              class="!text-center font-medium !px-3"
+              [ngClass]="themeService.isDarkMode() ? 'text-[#F0F6FC]' : 'text-slate-700'"
+            >
+              {{ movement.createdBy?.name ?? 'Sistema' }}
+            </td>
+            <td 
+              class="!text-left !pl-4 font-semibold"
+              [ngClass]="themeService.isDarkMode() ? 'text-[#F0F6FC]' : 'text-slate-800'"
+            >
+              {{ movement.product?.name }}
+            </td>
+            <td 
+              class="!text-right !pr-4 font-bold tabular-nums"
+              [ngClass]="themeService.isDarkMode() ? 'text-[#F0F6FC]' : 'text-slate-800'"
+            >
+              {{ movement.quantity | number : '1.0-2' }} {{ movement.product?.unit?.abbreviation || '' }}
+            </td>
+            <td 
+              class="!text-center font-medium !px-3"
+              [ngClass]="themeService.isDarkMode() ? 'text-[#8B949E]' : 'text-slate-800'"
+            >
+              {{ movement.branch?.name }}
+            </td>
             <td class="!text-center">
               <app-status-badge
                 [severity]="getSeverity(movement.type)"
@@ -116,13 +170,15 @@
                   <span class="text-slate-400 font-medium italic text-xs">N/A</span>
                 } @else {
                   <span
-                    class="line-through text-[#9f1239] font-medium text-xs tabular-nums"
+                    class="line-through font-medium text-xs tabular-nums"
+                    [ngClass]="themeService.isDarkMode() ? 'text-rose-400' : 'text-[#9f1239]'"
                     pTooltip="Stock Inicial (Antes del movimiento)"
                     tooltipPosition="top"
                   >{{ movement.previousStock | number : '1.0-2' }}</span>
-                  <i class="pi pi-arrow-right text-[10px] text-slate-400"></i>
+                  <i class="pi pi-arrow-right text-[10px]" [ngClass]="themeService.isDarkMode() ? 'text-[#8B949E]' : 'text-slate-400'"></i>
                   <span
-                    class="font-bold text-slate-800 text-xs tabular-nums"
+                    class="font-bold text-xs tabular-nums"
+                    [ngClass]="themeService.isDarkMode() ? 'text-[#F0F6FC]' : 'text-slate-800'"
                     pTooltip="Stock Final (Después del movimiento)"
                     tooltipPosition="top"
                   >
@@ -136,40 +192,85 @@
           <!-- Fila Móvil (Formato Tarjeta) -->
           <tr 
             (click)="inventoryMovementsDataTable.toggleRow(movement, $event)"
-            class="md:hidden block border-b border-[#48021C]/25 p-4 cursor-pointer select-none"
-            [class.row-odd]="rowIndex % 2 === 1"
-            [class.row-even]="rowIndex % 2 === 0"
+            class="md:hidden block border-b p-4 cursor-pointer select-none transition-colors"
+            [ngClass]="themeService.isDarkMode() 
+              ? (rowIndex % 2 === 1 ? '!bg-[#161B22] border-[#30363D]' : '!bg-[#0D1117] border-[#30363D]') 
+              : (rowIndex % 2 === 1 ? 'row-odd border-[#48021C]/25' : 'row-even border-[#48021C]/25')"
           >
             <td class="block p-0 border-none w-full">
               <div class="flex flex-col gap-3 w-full">
                 <!-- Cabecera: Producto y Botón -->
                 <div class="flex justify-between items-start gap-2">
                   <div class="flex flex-col min-w-0">
-                    <span class="font-bold text-gray-900 text-base truncate">{{ movement.product?.name }}</span>
-                    <span class="text-xs text-gray-500 mt-0.5">
-                      {{ movement.movementDate | date : 'dd/MM/yyyy HH:mm' }} • <span class="text-slate-800 font-medium">{{ movement.branch?.name }}</span>
+                    <span 
+                      class="font-bold text-base truncate transition-colors"
+                      [ngClass]="themeService.isDarkMode() ? 'text-[#F0F6FC]' : 'text-gray-900'"
+                    >
+                      {{ movement.product?.name }}
+                    </span>
+                    <span 
+                      class="text-xs mt-0.5"
+                      [ngClass]="themeService.isDarkMode() ? 'text-[#8B949E]' : 'text-gray-500'"
+                    >
+                      {{ movement.movementDate | date : 'dd/MM/yyyy HH:mm' }} • 
+                      <span [ngClass]="themeService.isDarkMode() ? 'text-[#F0F6FC] font-semibold' : 'text-slate-800 font-medium'">
+                        {{ movement.branch?.name }}
+                      </span>
                     </span>
                   </div>
                   <div class="w-6 h-6 rounded-md flex items-center justify-center flex-shrink-0 pointer-events-none">
-                    <i [class]="expanded ? 'pi pi-chevron-down text-xs font-bold text-[#48021C]' : 'pi pi-chevron-right text-xs font-semibold text-[#48021C]'"></i>
+                    <i 
+                      [class]="expanded ? 'pi pi-chevron-down text-xs font-bold' : 'pi pi-chevron-right text-xs font-semibold'"
+                      [ngClass]="themeService.isDarkMode() ? 'text-[#58A6FF]' : 'text-[#48021C]'"
+                    ></i>
                   </div>
                 </div>
 
                 <!-- Datos Cuantitativos -->
-                <div class="flex justify-between items-center bg-gray-50 p-2.5 rounded-lg border border-gray-100">
+                <div 
+                  class="flex justify-between items-center p-2.5 rounded-lg border transition-colors"
+                  [ngClass]="themeService.isDarkMode() 
+                    ? 'bg-[#161B22]/60 border-[#30363D]' 
+                    : 'bg-gray-50 border-gray-100'"
+                >
                   <div class="flex flex-col">
-                    <span class="text-[10px] uppercase font-semibold text-gray-500 tracking-wider mb-0.5">Cantidad</span>
-                    <span class="font-bold text-gray-900">{{ movement.quantity | number : '1.0-2' }} {{ movement.product?.unit?.abbreviation || '' }}</span>
+                    <span 
+                      class="text-[10px] uppercase font-semibold tracking-wider mb-0.5"
+                      [ngClass]="themeService.isDarkMode() ? 'text-[#8B949E]' : 'text-gray-500'"
+                    >
+                      Cantidad
+                    </span>
+                    <span 
+                      class="font-bold"
+                      [ngClass]="themeService.isDarkMode() ? 'text-[#F0F6FC]' : 'text-gray-900'"
+                    >
+                      {{ movement.quantity | number : '1.0-2' }} {{ movement.product?.unit?.abbreviation || '' }}
+                    </span>
                   </div>
                   <div class="flex flex-col items-end">
-                    <span class="text-[10px] uppercase font-semibold text-gray-500 tracking-wider mb-0.5">Evolución Stock</span>
+                    <span 
+                      class="text-[10px] uppercase font-semibold tracking-wider mb-0.5"
+                      [ngClass]="themeService.isDarkMode() ? 'text-[#8B949E]' : 'text-gray-500'"
+                    >
+                      Evolución Stock
+                    </span>
                     <div class="flex gap-2 items-center">
                       @if (movement.status === 'pending' || movement.previousStock === null || movement.newStock === null) {
                         <span class="text-gray-400 font-medium italic text-sm">N/A</span>
                       } @else {
-                        <span class="line-through text-[#9f1239] font-medium text-sm">{{ movement.previousStock | number : '1.0-2' }}</span>
-                        <i class="pi pi-arrow-right text-[10px] text-gray-400"></i>
-                        <span class="font-bold text-gray-900 text-sm">{{ movement.newStock | number : '1.0-2' }}</span>
+                        <span 
+                          class="line-through font-medium text-sm"
+                          [ngClass]="themeService.isDarkMode() ? 'text-rose-400' : 'text-[#9f1239]'"
+                        >
+                          {{ movement.previousStock | number : '1.0-2' }}
+                        </span>
+                        <i class="pi pi-arrow-right text-[10px]" [ngClass]="themeService.isDarkMode() ? 'text-[#8B949E]' : 'text-gray-400'"></i>
+                        <span 
+                          class="font-bold text-sm"
+                          [ngClass]="themeService.isDarkMode() ? 'text-[#F0F6FC]' : 'text-gray-900'"
+                        >
+                          {{ movement.newStock | number : '1.0-2' }}
+                        </span>
                       }
                     </div>
                   </div>
@@ -199,8 +300,17 @@
                 </div>
 
                 <!-- Pie de tarjeta: Usuario -->
-                <div class="text-[11px] text-gray-500 text-right mt-1">
-                  Usuario: <span class="font-semibold text-gray-700">{{ movement.createdBy?.name ?? 'Sistema' }}</span>
+                <div 
+                  class="text-[11px] text-right mt-1"
+                  [ngClass]="themeService.isDarkMode() ? 'text-[#8B949E]' : 'text-gray-500'"
+                >
+                  Usuario: 
+                  <span 
+                    class="font-semibold"
+                    [ngClass]="themeService.isDarkMode() ? 'text-[#F0F6FC]' : 'text-gray-700'"
+                  >
+                    {{ movement.createdBy?.name ?? 'Sistema' }}
+                  </span>
                 </div>
               </div>
             </td>
@@ -209,12 +319,26 @@
 
         <!-- Detalle Desplegable -->
         <ng-template #expandedrow let-movement>
-          <tr class="bg-rose-50/20">
-            <td colspan="10" class="!py-3.5 !px-6 border-b border-[#48021C]/25">
-              <div class="inline-flex flex-wrap items-center gap-6 text-xs bg-white p-3.5 rounded-xl border border-[#48021C]/25 shadow-2xs max-w-full">
+          <tr [ngClass]="themeService.isDarkMode() ? 'bg-[#0D1117]/60' : 'bg-rose-50/20'">
+            <td 
+              colspan="10" 
+              class="!py-3.5 !px-6 border-b"
+              [ngClass]="themeService.isDarkMode() ? 'border-[#30363D]' : 'border-[#48021C]/25'"
+            >
+              <div 
+                class="inline-flex flex-wrap items-center gap-6 text-xs p-3.5 rounded-xl border shadow-2xs max-w-full transition-colors"
+                [ngClass]="themeService.isDarkMode() 
+                  ? 'bg-[#161B22] border-[#30363D]' 
+                  : 'bg-white border-[#48021C]/25'"
+              >
                 <!-- Columna Producto y Básicos -->
                 <div class="flex items-center gap-3 min-w-[220px]">
-                  <div class="w-11 h-11 rounded-lg border border-[#48021C]/25 overflow-hidden flex-shrink-0 bg-slate-50 flex items-center justify-center">
+                  <div 
+                    class="w-11 h-11 rounded-lg border overflow-hidden flex-shrink-0 flex items-center justify-center transition-colors"
+                    [ngClass]="themeService.isDarkMode() 
+                      ? 'bg-[#0D1117] border-[#30363D]' 
+                      : 'bg-slate-50 border-[#48021C]/25'"
+                  >
                     @if (movement.product?.imageUrl) {
                       <img
                         [src]="getProductImageUrl(movement.product?.imageUrl)"
@@ -222,30 +346,41 @@
                         class="w-full h-full object-cover"
                       />
                     } @else {
-                      <i class="pi pi-image text-slate-300 text-lg"></i>
+                      <i class="pi pi-image text-lg" [ngClass]="themeService.isDarkMode() ? 'text-slate-600' : 'text-slate-300'"></i>
                     }
                   </div>
                   <div class="flex flex-col gap-0.5">
-                    <span class="font-semibold text-slate-800 text-xs md:text-sm leading-tight mb-0.5">{{ movement.product?.name }}</span>
+                    <span 
+                      class="font-semibold text-xs md:text-sm leading-tight mb-0.5"
+                      [ngClass]="themeService.isDarkMode() ? 'text-[#F0F6FC]' : 'text-slate-800'"
+                    >
+                      {{ movement.product?.name }}
+                    </span>
                     <div class="flex items-center gap-1 text-[11px] leading-tight">
-                      <span class="text-[#48021C]/75 font-semibold">SKU:</span>
-                      <span class="text-slate-700 font-medium">{{ movement.product?.sku || '---' }}</span>
+                      <span [ngClass]="themeService.isDarkMode() ? 'text-[#58A6FF] font-semibold' : 'text-[#48021C]/75 font-semibold'">SKU:</span>
+                      <span [ngClass]="themeService.isDarkMode() ? 'text-[#8B949E] font-medium' : 'text-slate-700 font-medium'">{{ movement.product?.sku || '---' }}</span>
                     </div>
                     <div class="flex items-center gap-1 text-[11px] leading-tight">
-                      <span class="text-[#48021C]/75 font-semibold">Barras:</span>
-                      <span class="text-slate-700 font-medium">{{ movement.product?.barcode || 'N/A' }}</span>
+                      <span [ngClass]="themeService.isDarkMode() ? 'text-[#58A6FF] font-semibold' : 'text-[#48021C]/75 font-semibold'">Barras:</span>
+                      <span [ngClass]="themeService.isDarkMode() ? 'text-[#8B949E] font-medium' : 'text-slate-700 font-medium'">{{ movement.product?.barcode || 'N/A' }}</span>
                     </div>
                   </div>
                 </div>
 
                 <!-- Datos de Tracking y Referencia -->
                 <div class="flex flex-col gap-1 min-w-[150px]">
-                  <div class="flex items-center gap-1.5"><span class="text-[#48021C]/75 font-semibold">Fecha:</span> <span class="text-slate-700 font-medium">{{ movement.movementDate | date : 'dd/MM/yyyy HH:mm' }}</span></div>
-                  <div class="flex items-center gap-1.5"><span class="text-[#48021C]/75 font-semibold">Usuario:</span> <span class="text-slate-700 font-medium">{{ movement.createdBy?.name ?? 'Sistema' }}</span></div>
+                  <div class="flex items-center gap-1.5">
+                    <span [ngClass]="themeService.isDarkMode() ? 'text-[#58A6FF] font-semibold' : 'text-[#48021C]/75 font-semibold'">Fecha:</span> 
+                    <span [ngClass]="themeService.isDarkMode() ? 'text-[#F0F6FC] font-medium' : 'text-slate-700 font-medium'">{{ movement.movementDate | date : 'dd/MM/yyyy HH:mm' }}</span>
+                  </div>
+                  <div class="flex items-center gap-1.5">
+                    <span [ngClass]="themeService.isDarkMode() ? 'text-[#58A6FF] font-semibold' : 'text-[#48021C]/75 font-semibold'">Usuario:</span> 
+                    <span [ngClass]="themeService.isDarkMode() ? 'text-[#F0F6FC] font-medium' : 'text-slate-700 font-medium'">{{ movement.createdBy?.name ?? 'Sistema' }}</span>
+                  </div>
                   @if (movement.referenceId && movement.referenceNumber) {
                     <div class="flex items-center gap-1.5">
-                      <span class="text-[#48021C]/75 font-semibold">Ref:</span>
-                      <a class="text-brand-royal hover:underline font-semibold" href="/sales/new-order?id={{ movement.referenceId }}">{{ movement.referenceNumber }}</a>
+                      <span [ngClass]="themeService.isDarkMode() ? 'text-[#58A6FF] font-semibold' : 'text-[#48021C]/75 font-semibold'">Ref:</span>
+                      <a class="text-[#58A6FF] hover:underline font-semibold" href="/sales/new-order?id={{ movement.referenceId }}">{{ movement.referenceNumber }}</a>
                     </div>
                   }
                 </div>
@@ -254,22 +389,59 @@
                 <div class="flex flex-col gap-1 min-w-[180px]">
                   @if (movement.previousStock !== null && movement.newStock !== null) {
                     <div class="flex items-center gap-1.5">
-                      <span class="text-[#48021C]/75 font-semibold">Stock:</span>
-                      <span class="text-[#9f1239] font-medium line-through">{{ movement.previousStock | number : '1.0-2' }}</span>
-                      <i class="pi pi-arrow-right text-[10px] text-slate-400"></i>
-                      <span class="text-slate-800 font-bold">{{ movement.newStock | number : '1.0-2' }} {{ movement.product?.unit?.abbreviation || '' }}</span>
+                      <span [ngClass]="themeService.isDarkMode() ? 'text-[#58A6FF] font-semibold' : 'text-[#48021C]/75 font-semibold'">Stock:</span>
+                      <span 
+                        class="font-medium line-through"
+                        [ngClass]="themeService.isDarkMode() ? 'text-rose-400' : 'text-[#9f1239]'"
+                      >
+                        {{ movement.previousStock | number : '1.0-2' }}
+                      </span>
+                      <i class="pi pi-arrow-right text-[10px]" [ngClass]="themeService.isDarkMode() ? 'text-[#8B949E]' : 'text-slate-400'"></i>
+                      <span 
+                        class="font-bold"
+                        [ngClass]="themeService.isDarkMode() ? 'text-[#F0F6FC]' : 'text-slate-800'"
+                      >
+                        {{ movement.newStock | number : '1.0-2' }} {{ movement.product?.unit?.abbreviation || '' }}
+                      </span>
                     </div>
                   }
-                  <div class="flex items-center gap-1.5"><span class="text-[#48021C]/75 font-semibold">Concepto:</span> <span class="text-slate-700 font-medium">{{ movement.concept | inventoryMovementConcept }}</span></div>
-                  <div class="flex items-center gap-1.5"><span class="text-[#48021C]/75 font-semibold">Motivo:</span> <span class="text-slate-700 font-medium italic truncate max-w-[200px]" [pTooltip]="movement.notes" tooltipPosition="top">"{{ movement.notes || 'Sin descripción' }}"</span></div>
+                  <div class="flex items-center gap-1.5">
+                    <span [ngClass]="themeService.isDarkMode() ? 'text-[#58A6FF] font-semibold' : 'text-[#48021C]/75 font-semibold'">Concepto:</span> 
+                    <span [ngClass]="themeService.isDarkMode() ? 'text-[#F0F6FC] font-medium' : 'text-slate-700 font-medium'">{{ movement.concept | inventoryMovementConcept }}</span>
+                  </div>
+                  <div class="flex items-center gap-1.5">
+                    <span [ngClass]="themeService.isDarkMode() ? 'text-[#58A6FF] font-semibold' : 'text-[#48021C]/75 font-semibold'">Motivo:</span> 
+                    <span 
+                      class="italic truncate max-w-[200px]"
+                      [ngClass]="themeService.isDarkMode() ? 'text-[#8B949E]' : 'text-slate-700'" 
+                      [pTooltip]="movement.notes" 
+                      tooltipPosition="top"
+                    >
+                      "{{ movement.notes || 'Sin descripción' }}"
+                    </span>
+                  </div>
                 </div>
 
                 <!-- Cancelación Info si aplica -->
                 @if (movement.status === 'cancelled') {
-                  <div class="flex flex-col gap-0.5 border-l border-[#48021C]/20 pl-4 py-0.5 max-w-[220px]">
-                    <span class="font-semibold text-rose-600 text-xs uppercase tracking-wider">Cancelado</span>
-                    <span class="text-slate-500 leading-tight"><span class="text-[#48021C]/75 font-semibold">Por:</span> {{ movement.cancelledBy?.name ?? 'Sistema' }}</span>
-                    <span class="text-slate-400 italic truncate max-w-[200px]" [pTooltip]="movement.cancellationReason" tooltipPosition="top"><span class="text-[#48021C]/75 font-semibold not-italic">Razón:</span> {{ movement.cancellationReason || 'N/A' }}</span>
+                  <div 
+                    class="flex flex-col gap-0.5 pl-4 py-0.5 max-w-[220px] border-l"
+                    [ngClass]="themeService.isDarkMode() ? 'border-[#30363D]' : 'border-[#48021C]/20'"
+                  >
+                    <span class="font-semibold text-rose-500 text-xs uppercase tracking-wider">Cancelado</span>
+                    <span [ngClass]="themeService.isDarkMode() ? 'text-[#8B949E]' : 'text-slate-500'" class="leading-tight">
+                      <span [ngClass]="themeService.isDarkMode() ? 'text-[#58A6FF] font-semibold' : 'text-[#48021C]/75 font-semibold'">Por:</span> 
+                      {{ movement.cancelledBy?.name ?? 'Sistema' }}
+                    </span>
+                    <span 
+                      class="italic truncate max-w-[200px]"
+                      [ngClass]="themeService.isDarkMode() ? 'text-[#8B949E]' : 'text-slate-400'" 
+                      [pTooltip]="movement.cancellationReason" 
+                      tooltipPosition="top"
+                    >
+                      <span [ngClass]="themeService.isDarkMode() ? 'text-[#58A6FF] font-semibold not-italic' : 'text-[#48021C]/75 font-semibold not-italic'">Razón:</span> 
+                      {{ movement.cancellationReason || 'N/A' }}
+                    </span>
                   </div>
                 }
 
@@ -291,7 +463,7 @@
                       [outlined]="true"
                       size="small"
                       (onClick)="openCancelDialog(movement)"
-                      styleClass="!rounded-lg !px-3 !py-1.5 text-xs font-semibold !text-rose-600 !border-rose-300 hover:!bg-rose-50"
+                      styleClass="!rounded-lg !px-3 !py-1.5 text-xs font-semibold !text-rose-500 !border-rose-500/50 hover:!bg-rose-500/10"
                     />
                   </div>
                 }
@@ -336,14 +508,23 @@
     (onCancel)="closeCancelDialog()"
   >
     <div class="flex flex-col gap-1.5 w-full text-left mt-3">
-      <label for="reason" class="text-xs font-medium text-slate-700">Motivo de cancelación <span class="text-rose-500">*</span></label>
+      <label 
+        for="reason" 
+        class="text-xs font-medium transition-colors"
+        [ngClass]="themeService.isDarkMode() ? 'text-[#F0F6FC]' : 'text-slate-700'"
+      >
+        Motivo de cancelación <span class="text-rose-500">*</span>
+      </label>
       <textarea
         pTextarea
         id="reason"
         [(ngModel)]="cancelReason"
         rows="3"
         placeholder="Ej: Error en el conteo, producto no era merma, etc."
-        class="w-full text-xs border-slate-300! focus:border-[#48021C]! p-2.5 rounded-lg"
+        class="w-full text-xs p-2.5 rounded-lg border transition-colors outline-none"
+        [ngClass]="themeService.isDarkMode()
+          ? 'bg-[#0D1117] border-[#30363D] text-[#F0F6FC] placeholder-[#8B949E] focus:border-[#58A6FF]'
+          : 'bg-white border-slate-300 text-slate-800 placeholder-slate-400 focus:border-[#48021C]'"
       ></textarea>
     </div>
   </app-confirmation-modal>
@@ -366,24 +547,18 @@
   />
 
   @if (showNewMovementModal) {
-  <p-dialog
+  <app-standard-modal
     [(visible)]="showNewMovementModal"
-    [modal]="true"
-    [dismissableMask]="true"
-    [closeOnEscape]="true"
-    [showHeader]="false"
-    [closable]="false"
-    [style]="{ width: '92vw', maxWidth: '1200px' }"
-    contentStyleClass="!p-0"
-    appendTo="body"
-    styleClass="rounded-2xl overflow-hidden shadow-2xl bg-white border border-slate-200"
-    (onHide)="showNewMovementModal = false"
+    title="Registrar Movimiento de Inventario"
+    maxWidth="1200px"
+    maxHeight="92vh"
+    (closed)="showNewMovementModal = false"
   >
     <app-movement-form 
       [isModal]="true" 
       (onClose)="showNewMovementModal = false"
       (onSaved)="onMovementSaved()"
     ></app-movement-form>
-  </p-dialog>
+  </app-standard-modal>
   }
 </section>

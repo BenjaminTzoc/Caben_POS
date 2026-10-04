@@ -12,6 +12,11 @@ import { CustomerCategoriesService } from '../../services/customer-categories.se
 import { ICustomerCategory } from '../../interfaces/customer.interface';
 import { CommonModule } from '@angular/common';
 
+import { ThemeService } from '../../../core/services/theme.service';
+import { PageHeaderComponent } from '../../../shared/components/page-header/page-header.component';
+import { PrimaryButtonComponent } from '../../../shared/components/primary-button/primary-button.component';
+import { SecondaryButtonComponent } from '../../../shared/components/secondary-button/secondary-button.component';
+
 @Component({
   selector: 'app-customer-category-form',
   standalone: true,
@@ -23,10 +28,14 @@ import { CommonModule } from '@angular/common';
     InputNumberModule,
     ButtonModule,
     ToggleSwitchModule,
+    PageHeaderComponent,
+    PrimaryButtonComponent,
+    SecondaryButtonComponent,
   ],
   templateUrl: './customer-category-form.component.html',
 })
 export class CustomerCategoryFormComponent implements OnInit {
+  public themeService = inject(ThemeService);
   private fb = inject(FormBuilder);
   private router = inject(Router);
   private route = inject(ActivatedRoute);

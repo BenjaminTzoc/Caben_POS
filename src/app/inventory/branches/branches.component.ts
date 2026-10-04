@@ -6,15 +6,20 @@ import { ButtonModule } from 'primeng/button';
 import { TableModule } from 'primeng/table';
 import { ToggleSwitchModule } from 'primeng/toggleswitch';
 import { TooltipModule } from 'primeng/tooltip';
+import { TagModule } from 'primeng/tag';
 import { MessageService } from 'primeng/api';
 import { ConfirmService } from '../../shared/services/confirm.service';
 import { BranchesService } from '../services/branches.service';
 import { Branch } from '../interfaces/branch.interface';
 import { AuthService } from '../../auth/auth.service';
-import { InputTextModule } from 'primeng/inputtext';
-import { TagModule } from 'primeng/tag';
-import { IconFieldModule } from 'primeng/iconfield';
-import { InputIconModule } from 'primeng/inputicon';
+import { PageHeaderComponent } from '../../shared/components/page-header/page-header.component';
+import { PrimaryButtonComponent } from '../../shared/components/primary-button/primary-button.component';
+import { RefreshButtonComponent } from '../../shared/components/refresh-button/refresh-button.component';
+import { SearchInputComponent } from '../../shared/components/search-input/search-input.component';
+import { StandardTableComponent } from '../../shared/components/standard-table/standard-table.component';
+import { StatusBadgeComponent } from '../../shared/components/status-badge/status-badge.component';
+import { BranchModalComponent } from './branch-modal/branch-modal.component';
+import { ThemeService } from '../../core/services/theme.service';
 
 @Component({
   selector: 'app-branches',
@@ -26,15 +31,20 @@ import { InputIconModule } from 'primeng/inputicon';
     TableModule,
     ToggleSwitchModule,
     TooltipModule,
-    InputTextModule,
     TagModule,
-    IconFieldModule,
-    InputIconModule
+    PageHeaderComponent,
+    PrimaryButtonComponent,
+    RefreshButtonComponent,
+    SearchInputComponent,
+    StandardTableComponent,
+    StatusBadgeComponent,
+    BranchModalComponent,
   ],
   templateUrl: './branches.component.html',
   styleUrl: './branches.component.css',
 })
 export class BranchesComponent implements OnInit {
+  public themeService = inject(ThemeService);
   private router = inject(Router);
   private branchesService = inject(BranchesService);
   private messageService = inject(MessageService);
@@ -44,6 +54,25 @@ export class BranchesComponent implements OnInit {
   branches: Branch[] = [];
   loading = signal<boolean>(false);
   showDeleted: boolean = false;
+  searchTerm: string = '';
+
+  // Modal State
+  modalVisible = false;
+  selectedBranch: Branch | null = null;
+
+  get filteredBranches(): Branch[] {
+    if (!this.searchTerm.trim()) {
+      return this.branches;
+    }
+    const term = this.searchTerm.toLowerCase().trim();
+    return this.branches.filter(
+      (b) =>
+        b.name?.toLowerCase().includes(term) ||
+        b.address?.toLowerCase().includes(term) ||
+        b.phone?.toLowerCase().includes(term) ||
+        b.email?.toLowerCase().includes(term)
+    );
+  }
 
   get canViewDeleted(): boolean {
     const user = this.authService.currentUser;
@@ -76,12 +105,18 @@ export class BranchesComponent implements OnInit {
     });
   }
 
-  goToNewBranch(): void {
-    this.router.navigate(['inventory/new-branch']);
+  openCreateModal(): void {
+    this.selectedBranch = null;
+    this.modalVisible = true;
   }
 
-  onEditBranch(id: string): void {
-    this.router.navigate(['inventory/edit-branch', id]);
+  openEditModal(branch: Branch): void {
+    this.selectedBranch = branch;
+    this.modalVisible = true;
+  }
+
+  onBranchSaved(): void {
+    this.loadBranches();
   }
 
   isDeleted(branch: Branch): boolean {

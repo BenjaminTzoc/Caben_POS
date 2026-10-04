@@ -41,6 +41,7 @@ import {
   DeliverTransferPayload,
   ReceiveTripReturnPayload,
 } from '../../../interfaces/trip.interface';
+import { ThemeService } from '../../../../core/services/theme.service';
 
 @Component({
   selector: 'app-trip-detail',
@@ -73,8 +74,10 @@ import {
   ],
   providers: [MessageService],
   templateUrl: './trip-detail.component.html',
+  styleUrl: './trip-detail.component.css',
 })
 export class TripDetailComponent implements OnInit, OnDestroy {
+  public themeService = inject(ThemeService);
   private route = inject(ActivatedRoute);
   private router = inject(Router);
   private tripsService = inject(TripsService);

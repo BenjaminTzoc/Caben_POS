@@ -17,6 +17,7 @@ import { CashRegisterService } from '../../inventory/services/cash-register.serv
 import { CashSession } from '../../inventory/interfaces/cash-register.interface';
 import { BranchesService } from '../../inventory/services/branches.service';
 import { AuthService } from '../../auth/auth.service';
+import { BranchContextService } from '../../core/services/branch-context.service';
 import { Branch } from '../../inventory/interfaces/branch.interface';
 import { SelectModule } from 'primeng/select';
 import { TextareaModule } from 'primeng/textarea';
@@ -50,10 +51,19 @@ export class CashRegisterComponent implements OnInit {
   private messageService = inject(MessageService);
   private fb = inject(FormBuilder);
   private authService = inject(AuthService);
+  public branchContext = inject(BranchContextService);
   private router = inject(Router);
 
   get user() {
     return this.authService.currentUser;
+  }
+
+  get isConsolidatedMode(): boolean {
+    return this.branchContext.isGlobalView;
+  }
+
+  get activeWorkingBranch() {
+    return this.branchContext.currentBranch();
   }
 
   // Status
@@ -157,8 +167,26 @@ export class CashRegisterComponent implements OnInit {
 
   loadBranches() {
     this.branchesService.getBranches().subscribe({
-      next: (res) => (this.branches = res.data),
+      next: (res) => {
+        this.branches = res.data;
+        this.syncBranchSelection();
+      },
     });
+  }
+
+  syncBranchSelection() {
+    const currentWorkingBranch = this.branchContext.currentBranch();
+    if (currentWorkingBranch && currentWorkingBranch.id) {
+      this.openForm.get('branchId')?.setValue(currentWorkingBranch.id);
+    } else {
+      const user: any = this.user;
+      const userBranchId = user?.branchId || user?.branch?.id;
+      if (userBranchId) {
+        this.openForm.get('branchId')?.setValue(userBranchId);
+      } else if (this.branches.length > 0 && !this.openForm.get('branchId')?.value) {
+        this.openForm.get('branchId')?.setValue(this.branches[0].id);
+      }
+    }
   }
 
   openCash() {
@@ -199,6 +227,7 @@ export class CashRegisterComponent implements OnInit {
         });
         this.isLoading = false;
         this.openForm.reset({ openingBalance: 0, branchId: '', notes: '' });
+        this.syncBranchSelection();
         this.router.navigate(['/logistics/settlements/today']);
       },
       error: (err) => {

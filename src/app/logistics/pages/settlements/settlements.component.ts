@@ -15,6 +15,7 @@ import { BranchSettlement, BranchSettlementStatus } from '../../interfaces/branc
 import { AuthService } from '../../../auth/auth.service';
 import { BranchesService } from '../../../inventory/services/branches.service';
 import { Branch } from '../../../inventory/interfaces/branch.interface';
+import { ThemeService } from '../../../core/services/theme.service';
 
 @Component({
   selector: 'app-settlements',
@@ -34,8 +35,10 @@ import { Branch } from '../../../inventory/interfaces/branch.interface';
     BranchSelectComponent,
   ],
   templateUrl: './settlements.component.html',
+  styleUrl: './settlements.component.css',
 })
 export class SettlementsComponent implements OnInit {
+  public themeService = inject(ThemeService);
   private api = inject(BranchSettlementsService);
   private auth = inject(AuthService);
   private branchesApi = inject(BranchesService);

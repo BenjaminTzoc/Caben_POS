@@ -76,6 +76,49 @@
   background: linear-gradient(180deg, #f8eef3 0%, #fdf7f9 48%, #ffffff 100%);
   border: 1px solid #d9b8c8;
   box-shadow: 0 1px 0 rgb(72 2 28 / 0.08);
+  transition: all 0.3s ease;
+}
+
+:host-context(.dark) .widget-card,
+:host-context([data-theme='dark']) .widget-card {
+  background: #161B22 !important;
+  border-color: #30363D !important;
+  box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.5) !important;
+}
+
+:host-context(.dark) .spark-bar {
+  background: #58A6FF;
+}
+
+:host-context(.dark) .spark-bar.is-empty {
+  background: #30363D;
+}
+
+:host-context(.dark) .week-cal-btn {
+  background: #0D1117;
+  border-color: #30363D;
+  color: #F0F6FC;
+}
+
+:host-context(.dark) .week-cal-btn:hover {
+  background: #1C2128;
+}
+
+:host-context(.dark) .week-cal-panel {
+  background: #161B22;
+  border-color: #30363D;
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.6);
+}
+
+:host-context(.dark) .customer-week-table thead th {
+  background: #0D1117 !important;
+  color: #F0F6FC !important;
+  border-color: #30363D !important;
+}
+
+:host-context(.dark) .customer-week-detail {
+  background: #161B22 !important;
+  color: #F0F6FC !important;
 }
 
 .list-layer.is-covered {

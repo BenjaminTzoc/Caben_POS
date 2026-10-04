@@ -1,4 +1,4 @@
-import { Component, ElementRef, inject, OnInit, signal, ViewChild } from '@angular/core';
+import { Component, computed, ElementRef, inject, OnInit, signal, ViewChild } from '@angular/core';
 import {
   FormBuilder,
   FormGroup,
@@ -31,6 +31,8 @@ import { ProductsService } from '../../services/products.service';
 import { BranchesService } from '../../services/branches.service';
 import { UnitsService } from '../../services/units.service';
 import { ConfirmationModalComponent } from '../../../shared/components/confirmation-modal/confirmation-modal.component';
+import { BranchContextService } from '../../../core/services/branch-context.service';
+import { ThemeService } from '../../../core/services/theme.service';
 
 @Component({
   selector: 'app-product-form',
@@ -56,6 +58,7 @@ import { ConfirmationModalComponent } from '../../../shared/components/confirmat
   styleUrl: './product-form.component.css',
 })
 export class ProductFormComponent implements OnInit {
+  public themeService = inject(ThemeService);
   @ViewChild('fileUpload') fileUpload!: FileUpload;
   private branchesService = inject(BranchesService);
   private unitsService = inject(UnitsService);
@@ -65,6 +68,14 @@ export class ProductFormComponent implements OnInit {
   private router = inject(Router);
   private confirmService = inject(ConfirmService);
   private route = inject(ActivatedRoute);
+  public branchContext = inject(BranchContextService);
+
+  readonly isConsolidatedMode = computed(() => this.branchContext.isGlobalView);
+  readonly activeWorkingBranch = computed(() => this.branchContext.currentBranch());
+
+  get hasActiveWorkingBranch(): boolean {
+    return !this.branchContext.isGlobalView && !!this.branchContext.currentBranch()?.id;
+  }
 
   @ViewChild('nameInput') nameInput!: ElementRef;
   productForm!: FormGroup;
@@ -142,6 +153,9 @@ export class ProductFormComponent implements OnInit {
     this.loadUnits();
     this.loadParents();
     this.initForm();
+    if (!this.isEditMode && this.hasActiveWorkingBranch) {
+      this.setupInitialStockForWorkingBranch();
+    }
 
     this.productForm.get('manageStock')!.valueChanges.subscribe((value) => {
       this.onManageStockChange(value);
@@ -302,12 +316,13 @@ export class ProductFormComponent implements OnInit {
 
   createInitialStockForm(stock: any = {}): FormGroup {
     const isManage = this.productForm?.get('manageStock')?.value !== false;
+    const isQuantityRequired = isManage && !this.hasActiveWorkingBranch;
     return this.fb.group({
       id: [stock.id || this.generateUniqueId()],
       branchId: [{ value: stock.branchId || stock.branch?.id || null, disabled: this.isEditMode }, Validators.required],
       quantity: [
         { value: stock.stock ?? stock.quantity ?? (isManage ? null : 0), disabled: this.isEditMode },
-        isManage ? [Validators.required, Validators.min(0)] : [],
+        isManage ? (isQuantityRequired ? [Validators.required, Validators.min(0)] : [Validators.min(0)]) : [],
       ],
       isAvailable: [stock.isAvailable !== undefined ? stock.isAvailable : true],
     });
@@ -388,7 +403,11 @@ export class ProductFormComponent implements OnInit {
     this.initialStocks.controls.forEach((control) => {
       const qtyCtrl = control.get('quantity');
       if (value) {
-        qtyCtrl?.setValidators([Validators.required, Validators.min(0)]);
+        if (this.hasActiveWorkingBranch) {
+          qtyCtrl?.setValidators([Validators.min(0)]);
+        } else {
+          qtyCtrl?.setValidators([Validators.required, Validators.min(0)]);
+        }
       } else {
         qtyCtrl?.clearValidators();
       }
@@ -434,6 +453,9 @@ export class ProductFormComponent implements OnInit {
     this.branchesService.getBranches().subscribe({
       next: (response) => {
         this.branches.set(response.data);
+        if (!this.isEditMode && this.hasActiveWorkingBranch && this.initialStocks.length === 0) {
+          this.setupInitialStockForWorkingBranch();
+        }
       },
       error: (error) => {
         this.messageService.add({
@@ -543,7 +565,7 @@ export class ProductFormComponent implements OnInit {
         return qty !== null && qty !== undefined && Number(qty) > 0;
       });
 
-    if (!this.isEditMode && !isMasterProduct && manageStock && !hasInitialStocks) {
+    if (!this.isEditMode && !isMasterProduct && manageStock && !hasInitialStocks && !this.hasActiveWorkingBranch) {
       this.showNoStockConfirmDialog.set(true);
       return;
     }
@@ -708,7 +730,40 @@ export class ProductFormComponent implements OnInit {
     return filtered;
   }
 
+  setupInitialStockForWorkingBranch(): void {
+    if (this.isEditMode) return;
+
+    const workingBranch = this.branchContext.currentBranch();
+    if (!this.branchContext.isGlobalView && workingBranch?.id) {
+      this.initialStocks.clear();
+      const isManage = this.productForm?.get('manageStock')?.value !== false;
+      const stockGroup = this.fb.group({
+        id: [this.generateUniqueId()],
+        branchId: [workingBranch.id, Validators.required],
+        quantity: [
+          isManage ? null : 0,
+          isManage ? [Validators.min(0)] : [],
+        ],
+        isAvailable: [true],
+      });
+      this.initialStocks.push(stockGroup);
+    }
+  }
+
+  getBranchName(branchId: string | null | undefined): string {
+    if (!branchId) return '';
+    const branch = this.branches().find((b) => b.id === branchId);
+    if (branch) return branch.name;
+    const current = this.branchContext.currentBranch();
+    if (current && current.id === branchId) return current.name;
+    return '';
+  }
+
   addStock() {
+    if (this.hasActiveWorkingBranch) {
+      return;
+    }
+
     if (this.initialStocks.invalid) {
       this.initialStocks.markAllAsTouched();
       this.messageService.add({
@@ -741,6 +796,9 @@ export class ProductFormComponent implements OnInit {
   }
 
   removeStock(index: number) {
+    if (this.hasActiveWorkingBranch) {
+      return;
+    }
     this.initialStocks.removeAt(index);
   }
 
@@ -750,6 +808,9 @@ export class ProductFormComponent implements OnInit {
     if (!this.selectedUnit) {
       this.productForm.get('unitId')?.reset();
       this.initialStocks.clear();
+      if (this.hasActiveWorkingBranch) {
+        this.setupInitialStockForWorkingBranch();
+      }
     }
     
     if (!selectedId) return;

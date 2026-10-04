@@ -13,8 +13,14 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { ProductsService } from '../../services/products.service';
 import { Category } from '../../interfaces/product.interface';
 
+import { ThemeService } from '../../../core/services/theme.service';
+import { PageHeaderComponent } from '../../../shared/components/page-header/page-header.component';
+import { PrimaryButtonComponent } from '../../../shared/components/primary-button/primary-button.component';
+import { SecondaryButtonComponent } from '../../../shared/components/secondary-button/secondary-button.component';
+
 @Component({
   selector: 'app-category-form',
+  standalone: true,
   imports: [
     CommonModule,
     ReactiveFormsModule,
@@ -22,11 +28,15 @@ import { Category } from '../../interfaces/product.interface';
     InputTextModule,
     TextareaModule,
     SelectModule,
+    PageHeaderComponent,
+    PrimaryButtonComponent,
+    SecondaryButtonComponent,
   ],
   templateUrl: './category-form.component.html',
   styleUrl: './category-form.component.css',
 })
 export class CategoryFormComponent implements OnInit {
+  public themeService = inject(ThemeService);
   private fb = inject(FormBuilder);
   private messageService = inject(MessageService);
   private confirmService = inject(ConfirmService);

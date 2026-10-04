@@ -8,19 +8,20 @@
   [draggable]="false"
   [resizable]="false"
   appendTo="body"
-  styleClass="rounded-2xl overflow-hidden shadow-2xl bg-white"
+  [styleClass]="themeService.isDarkMode() ? 'rounded-2xl overflow-hidden shadow-2xl bg-[#161B22] border border-[#30363D] text-[#F0F6FC]' : 'rounded-2xl overflow-hidden shadow-2xl bg-white'"
   (onHide)="onClose()"
 >
   <div class="preview-content flex flex-col h-full min-h-0 max-h-[88vh]" *ngIf="quotation">
-    <!-- Header with Title and Close Button (Compacto y sin icono) -->
-    <div class="flex items-center justify-between pb-2 mb-2 border-b border-slate-100 flex-shrink-0">
-      <h3 class="text-sm font-semibold text-slate-800 tracking-tight leading-none">
-        Documento de Cotización <span *ngIf="quotation?.correlative" class="text-brand-navy text-xs font-bold">#{{ quotation.correlative }}</span>
+    <!-- Header with Title and Close Button -->
+    <div class="flex items-center justify-between pb-2 mb-2 border-b flex-shrink-0 transition-colors" [ngClass]="themeService.isDarkMode() ? 'border-[#30363D]' : 'border-slate-100'">
+      <h3 class="text-sm font-semibold tracking-tight leading-none" [ngClass]="themeService.isDarkMode() ? 'text-[#F0F6FC]' : 'text-slate-800'">
+        Documento de Cotización <span *ngIf="quotation?.correlative" class="text-xs font-bold" [ngClass]="themeService.isDarkMode() ? 'text-[#58A6FF]' : 'text-[#48021C]'">#{{ quotation.correlative }}</span>
       </h3>
       <button 
         type="button" 
         (click)="onClose()"
-        class="w-7 h-7 -mr-1 rounded-lg flex items-center justify-center text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition-colors border-none bg-transparent cursor-pointer"
+        class="w-7 h-7 -mr-1 rounded-lg flex items-center justify-center transition-colors border-none bg-transparent cursor-pointer"
+        [ngClass]="themeService.isDarkMode() ? 'text-[#8B949E] hover:text-white hover:bg-[#30363D]' : 'text-slate-400 hover:text-slate-600 hover:bg-slate-100'"
         pTooltip="Cerrar vista previa"
       >
         <i class="pi pi-times text-xs"></i>

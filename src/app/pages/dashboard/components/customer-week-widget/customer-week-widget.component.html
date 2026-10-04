@@ -1,125 +1,150 @@
 <div class="widget-card p-4 rounded-xl">
   <div class="list-layer" [class.is-covered]="selected()">
     <div class="kpi-toolbar mb-4 flex items-center justify-between gap-3">
-      <h3 class="text-base font-semibold tracking-tight text-[#48021C] min-w-0 truncate">Consolidado semanal por cliente</h3>
+      <div class="min-w-0">
+        <h3 class="text-base font-medium truncate"
+          [ngClass]="themeService.isDarkMode() ? 'text-[#F0F6FC]' : 'text-[#48021C]'">Consolidado semanal por cliente
+        </h3>
+        <p class="text-[11px] font-medium leading-tight mt-0.5 truncate"
+          [ngClass]="themeService.isDarkMode() ? 'text-[#8B949E]' : 'text-[#9f6587]'">Métricas de compra, pedidos y
+          cobranza por cliente</p>
+      </div>
 
       <div class="flex items-center gap-1.5 shrink-0">
-        <button
-          type="button"
-          class="w-8 h-8 rounded-xl border border-[#9f6587]/35 bg-white text-[#48021C] hover:bg-[#9f6587]/15 flex items-center justify-center cursor-pointer"
-          (click)="shiftWeek(-1)"
-          pTooltip="Semana anterior"
-        >
-          <i class="pi pi-chevron-left text-xs"></i>
+        <button type="button"
+          class="w-8 h-8 rounded-xl border flex items-center justify-center cursor-pointer transition-colors"
+          [ngClass]="themeService.isDarkMode() ? 'border-[#30363D] bg-[#0D1117] text-slate-200 hover:bg-[#1C2128]' : 'border-[#9f6587]/35 bg-white text-[#48021C] hover:bg-[#9f6587]/15'"
+          (click)="shiftWeek(-1)" pTooltip="Semana anterior">
+          <i class="pi pi-chevron-left text-xs!"></i>
         </button>
         <div class="text-center min-w-[9.5rem]">
-          <p class="text-xs font-semibold text-[#6e3757] tabular-nums leading-tight">{{ weekRangeLabel() }}</p>
-          <p class="text-[10px] font-medium text-[#48021C]/70">Semana {{ weekNumber() }}</p>
+          <p class="text-xs! font-medium tabular-nums leading-tight"
+            [ngClass]="themeService.isDarkMode() ? 'text-slate-200' : 'text-[#6e3757]'">{{ weekRangeLabel() }}</p>
+          <p class="text-[11px] font-normal"
+            [ngClass]="themeService.isDarkMode() ? 'text-slate-400' : 'text-[#48021C]/70'">Semana {{ weekNumber() }}</p>
         </div>
-        <button
-          type="button"
-          class="w-8 h-8 rounded-xl border border-[#9f6587]/35 bg-white text-[#48021C] hover:bg-[#9f6587]/15 flex items-center justify-center cursor-pointer"
-          (click)="shiftWeek(1)"
-          pTooltip="Semana siguiente"
-        >
-          <i class="pi pi-chevron-right text-xs"></i>
+        <button type="button"
+          class="w-8 h-8 rounded-xl border flex items-center justify-center cursor-pointer transition-colors"
+          [ngClass]="themeService.isDarkMode() ? 'border-[#30363D] bg-[#0D1117] text-slate-200 hover:bg-[#1C2128]' : 'border-[#9f6587]/35 bg-white text-[#48021C] hover:bg-[#9f6587]/15'"
+          (click)="shiftWeek(1)" pTooltip="Semana siguiente">
+          <i class="pi pi-chevron-right text-xs!"></i>
         </button>
         <div class="week-cal-anchor">
-          <button
-            type="button"
-            class="week-cal-btn"
-            (click)="toggleCal($event)"
-            pTooltip="Elegir una fecha de la semana"
-          >
-            <i class="pi pi-calendar text-xs"></i>
+          <button type="button" class="week-cal-btn" (click)="toggleCal($event)"
+            pTooltip="Elegir una fecha de la semana">
+            <i class="pi pi-calendar text-xs!"></i>
           </button>
           @if (calOpen()) {
-            <div class="week-cal-panel" (click)="$event.stopPropagation()">
-              <p-datepicker
-                [ngModel]="weekStart()"
-                (ngModelChange)="onPickDate($event)"
-                [inline]="true"
-              />
-            </div>
+          <div class="week-cal-panel" (click)="$event.stopPropagation()">
+            <p-datepicker [ngModel]="weekStart()" (ngModelChange)="onPickDate($event)" [inline]="true" />
+          </div>
           }
         </div>
       </div>
     </div>
 
     @if (errorMessage()) {
-      <div class="mb-4 flex items-start gap-2 rounded-xl border border-rose-200 bg-rose-50 px-3 py-2.5 text-rose-800">
-        <i class="pi pi-exclamation-circle mt-0.5 text-sm"></i>
-        <p class="text-xs leading-relaxed">{{ errorMessage() }}</p>
-      </div>
+    <div class="mb-4 flex items-start gap-2 rounded-xl border border-rose-200 bg-rose-50 px-3 py-2.5 text-rose-800">
+      <i class="pi pi-exclamation-circle mt-0.5 text-sm"></i>
+      <p class="text-xs leading-relaxed">{{ errorMessage() }}</p>
+    </div>
     }
 
     <div class="kpi-toolbar mb-4">
       <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
-        <div class="rounded-lg border border-[#9ecad6] bg-[#e8f4f7] px-3 py-2.5">
-          <p class="text-[9px] font-bold text-[#1B768E]">Top cliente</p>
-          <p class="mt-0.5 text-xs font-semibold text-slate-800 truncate">{{ kpis().topName }}</p>
-          <p class="text-sm font-bold text-[#1B768E] tabular-nums">{{ kpis().topTotal | currency:'GTQ':'symbol':'1.2-2' }}</p>
+        <div class="rounded-lg border px-3 py-2.5 transition-colors"
+          [ngClass]="themeService.isDarkMode() ? 'border-none bg-cyan-950/40 text-cyan-200' : 'border-[#9ecad6] bg-[#e8f4f7]'">
+          <p class="text-[10px] font-normal"
+            [ngClass]="themeService.isDarkMode() ? 'text-slate-400' : 'text-[#1B768E]'">
+            Top cliente</p>
+          <p class="mt-0.5 text-xs font-normal truncate"
+            [ngClass]="themeService.isDarkMode() ? 'text-slate-100' : 'text-slate-800'">{{ kpis().topName }}</p>
+          <p class="text-sm font-semibold tabular-nums"
+            [ngClass]="themeService.isDarkMode() ? 'text-slate-100' : 'text-[#1B768E]'">{{ kpis().topTotal |
+            currency:'GTQ':'symbol':'1.2-2' }}</p>
         </div>
-        <div class="rounded-lg border border-sky-200 bg-sky-50 px-3 py-2.5">
-          <p class="text-[9px] font-bold text-sky-700">Promedio por pedido</p>
-          <p class="mt-0.5 text-sm font-bold text-slate-800 tabular-nums">{{ kpis().averageTicket | currency:'GTQ':'symbol':'1.2-2' }}</p>
-          <p class="text-[10px] font-semibold text-sky-700/80">{{ kpis().customerCount }} cuentas activas</p>
+        <div class="rounded-lg border px-3 py-2.5 transition-colors"
+          [ngClass]="themeService.isDarkMode() ? 'border-none bg-sky-950/40 text-sky-200' : 'border-sky-200 bg-sky-50'">
+          <p class="text-[10px] font-normal" [ngClass]="themeService.isDarkMode() ? 'text-slate-400' : 'text-sky-700'">
+            Promedio por pedido</p>
+          <p class="mt-0.5 text-sm font-semibold tabular-nums"
+            [ngClass]="themeService.isDarkMode() ? 'text-slate-100' : 'text-slate-800'">{{ kpis().averageTicket |
+            currency:'GTQ':'symbol':'1.2-2' }}</p>
+          <p class="text-[11px] font-normal"
+            [ngClass]="themeService.isDarkMode() ? 'text-sky-400/80' : 'text-sky-700/80'">{{ kpis().customerCount }}
+            cuentas activas</p>
         </div>
-        <div class="rounded-lg border border-amber-200 bg-amber-50 px-3 py-2.5">
-          <p class="text-[9px] font-bold text-amber-700">Concentración top 5</p>
-          <p class="mt-0.5 text-sm font-bold text-slate-800 tabular-nums">{{ kpis().concentration | number:'1.0-0' }}%</p>
-          <p class="text-[10px] font-semibold text-amber-700/80">del gasto de la semana</p>
+        <div class="rounded-lg border px-3 py-2.5 transition-colors"
+          [ngClass]="themeService.isDarkMode() ? 'border-none bg-amber-950/40 text-amber-200' : 'border-amber-200 bg-amber-50'">
+          <p class="text-[10px] font-normal"
+            [ngClass]="themeService.isDarkMode() ? 'text-slate-400' : 'text-amber-700'">
+            Concentración top 5</p>
+          <p class="mt-0.5 text-sm font-semibold tabular-nums"
+            [ngClass]="themeService.isDarkMode() ? 'text-slate-100' : 'text-slate-800'">{{ kpis().concentration |
+            number:'1.0-0' }}%</p>
+          <p class="text-[11px] font-normal"
+            [ngClass]="themeService.isDarkMode() ? 'text-amber-400/80' : 'text-amber-700/80'">del gasto de la semana</p>
         </div>
-        <div class="rounded-lg border border-rose-200 bg-rose-50 px-3 py-2.5">
-          <p class="text-[9px] font-bold text-rose-600">Saldo pendiente</p>
-          <p class="mt-0.5 text-sm font-bold text-rose-700 tabular-nums">{{ kpis().pending | currency:'GTQ':'symbol':'1.2-2' }}</p>
-          <p class="text-[10px] font-semibold text-rose-600/80">incluye preórdenes y crédito</p>
+        <div class="rounded-lg border px-3 py-2.5 transition-colors"
+          [ngClass]="themeService.isDarkMode() ? 'border-none bg-rose-950/40 text-rose-200' : 'border-rose-200 bg-rose-50'">
+          <p class="text-[10px] font-normal" [ngClass]="themeService.isDarkMode() ? 'text-slate-400' : 'text-rose-600'">
+            Saldo pendiente</p>
+          <p class="mt-0.5 text-sm font-semibold tabular-nums"
+            [ngClass]="themeService.isDarkMode() ? 'text-slate-100' : 'text-rose-700'">{{ kpis().pending |
+            currency:'GTQ':'symbol':'1.2-2' }}</p>
+          <p class="text-[11px] font-normal"
+            [ngClass]="themeService.isDarkMode() ? 'text-rose-400/80' : 'text-rose-600/80'">incluye preórdenes y crédito
+          </p>
         </div>
       </div>
 
       <div class="mt-2.5 flex items-center justify-between gap-2.5">
-        <app-search-input
-          placeholder="Buscar cliente, categoría o producto..."
-          widthClass="w-full sm:w-[28rem]"
-          (searchChange)="search.set($event)"
-        />
-        <div class="flex items-center bg-rose-50 p-1 rounded-xl border border-[#9f6587]/35 h-9 shrink-0">
-          <button
-            class="px-2.5 py-1 rounded-lg text-[11px] font-bold transition-all cursor-pointer"
-            [class.bg-white]="audience() === 'all'"
+        <app-search-input placeholder="Buscar cliente, categoría o producto..." widthClass="w-full sm:w-[28rem]"
+          (searchChange)="search.set($event)" />
+        <div class="flex items-center p-1 rounded-xl border h-9 shrink-0 transition-colors"
+          [ngClass]="themeService.isDarkMode() ? 'bg-[#0D1117] border-[#30363D]' : 'bg-rose-50 border-[#9f6587]/35'">
+          <button class="px-2.5 py-1 rounded-lg text-[11px] font-bold transition-all cursor-pointer"
+            [class.bg-white]="audience() === 'all' && !themeService.isDarkMode()"
+            [class.bg-[#1C2D42]]="audience() === 'all' && themeService.isDarkMode()"
+            [class.text-[#58A6FF]]="audience() === 'all' && themeService.isDarkMode()"
             [class.shadow-sm]="audience() === 'all'"
-            [class.text-[#48021C]]="audience() === 'all'"
-            [class.text-slate-500]="audience() !== 'all'"
-            (click)="setAudience('all')"
-          >Todos</button>
-          <button
-            class="px-2.5 py-1 rounded-lg text-[11px] font-bold transition-all cursor-pointer"
-            [class.bg-white]="audience() === 'registered'"
+            [class.text-[#48021C]]="audience() === 'all' && !themeService.isDarkMode()"
+            [class.text-slate-400]="audience() !== 'all' && themeService.isDarkMode()"
+            [class.text-slate-500]="audience() !== 'all' && !themeService.isDarkMode()"
+            (click)="setAudience('all')">Todos</button>
+          <button class="px-2.5 py-1 rounded-lg text-[11px] font-bold transition-all cursor-pointer"
+            [class.bg-white]="audience() === 'registered' && !themeService.isDarkMode()"
+            [class.bg-[#1C2D42]]="audience() === 'registered' && themeService.isDarkMode()"
+            [class.text-[#58A6FF]]="audience() === 'registered' && themeService.isDarkMode()"
             [class.shadow-sm]="audience() === 'registered'"
-            [class.text-[#48021C]]="audience() === 'registered'"
-            [class.text-slate-500]="audience() !== 'registered'"
-            (click)="setAudience('registered')"
-          >Cuentas</button>
-          <button
-            class="px-2.5 py-1 rounded-lg text-[11px] font-bold transition-all cursor-pointer"
-            [class.bg-white]="audience() === 'guest'"
+            [class.text-[#48021C]]="audience() === 'registered' && !themeService.isDarkMode()"
+            [class.text-slate-400]="audience() !== 'registered' && themeService.isDarkMode()"
+            [class.text-slate-500]="audience() !== 'registered' && !themeService.isDarkMode()"
+            (click)="setAudience('registered')">Cuentas</button>
+          <button class="px-2.5 py-1 rounded-lg text-[11px] font-bold transition-all cursor-pointer"
+            [class.bg-white]="audience() === 'guest' && !themeService.isDarkMode()"
+            [class.bg-[#1C2D42]]="audience() === 'guest' && themeService.isDarkMode()"
+            [class.text-[#58A6FF]]="audience() === 'guest' && themeService.isDarkMode()"
             [class.shadow-sm]="audience() === 'guest'"
-            [class.text-[#48021C]]="audience() === 'guest'"
-            [class.text-slate-500]="audience() !== 'guest'"
-            (click)="setAudience('guest')"
-          >C/F</button>
+            [class.text-[#48021C]]="audience() === 'guest' && !themeService.isDarkMode()"
+            [class.text-slate-400]="audience() !== 'guest' && themeService.isDarkMode()"
+            [class.text-slate-500]="audience() !== 'guest' && !themeService.isDarkMode()"
+            (click)="setAudience('guest')">C/F</button>
         </div>
       </div>
     </div>
 
     <div class="widget-span relative">
       @if (isLoading()) {
-        <div class="absolute inset-0 z-10 flex items-center justify-center bg-white/70 rounded-xl">
-          <i class="pi pi-spin pi-spinner text-2xl text-[#48021C]"></i>
-        </div>
+      <div class="absolute inset-0 z-10 flex items-center justify-center rounded-xl"
+        [ngClass]="themeService.isDarkMode() ? 'bg-[#0D1117]/80' : 'bg-white/70'">
+        <i class="pi pi-spin pi-spinner text-2xl"
+          [ngClass]="themeService.isDarkMode() ? 'text-[#58A6FF]' : 'text-[#48021C]'"></i>
+      </div>
       }
 
-      <div class="hidden lg:block overflow-hidden rounded-xl border border-[#9f6587]/35 bg-white/95">
+      <div class="hidden lg:block overflow-hidden rounded-xl border transition-colors"
+        [ngClass]="themeService.isDarkMode() ? 'border-[#30363D] bg-[#0D1117]' : 'border-[#9f6587]/35 bg-white/95'">
         <div class="customer-week-table-frame">
           <table class="customer-week-table w-full text-left border-collapse">
             <colgroup>
@@ -132,80 +157,102 @@
               <col class="w-[16%]" />
             </colgroup>
             <thead>
-              <tr class="border-b border-[#e4c9d5]/70">
-                <th class="px-2.5 py-2 text-[10px] text-[#48021C] font-semibold">Cliente</th>
-                <th class="px-2 py-2 text-[10px] text-[#48021C] font-semibold text-right">Gastó</th>
-                <th class="px-1.5 py-2 text-[10px] text-[#48021C] font-semibold text-center">Ped.</th>
-                <th class="px-2 py-2 text-[10px] text-[#48021C] font-semibold text-right">Prom. x pedido</th>
-                <th class="px-1.5 py-2 text-[10px] text-[#48021C] font-semibold text-center">vs ant.</th>
-                <th class="px-2 py-2 text-[10px] text-[#48021C] font-semibold">Cobro</th>
-                <th class="px-2 py-2 text-[10px] text-[#48021C] font-semibold">Top</th>
+              <tr class="border-b" [ngClass]="themeService.isDarkMode() ? 'border-[#30363D]' : 'border-[#e4c9d5]/70'">
+                <th class="px-2.5 py-2 text-[12px] font-normal"
+                  [ngClass]="themeService.isDarkMode() ? 'text-slate-200' : 'text-[#48021C]'">Cliente</th>
+                <th class="px-2 py-2 text-[12px] font-normal text-right"
+                  [ngClass]="themeService.isDarkMode() ? 'text-slate-200' : 'text-[#48021C]'">Gastó</th>
+                <th class="px-1.5 py-2 text-[12px] font-normal text-center"
+                  [ngClass]="themeService.isDarkMode() ? 'text-slate-200' : 'text-[#48021C]'">Ped.</th>
+                <th class="px-2 py-2 text-[12px] font-normal text-right"
+                  [ngClass]="themeService.isDarkMode() ? 'text-slate-200' : 'text-[#48021C]'">Prom. x pedido</th>
+                <th class="px-1.5 py-2 text-[12px] font-normal text-center"
+                  [ngClass]="themeService.isDarkMode() ? 'text-slate-200' : 'text-[#48021C]'">vs ant.</th>
+                <th class="px-2 py-2 text-[12px] font-normal"
+                  [ngClass]="themeService.isDarkMode() ? 'text-slate-200' : 'text-[#48021C]'">Cobro</th>
+                <th class="px-2 py-2 text-[12px] font-normal"
+                  [ngClass]="themeService.isDarkMode() ? 'text-slate-200' : 'text-[#48021C]'">Top</th>
               </tr>
             </thead>
             <tbody>
               @for (c of filtered(); track rowKey(c)) {
-                <tr
-                  class="border-b border-slate-100 cursor-pointer transition-colors hover:bg-[#9f6587]/10"
-                  [class.opacity-50]="c.inactiveThisWeek"
-                  (click)="selectCustomer(c)"
-                >
-                  <td class="px-2.5 py-2">
-                    <p class="text-xs font-semibold text-[#374375] truncate">{{ c.name }}</p>
-                    <div class="mt-0.5 flex items-center gap-1 min-w-0">
-                      <app-status-badge [value]="c.category.name" [severity]="categorySeverity(c.category.name)" size="xs" />
-                      @if (c.preorderCommitted > 0) {
-                        <app-status-badge value="Preorden" severity="info" size="xs" />
-                      }
-                    </div>
-                  </td>
-                  <td class="px-2 py-2 text-right">
-                    <span class="text-xs font-bold tabular-nums text-slate-800">{{ c.total | currency:'GTQ':'symbol':'1.2-2' }}</span>
-                  </td>
-                  <td class="px-1.5 py-2 text-center text-xs font-semibold text-slate-600">{{ c.orderCount }}</td>
-                  <td class="px-2 py-2 text-right text-xs tabular-nums text-slate-600">{{ c.averageTicket | currency:'GTQ':'symbol':'1.0-0' }}</td>
-                  <td class="px-1.5 py-2 text-center">
-                    @if (c.trendPercent > 0) {
-                      <span class="inline-flex items-center gap-0.5 text-[11px] font-bold text-emerald-600">
-                        <i class="pi pi-arrow-up-right trend-icon"></i>{{ c.trendPercent }}%
-                      </span>
-                    } @else if (c.trendPercent < 0) {
-                      <span class="inline-flex items-center gap-0.5 text-[11px] font-bold text-rose-600">
-                        <i class="pi pi-arrow-down-left trend-icon"></i>{{ c.trendPercent }}%
-                      </span>
+              <tr class="border-b cursor-pointer transition-colors" [ngClass]="themeService.isDarkMode() 
+                    ? 'border-[#30363D]/60 hover:bg-[#161B22]' 
+                    : 'border-slate-100 hover:bg-[#9f6587]/10'" [class.opacity-50]="c.inactiveThisWeek"
+                (click)="selectCustomer(c)">
+                <td class="px-2.5 py-2">
+                  <p class="text-[13px] font-normal truncate"
+                    [ngClass]="themeService.isDarkMode() ? 'text-slate-100' : 'text-[#374375]'">{{ c.name }}</p>
+                  <div class="mt-0.5 flex items-center gap-1 min-w-0">
+                    <app-status-badge [value]="c.category.name" [severity]="categorySeverity(c.category.name)"
+                      size="xs" />
+                    @if (c.preorderCommitted > 0) {
+                    <app-status-badge value="Preorden" severity="info" size="xs" />
+                    }
+                  </div>
+                </td>
+                <td class="px-2 py-2 text-right">
+                  <span class="text-[13px] font-semibold tabular-nums tracking-wider"
+                    [ngClass]="themeService.isDarkMode() ? 'text-slate-100' : 'text-slate-800'">{{ c.total |
+                    currency:'GTQ':'symbol':'1.2-2' }}</span>
+                </td>
+                <td class="px-1.5 py-2 text-center text-[13px] font-normal"
+                  [ngClass]="themeService.isDarkMode() ? 'text-slate-300' : 'text-slate-600'">{{ c.orderCount }}</td>
+                <td class="px-2 py-2 text-right text-[13px] font-normal tabular-nums tracking-wider"
+                  [ngClass]="themeService.isDarkMode() ? 'text-slate-300' : 'text-slate-600'">{{ c.averageTicket |
+                  currency:'GTQ':'symbol':'1.0-0' }}</td>
+                <td class="px-1.5 py-2 text-center">
+                  @if (c.trendPercent > 0) {
+                  <span class="inline-flex items-center gap-1 text-[12px] font-medium text-emerald-400">
+                    <i class="pi pi-arrow-up-right trend-icon text-[10px]!"></i>{{ c.trendPercent }}%
+                  </span>
+                  } @else if (c.trendPercent < 0) { <span
+                    class="inline-flex items-center gap-0.5 text-[11px] font-bold text-rose-400">
+                    <i class="pi pi-arrow-down-left trend-icon"></i>{{ c.trendPercent }}%
+                    </span>
                     } @else {
-                      <span class="text-[11px] font-bold text-slate-400">0%</span>
+                    <span class="text-[11px] font-bold text-slate-500">0%</span>
                     }
-                  </td>
-                  <td class="px-2 py-2">
-                    <div class="h-1 rounded-full bg-slate-100 overflow-hidden mb-0.5">
-                      <div class="h-full bg-[#48021C]" [style.width.%]="paidPercent(c)"></div>
-                    </div>
-                    <p class="text-[10px] font-semibold text-slate-500 leading-tight truncate">
-                      <span class="font-semibold text-[#48021C]">{{ c.paidAmount | currency:'GTQ':'symbol':'1.0-0' }}</span>
-                      @if (c.pendingAmount > 0) {
-                        <span> · {{ c.pendingAmount | currency:'GTQ':'symbol':'1.0-0' }}</span>
-                      }
-                    </p>
-                  </td>
-                  <td class="px-2 py-2">
-                    <p class="text-xs font-medium text-slate-700 truncate">{{ c.topProduct?.name || '—' }}</p>
-                    @if (c.topProduct && c.topProduct.quantity > 0) {
-                      <p class="text-[10px] text-slate-400 font-semibold truncate">{{ c.topProduct.quantity }} {{ c.topProduct.unit }}</p>
+                </td>
+                <td class="px-2 py-2">
+                  <div class="h-1 rounded-full overflow-hidden mb-0.5"
+                    [ngClass]="themeService.isDarkMode() ? 'bg-[#30363D]' : 'bg-slate-100'">
+                    <div class="h-full" [ngClass]="themeService.isDarkMode() ? 'bg-[#58A6FF]' : 'bg-[#48021C]'"
+                      [style.width.%]="paidPercent(c)"></div>
+                  </div>
+                  <p class="text-[10px] font-semibold leading-tight truncate"
+                    [ngClass]="themeService.isDarkMode() ? 'text-slate-400' : 'text-slate-500'">
+                    <span class="font-semibold"
+                      [ngClass]="themeService.isDarkMode() ? 'text-[#58A6FF]' : 'text-[#48021C]'">{{ c.paidAmount |
+                      currency:'GTQ':'symbol':'1.0-0' }}</span>
+                    @if (c.pendingAmount > 0) {
+                    <span> · {{ c.pendingAmount | currency:'GTQ':'symbol':'1.0-0' }}</span>
                     }
-                  </td>
-                </tr>
-              }
-              @if (filtered().length === 0) {
-                <tr class="is-empty">
-                  <td colspan="7" class="px-2.5 text-center text-sm text-slate-400">
-                    {{ isLoading() ? 'Cargando...' : 'No hay clientes con ese filtro.' }}
-                  </td>
-                </tr>
+                  </p>
+                </td>
+                <td class="px-2 py-2">
+                  <p class="text-xs font-normal truncate"
+                    [ngClass]="themeService.isDarkMode() ? 'text-emerald-400' : 'text-slate-700'">{{ c.topProduct?.name
+                    ||
+                    '—' }}</p>
+                  @if (c.topProduct && c.topProduct.quantity > 0) {
+                  <p class="text-[10px] font-medium truncate"
+                    [ngClass]="themeService.isDarkMode() ? 'text-slate-300' : 'text-slate-400'">{{ c.topProduct.quantity
+                    }} {{ c.topProduct.unit }}</p>
+                  }
+                </td>
+                }
+                @if (filtered().length === 0) {
+              <tr class="is-empty">
+                <td colspan="7" class="px-2.5 text-center text-sm text-slate-400">
+                  {{ isLoading() ? 'Cargando...' : 'No hay clientes con ese filtro.' }}
+                </td>
+              </tr>
               }
               @for (_ of emptySlots(); track $index) {
-                <tr class="is-empty border-b border-slate-50">
-                  <td colspan="7"></td>
-                </tr>
+              <tr class="is-empty">
+                <td colspan="7"></td>
+              </tr>
               }
             </tbody>
           </table>
@@ -214,168 +261,194 @@
 
       <div class="lg:hidden space-y-3">
         @for (c of filtered(); track rowKey(c)) {
-          <button
-            type="button"
-            class="w-full text-left bg-white border border-slate-200 rounded-xl p-4 shadow-sm"
-            [class.opacity-60]="c.inactiveThisWeek"
-            (click)="selectCustomer(c)"
-          >
-            <div class="flex justify-between gap-3 mb-2">
-              <div class="min-w-0">
-                <p class="text-sm font-bold text-slate-800 truncate">{{ c.name }}</p>
-                <div class="mt-1">
-                  <app-status-badge [value]="c.category.name" [severity]="categorySeverity(c.category.name)" size="xs" />
-                </div>
+        <button type="button" class="w-full text-left bg-white border border-slate-200 rounded-xl p-4 shadow-sm"
+          [class.opacity-60]="c.inactiveThisWeek" (click)="selectCustomer(c)">
+          <div class="flex justify-between gap-3 mb-2">
+            <div class="min-w-0">
+              <p class="text-sm font-bold text-slate-800 truncate">{{ c.name }}</p>
+              <div class="mt-1">
+                <app-status-badge [value]="c.category.name" [severity]="categorySeverity(c.category.name)" size="xs" />
               </div>
-              <p class="text-sm font-black text-[#48021C] tabular-nums shrink-0">{{ c.total | currency:'GTQ':'symbol':'1.0-0' }}</p>
             </div>
-            <div class="flex items-center justify-between text-[11px] text-slate-500">
-              <span>{{ c.orderCount }} pedidos · {{ c.averageTicket | currency:'GTQ':'symbol':'1.0-0' }} c/u</span>
-              @if (c.trendPercent > 0) {
-                <span class="font-bold text-emerald-600">+{{ c.trendPercent }}%</span>
-              } @else if (c.trendPercent < 0) {
-                <span class="font-bold text-rose-600">{{ c.trendPercent }}%</span>
+            <p class="text-sm font-black text-[#48021C] tabular-nums shrink-0">{{ c.total |
+              currency:'GTQ':'symbol':'1.0-0' }}</p>
+          </div>
+          <div class="flex items-center justify-between text-[11px] text-slate-500">
+            <span>{{ c.orderCount }} pedidos · {{ c.averageTicket | currency:'GTQ':'symbol':'1.0-0' }} c/u</span>
+            @if (c.trendPercent > 0) {
+            <span class="font-bold text-emerald-600">+{{ c.trendPercent }}%</span>
+            } @else if (c.trendPercent < 0) { <span class="font-bold text-rose-600">{{ c.trendPercent }}%</span>
               }
-            </div>
-            <p class="mt-2 text-[11px] text-slate-500">Top: <span class="font-semibold text-slate-700">{{ c.topProduct?.name || '—' }}</span></p>
-          </button>
+          </div>
+          <p class="mt-2 text-[11px] text-slate-500">Top: <span class="font-semibold text-slate-700">{{
+              c.topProduct?.name || '—' }}</span></p>
+        </button>
         }
       </div>
     </div>
   </div>
 
   @if (selected(); as c) {
-    <aside class="customer-week-detail">
-      <div class="flex items-start justify-between gap-3 mb-3 shrink-0">
-        <div class="min-w-0">
-          <p class="text-[10px] font-bold text-black">Ficha de la semana · {{ weekRangeLabel() }}</p>
-          <h4 class="text-lg font-bold text-black leading-tight truncate">{{ c.name }}</h4>
-          <div class="mt-1.5 flex flex-wrap gap-1.5">
-            <app-status-badge [value]="c.category.name" [severity]="categorySeverity(c.category.name)" size="xs" />
-            @if (c.inactiveThisWeek) {
-              <app-status-badge value="No compró esta semana" severity="danger" size="xs" />
-            }
-          </div>
-        </div>
-        <div class="flex items-center gap-1.5 shrink-0">
-          <button
-            type="button"
-            class="inline-flex items-center gap-1.5 rounded-xl border border-[#9f6587]/35 bg-white px-2.5 py-1.5 text-[11px] font-bold text-[#48021C] hover:bg-[#9f6587]/15 cursor-pointer"
-            (click)="openPreview(c)"
-            pTooltip="Ver documento consolidado semanal"
-          >
-            <i class="pi pi-file-pdf text-[11px] text-rose-600"></i>
-            Ver Documento
-          </button>
-          <button
-            type="button"
-            class="inline-flex items-center gap-1.5 rounded-xl border border-[#9f6587]/35 bg-white px-2.5 py-1.5 text-[11px] font-bold text-[#48021C] hover:bg-[#9f6587]/15 cursor-pointer"
-            (click)="closeDetail()"
-          >
-            <i class="pi pi-chevron-left text-[10px]"></i>
-            Volver
-          </button>
-        </div>
-      </div>
-
-      <div class="customer-week-detail-body">
-        <div class="customer-week-detail-col">
-          <div class="grid grid-cols-3 gap-2">
-            <div class="rounded-lg border border-[#9f6587]/20 bg-white/80 p-2.5">
-              <p class="text-[9px] font-bold text-black">Gastó</p>
-              <p class="text-sm font-bold tabular-nums text-black">{{ c.total | currency:'GTQ':'symbol':'1.0-0' }}</p>
-            </div>
-            <div class="rounded-lg border border-[#9f6587]/20 bg-white/80 p-2.5">
-              <p class="text-[9px] font-bold text-black">Pedidos</p>
-              <p class="text-sm font-bold text-black">{{ c.orderCount }}</p>
-            </div>
-            <div class="rounded-lg border border-[#9f6587]/20 bg-white/80 p-2.5">
-              <p class="text-[9px] font-bold text-black">Prom. x pedido</p>
-              <p class="text-sm font-bold tabular-nums text-black">{{ c.averageTicket | currency:'GTQ':'symbol':'1.0-0' }}</p>
-            </div>
-          </div>
-
-          <p class="text-[10px] font-bold text-black mb-2 mt-4">Gastos por día</p>
-          <div class="flex items-end gap-1 mb-4">
-            @for (d of c.days; track d.date) {
-              <div class="flex-1 min-w-0 flex flex-col items-center">
-                <div class="flex items-end w-full h-28 mb-1.5">
-                  <div
-                    class="spark-bar w-full"
-                    [class.is-empty]="d.total === 0"
-                    [style.height.%]="d.total === 0 ? 2 : barHeight(d.total)"
-                    [pTooltip]="dayTooltip(d.total)"
-                  ></div>
-                </div>
-                <span
-                  class="w-full text-center text-[11px] font-bold tabular-nums leading-tight text-black"
-                  [class.text-slate-400]="d.total === 0"
-                >{{ dayAmountLabel(d.total) }}</span>
-                <span class="text-[11px] font-bold text-black leading-none mt-1">{{ d.day }}</span>
-              </div>
-            }
-          </div>
-
-          <div class="grid grid-cols-2 gap-3">
-            <div class="rounded-lg border border-slate-100 bg-white/80 p-3">
-              <p class="text-[9px] font-bold text-black mb-1">Cobrado / saldo</p>
-              <p class="text-sm font-bold text-emerald-700">{{ c.paidAmount | currency:'GTQ':'symbol':'1.2-2' }}</p>
-              <p class="text-xs font-semibold text-rose-600">Pendiente {{ c.pendingAmount | currency:'GTQ':'symbol':'1.2-2' }}</p>
-            </div>
-            <div class="rounded-lg border border-slate-100 bg-white/80 p-3">
-              <p class="text-[9px] font-bold text-black mb-1">Crédito</p>
-              @if (c.creditLimit > 0) {
-                <p class="text-sm font-bold text-black">{{ creditPercent(c) }}% usado</p>
-                <p class="text-[11px] font-semibold text-black">{{ c.creditUsed | currency:'GTQ':'symbol':'1.0-0' }} de {{ c.creditLimit | currency:'GTQ':'symbol':'1.0-0' }}</p>
-              } @else {
-                <p class="text-sm font-semibold text-black">Sin línea de crédito</p>
-              }
-            </div>
-          </div>
-
-          @if (c.preorderCommitted > 0) {
-            <div class="rounded-lg border border-[#9f6587]/30 bg-rose-50 px-3 py-2 mt-3 text-xs text-[#6e3757]">
-              Preorden comprometida: <span class="font-bold">{{ c.preorderCommitted | currency:'GTQ' }}</span> (no es venta confirmada).
-            </div>
-          }
-
-          <p class="text-[11px] font-semibold text-black mt-3">
-            Última compra:
-            {{ c.lastPurchaseDate ? formatIsoDate(c.lastPurchaseDate) : '—' }}
-          </p>
-        </div>
-
-        <div class="customer-week-detail-col">
-          <p class="text-[10px] font-bold text-black mb-2">Qué compró más</p>
-          @if (c.mix.length === 0) {
-            <p class="text-sm font-semibold text-black">Sin compras en este periodo.</p>
-          } @else {
-            <ul class="space-y-2.5">
-              @for (item of c.mix; track $index) {
-                <li>
-                  <div class="flex justify-between text-xs mb-1 gap-2">
-                    <span class="font-bold text-black truncate">{{ item.productName }}</span>
-                    <span class="tabular-nums font-semibold text-black shrink-0">{{ item.revenue | currency:'GTQ':'symbol':'1.0-0' }} · {{ item.share }}%</span>
-                  </div>
-                  <div class="h-1.5 rounded-full bg-slate-100 overflow-hidden">
-                    <div class="h-full bg-[#48021C]" [style.width.%]="item.share"></div>
-                  </div>
-                  @if (item.quantity > 0) {
-                    <p class="text-[10px] font-bold text-black mt-0.5">{{ item.quantity }} {{ item.unit }}</p>
-                  }
-                </li>
-              }
-            </ul>
+  <aside class="customer-week-detail">
+    <div class="flex items-start justify-between gap-3 mb-3 shrink-0">
+      <div class="min-w-0">
+        <p class="text-[10px] font-bold" [ngClass]="themeService.isDarkMode() ? 'text-slate-400' : 'text-slate-600'">
+          Ficha de la semana · {{ weekRangeLabel() }}</p>
+        <h4 class="text-lg font-bold leading-tight truncate"
+          [ngClass]="themeService.isDarkMode() ? 'text-white' : 'text-slate-900'">{{ c.name }}</h4>
+        <div class="mt-1.5 flex flex-wrap gap-1.5">
+          <app-status-badge [value]="c.category.name" [severity]="categorySeverity(c.category.name)" size="xs" />
+          @if (c.inactiveThisWeek) {
+          <app-status-badge value="No compró esta semana" severity="danger" size="xs" />
           }
         </div>
       </div>
-    </aside>
+      <div class="flex items-center gap-1.5 shrink-0">
+        <button type="button"
+          class="inline-flex items-center gap-1.5 rounded-xl border px-2.5 py-1.5 text-[11px] font-bold cursor-pointer transition-colors"
+          [ngClass]="themeService.isDarkMode() 
+              ? 'border-[#30363D] bg-[#0D1117] text-slate-200 hover:bg-[#1C2128]' 
+              : 'border-[#9f6587]/35 bg-white text-[#48021C] hover:bg-[#9f6587]/15'" (click)="openPreview(c)"
+          pTooltip="Ver documento consolidado semanal">
+          <i class="pi pi-file-pdf text-[11px] text-rose-500"></i>
+          Ver Documento
+        </button>
+        <button type="button"
+          class="inline-flex items-center gap-1.5 rounded-xl border px-2.5 py-1.5 text-[11px] font-bold cursor-pointer transition-colors"
+          [ngClass]="themeService.isDarkMode() 
+              ? 'border-[#30363D] bg-[#0D1117] text-slate-200 hover:bg-[#1C2128]' 
+              : 'border-[#9f6587]/35 bg-white text-[#48021C] hover:bg-[#9f6587]/15'" (click)="closeDetail()">
+          <i class="pi pi-chevron-left text-[10px]"></i>
+          Volver
+        </button>
+      </div>
+    </div>
+
+    <div class="customer-week-detail-body">
+      <div class="customer-week-detail-col">
+        <div class="grid grid-cols-3 gap-2">
+          <div class="rounded-lg border p-2.5 transition-colors"
+            [ngClass]="themeService.isDarkMode() ? 'border-[#30363D] bg-[#0D1117]' : 'border-[#9f6587]/20 bg-white/80'">
+            <p class="text-[9px] font-bold" [ngClass]="themeService.isDarkMode() ? 'text-slate-400' : 'text-slate-600'">
+              Gastó</p>
+            <p class="text-sm font-bold tabular-nums"
+              [ngClass]="themeService.isDarkMode() ? 'text-white' : 'text-slate-900'">{{ c.total |
+              currency:'GTQ':'symbol':'1.0-0' }}</p>
+          </div>
+          <div class="rounded-lg border p-2.5 transition-colors"
+            [ngClass]="themeService.isDarkMode() ? 'border-[#30363D] bg-[#0D1117]' : 'border-[#9f6587]/20 bg-white/80'">
+            <p class="text-[9px] font-bold" [ngClass]="themeService.isDarkMode() ? 'text-slate-400' : 'text-slate-600'">
+              Pedidos</p>
+            <p class="text-sm font-bold" [ngClass]="themeService.isDarkMode() ? 'text-white' : 'text-slate-900'">{{
+              c.orderCount }}</p>
+          </div>
+          <div class="rounded-lg border p-2.5 transition-colors"
+            [ngClass]="themeService.isDarkMode() ? 'border-[#30363D] bg-[#0D1117]' : 'border-[#9f6587]/20 bg-white/80'">
+            <p class="text-[9px] font-bold" [ngClass]="themeService.isDarkMode() ? 'text-slate-400' : 'text-slate-600'">
+              Prom. x pedido</p>
+            <p class="text-sm font-bold tabular-nums"
+              [ngClass]="themeService.isDarkMode() ? 'text-white' : 'text-slate-900'">{{ c.averageTicket |
+              currency:'GTQ':'symbol':'1.0-0' }}</p>
+          </div>
+        </div>
+
+        <p class="text-[10px] font-bold mb-2 mt-4"
+          [ngClass]="themeService.isDarkMode() ? 'text-slate-300' : 'text-slate-700'">Gastos por día</p>
+        <div class="flex items-end gap-1 mb-4">
+          @for (d of c.days; track d.date) {
+          <div class="flex-1 min-w-0 flex flex-col items-center">
+            <div class="flex items-end w-full h-28 mb-1.5">
+              <div class="spark-bar w-full" [class.is-empty]="d.total === 0"
+                [style.height.%]="d.total === 0 ? 2 : barHeight(d.total)" [pTooltip]="dayTooltip(d.total)"></div>
+            </div>
+            <span class="w-full text-center text-[11px] font-bold tabular-nums leading-tight"
+              [ngClass]="themeService.isDarkMode() ? (d.total === 0 ? 'text-slate-600' : 'text-slate-200') : (d.total === 0 ? 'text-slate-400' : 'text-slate-800')">{{
+              dayAmountLabel(d.total) }}</span>
+            <span class="text-[11px] font-bold leading-none mt-1"
+              [ngClass]="themeService.isDarkMode() ? 'text-slate-400' : 'text-slate-600'">{{ d.day }}</span>
+          </div>
+          }
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div class="rounded-lg border p-3 transition-colors"
+            [ngClass]="themeService.isDarkMode() ? 'border-[#30363D] bg-[#0D1117]' : 'border-slate-100 bg-white/80'">
+            <p class="text-[9px] font-bold mb-1"
+              [ngClass]="themeService.isDarkMode() ? 'text-slate-400' : 'text-slate-600'">Cobrado / saldo</p>
+            <p class="text-sm font-bold text-emerald-400">{{ c.paidAmount | currency:'GTQ':'symbol':'1.2-2' }}</p>
+            <p class="text-xs font-semibold text-rose-400">Pendiente {{ c.pendingAmount |
+              currency:'GTQ':'symbol':'1.2-2' }}</p>
+          </div>
+          <div class="rounded-lg border p-3 transition-colors"
+            [ngClass]="themeService.isDarkMode() ? 'border-[#30363D] bg-[#0D1117]' : 'border-slate-100 bg-white/80'">
+            <p class="text-[9px] font-bold mb-1"
+              [ngClass]="themeService.isDarkMode() ? 'text-slate-400' : 'text-slate-600'">Crédito</p>
+            @if (c.creditLimit > 0) {
+            <p class="text-sm font-bold" [ngClass]="themeService.isDarkMode() ? 'text-white' : 'text-slate-900'">{{
+              creditPercent(c) }}% usado</p>
+            <p class="text-[11px] font-semibold"
+              [ngClass]="themeService.isDarkMode() ? 'text-slate-400' : 'text-slate-600'">{{ c.creditUsed |
+              currency:'GTQ':'symbol':'1.0-0' }} de {{ c.creditLimit | currency:'GTQ':'symbol':'1.0-0' }}</p>
+            } @else {
+            <p class="text-sm font-semibold"
+              [ngClass]="themeService.isDarkMode() ? 'text-slate-400' : 'text-slate-600'">Sin línea de crédito</p>
+            }
+          </div>
+        </div>
+
+        @if (c.preorderCommitted > 0) {
+        <div class="rounded-lg border px-3 py-2 mt-3 text-xs" [ngClass]="themeService.isDarkMode() 
+                ? 'border-rose-800/40 bg-rose-950/30 text-rose-300' 
+                : 'border-[#9f6587]/30 bg-rose-50 text-[#6e3757]'">
+          Preorden comprometida: <span class="font-bold">{{ c.preorderCommitted | currency:'GTQ' }}</span> (no es venta
+          confirmada).
+        </div>
+        }
+
+        <p class="text-[11px] font-semibold mt-3"
+          [ngClass]="themeService.isDarkMode() ? 'text-slate-400' : 'text-slate-600'">
+          Última compra:
+          {{ c.lastPurchaseDate ? formatIsoDate(c.lastPurchaseDate) : '—' }}
+        </p>
+      </div>
+
+      <div class="customer-week-detail-col">
+        <p class="text-[10px] font-bold mb-2"
+          [ngClass]="themeService.isDarkMode() ? 'text-slate-300' : 'text-slate-700'">Qué compró más</p>
+        @if (c.mix.length === 0) {
+        <p class="text-sm font-semibold" [ngClass]="themeService.isDarkMode() ? 'text-slate-400' : 'text-slate-600'">Sin
+          compras en este periodo.</p>
+        } @else {
+        <ul class="space-y-2.5">
+          @for (item of c.mix; track $index) {
+          <li>
+            <div class="flex justify-between text-xs mb-1 gap-2">
+              <span class="font-bold truncate"
+                [ngClass]="themeService.isDarkMode() ? 'text-slate-200' : 'text-slate-800'">{{ item.productName
+                }}</span>
+              <span class="tabular-nums font-semibold shrink-0"
+                [ngClass]="themeService.isDarkMode() ? 'text-slate-300' : 'text-slate-700'">{{ item.revenue |
+                currency:'GTQ':'symbol':'1.0-0' }} · {{ item.share }}%</span>
+            </div>
+            <div class="h-1.5 rounded-full overflow-hidden"
+              [ngClass]="themeService.isDarkMode() ? 'bg-[#30363D]' : 'bg-slate-100'">
+              <div class="h-full" [ngClass]="themeService.isDarkMode() ? 'bg-[#58A6FF]' : 'bg-[#48021C]'"
+                [style.width.%]="item.share"></div>
+            </div>
+            @if (item.quantity > 0) {
+            <p class="text-[10px] font-bold mt-0.5"
+              [ngClass]="themeService.isDarkMode() ? 'text-slate-400' : 'text-slate-500'">{{ item.quantity }} {{
+              item.unit }}</p>
+            }
+          </li>
+          }
+        </ul>
+        }
+      </div>
+    </div>
+  </aside>
   }
 
-  <app-weekly-consolidated-preview
-    [customer]="previewCustomer()"
-    [period]="activePeriod()"
-    [branchId]="dashboardFilter.branchId() || undefined"
-    [(visible)]="previewModalVisible"
-  />
+  <app-weekly-consolidated-preview [customer]="previewCustomer()" [period]="activePeriod()"
+    [branchId]="dashboardFilter.branchId() || undefined" [(visible)]="previewModalVisible" />
 </div>

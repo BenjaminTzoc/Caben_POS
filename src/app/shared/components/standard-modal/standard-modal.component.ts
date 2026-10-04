@@ -1,6 +1,7 @@
-import { Component, EventEmitter, HostListener, Input, Output } from '@angular/core';
+import { Component, EventEmitter, HostListener, Input, Output, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { DialogModule } from 'primeng/dialog';
+import { ThemeService } from '../../../core/services/theme.service';
 
 @Component({
   selector: 'app-standard-modal',
@@ -9,6 +10,8 @@ import { DialogModule } from 'primeng/dialog';
   templateUrl: './standard-modal.component.html',
 })
 export class StandardModalComponent {
+  public themeService = inject(ThemeService);
+
   /** Visibilidad del modal (two-way binding: [(visible)]) */
   @Input() visible = false;
 

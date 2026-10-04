@@ -1,16 +1,19 @@
 <p-toast></p-toast>
 
-<div class="py-4 px-0 md:px-6 bg-slate-50/50 min-h-screen">
+<div class="py-4 px-0 md:px-6 min-h-screen transition-colors duration-200" [ngClass]="themeService.isDarkMode() ? 'bg-[#0D1117]' : 'bg-slate-50/50'">
   <div class="max-w-[1700px] mx-auto px-4 md:px-0">
     
     <!-- Top Header Card -->
-    <div class="bg-white rounded-2xl border border-slate-300 shadow-sm mb-6">
-      <div class="py-3 px-4 md:px-6 flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-100 bg-slate-50/50 rounded-t-2xl">
+    <div class="rounded-2xl shadow-sm mb-6 transition-colors duration-200"
+      [ngClass]="themeService.isDarkMode() ? 'bg-[#161B22] border border-[#30363D]' : 'bg-white border border-slate-300'">
+      <div class="py-3 px-4 md:px-6 flex flex-col md:flex-row md:items-center justify-between gap-4 border-b rounded-t-2xl"
+        [ngClass]="themeService.isDarkMode() ? 'bg-[#1C2128] border-[#30363D]' : 'bg-slate-50/50 border-slate-100'">
         <div class="flex items-center gap-3">
           <button 
             type="button" 
             (click)="goBack()" 
-            class="w-9 h-9 rounded-xl border border-slate-200 bg-white hover:bg-slate-100 text-slate-700 flex items-center justify-center transition-all cursor-pointer shadow-none"
+            class="w-9 h-9 rounded-xl flex items-center justify-center transition-all cursor-pointer shadow-none"
+            [ngClass]="themeService.isDarkMode() ? 'bg-[#161B22] border border-[#30363D] hover:bg-[#21262D] text-[#F0F6FC]' : 'border border-slate-200 bg-white hover:bg-slate-100 text-slate-700'"
             pTooltip="Regresar a listado"
           >
             <svg lucideArrowLeft class="w-4 h-4 stroke-[2.2]"></svg>
@@ -18,7 +21,8 @@
           
           <div>
             <div class="flex items-center gap-2.5">
-              <h1 class="text-lg md:text-xl font-semibold text-gray-900 tracking-tight leading-none">
+              <h1 class="text-lg md:text-xl font-semibold tracking-tight leading-none"
+                [ngClass]="themeService.isDarkMode() ? 'text-[#F0F6FC]' : 'text-gray-900'">
                 Viaje {{ trip()?.tripNumber || '...' }}
               </h1>
               
@@ -26,25 +30,29 @@
               @if (trip()) {
                 @switch (trip()?.status) {
                   @case ('draft') {
-                    <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-medium border border-blue-200 bg-blue-50/50 text-blue-700">
+                    <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-medium border"
+                      [ngClass]="themeService.isDarkMode() ? 'border-blue-500/30 bg-blue-950/40 text-blue-400' : 'border-blue-200 bg-blue-50/50 text-blue-700'">
                       <span class="w-1.5 h-1.5 rounded-full bg-blue-500"></span>
                       Borrador / Planificado
                     </span>
                   }
                   @case ('on_route') {
-                    <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-medium border border-amber-200 bg-amber-50/50 text-amber-700">
+                    <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-medium border"
+                      [ngClass]="themeService.isDarkMode() ? 'border-amber-500/30 bg-amber-950/40 text-amber-400' : 'border-amber-200 bg-amber-50/50 text-amber-700'">
                       <span class="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse"></span>
                       En Ruta
                     </span>
                   }
                   @case ('completed') {
-                    <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-medium border border-emerald-200 bg-emerald-50/50 text-emerald-700">
+                    <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-medium border"
+                      [ngClass]="themeService.isDarkMode() ? 'border-emerald-500/30 bg-emerald-950/40 text-emerald-400' : 'border-emerald-200 bg-emerald-50/50 text-emerald-700'">
                       <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
                       Completado
                     </span>
                   }
                   @case ('cancelled') {
-                    <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-medium border border-rose-200 bg-rose-50/50 text-rose-700">
+                    <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-medium border"
+                      [ngClass]="themeService.isDarkMode() ? 'border-rose-500/30 bg-rose-950/40 text-rose-400' : 'border-rose-200 bg-rose-50/50 text-rose-700'">
                       <span class="w-1.5 h-1.5 rounded-full bg-rose-500"></span>
                       Cancelado
                     </span>
@@ -52,7 +60,7 @@
                 }
               }
             </div>
-            <p class="text-xs text-slate-500 mt-1">Monitoreo, devoluciones a bodega e incidencias para poder cerrar el viaje.</p>
+            <p class="text-xs mt-1" [ngClass]="themeService.isDarkMode() ? 'text-[#8B949E]' : 'text-slate-500'">Monitoreo, devoluciones a bodega e incidencias para poder cerrar el viaje.</p>
           </div>
         </div>
 
@@ -60,7 +68,7 @@
         <div class="flex items-center gap-2 flex-wrap">
           <p-button 
             [outlined]="true"
-            styleClass="!rounded-lg text-sm! font-semibold !border-[1.5px] !border-slate-300 !text-slate-700 !bg-white hover:!bg-slate-100 inline-flex items-center gap-1.5 shadow-sm transition-all"
+            [styleClass]="'!rounded-lg text-sm! font-semibold !border-[1.5px] inline-flex items-center gap-1.5 shadow-sm transition-all ' + (themeService.isDarkMode() ? '!border-[#30363D] !text-[#F0F6FC] !bg-[#161B22] hover:!bg-[#21262D]' : '!border-slate-300 !text-slate-700 !bg-white hover:!bg-slate-100')"
             [loading]="loading()"
             (onClick)="loadTrip()"
             pTooltip="Actualizar datos"
@@ -99,52 +107,72 @@
 
       <!-- Resumen / Metadatos del Viaje -->
       @if (trip()) {
-        <div class="p-4 md:px-6 grid grid-cols-1 md:grid-cols-4 gap-4 bg-white rounded-b-2xl">
+        <div class="p-4 md:px-6 grid grid-cols-1 md:grid-cols-4 gap-4 rounded-b-2xl transition-colors duration-200"
+          [ngClass]="themeService.isDarkMode() ? 'bg-[#161B22]' : 'bg-white'">
           <!-- 1. Planta Origen -->
-          <div class="flex items-center gap-3 p-3 rounded-xl bg-slate-50 border border-slate-100">
-            <div class="w-10 h-10 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center shrink-0 border border-blue-100">
+          <div class="flex items-center gap-3 p-3 rounded-xl border transition-colors"
+            [ngClass]="themeService.isDarkMode() ? 'bg-[#1C2128] border-[#30363D]' : 'bg-slate-50 border-slate-100'">
+            <div class="w-10 h-10 rounded-lg flex items-center justify-center shrink-0 border"
+              [ngClass]="themeService.isDarkMode() ? 'bg-blue-950/60 text-blue-400 border-blue-800/40' : 'bg-blue-50 text-blue-600 border-blue-100'">
               <svg lucideMapPin class="w-5 h-5 stroke-[2]"></svg>
             </div>
             <div class="min-w-0">
-              <span class="text-[11px] font-semibold text-slate-400 uppercase tracking-wider block">Origen</span>
-              <span class="text-xs font-bold text-slate-800 truncate block">{{ trip()?.originBranch?.name }}</span>
+              <span class="text-[11px] font-semibold uppercase tracking-wider block"
+                [ngClass]="themeService.isDarkMode() ? 'text-[#8B949E]' : 'text-slate-400'">Origen</span>
+              <span class="text-xs font-bold truncate block"
+                [ngClass]="themeService.isDarkMode() ? 'text-[#F0F6FC]' : 'text-slate-800'">{{ trip()?.originBranch?.name }}</span>
             </div>
           </div>
 
           <!-- 2. Vehículo -->
-          <div class="flex items-center gap-3 p-3 rounded-xl bg-slate-50 border border-slate-100">
-            <div class="w-10 h-10 rounded-lg bg-indigo-50 text-indigo-600 flex items-center justify-center shrink-0 border border-indigo-100">
+          <div class="flex items-center gap-3 p-3 rounded-xl border transition-colors"
+            [ngClass]="themeService.isDarkMode() ? 'bg-[#1C2128] border-[#30363D]' : 'bg-slate-50 border-slate-100'">
+            <div class="w-10 h-10 rounded-lg flex items-center justify-center shrink-0 border"
+              [ngClass]="themeService.isDarkMode() ? 'bg-indigo-950/60 text-indigo-400 border-indigo-800/40' : 'bg-indigo-50 text-indigo-600 border-indigo-100'">
               <svg lucideTruck class="w-5 h-5 stroke-[2]"></svg>
             </div>
             <div class="min-w-0">
-              <span class="text-[11px] font-semibold text-slate-400 uppercase tracking-wider block">Vehículo</span>
-              <span class="text-xs font-bold text-slate-800 truncate block">{{ trip()?.truck?.name }}</span>
-              <span class="text-[10px] text-slate-500 font-mono">Placa: {{ trip()?.truck?.licensePlate }}</span>
+              <span class="text-[11px] font-semibold uppercase tracking-wider block"
+                [ngClass]="themeService.isDarkMode() ? 'text-[#8B949E]' : 'text-slate-400'">Vehículo</span>
+              <span class="text-xs font-bold truncate block"
+                [ngClass]="themeService.isDarkMode() ? 'text-[#F0F6FC]' : 'text-slate-800'">{{ trip()?.truck?.name }}</span>
+              <span class="text-[10px] font-mono"
+                [ngClass]="themeService.isDarkMode() ? 'text-[#8B949E]' : 'text-slate-500'">Placa: {{ trip()?.truck?.licensePlate }}</span>
             </div>
           </div>
 
           <!-- 3. Piloto -->
-          <div class="flex items-center gap-3 p-3 rounded-xl bg-slate-50 border border-slate-100">
-            <div class="w-10 h-10 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0 border border-emerald-100">
+          <div class="flex items-center gap-3 p-3 rounded-xl border transition-colors"
+            [ngClass]="themeService.isDarkMode() ? 'bg-[#1C2128] border-[#30363D]' : 'bg-slate-50 border-slate-100'">
+            <div class="w-10 h-10 rounded-lg flex items-center justify-center shrink-0 border"
+              [ngClass]="themeService.isDarkMode() ? 'bg-emerald-950/60 text-emerald-400 border-emerald-800/40' : 'bg-emerald-50 text-emerald-600 border-emerald-100'">
               <svg lucideUser class="w-5 h-5 stroke-[2]"></svg>
             </div>
             <div class="min-w-0">
-              <span class="text-[11px] font-semibold text-slate-400 uppercase tracking-wider block">Piloto / Conductor</span>
-              <span class="text-xs font-bold text-slate-800 truncate block">{{ trip()?.driver?.name }}</span>
-              <span class="text-[10px] text-slate-500 truncate block">{{ trip()?.driver?.email }}</span>
+              <span class="text-[11px] font-semibold uppercase tracking-wider block"
+                [ngClass]="themeService.isDarkMode() ? 'text-[#8B949E]' : 'text-slate-400'">Piloto / Conductor</span>
+              <span class="text-xs font-bold truncate block"
+                [ngClass]="themeService.isDarkMode() ? 'text-[#F0F6FC]' : 'text-slate-800'">{{ trip()?.driver?.name }}</span>
+              <span class="text-[10px] truncate block"
+                [ngClass]="themeService.isDarkMode() ? 'text-[#8B949E]' : 'text-slate-500'">{{ trip()?.driver?.email }}</span>
             </div>
           </div>
 
           <!-- 4. Fecha y Salida -->
-          <div class="flex items-center gap-3 p-3 rounded-xl bg-slate-50 border border-slate-100">
-            <div class="w-10 h-10 rounded-lg bg-purple-50 text-purple-600 flex items-center justify-center shrink-0 border border-purple-100">
+          <div class="flex items-center gap-3 p-3 rounded-xl border transition-colors"
+            [ngClass]="themeService.isDarkMode() ? 'bg-[#1C2128] border-[#30363D]' : 'bg-slate-50 border-slate-100'">
+            <div class="w-10 h-10 rounded-lg flex items-center justify-center shrink-0 border"
+              [ngClass]="themeService.isDarkMode() ? 'bg-purple-950/60 text-purple-400 border-purple-800/40' : 'bg-purple-50 text-purple-600 border-purple-100'">
               <svg lucideCalendar class="w-5 h-5 stroke-[2]"></svg>
             </div>
             <div class="min-w-0">
-              <span class="text-[11px] font-semibold text-slate-400 uppercase tracking-wider block">Fecha Programada</span>
-              <span class="text-xs font-bold text-slate-800 block">{{ trip()?.date | date:'dd/MM/yyyy' }}</span>
+              <span class="text-[11px] font-semibold uppercase tracking-wider block"
+                [ngClass]="themeService.isDarkMode() ? 'text-[#8B949E]' : 'text-slate-400'">Fecha Programada</span>
+              <span class="text-xs font-bold block"
+                [ngClass]="themeService.isDarkMode() ? 'text-[#F0F6FC]' : 'text-slate-800'">{{ trip()?.date | date:'dd/MM/yyyy' }}</span>
               @if (trip()?.departureAt) {
-                <span class="text-[10px] text-emerald-600 block font-medium">Salida: {{ trip()?.departureAt | date:'HH:mm' }} hrs</span>
+                <span class="text-[10px] block font-medium"
+                  [ngClass]="themeService.isDarkMode() ? 'text-emerald-400' : 'text-emerald-600'">Salida: {{ trip()?.departureAt | date:'HH:mm' }} hrs</span>
               }
             </div>
           </div>
@@ -153,11 +181,14 @@
     </div>
 
     @if (trip()?.status === 'on_route' && (hasPendingReturns() || hasOpenIncidents())) {
-      <div class="mb-6 p-3.5 rounded-2xl border border-amber-200 bg-amber-50 flex flex-col sm:flex-row sm:items-center gap-2">
-        <p class="text-xs font-semibold text-amber-900 m-0">
+      <div class="mb-6 p-3.5 rounded-2xl border flex flex-col sm:flex-row sm:items-center gap-2"
+        [ngClass]="themeService.isDarkMode() ? 'border-amber-500/30 bg-amber-950/40' : 'border-amber-200 bg-amber-50'">
+        <p class="text-xs font-semibold m-0"
+          [ngClass]="themeService.isDarkMode() ? 'text-amber-300' : 'text-amber-900'">
           Bodega: el viaje no se puede completar todavía.
         </p>
-        <p class="text-xs text-amber-800 m-0">
+        <p class="text-xs m-0"
+          [ngClass]="themeService.isDarkMode() ? 'text-amber-400' : 'text-amber-800'">
           @if (hasPendingReturns()) {
             Hay devolución pendiente de recibir.
           }
@@ -169,33 +200,44 @@
     }
 
     <!-- Main Content: Paradas de la Ruta -->
-    <div class="bg-white rounded-2xl border border-slate-300 shadow-sm overflow-hidden mb-6">
-      <div class="py-3 px-4 md:px-6 flex items-center justify-between border-b border-slate-100 bg-slate-50/50">
+    <div class="rounded-2xl shadow-sm overflow-hidden mb-6 transition-colors duration-200"
+      [ngClass]="themeService.isDarkMode() ? 'bg-[#161B22] border border-[#30363D]' : 'bg-white border border-slate-300'">
+      <div class="py-3 px-4 md:px-6 flex items-center justify-between border-b"
+        [ngClass]="themeService.isDarkMode() ? 'border-[#30363D] bg-[#1C2128]' : 'border-slate-100 bg-slate-50/50'">
         <div class="flex items-center gap-2">
-          <svg lucideBoxes class="w-4 h-4 text-[#1e3a5f] stroke-[2.2]"></svg>
-          <h2 class="text-sm font-bold text-slate-800 uppercase tracking-wider">Itinerario de Paradas ({{ trip()?.items?.length || 0 }})</h2>
+          <svg lucideBoxes class="w-4 h-4 stroke-[2.2]"
+            [ngClass]="themeService.isDarkMode() ? 'text-[#58A6FF]' : 'text-[#1e3a5f]'"></svg>
+          <h2 class="text-sm font-bold uppercase tracking-wider"
+            [ngClass]="themeService.isDarkMode() ? 'text-[#F0F6FC]' : 'text-slate-800'">
+            Itinerario de Paradas ({{ trip()?.items?.length || 0 }})
+          </h2>
         </div>
       </div>
 
       <div class="p-4 md:p-6">
         @if (!trip()?.items || trip()?.items?.length === 0) {
           <div class="py-12 flex flex-col items-center justify-center text-center">
-            <div class="w-12 h-12 rounded-full bg-slate-100 text-slate-400 flex items-center justify-center mb-3">
+            <div class="w-12 h-12 rounded-full flex items-center justify-center mb-3"
+              [ngClass]="themeService.isDarkMode() ? 'bg-[#1C2128] text-[#8B949E]' : 'bg-slate-100 text-slate-400'">
               <svg lucidePackage class="w-6 h-6 stroke-[1.8]"></svg>
             </div>
-            <p class="text-xs font-semibold text-slate-700">No hay paradas registradas en este viaje</p>
-            <p class="text-[11px] text-slate-400 mt-0.5">El viaje no contiene traslados ni órdenes de venta asociadas.</p>
+            <p class="text-xs font-semibold"
+              [ngClass]="themeService.isDarkMode() ? 'text-[#F0F6FC]' : 'text-slate-700'">No hay paradas registradas en este viaje</p>
+            <p class="text-[11px] mt-0.5"
+              [ngClass]="themeService.isDarkMode() ? 'text-[#8B949E]' : 'text-slate-400'">El viaje no contiene traslados ni órdenes de venta asociadas.</p>
           </div>
         } @else {
           <div class="space-y-4">
             @for (item of trip()?.items; track item.id; let i = $index) {
-              <div class="p-4 rounded-xl border border-slate-200 hover:border-slate-300 transition-all bg-white relative">
+              <div class="p-4 rounded-xl border transition-all relative"
+                [ngClass]="themeService.isDarkMode() ? 'bg-[#1C2128] border-[#30363D] hover:border-[#58A6FF]/40' : 'bg-white border-slate-200 hover:border-slate-300'">
                 
                 <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
                   <!-- Columna Izquierda: Secuencia, Tipo y Detalle -->
                   <div class="flex items-start gap-3 min-w-0">
                     <!-- Número de Parada -->
-                    <div class="w-8 h-8 rounded-lg bg-slate-900 text-white font-bold text-xs flex items-center justify-center shrink-0 mt-0.5">
+                    <div class="w-8 h-8 rounded-lg font-bold text-xs flex items-center justify-center shrink-0 mt-0.5"
+                      [ngClass]="themeService.isDarkMode() ? 'bg-[#21262D] text-[#58A6FF] border border-[#30363D]' : 'bg-slate-900 text-white'">
                       #{{ item.sequence || (i + 1) }}
                     </div>
 
@@ -203,12 +245,14 @@
                       <div class="flex items-center gap-2 flex-wrap mb-1">
                         <!-- Tipo Badge -->
                         @if (item.type === 'transfer') {
-                          <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold bg-indigo-50 text-indigo-700 border border-indigo-200">
+                          <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold border"
+                            [ngClass]="themeService.isDarkMode() ? 'bg-indigo-950/60 text-indigo-400 border-indigo-800/40' : 'bg-indigo-50 text-indigo-700 border-indigo-200'">
                             <svg lucideBoxes class="w-3 h-3 stroke-[2]"></svg>
                             Traslado entre Sucursales
                           </span>
                         } @else {
-                          <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                          <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold border"
+                            [ngClass]="themeService.isDarkMode() ? 'bg-emerald-950/60 text-emerald-400 border-emerald-800/40' : 'bg-emerald-50 text-emerald-700 border-emerald-200'">
                             <svg lucidePackage class="w-3 h-3 stroke-[2]"></svg>
                             Orden de Venta (Entrega Final)
                           </span>
@@ -217,31 +261,36 @@
                         <!-- Estado Badge -->
                         @switch (item.status) {
                           @case ('pending') {
-                            <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-semibold bg-amber-50 text-amber-700 border border-amber-200">
+                            <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-semibold border"
+                              [ngClass]="themeService.isDarkMode() ? 'bg-amber-950/50 text-amber-400 border-amber-800/40' : 'bg-amber-50 text-amber-700 border-amber-200'">
                               <span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
                               Pendiente
                             </span>
                           }
                           @case ('delivered') {
-                            <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                            <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-semibold border"
+                              [ngClass]="themeService.isDarkMode() ? 'bg-emerald-950/50 text-emerald-400 border-emerald-800/40' : 'bg-emerald-50 text-emerald-700 border-emerald-200'">
                               <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
                               Entregado Total
                             </span>
                           }
                           @case ('partially_delivered') {
-                            <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-semibold bg-blue-50 text-blue-700 border border-blue-200">
+                            <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-semibold border"
+                              [ngClass]="themeService.isDarkMode() ? 'bg-blue-950/50 text-blue-400 border-blue-800/40' : 'bg-blue-50 text-blue-700 border-blue-200'">
                               <span class="w-1.5 h-1.5 rounded-full bg-blue-500"></span>
                               Entrega Parcial
                             </span>
                           }
                           @case ('rejected') {
-                            <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-semibold bg-rose-50 text-rose-700 border border-rose-200">
+                            <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-semibold border"
+                              [ngClass]="themeService.isDarkMode() ? 'bg-rose-950/50 text-rose-400 border-rose-800/40' : 'bg-rose-50 text-rose-700 border-rose-200'">
                               <span class="w-1.5 h-1.5 rounded-full bg-rose-500"></span>
                               Rechazado
                             </span>
                           }
                           @case ('failed') {
-                            <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-semibold bg-slate-100 text-slate-700 border border-slate-200">
+                            <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-semibold border"
+                              [ngClass]="themeService.isDarkMode() ? 'bg-slate-800 text-slate-300 border-slate-700' : 'bg-slate-100 text-slate-700 border-slate-200'">
                               <span class="w-1.5 h-1.5 rounded-full bg-slate-500"></span>
                               Fallido
                             </span>
@@ -251,27 +300,32 @@
 
                       <!-- Destino y Documento -->
                       @if (item.type === 'transfer') {
-                        <h3 class="text-xs font-bold text-slate-900">
+                        <h3 class="text-xs font-bold"
+                          [ngClass]="themeService.isDarkMode() ? 'text-[#F0F6FC]' : 'text-slate-900'">
                           Traslado: {{ item.transfer?.transferNumber || item.transfer?.id || 'Ref N/A' }}
                         </h3>
-                        <p class="text-xs text-slate-600 mt-0.5">
-                          Destino: <span class="font-semibold text-slate-800">{{ item.transfer?.destinationBranch?.name || 'Sucursal Destino' }}</span>
+                        <p class="text-xs mt-0.5"
+                          [ngClass]="themeService.isDarkMode() ? 'text-[#8B949E]' : 'text-slate-600'">
+                          Destino: <span class="font-semibold" [ngClass]="themeService.isDarkMode() ? 'text-[#F0F6FC]' : 'text-slate-800'">{{ item.transfer?.destinationBranch?.name || 'Sucursal Destino' }}</span>
                         </p>
                       } @else {
-                        <h3 class="text-xs font-bold text-slate-900">
+                        <h3 class="text-xs font-bold"
+                          [ngClass]="themeService.isDarkMode() ? 'text-[#F0F6FC]' : 'text-slate-900'">
                           Orden: {{ item.sale?.orderNumber || item.sale?.invoiceNumber || item.sale?.id || 'Ref N/A' }}
                         </h3>
-                        <p class="text-xs text-slate-600 mt-0.5">
-                          Cliente: <span class="font-semibold text-slate-800">{{ item.sale?.customer?.name || 'Cliente Particular' }}</span>
+                        <p class="text-xs mt-0.5"
+                          [ngClass]="themeService.isDarkMode() ? 'text-[#8B949E]' : 'text-slate-600'">
+                          Cliente: <span class="font-semibold" [ngClass]="themeService.isDarkMode() ? 'text-[#F0F6FC]' : 'text-slate-800'">{{ item.sale?.customer?.name || 'Cliente Particular' }}</span>
                           @if (item.sale?.deliveryAddress) {
-                            <span class="text-slate-400"> • </span>
-                            <span class="text-slate-500">{{ item.sale?.deliveryAddress }}</span>
+                            <span [ngClass]="themeService.isDarkMode() ? 'text-[#8B949E]' : 'text-slate-400'"> • </span>
+                            <span [ngClass]="themeService.isDarkMode() ? 'text-[#8B949E]' : 'text-slate-500'">{{ item.sale?.deliveryAddress }}</span>
                           }
                         </p>
                       }
                       
                       @if (item.deliveredAt) {
-                        <span class="text-[10px] text-slate-400 block mt-1">
+                        <span class="text-[10px] block mt-1"
+                          [ngClass]="themeService.isDarkMode() ? 'text-[#8B949E]' : 'text-slate-400'">
                           Hora de atención: {{ item.deliveredAt | date:'dd/MM/yyyy HH:mm' }}
                         </span>
                       }
@@ -299,12 +353,13 @@
                         </p-button>
                       }
                     } @else if (item.status !== 'pending') {
-                      <span class="inline-flex items-center gap-1 text-xs text-emerald-700 font-semibold px-2 py-1 bg-emerald-50 rounded-lg border border-emerald-200">
+                      <span class="inline-flex items-center gap-1 text-xs font-semibold px-2 py-1 rounded-lg border"
+                        [ngClass]="themeService.isDarkMode() ? 'bg-emerald-950/60 text-emerald-400 border-emerald-800/40' : 'bg-emerald-50 text-emerald-700 border-emerald-200'">
                         <svg lucideCheck class="w-3.5 h-3.5 stroke-[2.5]"></svg>
                         Parada Atendida
                       </span>
                     } @else {
-                      <span class="text-xs text-slate-400 italic">Requiere confirmar salida</span>
+                      <span class="text-xs italic" [ngClass]="themeService.isDarkMode() ? 'text-[#8B949E]' : 'text-slate-400'">Requiere confirmar salida</span>
                     }
                   </div>
                 </div>
@@ -318,36 +373,46 @@
 
     <!-- Sección de Devoluciones (si existen) -->
     @if (trip()?.returns && (trip()?.returns?.length || 0) > 0) {
-      <div class="bg-white rounded-2xl border border-slate-300 shadow-sm overflow-hidden mb-6">
-        <div class="py-3 px-4 md:px-6 flex items-center justify-between border-b border-slate-100 bg-amber-50/30">
+      <div class="rounded-2xl shadow-sm overflow-hidden mb-6 transition-colors duration-200"
+        [ngClass]="themeService.isDarkMode() ? 'bg-[#161B22] border border-[#30363D]' : 'bg-white border border-slate-300'">
+        <div class="py-3 px-4 md:px-6 flex items-center justify-between border-b"
+          [ngClass]="themeService.isDarkMode() ? 'border-[#30363D] bg-[#1C2128]' : 'border-slate-100 bg-amber-50/30'">
           <div class="flex items-center gap-2">
-            <svg lucideRotateCcw class="w-4 h-4 text-amber-600 stroke-[2.2]"></svg>
-            <h2 class="text-sm font-bold text-slate-800 uppercase tracking-wider">Devoluciones a planta ({{ trip()?.returns?.length }})</h2>
+            <svg lucideRotateCcw class="w-4 h-4 text-amber-500 stroke-[2.2]"></svg>
+            <h2 class="text-sm font-bold uppercase tracking-wider"
+              [ngClass]="themeService.isDarkMode() ? 'text-[#F0F6FC]' : 'text-slate-800'">
+              Devoluciones a planta ({{ trip()?.returns?.length }})
+            </h2>
           </div>
         </div>
 
         <div class="p-4 md:p-6 space-y-3">
           @for (ret of trip()?.returns; track ret.id) {
-            <div class="p-3.5 rounded-xl border border-amber-200 bg-amber-50/20 flex flex-col md:flex-row md:items-center justify-between gap-3">
+            <div class="p-3.5 rounded-xl border flex flex-col md:flex-row md:items-center justify-between gap-3 transition-colors"
+              [ngClass]="themeService.isDarkMode() ? 'bg-[#1C2128] border-amber-800/40' : 'bg-amber-50/20 border-amber-200'">
               <div class="min-w-0">
                 <div class="flex items-center gap-2 mb-1">
-                  <span class="text-xs font-bold text-slate-800">{{ returnOrderLabel(ret) }}</span>
+                  <span class="text-xs font-bold"
+                    [ngClass]="themeService.isDarkMode() ? 'text-[#F0F6FC]' : 'text-slate-800'">{{ returnOrderLabel(ret) }}</span>
                   @if (ret.status === 'pending_receipt') {
-                    <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold bg-amber-100 text-amber-800 border border-amber-300">
+                    <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold border"
+                      [ngClass]="themeService.isDarkMode() ? 'bg-amber-950/60 text-amber-400 border-amber-800/40' : 'bg-amber-100 text-amber-800 border-amber-300'">
                       Pendiente en bodega
                     </span>
                   } @else {
-                    <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-300">
+                    <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold border"
+                      [ngClass]="themeService.isDarkMode() ? 'bg-emerald-950/60 text-emerald-400 border-emerald-800/40' : 'bg-emerald-100 text-emerald-800 border-emerald-300'">
                       Recibida en bodega
                     </span>
                   }
                 </div>
-                <p class="text-xs text-slate-600">
-                  Motivo: <span class="font-medium text-slate-800">{{ ret.reason || 'Devolución de mercadería' }}</span>
+                <p class="text-xs" [ngClass]="themeService.isDarkMode() ? 'text-[#8B949E]' : 'text-slate-600'">
+                  Motivo: <span class="font-medium" [ngClass]="themeService.isDarkMode() ? 'text-[#F0F6FC]' : 'text-slate-800'">{{ ret.reason || 'Devolución de mercadería' }}</span>
                 </p>
                 <div class="mt-2 flex items-center gap-2 flex-wrap">
                   @for (item of ret.items; track item.id) {
-                    <span class="inline-flex items-center gap-1 text-[11px] bg-white px-2 py-0.5 rounded border border-slate-200 text-slate-700">
+                    <span class="inline-flex items-center gap-1 text-[11px] px-2 py-0.5 rounded border"
+                      [ngClass]="themeService.isDarkMode() ? 'bg-[#161B22] border-[#30363D] text-[#F0F6FC]' : 'bg-white border-slate-200 text-slate-700'">
                       {{ item.product.name || 'Item' }}: <strong>{{ productQtyLabel(item.returnedQuantity, item.product) }}</strong>
                     </span>
                   }
@@ -365,7 +430,8 @@
                     <span>Recibir en bodega</span>
                   </p-button>
                 } @else {
-                  <span class="text-xs text-emerald-600 font-semibold flex items-center gap-1">
+                  <span class="text-xs font-semibold flex items-center gap-1"
+                    [ngClass]="themeService.isDarkMode() ? 'text-emerald-400' : 'text-emerald-600'">
                     <svg lucideCheck class="w-3.5 h-3.5 stroke-[2.5]"></svg>
                     Recibida en bodega
                   </span>
@@ -379,42 +445,51 @@
 
     <!-- Sección de Incidencias (si existen) -->
     @if (trip()?.incidents && (trip()?.incidents?.length || 0) > 0) {
-      <div class="bg-white rounded-2xl border border-slate-300 shadow-sm overflow-hidden mb-6">
-        <div class="py-3 px-4 md:px-6 flex items-center justify-between border-b border-slate-100 bg-rose-50/30">
+      <div class="rounded-2xl shadow-sm overflow-hidden mb-6 transition-colors duration-200"
+        [ngClass]="themeService.isDarkMode() ? 'bg-[#161B22] border border-[#30363D]' : 'bg-white border border-slate-300'">
+        <div class="py-3 px-4 md:px-6 flex items-center justify-between border-b"
+          [ngClass]="themeService.isDarkMode() ? 'border-[#30363D] bg-[#1C2128]' : 'border-slate-100 bg-rose-50/30'">
           <div class="flex items-center gap-2">
-            <svg lucideAlertTriangle class="w-4 h-4 text-rose-600 stroke-[2.2]"></svg>
-            <h2 class="text-sm font-bold text-slate-800 uppercase tracking-wider">Incidencias y Novedades ({{ trip()?.incidents?.length }})</h2>
+            <svg lucideAlertTriangle class="w-4 h-4 text-rose-500 stroke-[2.2]"></svg>
+            <h2 class="text-sm font-bold uppercase tracking-wider"
+              [ngClass]="themeService.isDarkMode() ? 'text-[#F0F6FC]' : 'text-slate-800'">
+              Incidencias y Novedades ({{ trip()?.incidents?.length }})
+            </h2>
           </div>
         </div>
 
         <div class="p-4 md:p-6 space-y-3">
           @for (inc of trip()?.incidents; track inc.id) {
-            <div class="p-3.5 rounded-xl border border-rose-200 bg-rose-50/20 flex flex-col md:flex-row md:items-center justify-between gap-3">
+            <div class="p-3.5 rounded-xl border flex flex-col md:flex-row md:items-center justify-between gap-3 transition-colors"
+              [ngClass]="themeService.isDarkMode() ? 'bg-[#1C2128] border-rose-800/40' : 'bg-rose-50/20 border-rose-200'">
               <div class="min-w-0">
                 <div class="flex items-center gap-2 mb-1">
                   @if (inc.status === 'open') {
-                    <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold bg-rose-100 text-rose-800 border border-rose-300">
+                    <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold border"
+                      [ngClass]="themeService.isDarkMode() ? 'bg-rose-950/60 text-rose-400 border-rose-800/40' : 'bg-rose-100 text-rose-800 border-rose-300'">
                       Abierta / Requiere Resolución
                     </span>
                   } @else {
-                    <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-300">
+                    <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold border"
+                      [ngClass]="themeService.isDarkMode() ? 'bg-emerald-950/60 text-emerald-400 border-emerald-800/40' : 'bg-emerald-100 text-emerald-800 border-emerald-300'">
                       Resuelta
                     </span>
                   }
                 </div>
-                <p class="text-xs text-slate-800 font-medium">{{ inc.description }}</p>
+                <p class="text-xs font-medium" [ngClass]="themeService.isDarkMode() ? 'text-[#F0F6FC]' : 'text-slate-800'">{{ inc.description }}</p>
                 @if (inc.attachmentUrls?.length) {
                   <div class="mt-2 flex flex-wrap gap-2">
                     @for (url of inc.attachmentUrls; track url) {
-                      <a [href]="url" target="_blank" rel="noopener" class="block w-14 h-14 rounded-lg overflow-hidden border border-rose-200 bg-white">
+                      <a [href]="url" target="_blank" rel="noopener" class="block w-14 h-14 rounded-lg overflow-hidden border"
+                        [ngClass]="themeService.isDarkMode() ? 'border-rose-800/40 bg-[#161B22]' : 'border-rose-200 bg-white'">
                         <img [src]="url" alt="Anexo" class="w-full h-full object-cover" />
                       </a>
                     }
                   </div>
                 }
                 @if (inc.resolutionNotes) {
-                  <p class="text-[11px] text-slate-500 mt-1">
-                    Resolución: <span class="italic text-slate-700">{{ inc.resolutionNotes }}</span>
+                  <p class="text-[11px] mt-1" [ngClass]="themeService.isDarkMode() ? 'text-[#8B949E]' : 'text-slate-500'">
+                    Resolución: <span class="italic" [ngClass]="themeService.isDarkMode() ? 'text-[#F0F6FC]' : 'text-slate-700'">{{ inc.resolutionNotes }}</span>
                   </p>
                 }
               </div>
@@ -453,11 +528,14 @@
 >
   <div class="p-1 space-y-4">
     <!-- Código OTP Requerido -->
-    <div class="p-3.5 rounded-xl bg-blue-50/50 border border-blue-200">
-      <label class="text-xs font-bold text-slate-800 block mb-1">
+    <div class="p-3.5 rounded-xl border transition-colors"
+      [ngClass]="themeService.isDarkMode() ? 'bg-blue-950/40 border-blue-800/40' : 'bg-blue-50/50 border-blue-200'">
+      <label class="text-xs font-bold block mb-1"
+        [ngClass]="themeService.isDarkMode() ? 'text-[#F0F6FC]' : 'text-slate-800'">
         Código OTP de Validación *
       </label>
-      <p class="text-[11px] text-slate-500 mb-2">
+      <p class="text-[11px] mb-2"
+        [ngClass]="themeService.isDarkMode() ? 'text-[#8B949E]' : 'text-slate-500'">
         Solicite al cliente el código de 4 o 6 dígitos para validar la entrega en destino.
       </p>
       <input 
@@ -465,61 +543,68 @@
         type="text" 
         [(ngModel)]="saleOtp" 
         placeholder="Ej: 123456" 
-        class="!w-full !rounded-xl !border-slate-300 font-mono text-center tracking-widest text-base font-bold h-11!"
+        class="!w-full !rounded-xl font-mono text-center tracking-widest text-base font-bold h-11! transition-colors"
+        [ngClass]="themeService.isDarkMode() ? '!bg-[#0D1117] !text-[#F0F6FC] !border-[#30363D] focus:!border-[#58A6FF]' : '!border-slate-300'"
       />
     </div>
 
     <!-- Resultado de la Entrega -->
     <div>
-      <label class="text-xs font-semibold text-slate-700 block mb-2">Resultado de la Entrega</label>
+      <label class="text-xs font-semibold block mb-2"
+        [ngClass]="themeService.isDarkMode() ? 'text-[#F0F6FC]' : 'text-slate-700'">Resultado de la Entrega</label>
       <div class="grid grid-cols-3 gap-2">
         <label 
           class="flex flex-col items-center justify-center p-3 rounded-xl border text-center cursor-pointer transition-all"
-          [class.border-emerald-500]="saleOutcome === 'full'"
-          [class.bg-emerald-50]="saleOutcome === 'full'"
-          [class.border-slate-200]="saleOutcome !== 'full'"
+          [ngClass]="themeService.isDarkMode()
+            ? (saleOutcome === 'full' ? 'border-emerald-500 bg-emerald-950/40' : 'border-[#30363D] bg-[#161B22]')
+            : (saleOutcome === 'full' ? 'border-emerald-500 bg-emerald-50' : 'border-slate-200 bg-white')"
         >
           <input type="radio" name="saleOutcome" value="full" [(ngModel)]="saleOutcome" class="sr-only" />
-          <span class="text-xs font-bold text-slate-800">Total</span>
-          <span class="text-[10px] text-slate-500">100% Entregado</span>
+          <span class="text-xs font-bold" [ngClass]="themeService.isDarkMode() ? 'text-[#F0F6FC]' : 'text-slate-800'">Total</span>
+          <span class="text-[10px]" [ngClass]="themeService.isDarkMode() ? 'text-[#8B949E]' : 'text-slate-500'">100% Entregado</span>
         </label>
 
         <label 
           class="flex flex-col items-center justify-center p-3 rounded-xl border text-center cursor-pointer transition-all"
-          [class.border-blue-500]="saleOutcome === 'partial'"
-          [class.bg-blue-50]="saleOutcome === 'partial'"
-          [class.border-slate-200]="saleOutcome !== 'partial'"
+          [ngClass]="themeService.isDarkMode()
+            ? (saleOutcome === 'partial' ? 'border-blue-500 bg-blue-950/40' : 'border-[#30363D] bg-[#161B22]')
+            : (saleOutcome === 'partial' ? 'border-blue-500 bg-blue-50' : 'border-slate-200 bg-white')"
         >
           <input type="radio" name="saleOutcome" value="partial" [(ngModel)]="saleOutcome" class="sr-only" />
-          <span class="text-xs font-bold text-slate-800">Parcial</span>
-          <span class="text-[10px] text-slate-500">Con Faltantes/Dev.</span>
+          <span class="text-xs font-bold" [ngClass]="themeService.isDarkMode() ? 'text-[#F0F6FC]' : 'text-slate-800'">Parcial</span>
+          <span class="text-[10px]" [ngClass]="themeService.isDarkMode() ? 'text-[#8B949E]' : 'text-slate-500'">Con Faltantes/Dev.</span>
         </label>
 
         <label 
           class="flex flex-col items-center justify-center p-3 rounded-xl border text-center cursor-pointer transition-all"
-          [class.border-rose-500]="saleOutcome === 'rejected'"
-          [class.bg-rose-50]="saleOutcome === 'rejected'"
-          [class.border-slate-200]="saleOutcome !== 'rejected'"
+          [ngClass]="themeService.isDarkMode()
+            ? (saleOutcome === 'rejected' ? 'border-rose-500 bg-rose-950/40' : 'border-[#30363D] bg-[#161B22]')
+            : (saleOutcome === 'rejected' ? 'border-rose-500 bg-rose-50' : 'border-slate-200 bg-white')"
         >
           <input type="radio" name="saleOutcome" value="rejected" [(ngModel)]="saleOutcome" class="sr-only" />
-          <span class="text-xs font-bold text-slate-800">Rechazado</span>
-          <span class="text-[10px] text-slate-500">Rechazo Total</span>
+          <span class="text-xs font-bold" [ngClass]="themeService.isDarkMode() ? 'text-[#F0F6FC]' : 'text-slate-800'">Rechazado</span>
+          <span class="text-[10px]" [ngClass]="themeService.isDarkMode() ? 'text-[#8B949E]' : 'text-slate-500'">Rechazo Total</span>
         </label>
       </div>
     </div>
 
     <!-- Si es Parcial: Cantidades entregadas -->
     @if (saleOutcome === 'partial') {
-      <div class="p-3 rounded-xl bg-slate-50 border border-slate-200 space-y-2">
-        <label class="text-[11px] font-bold text-slate-700 uppercase tracking-wider block">
+      <div class="p-3 rounded-xl border space-y-2 transition-colors"
+        [ngClass]="themeService.isDarkMode() ? 'bg-[#1C2128] border-[#30363D]' : 'bg-slate-50 border-slate-200'">
+        <label class="text-[11px] font-bold uppercase tracking-wider block"
+          [ngClass]="themeService.isDarkMode() ? 'text-[#8B949E]' : 'text-slate-700'">
           Cantidades Entregadas
         </label>
         <div class="space-y-2 max-h-48 overflow-y-auto">
           @for (item of saleDeliveryItems; track item.saleDetailId) {
-            <div class="flex items-center justify-between gap-2 p-2 bg-white rounded-lg border border-slate-200">
+            <div class="flex items-center justify-between gap-2 p-2 rounded-lg border transition-colors"
+              [ngClass]="themeService.isDarkMode() ? 'bg-[#161B22] border-[#30363D]' : 'bg-white border-slate-200'">
               <div class="min-w-0">
-                <span class="text-xs font-semibold text-slate-800 block truncate">{{ item.name }}</span>
-                <span class="text-[10px] text-slate-400">Pedido: {{ qtyLabel(item.quantity, item.unit) }}</span>
+                <span class="text-xs font-semibold block truncate"
+                  [ngClass]="themeService.isDarkMode() ? 'text-[#F0F6FC]' : 'text-slate-800'">{{ item.name }}</span>
+                <span class="text-[10px]"
+                  [ngClass]="themeService.isDarkMode() ? 'text-[#8B949E]' : 'text-slate-400'">Pedido: {{ qtyLabel(item.quantity, item.unit) }}</span>
               </div>
               <div class="flex items-center gap-1 shrink-0">
                 <p-inputNumber 
@@ -542,7 +627,8 @@
     <!-- Motivo si es Parcial o Rechazo -->
     @if (saleOutcome !== 'full') {
       <div>
-        <label class="text-xs font-semibold text-slate-700 block mb-1">
+        <label class="text-xs font-semibold block mb-1"
+          [ngClass]="themeService.isDarkMode() ? 'text-[#F0F6FC]' : 'text-slate-700'">
           Motivo / Justificación *
         </label>
         <textarea 
@@ -550,14 +636,16 @@
           [(ngModel)]="saleReason" 
           rows="2" 
           placeholder="Indique el motivo por el cual no se entregó la totalidad..."
-          class="!w-full !rounded-xl !border-slate-300 text-xs"
+          class="!w-full !rounded-xl text-xs transition-colors"
+          [ngClass]="themeService.isDarkMode() ? '!bg-[#0D1117] !text-[#F0F6FC] !border-[#30363D] focus:!border-[#58A6FF]' : '!border-slate-300'"
         ></textarea>
       </div>
     }
   </div>
 
   <ng-template #footer>
-    <div class="flex items-center justify-end gap-2 pt-2 border-t border-slate-100">
+    <div class="flex items-center justify-end gap-2 pt-2 border-t"
+      [ngClass]="themeService.isDarkMode() ? 'border-[#30363D]' : 'border-slate-100'">
       <p-button 
         label="Cancelar" 
         [text]="true" 
@@ -590,16 +678,17 @@
 >
   <div class="p-1 space-y-4">
     @if (transferStep === 'quantities') {
-      <p class="text-xs text-slate-500">
+      <p class="text-xs" [ngClass]="themeService.isDarkMode() ? 'text-[#8B949E]' : 'text-slate-500'">
         Indica cuánto llegó de cada producto. No se puede recibir de más. Si falta algo, el traslado queda en discrepancia.
       </p>
     } @else {
-      <p class="text-xs text-slate-500">
+      <p class="text-xs" [ngClass]="themeService.isDarkMode() ? 'text-[#8B949E]' : 'text-slate-500'">
         Revisa las cantidades. Esta lista ya no se puede editar. Al confirmar, entra a inventario solo lo recibido.
       </p>
     }
 
-    <div class="hidden sm:grid grid-cols-[minmax(0,1fr)_6.5rem_8.5rem_6.5rem] gap-2 px-1 text-[10px] font-bold uppercase tracking-wide text-slate-500">
+    <div class="hidden sm:grid grid-cols-[minmax(0,1fr)_6.5rem_8.5rem_6.5rem] gap-2 px-1 text-[10px] font-bold uppercase tracking-wide"
+      [ngClass]="themeService.isDarkMode() ? 'text-[#8B949E]' : 'text-slate-500'">
       <span>Producto</span>
       <span class="text-center">Enviado</span>
       <span class="text-center">Recibido</span>
@@ -608,19 +697,26 @@
 
     <div class="space-y-2 max-h-72 overflow-y-auto">
       @for (item of transferInspectionItems; track item.transferItemId || item.productId) {
-        <div class="p-3 bg-slate-50 rounded-xl border border-slate-200 grid grid-cols-1 sm:grid-cols-[minmax(0,1fr)_6.5rem_8.5rem_6.5rem] gap-2 items-center">
+        <div class="p-3 rounded-xl border grid grid-cols-1 sm:grid-cols-[minmax(0,1fr)_6.5rem_8.5rem_6.5rem] gap-2 items-center transition-colors"
+          [ngClass]="themeService.isDarkMode() ? 'bg-[#1C2128] border-[#30363D]' : 'bg-slate-50 border-slate-200'">
           <div class="min-w-0">
-            <span class="text-xs font-bold text-slate-800 block truncate">{{ item.name }}</span>
-            <span class="text-[10px] text-slate-500 font-mono">SKU: {{ item.sku }}</span>
+            <span class="text-xs font-bold block truncate"
+              [ngClass]="themeService.isDarkMode() ? 'text-[#F0F6FC]' : 'text-slate-800'">{{ item.name }}</span>
+            <span class="text-[10px] font-mono"
+              [ngClass]="themeService.isDarkMode() ? 'text-[#8B949E]' : 'text-slate-500'">SKU: {{ item.sku }}</span>
           </div>
           <div class="text-left sm:text-center">
-            <span class="sm:hidden text-[10px] font-bold uppercase text-slate-400">Enviado</span>
-            <p class="text-xs font-bold text-slate-700 m-0">{{ qtyLabel(item.requestedQuantity, item.unit) }}</p>
+            <span class="sm:hidden text-[10px] font-bold uppercase"
+              [ngClass]="themeService.isDarkMode() ? 'text-[#8B949E]' : 'text-slate-400'">Enviado</span>
+            <p class="text-xs font-bold m-0"
+              [ngClass]="themeService.isDarkMode() ? 'text-[#F0F6FC]' : 'text-slate-700'">{{ qtyLabel(item.requestedQuantity, item.unit) }}</p>
           </div>
           @if (transferStep === 'quantities') {
             <div>
-              <label class="sm:hidden text-[10px] font-bold uppercase text-slate-400">Recibido</label>
-              <div class="flex items-stretch rounded-lg border border-slate-300 bg-white overflow-hidden">
+              <label class="sm:hidden text-[10px] font-bold uppercase"
+                [ngClass]="themeService.isDarkMode() ? 'text-[#8B949E]' : 'text-slate-400'">Recibido</label>
+              <div class="flex items-stretch rounded-lg border overflow-hidden"
+                [ngClass]="themeService.isDarkMode() ? 'border-[#30363D] bg-[#0D1117]' : 'border-slate-300 bg-white'">
                 <p-inputNumber 
                   [(ngModel)]="item.receivedQuantity" 
                   [min]="0"
@@ -632,22 +728,26 @@
                   inputStyleClass="!w-full !text-center !text-xs !h-9 !border-0 !rounded-none"
                 ></p-inputNumber>
                 @if (item.unit) {
-                  <span class="shrink-0 px-2 inline-flex items-center text-[10px] font-extrabold text-slate-600 bg-slate-100 border-l border-slate-200">{{ item.unit }}</span>
+                  <span class="shrink-0 px-2 inline-flex items-center text-[10px] font-extrabold border-l"
+                    [ngClass]="themeService.isDarkMode() ? 'text-[#8B949E] bg-[#21262D] border-[#30363D]' : 'text-slate-600 bg-slate-100 border-slate-200'">{{ item.unit }}</span>
                 }
               </div>
             </div>
           } @else {
             <div class="text-left sm:text-center">
-              <span class="sm:hidden text-[10px] font-bold uppercase text-slate-400">Recibido</span>
-              <p class="text-xs font-bold text-slate-800 m-0">{{ qtyLabel(item.receivedQuantity, item.unit) }}</p>
+              <span class="sm:hidden text-[10px] font-bold uppercase"
+                [ngClass]="themeService.isDarkMode() ? 'text-[#8B949E]' : 'text-slate-400'">Recibido</span>
+              <p class="text-xs font-bold m-0"
+                [ngClass]="themeService.isDarkMode() ? 'text-[#F0F6FC]' : 'text-slate-800'">{{ qtyLabel(item.receivedQuantity, item.unit) }}</p>
             </div>
           }
           <div class="text-left sm:text-center">
-            <span class="sm:hidden text-[10px] font-bold uppercase text-slate-400">Faltante</span>
+            <span class="sm:hidden text-[10px] font-bold uppercase"
+              [ngClass]="themeService.isDarkMode() ? 'text-[#8B949E]' : 'text-slate-400'">Faltante</span>
             <p
               class="text-xs font-bold m-0"
-              [class.text-amber-700]="missingQty(item) > 0"
-              [class.text-emerald-700]="missingQty(item) === 0"
+              [class.text-amber-500]="missingQty(item) > 0"
+              [class.text-emerald-500]="missingQty(item) === 0"
             >
               {{ qtyLabel(missingQty(item), item.unit) }}
             </p>
@@ -658,25 +758,31 @@
 
     @if (transferStep === 'quantities') {
       <div>
-        <label class="text-xs font-semibold text-slate-700 block mb-1">Notas</label>
+        <label class="text-xs font-semibold block mb-1"
+          [ngClass]="themeService.isDarkMode() ? 'text-[#F0F6FC]' : 'text-slate-700'">Notas</label>
         <textarea 
           pTextarea 
           [(ngModel)]="transferNotes" 
           rows="2" 
           [placeholder]="hasTransferShortage() ? 'Indica qué faltó o llegó dañado' : 'Opcional'"
-          class="!w-full !rounded-xl !border-slate-300 text-xs"
+          class="!w-full !rounded-xl text-xs transition-colors"
+          [ngClass]="themeService.isDarkMode() ? '!bg-[#0D1117] !text-[#F0F6FC] !border-[#30363D] focus:!border-[#58A6FF]' : '!border-slate-300'"
         ></textarea>
       </div>
     } @else if (transferNotes.trim()) {
-      <div class="p-3 rounded-xl bg-slate-50 border border-slate-200">
-        <p class="text-[10px] font-bold uppercase tracking-wide text-slate-500 m-0 mb-1">Notas</p>
-        <p class="text-xs text-slate-700 m-0 whitespace-pre-wrap">{{ transferNotes }}</p>
+      <div class="p-3 rounded-xl border transition-colors"
+        [ngClass]="themeService.isDarkMode() ? 'bg-[#1C2128] border-[#30363D]' : 'bg-slate-50 border-slate-200'">
+        <p class="text-[10px] font-bold uppercase tracking-wide m-0 mb-1"
+          [ngClass]="themeService.isDarkMode() ? 'text-[#8B949E]' : 'text-slate-500'">Notas</p>
+        <p class="text-xs m-0 whitespace-pre-wrap"
+          [ngClass]="themeService.isDarkMode() ? 'text-[#F0F6FC]' : 'text-slate-700'">{{ transferNotes }}</p>
       </div>
     }
   </div>
 
   <ng-template #footer>
-    <div class="flex items-center justify-end gap-2 pt-2 border-t border-slate-100">
+    <div class="flex items-center justify-end gap-2 pt-2 border-t"
+      [ngClass]="themeService.isDarkMode() ? 'border-[#30363D]' : 'border-slate-100'">
       @if (transferStep === 'quantities') {
         <p-button 
           label="Cancelar" 
@@ -723,27 +829,31 @@
 >
   <div class="p-1 space-y-4">
     @if (returnStep === 'quantities') {
-      <p class="text-xs text-slate-500">
+      <p class="text-xs" [ngClass]="themeService.isDarkMode() ? 'text-[#8B949E]' : 'text-slate-500'">
         Cuenta lo que volvió a planta (producto que el cliente no se quedó). No se puede recibir de más. Si falta algo, márcalo como merma para darlo de baja en kárdex, o déjalo como incidencia si aún no sabes la causa.
       </p>
     } @else {
-      <p class="text-xs text-slate-500">
+      <p class="text-xs" [ngClass]="themeService.isDarkMode() ? 'text-[#8B949E]' : 'text-slate-500'">
         Lo recibido es devolución. El faltante marcado como merma sale en kárdex y cierra el aviso del piloto (no se abre otra incidencia).
       </p>
     }
 
     @if (relatedPilotIncidents().length) {
-      <div class="p-3 rounded-xl border border-rose-200 bg-rose-50/50 space-y-2">
-        <p class="text-[10px] font-bold uppercase tracking-wide text-rose-800 m-0">Aviso del piloto en esta parada</p>
-        <p class="text-[11px] text-rose-700 m-0">
+      <div class="p-3 rounded-xl border space-y-2"
+        [ngClass]="themeService.isDarkMode() ? 'border-rose-800/40 bg-rose-950/40' : 'border-rose-200 bg-rose-50/50'">
+        <p class="text-[10px] font-bold uppercase tracking-wide m-0"
+          [ngClass]="themeService.isDarkMode() ? 'text-rose-400' : 'text-rose-800'">Aviso del piloto en esta parada</p>
+        <p class="text-[11px] m-0"
+          [ngClass]="themeService.isDarkMode() ? 'text-rose-300' : 'text-rose-700'">
           No se genera una incidencia nueva. Si das de baja el faltante como merma, se cierra este aviso.
         </p>
         @for (inc of relatedPilotIncidents(); track inc.id) {
-          <p class="text-xs text-slate-800 m-0">{{ inc.description }}</p>
+          <p class="text-xs m-0" [ngClass]="themeService.isDarkMode() ? 'text-[#F0F6FC]' : 'text-slate-800'">{{ inc.description }}</p>
           @if (inc.attachmentUrls?.length) {
             <div class="flex flex-wrap gap-2">
               @for (url of inc.attachmentUrls; track url) {
-                <a [href]="url" target="_blank" rel="noopener" class="block w-12 h-12 rounded-lg overflow-hidden border border-rose-200 bg-white">
+                <a [href]="url" target="_blank" rel="noopener" class="block w-12 h-12 rounded-lg overflow-hidden border"
+                  [ngClass]="themeService.isDarkMode() ? 'border-rose-800/40 bg-[#161B22]' : 'border-rose-200 bg-white'">
                   <img [src]="url" alt="Anexo" class="w-full h-full object-cover" />
                 </a>
               }
@@ -753,7 +863,8 @@
       </div>
     }
 
-    <div class="hidden sm:grid grid-cols-[minmax(0,1fr)_6.5rem_8.5rem_6.5rem_7rem] gap-2 px-1 text-[10px] font-bold uppercase tracking-wide text-slate-500">
+    <div class="hidden sm:grid grid-cols-[minmax(0,1fr)_6.5rem_8.5rem_6.5rem_7rem] gap-2 px-1 text-[10px] font-bold uppercase tracking-wide"
+      [ngClass]="themeService.isDarkMode() ? 'text-[#8B949E]' : 'text-slate-500'">
       <span>Producto</span>
       <span class="text-center">Debía volver</span>
       <span class="text-center">Recibido</span>
@@ -763,19 +874,26 @@
 
     <div class="space-y-2 max-h-72 overflow-y-auto">
       @for (item of returnInspectionItems; track item.productId + item.sku) {
-        <div class="p-3 bg-slate-50 rounded-xl border border-slate-200 grid grid-cols-1 sm:grid-cols-[minmax(0,1fr)_6.5rem_8.5rem_6.5rem_7rem] gap-2 items-center">
+        <div class="p-3 rounded-xl border grid grid-cols-1 sm:grid-cols-[minmax(0,1fr)_6.5rem_8.5rem_6.5rem_7rem] gap-2 items-center transition-colors"
+          [ngClass]="themeService.isDarkMode() ? 'bg-[#1C2128] border-[#30363D]' : 'bg-slate-50 border-slate-200'">
           <div class="min-w-0">
-            <span class="text-xs font-bold text-slate-800 block truncate">{{ item.name }}</span>
-            <span class="text-[10px] text-slate-500 font-mono">SKU: {{ item.sku }}</span>
+            <span class="text-xs font-bold block truncate"
+              [ngClass]="themeService.isDarkMode() ? 'text-[#F0F6FC]' : 'text-slate-800'">{{ item.name }}</span>
+            <span class="text-[10px] font-mono"
+              [ngClass]="themeService.isDarkMode() ? 'text-[#8B949E]' : 'text-slate-500'">SKU: {{ item.sku }}</span>
           </div>
           <div class="text-left sm:text-center">
-            <span class="sm:hidden text-[10px] font-bold uppercase text-slate-400">Debía volver</span>
-            <p class="text-xs font-bold text-slate-700 m-0">{{ qtyLabel(item.returnedQuantity, item.unit) }}</p>
+            <span class="sm:hidden text-[10px] font-bold uppercase"
+              [ngClass]="themeService.isDarkMode() ? 'text-[#8B949E]' : 'text-slate-400'">Debía volver</span>
+            <p class="text-xs font-bold m-0"
+              [ngClass]="themeService.isDarkMode() ? 'text-[#F0F6FC]' : 'text-slate-700'">{{ qtyLabel(item.returnedQuantity, item.unit) }}</p>
           </div>
           @if (returnStep === 'quantities') {
             <div>
-              <label class="sm:hidden text-[10px] font-bold uppercase text-slate-400">Recibido</label>
-              <div class="flex items-stretch rounded-lg border border-slate-300 bg-white overflow-hidden">
+              <label class="sm:hidden text-[10px] font-bold uppercase"
+                [ngClass]="themeService.isDarkMode() ? 'text-[#8B949E]' : 'text-slate-400'">Recibido</label>
+              <div class="flex items-stretch rounded-lg border overflow-hidden"
+                [ngClass]="themeService.isDarkMode() ? 'border-[#30363D] bg-[#0D1117]' : 'border-slate-300 bg-white'">
                 <p-inputNumber 
                   [(ngModel)]="item.receivedQuantity"
                   (ngModelChange)="onReturnReceivedChange(item, $event)"
@@ -788,40 +906,47 @@
                   inputStyleClass="!w-full !text-center !text-xs !h-9 !border-0 !rounded-none"
                 ></p-inputNumber>
                 @if (item.unit) {
-                  <span class="shrink-0 px-2 inline-flex items-center text-[10px] font-extrabold text-slate-600 bg-slate-100 border-l border-slate-200">{{ item.unit }}</span>
+                  <span class="shrink-0 px-2 inline-flex items-center text-[10px] font-extrabold border-l"
+                    [ngClass]="themeService.isDarkMode() ? 'text-[#8B949E] bg-[#21262D] border-[#30363D]' : 'text-slate-600 bg-slate-100 border-slate-200'">{{ item.unit }}</span>
                 }
               </div>
             </div>
           } @else {
             <div class="text-left sm:text-center">
-              <span class="sm:hidden text-[10px] font-bold uppercase text-slate-400">Recibido</span>
-              <p class="text-xs font-bold text-slate-800 m-0">{{ qtyLabel(item.receivedQuantity, item.unit) }}</p>
+              <span class="sm:hidden text-[10px] font-bold uppercase"
+                [ngClass]="themeService.isDarkMode() ? 'text-[#8B949E]' : 'text-slate-400'">Recibido</span>
+              <p class="text-xs font-bold m-0"
+                [ngClass]="themeService.isDarkMode() ? 'text-[#F0F6FC]' : 'text-slate-800'">{{ qtyLabel(item.receivedQuantity, item.unit) }}</p>
             </div>
           }
           <div class="text-left sm:text-center">
-            <span class="sm:hidden text-[10px] font-bold uppercase text-slate-400">Faltante</span>
+            <span class="sm:hidden text-[10px] font-bold uppercase"
+              [ngClass]="themeService.isDarkMode() ? 'text-[#8B949E]' : 'text-slate-400'">Faltante</span>
             <p
               class="text-xs font-bold m-0"
-              [class.text-amber-700]="missingReturnQty(item) > 0"
-              [class.text-emerald-700]="missingReturnQty(item) === 0"
+              [class.text-amber-500]="missingReturnQty(item) > 0"
+              [class.text-emerald-500]="missingReturnQty(item) === 0"
             >
               {{ qtyLabel(missingReturnQty(item), item.unit) }}
             </p>
           </div>
           <div class="text-left sm:text-center">
-            <span class="sm:hidden text-[10px] font-bold uppercase text-slate-400">Merma</span>
+            <span class="sm:hidden text-[10px] font-bold uppercase"
+              [ngClass]="themeService.isDarkMode() ? 'text-[#8B949E]' : 'text-slate-400'">Merma</span>
             @if (missingReturnQty(item) > 0) {
               <label class="inline-flex items-center gap-1.5 cursor-pointer">
                 <input
                   type="checkbox"
-                  class="rounded border-slate-300"
+                  class="rounded"
+                  [ngClass]="themeService.isDarkMode() ? 'border-[#30363D] bg-[#0D1117]' : 'border-slate-300'"
                   [(ngModel)]="item.registerAsWaste"
                   [disabled]="returnStep === 'review'"
                 />
-                <span class="text-[11px] font-semibold text-slate-700">Dar de baja como merma</span>
+                <span class="text-[11px] font-semibold"
+                  [ngClass]="themeService.isDarkMode() ? 'text-[#F0F6FC]' : 'text-slate-700'">Dar de baja como merma</span>
               </label>
             } @else {
-              <span class="text-[11px] text-slate-400">—</span>
+              <span class="text-[11px]" [ngClass]="themeService.isDarkMode() ? 'text-[#8B949E]' : 'text-slate-400'">—</span>
             }
           </div>
         </div>
@@ -830,25 +955,31 @@
 
     @if (returnStep === 'quantities') {
       <div>
-        <label class="text-xs font-semibold text-slate-700 block mb-1">Notas</label>
+        <label class="text-xs font-semibold block mb-1"
+          [ngClass]="themeService.isDarkMode() ? 'text-[#F0F6FC]' : 'text-slate-700'">Notas</label>
         <textarea 
           pTextarea 
           [(ngModel)]="returnNotes" 
           rows="2" 
           [placeholder]="hasUnmarkedReturnShortage() ? 'Indica qué faltó (no marcado como merma)' : hasWasteMarked() ? 'Opcional. El faltante marcado sale como merma' : 'Opcional'"
-          class="!w-full !rounded-xl !border-slate-300 text-xs"
+          class="!w-full !rounded-xl text-xs transition-colors"
+          [ngClass]="themeService.isDarkMode() ? '!bg-[#0D1117] !text-[#F0F6FC] !border-[#30363D] focus:!border-[#58A6FF]' : '!border-slate-300'"
         ></textarea>
       </div>
     } @else if (returnNotes.trim()) {
-      <div class="p-3 rounded-xl bg-slate-50 border border-slate-200">
-        <p class="text-[10px] font-bold uppercase tracking-wide text-slate-500 m-0 mb-1">Notas</p>
-        <p class="text-xs text-slate-700 m-0 whitespace-pre-wrap">{{ returnNotes }}</p>
+      <div class="p-3 rounded-xl border transition-colors"
+        [ngClass]="themeService.isDarkMode() ? 'bg-[#1C2128] border-[#30363D]' : 'bg-slate-50 border-slate-200'">
+        <p class="text-[10px] font-bold uppercase tracking-wide m-0 mb-1"
+          [ngClass]="themeService.isDarkMode() ? 'text-[#8B949E]' : 'text-slate-500'">Notas</p>
+        <p class="text-xs m-0 whitespace-pre-wrap"
+          [ngClass]="themeService.isDarkMode() ? 'text-[#F0F6FC]' : 'text-slate-700'">{{ returnNotes }}</p>
       </div>
     }
   </div>
 
   <ng-template #footer>
-    <div class="flex items-center justify-end gap-2 pt-2 border-t border-slate-100">
+    <div class="flex items-center justify-end gap-2 pt-2 border-t"
+      [ngClass]="themeService.isDarkMode() ? 'border-[#30363D]' : 'border-slate-100'">
       @if (returnStep === 'quantities') {
         <p-button 
           label="Cancelar" 
@@ -895,25 +1026,30 @@
   styleClass="!rounded-2xl shadow-2xl"
 >
   <div class="p-1 space-y-3">
-    <div class="p-3 bg-rose-50 rounded-xl border border-rose-200">
-      <span class="text-[11px] font-bold text-rose-800 uppercase tracking-wider block mb-1">Descripción de la Novedad</span>
-      <p class="text-xs text-rose-900">{{ selectedIncident?.description }}</p>
+    <div class="p-3 rounded-xl border transition-colors"
+      [ngClass]="themeService.isDarkMode() ? 'bg-rose-950/40 border-rose-800/40' : 'bg-rose-50 border-rose-200'">
+      <span class="text-[11px] font-bold uppercase tracking-wider block mb-1"
+        [ngClass]="themeService.isDarkMode() ? 'text-rose-400' : 'text-rose-800'">Descripción de la Novedad</span>
+      <p class="text-xs" [ngClass]="themeService.isDarkMode() ? 'text-[#F0F6FC]' : 'text-rose-900'">{{ selectedIncident?.description }}</p>
     </div>
 
     <div>
-      <label class="text-xs font-semibold text-slate-700 block mb-1">Notas de Resolución *</label>
+      <label class="text-xs font-semibold block mb-1"
+        [ngClass]="themeService.isDarkMode() ? 'text-[#F0F6FC]' : 'text-slate-700'">Notas de Resolución *</label>
       <textarea 
         pTextarea 
         [(ngModel)]="resolutionNotes" 
         rows="3" 
         placeholder="Indique cómo fue resuelta o justificada esta incidencia..."
-        class="!w-full !rounded-xl !border-slate-300 text-xs"
+        class="!w-full !rounded-xl text-xs transition-colors"
+        [ngClass]="themeService.isDarkMode() ? '!bg-[#0D1117] !text-[#F0F6FC] !border-[#30363D] focus:!border-[#58A6FF]' : '!border-slate-300'"
       ></textarea>
     </div>
   </div>
 
   <ng-template #footer>
-    <div class="flex items-center justify-end gap-2 pt-2 border-t border-slate-100">
+    <div class="flex items-center justify-end gap-2 pt-2 border-t"
+      [ngClass]="themeService.isDarkMode() ? 'border-[#30363D]' : 'border-slate-100'">
       <p-button 
         label="Cancelar" 
         [text]="true" 

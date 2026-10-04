@@ -1,193 +1,239 @@
-<div class="py-4 px-0 md:px-6 bg-slate-50/50 min-h-screen">
+<div class="py-4 px-0 md:px-6 min-h-screen transition-colors duration-200"
+     [ngClass]="themeService.isDarkMode() ? 'bg-[#0D1117]' : 'bg-slate-50/50'">
   <!-- Header Section -->
-  <div class="max-w-[1700px] mx-auto px-4 md:px-0 mb-6 md:mb-8">
-    <div class="flex flex-col md:flex-row md:items-end justify-between gap-4">
-      <div class="w-full md:max-w-[60%]">
-        <h1 class="text-2xl md:text-4xl font-semibold text-gray-900 tracking-tight">
-          {{ isEditMode ? 'Editar Proveedor' : 'Nuevo Proveedor' }}
-        </h1>
-        <p class="hidden md:block text-[#627ca7] mt-1 md:mt-2 text-sm md:text-md font-medium">
-           {{ isEditMode ? 'Actualiza la información de tu' : 'Registra un nuevo' }} socio comercial en tu base de datos.
-        </p>
-      </div>
+  <app-page-header
+    [title]="isEditMode ? 'Editar Proveedor' : 'Nuevo Proveedor'"
+    [subtitle]="isEditMode ? 'Actualiza la información de tu socio comercial en tu base de datos.' : 'Registra un nuevo socio comercial en tu base de datos.'"
+    icon="pi pi-truck"
+    colorScheme="burgundy"
+    [showBackButton]="true"
+    (onBack)="onCancelProccess()"
+  >
+    <ng-container actions>
+      <app-secondary-button
+        label="Cancelar"
+        icon="pi pi-times"
+        colorScheme="burgundy"
+        (clicked)="onCancelProccess()"
+      />
+      <app-primary-button
+        [label]="isEditMode ? 'Guardar Cambios' : 'Crear Proveedor'"
+        [icon]="isEditMode ? 'pi pi-save' : 'pi pi-check'"
+        [disabled]="supplierForm.invalid"
+        (clicked)="onSaveSupplier()"
+      />
+    </ng-container>
+  </app-page-header>
 
-      <div class="flex items-center gap-2 md:gap-4 w-full md:w-auto">
-        <div class="flex-1">
-          <p-button 
-            label="Cancelar" 
-            (onClick)="onCancelProccess()" 
-            variant="outlined" 
-            severity="danger" 
-            icon="pi pi-times"
-            styleClass="border-rose-400! h-[44px] justify-center"
-            fluid
+  <form class="max-w-[1100px] mx-auto pb-32 px-4 md:px-0" [formGroup]="supplierForm">
+    <div class="rounded-2xl border shadow-sm p-6 md:p-8 flex flex-col gap-6 transition-colors"
+         [ngClass]="themeService.isDarkMode() ? 'bg-[#161B22] border-[#30363D]' : 'bg-white border-slate-200'">
+      
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
+        <!-- Name Field -->
+        <div class="flex flex-col gap-1.5">
+          <label class="text-xs font-semibold"
+                 [ngClass]="themeService.isDarkMode() ? 'text-[#F0F6FC]' : 'text-[#48021C]'" for="name">
+            Razón Social / Nombre <span class="text-rose-500">*</span>
+          </label>
+          <input
+            pInputText
+            id="name"
+            formControlName="name"
+            class="w-full !rounded-xl h-10 text-xs font-medium"
+            [ngClass]="[
+              themeService.isDarkMode()
+                ? '!bg-[#0D1117] !border-[#30363D] !text-[#F0F6FC] focus:!border-[#58A6FF]'
+                : '!bg-white !border-slate-300 !text-slate-800 focus:!border-[#48021C]',
+              supplierForm.get('name')?.invalid && supplierForm.get('name')?.touched ? '!border-rose-400 ng-invalid ng-dirty' : ''
+            ]"
+            placeholder="Ej. Distribuidora Central S.A."
+            autocomplete="off"
+          />
+          @if (supplierForm.get('name')?.invalid && supplierForm.get('name')?.touched) {
+            <small class="text-rose-500 text-[10px] font-medium flex items-center mt-0.5">
+              <i class="pi pi-exclamation-circle mr-1 text-[10px]"></i>El nombre del proveedor es obligatorio.
+            </small>
+          }
+        </div>
+
+        <!-- NIT Field -->
+        <div class="flex flex-col gap-1.5">
+          <label class="text-xs font-semibold"
+                 [ngClass]="themeService.isDarkMode() ? 'text-[#F0F6FC]' : 'text-[#48021C]'" for="nit">
+            NIT del Proveedor
+          </label>
+          <input
+            pInputText
+            id="nit"
+            formControlName="nit"
+            class="w-full !rounded-xl h-10 text-xs font-medium"
+            [ngClass]="[
+              themeService.isDarkMode()
+                ? '!bg-[#0D1117] !border-[#30363D] !text-[#F0F6FC] focus:!border-[#58A6FF]'
+                : '!bg-white !border-slate-300 !text-slate-800 focus:!border-[#48021C]'
+            ]"
+            placeholder="Ej. 123456-7"
+            autocomplete="off"
           />
         </div>
-        <div class="flex-1">
-          <p-button
-            (onClick)="onSaveSupplier()"
-            [label]="isEditMode ? 'Guardar' : 'Crear'"
-            severity="success"
-            [raised]="true"
-            styleClass="shadow-lg h-[44px] justify-center"
-            [loading]="false"
-            icon="pi pi-check"
-            [disabled]="supplierForm.invalid"
-            fluid
+
+        <!-- Contact Name -->
+        <div class="flex flex-col gap-1.5">
+          <label class="text-xs font-semibold"
+                 [ngClass]="themeService.isDarkMode() ? 'text-[#F0F6FC]' : 'text-[#48021C]'" for="contactName">
+            Persona de Contacto <span class="text-rose-500">*</span>
+          </label>
+          <input
+            pInputText
+            id="contactName"
+            formControlName="contactName"
+            class="w-full !rounded-xl h-10 text-xs font-medium"
+            [ngClass]="[
+              themeService.isDarkMode()
+                ? '!bg-[#0D1117] !border-[#30363D] !text-[#F0F6FC] focus:!border-[#58A6FF]'
+                : '!bg-white !border-slate-300 !text-slate-800 focus:!border-[#48021C]',
+              supplierForm.get('contactName')?.invalid && supplierForm.get('contactName')?.touched ? '!border-rose-400 ng-invalid ng-dirty' : ''
+            ]"
+            placeholder="Ej. Juan Pérez"
+            autocomplete="off"
+          />
+          @if (supplierForm.get('contactName')?.invalid && supplierForm.get('contactName')?.touched) {
+            <small class="text-rose-500 text-[10px] font-medium flex items-center mt-0.5">
+              <i class="pi pi-exclamation-circle mr-1 text-[10px]"></i>El contacto es obligatorio.
+            </small>
+          }
+        </div>
+
+        <!-- Phone Field -->
+        <div class="flex flex-col gap-1.5">
+          <label class="text-xs font-semibold"
+                 [ngClass]="themeService.isDarkMode() ? 'text-[#F0F6FC]' : 'text-[#48021C]'" for="phone">
+            Teléfono de Contacto <span class="text-rose-500">*</span>
+          </label>
+          <p-inputMask
+            id="phone"
+            formControlName="phone"
+            mask="+502 9999 9999"
+            styleClass="w-full !rounded-xl h-10 text-xs font-medium"
+            [ngClass]="[
+              themeService.isDarkMode()
+                ? '!bg-[#0D1117] !border-[#30363D] !text-[#F0F6FC] focus:!border-[#58A6FF]'
+                : '!bg-white !border-slate-300 !text-slate-800 focus:!border-[#48021C]',
+              supplierForm.get('phone')?.invalid && supplierForm.get('phone')?.touched ? '!border-rose-400 ng-invalid ng-dirty' : ''
+            ]"
+            placeholder="+502 0000 0000"
+          />
+          @if (supplierForm.get('phone')?.invalid && supplierForm.get('phone')?.touched) {
+            <small class="text-rose-500 text-[10px] font-medium flex items-center mt-0.5">
+              <i class="pi pi-exclamation-circle mr-1 text-[10px]"></i>El teléfono es obligatorio.
+            </small>
+          }
+        </div>
+
+        <!-- Email Field -->
+        <div class="flex flex-col gap-1.5">
+          <label class="text-xs font-semibold"
+                 [ngClass]="themeService.isDarkMode() ? 'text-[#F0F6FC]' : 'text-[#48021C]'" for="email">
+            Correo Electrónico
+          </label>
+          <input
+            pInputText
+            id="email"
+            formControlName="email"
+            class="w-full !rounded-xl h-10 text-xs font-medium"
+            [ngClass]="[
+              themeService.isDarkMode()
+                ? '!bg-[#0D1117] !border-[#30363D] !text-[#F0F6FC] focus:!border-[#58A6FF]'
+                : '!bg-white !border-slate-300 !text-slate-800 focus:!border-[#48021C]'
+            ]"
+            placeholder="proveedor@empresa.com"
+            autocomplete="off"
           />
         </div>
-      </div>
-    </div>
-  </div>
 
-  <form class="max-w-[1100px] mx-auto pb-40" [formGroup]="supplierForm">
-    <div class="grid grid-cols-1 md:grid-cols-12 gap-6 md:gap-8">
-      <!-- General Info -->
-      <div class="col-span-12 flex flex-col gap-6">
-        <div class="p-5 md:p-8 rounded-none md:rounded-lg bg-white border-y md:border border-slate-300 shadow-sm relative overflow-hidden">
-          <div class="absolute top-0 right-0 p-4 opacity-[0.03]">
-             <i class="pi pi-truck" style="font-size: 8rem"></i>
-          </div>
+        <!-- Account Number -->
+        <div class="flex flex-col gap-1.5">
+          <label class="text-xs font-semibold"
+                 [ngClass]="themeService.isDarkMode() ? 'text-[#F0F6FC]' : 'text-[#48021C]'" for="accountNumber">
+            Número de Cuenta Bancaria
+          </label>
+          <input
+            pInputText
+            id="accountNumber"
+            formControlName="accountNumber"
+            class="w-full !rounded-xl h-10 text-xs font-medium"
+            [ngClass]="[
+              themeService.isDarkMode()
+                ? '!bg-[#0D1117] !border-[#30363D] !text-[#F0F6FC] focus:!border-[#58A6FF]'
+                : '!bg-white !border-slate-300 !text-slate-800 focus:!border-[#48021C]'
+            ]"
+            placeholder="Ej. 000-000000-0"
+            autocomplete="off"
+          />
+        </div>
 
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6 md:gap-y-8">
-            <!-- Name Field -->
-            <div class="flex flex-col gap-1.5 md:gap-1">
-              <label class="text-xs md:text-sm font-semibold text-[#3B5B8A]" for="name">
-                <i class="pi pi-briefcase mr-1 text-xs! text-blue-500"></i>
-                Razón Social / Nombre <span class="text-red-700">*</span>
-              </label>
-              <input
-                pInputText
-                id="name"
-                formControlName="name"
-                class="w-full !rounded-lg h-[44px] md:h-auto font-medium"
-                [ngClass]="{'ng-invalid ng-dirty': supplierForm.get('name')?.invalid && supplierForm.get('name')?.touched}"
-                placeholder="Ej. Distribuidora Central S.A."
-                autocomplete="off"
-              />
-              @if (supplierForm.get('name')?.invalid && supplierForm.get('name')?.touched) {
-                <small class="text-rose-500 text-[10px] font-medium flex items-center mt-1">
-                  <i class="pi pi-exclamation-circle mr-1 text-[10px]!"></i>Requerido.
-                </small>
-              }
-            </div>
+        <!-- Address Field -->
+        <div class="col-span-1 md:col-span-2 flex flex-col gap-1.5">
+          <label class="text-xs font-semibold"
+                 [ngClass]="themeService.isDarkMode() ? 'text-[#F0F6FC]' : 'text-[#48021C]'" for="address">
+            Dirección Física
+          </label>
+          <input
+            pInputText
+            id="address"
+            formControlName="address"
+            class="w-full !rounded-xl h-10 text-xs font-medium"
+            [ngClass]="[
+              themeService.isDarkMode()
+                ? '!bg-[#0D1117] !border-[#30363D] !text-[#F0F6FC] focus:!border-[#58A6FF]'
+                : '!bg-white !border-slate-300 !text-slate-800 focus:!border-[#48021C]'
+            ]"
+            placeholder="Ej. 3a Av. 10-20 Zona 1, Ciudad"
+            autocomplete="off"
+          />
+        </div>
 
-            <!-- NIT Field -->
-            <div class="flex flex-col gap-1.5 md:gap-1">
-              <label class="text-xs md:text-sm font-semibold text-[#3B5B8A]" for="nit">
-                <i class="pi pi-id-card mr-1 text-xs! text-blue-500"></i>
-                NIT del Proveedor
-              </label>
-              <input
-                pInputText
-                id="nit"
-                formControlName="nit"
-                class="w-full !rounded-lg h-[44px] md:h-auto font-medium"
-                placeholder="Ej. 123456-7"
-                autocomplete="off"
-              />
-            </div>
-
-            <!-- Email Field -->
-            <div class="flex flex-col gap-1.5 md:gap-1">
-              <label class="text-xs md:text-sm font-semibold text-[#3B5B8A]" for="email">
-                <i class="pi pi-envelope mr-1 text-xs! text-blue-500"></i>
-                Correo Electrónico
-              </label>
-              <input
-                pInputText
-                id="email"
-                formControlName="email"
-                class="w-full !rounded-lg h-[44px] md:h-auto font-medium"
-                placeholder="proveedor@empresa.com"
-                autocomplete="off"
-              />
-            </div>
-
-            <!-- Account Number -->
-            <div class="flex flex-col gap-1.5 md:gap-1">
-              <label class="text-xs md:text-sm font-semibold text-[#3B5B8A]" for="accountNumber">
-                <i class="pi pi-credit-card mr-1 text-xs! text-blue-500"></i>
-                Número de Cuenta Bancaria
-              </label>
-              <input
-                pInputText
-                id="accountNumber"
-                formControlName="accountNumber"
-                class="w-full !rounded-lg h-[44px] md:h-auto font-medium"
-                placeholder="Ej. 000-000000-0"
-                autocomplete="off"
-              />
-            </div>
-
-            <!-- Contact Name -->
-            <div class="flex flex-col gap-1.5 md:gap-1">
-              <label class="text-xs md:text-sm font-semibold text-[#3B5B8A]" for="contactName">
-                <i class="pi pi-user mr-1 text-xs! text-blue-500"></i>
-                Persona de Contacto <span class="text-red-700">*</span>
-              </label>
-              <input
-                pInputText
-                id="contactName"
-                formControlName="contactName"
-                class="w-full !rounded-lg h-[44px] md:h-auto font-medium"
-                [ngClass]="{'ng-invalid ng-dirty': supplierForm.get('contactName')?.invalid && supplierForm.get('contactName')?.touched}"
-                placeholder="Nombre completo"
-                autocomplete="off"
-              />
-            </div>
-
-            <!-- Phone Field -->
-            <div class="flex flex-col gap-1.5 md:gap-1">
-              <label class="text-xs md:text-sm font-semibold text-[#3B5B8A]" for="phone">
-                <i class="pi pi-phone mr-1 text-xs! text-blue-500"></i>
-                Teléfono de Contacto <span class="text-red-700">*</span>
-              </label>
-              <p-inputMask
-                id="phone"
-                formControlName="phone"
-                mask="+502 9999 9999"
-                styleClass="w-full !rounded-lg h-[44px] md:h-auto font-medium"
-                placeholder="+502 0000 0000"
-                [ngClass]="{'ng-invalid ng-dirty': supplierForm.get('phone')?.invalid && supplierForm.get('phone')?.touched}"
-              />
-            </div>
-
-            <!-- Address Field -->
-            <div class="col-span-1 md:col-span-2 flex flex-col gap-1.5 md:gap-1">
-              <label class="text-xs md:text-sm font-semibold text-[#3B5B8A]" for="address">
-                <i class="pi pi-map-marker mr-1 text-xs! text-blue-500"></i>
-                Dirección Física
-              </label>
-              <input
-                pInputText
-                id="address"
-                formControlName="address"
-                class="w-full !rounded-lg h-[44px] md:h-auto font-medium"
-                placeholder="Ej. 3a Av. 10-20 Zona 1, Ciudad"
-                autocomplete="off"
-              />
-            </div>
-
-            <!-- Notes -->
-            <div class="col-span-1 md:col-span-2 flex flex-col gap-1.5 md:gap-1">
-              <label class="text-xs md:text-sm font-semibold text-[#3B5B8A]" for="notes">
-                <i class="pi pi-align-left mr-1 text-xs! text-blue-500"></i>
-                Notas Adicionales
-              </label>
-              <textarea
-                rows="4"
-                pTextarea
-                id="notes"
-                formControlName="notes"
-                class="w-full !rounded-lg border-slate-300 p-4 font-medium resize-none text-sm md:text-base"
-                placeholder="Información adicional sobre el proveedor..."
-                autocomplete="off"
-              ></textarea>
-            </div>
-          </div>
+        <!-- Notes Field -->
+        <div class="col-span-1 md:col-span-2 flex flex-col gap-1.5">
+          <label class="text-xs font-semibold"
+                 [ngClass]="themeService.isDarkMode() ? 'text-[#F0F6FC]' : 'text-[#48021C]'" for="notes">
+            Notas Adicionales (Opcional)
+          </label>
+          <textarea
+            rows="4"
+            pTextarea
+            id="notes"
+            formControlName="notes"
+            class="w-full !rounded-xl p-3 text-xs font-medium resize-none transition-colors"
+            [ngClass]="[
+              themeService.isDarkMode()
+                ? '!bg-[#0D1117] !border-[#30363D] !text-[#F0F6FC] focus:!border-[#58A6FF]'
+                : '!bg-white !border-slate-300 !text-slate-800 focus:!border-[#48021C]'
+            ]"
+            placeholder="Condiciones de pago, días de entrega o detalles clave..."
+            autocomplete="off"
+          ></textarea>
         </div>
       </div>
+
+      <!-- Action Buttons footer -->
+      <div class="flex items-center justify-end gap-3 pt-4 border-t"
+           [ngClass]="themeService.isDarkMode() ? 'border-[#30363D]' : 'border-slate-100'">
+        <app-secondary-button
+          label="Cancelar"
+          icon="pi pi-times"
+          colorScheme="burgundy"
+          (clicked)="onCancelProccess()"
+        />
+        <app-primary-button
+          [label]="isEditMode ? 'Guardar Cambios' : 'Crear Proveedor'"
+          [icon]="isEditMode ? 'pi pi-save' : 'pi pi-check'"
+          [disabled]="supplierForm.invalid"
+          (clicked)="onSaveSupplier()"
+        />
+      </div>
+
     </div>
   </form>
 </div>

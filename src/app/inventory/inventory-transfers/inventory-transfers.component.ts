@@ -30,6 +30,7 @@ import { RefreshButtonComponent } from '../../shared/components/refresh-button/r
 import { PrimaryButtonComponent } from '../../shared/components/primary-button/primary-button.component';
 import { StandardTableComponent } from '../../shared/components/standard-table/standard-table.component';
 import { StatusBadgeComponent } from '../../shared/components/status-badge/status-badge.component';
+import { ThemeService } from '../../core/services/theme.service';
 
 @Component({
   selector: 'app-inventory-transfers',
@@ -62,6 +63,7 @@ import { StatusBadgeComponent } from '../../shared/components/status-badge/statu
   styleUrl: './inventory-transfers.component.css',
 })
 export class InventoryTransfersComponent implements OnInit {
+  public themeService = inject(ThemeService);
   private transfersService = inject(InventoryTransfersService);
   private tripsService = inject(TripsService);
   private confirmService = inject(ConfirmService);

@@ -1,4 +1,4 @@
-<div class="py-4 px-0 md:px-6 bg-slate-50/50 min-h-screen">
+<div class="py-4 px-0 md:px-6 min-h-screen transition-colors" [ngClass]="themeService.isDarkMode() ? 'bg-[#0D1117]' : 'bg-slate-50/50'">
   <!-- Top Card: Reusable Page Header -->
   <app-page-header
     title="Cotizaciones"
@@ -20,7 +20,7 @@
     <ng-container filters>
       <!-- Status Filter -->
       <div class="flex flex-col gap-1 w-full md:w-auto">
-        <label class="text-xs font-semibold text-[#48021C]">Estado</label>
+        <label class="text-xs font-semibold" [ngClass]="themeService.isDarkMode() ? 'text-[#F0F6FC]' : 'text-[#48021C]'">Estado</label>
         <p-select
           [options]="statusOptions"
           [(ngModel)]="selectedStatus"
@@ -32,14 +32,50 @@
           appendTo="body"
           size="small"
           class="w-full md:w-auto"
-          styleClass="!rounded-lg !border-[#9f6587]/35 focus-within:!border-[#9f6587] focus-within:!ring-2 focus-within:!ring-[#9f6587]/20 w-full md:w-56 text-xs font-medium"
+          [styleClass]="themeService.isDarkMode()
+            ? '!rounded-lg !bg-[#161B22] !text-[#F0F6FC] !border-[#30363D] focus-within:!border-[#58A6FF] focus-within:!ring-2 focus-within:!ring-[#58A6FF]/20 w-full md:w-56 text-xs font-medium'
+            : '!rounded-lg !border-[#9f6587]/35 focus-within:!border-[#9f6587] focus-within:!ring-2 focus-within:!ring-[#9f6587]/20 w-full md:w-56 text-xs font-medium'"
+          [panelStyleClass]="themeService.isDarkMode() ? '!bg-[#161B22] !border-[#30363D] !text-[#F0F6FC] shadow-2xl' : '!bg-white !border-slate-200 shadow-xl'"
         />
       </div>
 
-      <!-- Branch Filter -->
-      @if (isSuperAdmin()) {
+      <!-- Branch Filter / Active Branch Display -->
+      @if (!isConsolidatedMode() && activeWorkingBranch()?.id) {
         <div class="flex flex-col gap-1 w-full md:w-auto">
-          <label class="text-xs font-semibold text-[#48021C]">Sucursal</label>
+          <label class="text-xs font-semibold opacity-0 select-none hidden md:block">Sucursal</label>
+          <div 
+            class="flex items-center gap-2 px-3 py-1.5 border rounded-xl shadow-2xs transition-all w-fit" 
+            [ngClass]="themeService.isDarkMode() 
+              ? 'bg-[#161B22] border-[#30363D] text-[#F0F6FC]' 
+              : 'bg-rose-50/40 border-[#48021C]/25 text-slate-800'"
+          >
+            <span 
+              class="w-5 h-5 rounded-md flex items-center justify-center shrink-0 border"
+              [ngClass]="activeWorkingBranch()?.isPlant
+                ? (themeService.isDarkMode() ? 'bg-emerald-950/50 text-emerald-400 border-emerald-800/60' : 'bg-emerald-50 text-emerald-700 border-emerald-200')
+                : (themeService.isDarkMode() ? 'bg-[#1C2D42] text-[#58A6FF] border-[#58A6FF]/30' : 'bg-sky-50 text-sky-700 border-sky-200')"
+            >
+              <i [class]="activeWorkingBranch()?.isPlant ? 'pi pi-server' : 'pi pi-shop'" class="text-[10px]"></i>
+            </span>
+            <div class="flex flex-col min-w-0 pr-1">
+              <span 
+                class="text-xs md:text-sm font-semibold truncate"
+                [ngClass]="themeService.isDarkMode() ? 'text-[#F0F6FC]' : 'text-slate-800'"
+              >
+                {{ activeWorkingBranch()?.name }}
+              </span>
+              <span 
+                class="text-[10px] md:text-[11px] font-medium"
+                [ngClass]="themeService.isDarkMode() ? 'text-slate-400' : 'text-slate-500'"
+              >
+                Sucursal activa
+              </span>
+            </div>
+          </div>
+        </div>
+      } @else if (canFilterByBranch()) {
+        <div class="flex flex-col gap-1 w-full md:w-auto">
+          <label class="text-xs font-semibold" [ngClass]="themeService.isDarkMode() ? 'text-[#F0F6FC]' : 'text-[#48021C]'">Sucursal</label>
           <p-select
             [options]="branches()"
             [(ngModel)]="selectedBranch"
@@ -51,16 +87,20 @@
             appendTo="body"
             size="small"
             class="w-full md:w-auto"
-            styleClass="!rounded-lg !border-[#9f6587]/35 focus-within:!border-[#9f6587] focus-within:!ring-2 focus-within:!ring-[#9f6587]/20 w-full md:w-60 text-xs font-medium"
+            [styleClass]="themeService.isDarkMode()
+              ? '!rounded-lg !bg-[#161B22] !text-[#F0F6FC] !border-[#30363D] focus-within:!border-[#58A6FF] focus-within:!ring-2 focus-within:!ring-[#58A6FF]/20 w-full md:w-60 text-xs font-medium'
+              : '!rounded-lg !border-[#9f6587]/35 focus-within:!border-[#9f6587] focus-within:!ring-2 focus-within:!ring-[#9f6587]/20 w-full md:w-60 text-xs font-medium'"
+            [panelStyleClass]="themeService.isDarkMode() ? '!bg-[#161B22] !border-[#30363D] !text-[#F0F6FC] shadow-2xl' : '!bg-white !border-slate-200 shadow-xl'"
+            fluid
           />
         </div>
       }
 
       <!-- Search Input -->
       <div class="flex flex-col gap-1 w-full md:w-80">
-        <label class="text-xs font-semibold text-[#48021C]">Búsqueda rápida</label>
+        <label class="text-xs font-semibold" [ngClass]="themeService.isDarkMode() ? 'text-[#F0F6FC]' : 'text-[#48021C]'">Búsqueda rápida</label>
         <p-iconfield class="w-full">
-          <p-inputicon class="pi pi-search text-xs text-[#9f6587]" />
+          <p-inputicon class="pi pi-search text-xs" [ngClass]="themeService.isDarkMode() ? 'text-[#58A6FF]' : 'text-[#9f6587]'" />
           <input 
             [(ngModel)]="searchTerm"
             (input)="loadQuotations()"
@@ -69,7 +109,10 @@
             pSize="small"
             placeholder="Buscar por No. correlativo o cliente..."
             autocomplete="off"
-            class="w-full !rounded-lg font-medium p-inputtext-sm !border-[#9f6587]/35 focus:!border-[#9f6587] focus:!ring-2 focus:!ring-[#9f6587]/20 text-xs"
+            class="w-full !rounded-lg font-medium p-inputtext-sm text-xs transition-all"
+            [ngClass]="themeService.isDarkMode()
+              ? '!bg-[#161B22] !text-[#F0F6FC] !border-[#30363D] focus:!border-[#58A6FF] focus:!ring-2 focus:!ring-[#58A6FF]/20'
+              : '!border-[#9f6587]/35 focus:!border-[#9f6587] focus:!ring-2 focus:!ring-[#9f6587]/20'"
           />
         </p-iconfield>
       </div>
@@ -77,16 +120,17 @@
       <!-- Reset Filters Button -->
       @if (selectedStatus || selectedBranch || searchTerm) {
         <div class="flex items-end">
-          <p-button
+          <button
+            pButton
             icon="pi pi-filter-slash"
-            [outlined]="true"
-            severity="secondary"
-            size="small"
-            (onClick)="resetFilters()"
-            pTooltip="Limpiar todos los filtros"
-            tooltipPosition="top"
-            styleClass="!h-8 !px-2.5 text-xs text-slate-600 hover:text-[#48021C] border-[#9f6587]/35 hover:bg-[#9f6587]/15 !rounded-lg"
-          />
+            (click)="resetFilters()"
+            class="!w-[33px] !h-[33px] !p-0 !rounded-lg flex items-center justify-center cursor-pointer transition-all shadow-2xs shrink-0 border"
+            [ngClass]="themeService.isDarkMode()
+              ? '!border-[#30363D] !text-[#58A6FF] !bg-[#161B22] hover:!bg-[#1C2128] hover:!border-[#58A6FF]/60'
+              : '!border-[#9f6587]/35 !text-[#48021C] !bg-white hover:!bg-[#48021C]/5 hover:!border-[#9f6587]'"
+            pTooltip="Limpiar filtros"
+            tooltipPosition="bottom"
+          ></button>
         </div>
       }
     </ng-container>
@@ -108,42 +152,48 @@
         colorScheme="navy"
         emptyIcon="pi pi-file-edit"
         emptyMessage="No se encontraron cotizaciones. Prueba ajustando los filtros de búsqueda o crea una nueva."
+        [customClass]="themeService.isDarkMode() ? 'theme-dark' : ''"
       >
         <ng-template #header>
-          <tr class="h-11 text-xs bg-[#eddde1] border-b border-[#762f41]/40 text-[#3b141e] font-bold sticky top-0 z-10">
-            <th class="!text-center border-r border-[#762f41]/35 w-10 !px-0.5"></th>
-            <th class="!text-left !pl-3 border-r border-[#762f41]/35 w-[130px] text-[#3b141e]">Estado</th>
-            <th class="!text-left !pl-3 border-r border-[#762f41]/35 w-[140px] text-[#3b141e]">Cotización</th>
-            <th class="!text-left !pl-3 border-r border-[#762f41]/35 w-[200px] max-w-[200px] text-[#3b141e]">Cliente / Sucursal</th>
-            <th class="!text-left !pl-3 border-r border-[#762f41]/35 w-[125px] text-[#3b141e]">Vigencia</th>
-            <th class="!text-right !pr-4 border-r border-[#762f41]/35 w-[135px] text-[#3b141e]">Total</th>
-            <th class="!text-right !pr-4 w-[350px] text-[#3b141e]">Acciones</th>
+          <tr 
+            class="h-11 text-xs border-b font-bold sticky top-0 z-10 transition-colors"
+            [ngClass]="themeService.isDarkMode() 
+              ? 'bg-[#161B22] border-[#30363D] text-[#8B949E]' 
+              : 'bg-[#eddde1] border-[#762f41]/40 text-[#3b141e]'"
+          >
+            <th class="!text-center w-10 !px-0.5" [ngClass]="themeService.isDarkMode() ? 'border-r border-[#30363D]' : 'border-r border-[#762f41]/35'"></th>
+            <th class="!text-left !pl-3 w-[130px]" [ngClass]="themeService.isDarkMode() ? 'border-r border-[#30363D]' : 'border-r border-[#762f41]/35 text-[#3b141e]'">Estado</th>
+            <th class="!text-left !pl-3 w-[140px]" [ngClass]="themeService.isDarkMode() ? 'border-r border-[#30363D]' : 'border-r border-[#762f41]/35 text-[#3b141e]'">Cotización</th>
+            <th class="!text-left !pl-3 w-[200px] max-w-[200px]" [ngClass]="themeService.isDarkMode() ? 'border-r border-[#30363D]' : 'border-r border-[#762f41]/35 text-[#3b141e]'">Cliente / Sucursal</th>
+            <th class="!text-left !pl-3 w-[125px]" [ngClass]="themeService.isDarkMode() ? 'border-r border-[#30363D]' : 'border-r border-[#762f41]/35 text-[#3b141e]'">Vigencia</th>
+            <th class="!text-right !pr-4 w-[135px]" [ngClass]="themeService.isDarkMode() ? 'border-r border-[#30363D]' : 'border-r border-[#762f41]/35 text-[#3b141e]'">Total</th>
+            <th class="!text-right !pr-4 w-[350px]">Acciones</th>
           </tr>
         </ng-template>
 
         <ng-template #body let-quotation let-expanded="expanded">
           <tr 
-            [ngClass]="{ 
-              'bg-[#eddde1]/25': expanded,
-              'odd:bg-[#a65a6b]/[0.05]': !expanded
-            }" 
+            [ngClass]="themeService.isDarkMode()
+              ? { 'bg-[#1C2128]': expanded, 'odd:bg-[#0D1117] even:bg-[#161B22]': !expanded }
+              : { 'bg-[#eddde1]/25': expanded, 'odd:bg-[#a65a6b]/[0.05]': !expanded }" 
             (click)="toggleRowExpansion(quotation, quotationsDesktopTable, $event)"
-            class="hover:!bg-[#eddde1]/45 transition-colors duration-150 border-b border-[#762f41]/18 last:border-0 text-xs cursor-pointer"
+            class="hover:!bg-[#eddde1]/45 dark:hover:!bg-[#1F242C] transition-colors duration-150 border-b border-[#762f41]/18 dark:border-[#30363D] last:border-0 text-xs cursor-pointer"
           >
             <!-- 0. Expander Button -->
-            <td class="!text-center !py-2.5 border-r border-[#762f41]/18 w-10 !px-0.5">
+            <td class="!text-center !py-2.5 border-r w-10 !px-0.5" [ngClass]="themeService.isDarkMode() ? 'border-[#30363D]' : 'border-[#762f41]/18'">
               <button
                 type="button"
                 pButton
                 [icon]="expanded ? 'pi pi-chevron-down' : 'pi pi-chevron-right'"
-                class="p-button-text p-button-rounded !w-7 !h-7 !p-0 hover:!bg-[#eddde1]/60 !text-[#762f41] inline-flex items-center justify-center cursor-pointer"
+                class="p-button-text p-button-rounded !w-7 !h-7 !p-0 inline-flex items-center justify-center cursor-pointer"
+                [ngClass]="themeService.isDarkMode() ? '!text-[#58A6FF] hover:!bg-[#30363D]' : '!text-[#762f41] hover:!bg-[#eddde1]/60'"
                 (click)="toggleRowExpansion(quotation, quotationsDesktopTable, $event)"
                 [pTooltip]="expanded ? 'Ocultar detalles' : 'Ver productos'"
               ></button>
             </td>
 
-            <!-- 1. Estado (app-status-badge con color secondary/slate para CANCELLED) -->
-            <td class="!py-2.5 !pl-3 border-r border-[#762f41]/18 w-[130px]">
+            <!-- 1. Estado -->
+            <td class="!py-2.5 !pl-3 border-r w-[130px]" [ngClass]="themeService.isDarkMode() ? 'border-[#30363D]' : 'border-[#762f41]/18'">
               <app-status-badge
                 [severity]="getSeverity(quotation.status)"
                 [value]="getStatusLabel(quotation.status)"
@@ -152,39 +202,44 @@
             </td>
 
             <!-- 2. Cotización -->
-            <td class="!py-2.5 !pl-3 border-r border-[#762f41]/18 w-[140px]">
+            <td class="!py-2.5 !pl-3 border-r w-[140px]" [ngClass]="themeService.isDarkMode() ? 'border-[#30363D]' : 'border-[#762f41]/18'">
               <div class="flex flex-col gap-0.5 items-start">
-                <span class="px-1.5 py-0.5 bg-[#93c5fd]/50 text-[#172554] rounded-md text-[11px] font-bold border border-[#2563eb]/60">
+                <span 
+                  class="px-1.5 py-0.5 rounded-md text-[11px] font-bold border transition-colors"
+                  [ngClass]="themeService.isDarkMode() 
+                    ? 'bg-[#1C2D42] text-[#58A6FF] border-[#388BFD]/40' 
+                    : 'bg-[#93c5fd]/50 text-[#172554] border-[#2563eb]/60'"
+                >
                   {{ quotation.correlative }}
                 </span>
-                <span class="text-[10.5px] font-medium text-slate-500 leading-tight">
+                <span class="text-[10.5px] font-medium leading-tight" [ngClass]="themeService.isDarkMode() ? 'text-[#8B949E]' : 'text-slate-500'">
                   {{ quotation.createdAt | date: 'dd/MM/yyyy' }}
                 </span>
               </div>
             </td>
 
             <!-- 3. Cliente / Sucursal -->
-            <td class="!py-2.5 !pl-3 text-left border-r border-[#762f41]/18 w-[200px] max-w-[200px]">
+            <td class="!py-2.5 !pl-3 text-left border-r w-[200px] max-w-[200px]" [ngClass]="themeService.isDarkMode() ? 'border-[#30363D]' : 'border-[#762f41]/18'">
               <div class="flex flex-col min-w-0">
-                <span class="font-semibold capitalize text-slate-800 leading-tight truncate" [pTooltip]="quotation.customerName || quotation.guestCustomer?.name || 'Consumidor Final'" tooltipPosition="top">
+                <span class="font-semibold capitalize leading-tight truncate" [ngClass]="themeService.isDarkMode() ? 'text-[#F0F6FC]' : 'text-slate-800'" [pTooltip]="quotation.customerName || quotation.guestCustomer?.name || 'Consumidor Final'" tooltipPosition="top">
                   {{ quotation.customerName || quotation.guestCustomer?.name || 'Consumidor Final' }}
                 </span>
-                <span class="text-[11px] font-medium text-slate-500 mt-0.5 truncate">
+                <span class="text-[11px] font-medium mt-0.5 truncate" [ngClass]="themeService.isDarkMode() ? 'text-[#8B949E]' : 'text-slate-500'">
                   {{ quotation.branchName || 'Sin sucursal' }}
                 </span>
               </div>
             </td>
 
             <!-- 4. Vigencia -->
-            <td class="!py-2.5 !pl-3 text-left border-r border-[#762f41]/18">
+            <td class="!py-2.5 !pl-3 text-left border-r" [ngClass]="themeService.isDarkMode() ? 'border-[#30363D]' : 'border-[#762f41]/18'">
               @let validity = getValidityInfo(quotation.validUntil);
               <div class="flex flex-col">
-                <span class="font-semibold text-slate-800 leading-tight">
+                <span class="font-semibold leading-tight" [ngClass]="themeService.isDarkMode() ? 'text-[#F0F6FC]' : 'text-slate-800'">
                   {{ quotation.validUntil | date: 'dd/MM/yyyy' }}
                 </span>
                 <span 
                   class="text-[10.5px] mt-0.5"
-                  [ngClass]="validity.isExpired ? 'text-rose-600 font-semibold' : 'text-slate-500 font-medium'"
+                  [ngClass]="validity.isExpired ? (themeService.isDarkMode() ? 'text-rose-400 font-semibold' : 'text-rose-600 font-semibold') : (themeService.isDarkMode() ? 'text-[#8B949E] font-medium' : 'text-slate-500 font-medium')"
                 >
                   {{ validity.text }}
                 </span>
@@ -192,12 +247,12 @@
             </td>
 
             <!-- 5. Total -->
-            <td class="!py-2.5 !pr-4 text-right border-r border-[#762f41]/18">
+            <td class="!py-2.5 !pr-4 text-right border-r" [ngClass]="themeService.isDarkMode() ? 'border-[#30363D]' : 'border-[#762f41]/18'">
               <div class="flex flex-col items-end">
-                <span class="font-bold text-slate-900 leading-tight text-xs tabular-nums">
+                <span class="font-bold leading-tight text-xs tabular-nums" [ngClass]="themeService.isDarkMode() ? 'text-[#58A6FF]' : 'text-slate-900'">
                   {{ quotation.total | currency: 'Q ' }}
                 </span>
-                <span class="text-[10px] font-medium text-slate-500 mt-0.5">
+                <span class="text-[10px] font-medium mt-0.5" [ngClass]="themeService.isDarkMode() ? 'text-[#8B949E]' : 'text-slate-500'">
                   {{ quotation.applyTax ? ('IVA: ' + (quotation.taxAmount | currency:'Q ')) : 'Sin IVA' }}
                 </span>
               </div>
@@ -206,12 +261,15 @@
             <!-- 6. Acciones -->
             <td class="!pr-4 !text-right !py-2.5">
               <div class="flex items-center justify-end gap-1.5" (click)="$event.stopPropagation()">
-                <!-- Ver (Anulada): Tono slate neutro -->
+                <!-- Ver (Anulada) -->
                 @if (quotation.status === 'CANCELLED') {
                   <button
                     type="button"
                     (click)="showDetails(quotation)"
-                    class="px-2 py-1 rounded-md text-[11px] font-semibold inline-flex items-center gap-1 border border-slate-400/50 bg-slate-100 text-slate-700 hover:bg-slate-200 hover:border-slate-500 hover:text-slate-900 transition-all cursor-pointer shadow-2xs active:scale-95"
+                    class="px-2 py-1 rounded-md text-[11px] font-semibold inline-flex items-center gap-1 border transition-all cursor-pointer shadow-2xs active:scale-95"
+                    [ngClass]="themeService.isDarkMode()
+                      ? 'border-[#30363D] bg-[#161B22] text-[#C9D1D9] hover:bg-[#1F242C] hover:text-white'
+                      : 'border-slate-400/50 bg-slate-100 text-slate-700 hover:bg-slate-200 hover:border-slate-500 hover:text-slate-900'"
                     pTooltip="Ver detalle histórico (Anulada)"
                     tooltipPosition="top"
                   >
@@ -219,11 +277,14 @@
                     <span>Ver</span>
                   </button>
                 } @else {
-                  <!-- Enviar: Tono institucional guinda/vino (#48021C / #9f6587) -->
+                  <!-- Enviar -->
                   <button
                     type="button"
                     (click)="showDetails(quotation)"
-                    class="px-2 py-1 rounded-md text-[11px] font-semibold inline-flex items-center gap-1 border border-[#48021C]/45 bg-[#48021C]/[0.08] text-[#48021C] hover:bg-[#48021C]/[0.18] hover:border-[#48021C]/85 hover:text-[#350114] transition-all cursor-pointer shadow-2xs active:scale-95"
+                    class="px-2 py-1 rounded-md text-[11px] font-semibold inline-flex items-center gap-1 border transition-all cursor-pointer shadow-2xs active:scale-95"
+                    [ngClass]="themeService.isDarkMode()
+                      ? 'border-[#388BFD]/50 bg-[#1C2D42] text-[#58A6FF] hover:bg-[#1F385C]'
+                      : 'border-[#48021C]/45 bg-[#48021C]/[0.08] text-[#48021C] hover:bg-[#48021C]/[0.18] hover:border-[#48021C]/85 hover:text-[#350114]'"
                     pTooltip="Ver y Enviar documento"
                     tooltipPosition="top"
                   >
@@ -232,12 +293,15 @@
                   </button>
                 }
 
-                <!-- Editar: Solo para PENDING o EXPIRED (para renovar/ajustar) -->
+                <!-- Editar -->
                 @if (quotation.status === 'PENDING' || quotation.status === 'EXPIRED') {
                   <button
                     type="button"
                     (click)="onEditQuotation(quotation.id)"
-                    class="px-2 py-1 rounded-md text-[11px] font-semibold inline-flex items-center gap-1 border border-amber-600/45 bg-amber-500/[0.08] text-amber-700 hover:bg-amber-500/[0.18] hover:border-amber-600/85 hover:text-amber-800 transition-all cursor-pointer shadow-2xs active:scale-95"
+                    class="px-2 py-1 rounded-md text-[11px] font-semibold inline-flex items-center gap-1 border transition-all cursor-pointer shadow-2xs active:scale-95"
+                    [ngClass]="themeService.isDarkMode()
+                      ? 'border-amber-800/60 bg-amber-950/30 text-amber-300 hover:bg-amber-900/40 hover:border-amber-600'
+                      : 'border-amber-600/45 bg-amber-500/[0.08] text-amber-700 hover:bg-amber-500/[0.18] hover:border-amber-600/85 hover:text-amber-800'"
                     pTooltip="Modificar cotización"
                     tooltipPosition="top"
                   >
@@ -246,12 +310,15 @@
                   </button>
                 }
 
-                <!-- Consolidar & Anular: Exclusivo de PENDING -->
+                <!-- Consolidar & Anular -->
                 @if (quotation.status === 'PENDING') {
                   <button
                     type="button"
                     (click)="confirmConvert(quotation)"
-                    class="px-2 py-1 rounded-md text-[11px] font-semibold inline-flex items-center gap-1 border border-emerald-500/45 bg-emerald-500/[0.08] text-emerald-600 hover:bg-emerald-500/[0.18] hover:border-emerald-500/85 hover:text-emerald-700 transition-all cursor-pointer shadow-2xs active:scale-95"
+                    class="px-2 py-1 rounded-md text-[11px] font-semibold inline-flex items-center gap-1 border transition-all cursor-pointer shadow-2xs active:scale-95"
+                    [ngClass]="themeService.isDarkMode()
+                      ? 'border-emerald-800/60 bg-emerald-950/30 text-emerald-300 hover:bg-emerald-900/40 hover:border-emerald-600'
+                      : 'border-emerald-500/45 bg-emerald-500/[0.08] text-emerald-600 hover:bg-emerald-500/[0.18] hover:border-emerald-500/85 hover:text-emerald-700'"
                     pTooltip="Convertir a Orden de Venta"
                     tooltipPosition="top"
                   >
@@ -261,7 +328,10 @@
                   <button
                     type="button"
                     (click)="confirmCancel(quotation)"
-                    class="px-2 py-1 rounded-md text-[11px] font-semibold inline-flex items-center gap-1 border border-rose-500/45 bg-rose-500/[0.08] text-rose-600 hover:bg-rose-500/[0.18] hover:border-rose-500/85 hover:text-rose-700 transition-all cursor-pointer shadow-2xs active:scale-95"
+                    class="px-2 py-1 rounded-md text-[11px] font-semibold inline-flex items-center gap-1 border transition-all cursor-pointer shadow-2xs active:scale-95"
+                    [ngClass]="themeService.isDarkMode()
+                      ? 'border-rose-800/60 bg-rose-950/30 text-rose-300 hover:bg-rose-900/40 hover:border-rose-600'
+                      : 'border-rose-500/45 bg-rose-500/[0.08] text-rose-600 hover:bg-rose-500/[0.18] hover:border-rose-500/85 hover:text-rose-700'"
                     pTooltip="Anular cotización"
                     tooltipPosition="top"
                   >
@@ -277,8 +347,13 @@
         <!-- Expanded Row Template -->
         <ng-template #expandedrow let-quotation>
           <tr>
-            <td colspan="7" class="!p-0 border-b border-[#7c5aac]/25 bg-transparent">
-              <div class="px-4 sm:px-7 py-4 bg-[#7c5aac]/[0.06] border-l-4 border-[#7c5aac]">
+            <td colspan="7" class="!p-0 border-b bg-transparent" [ngClass]="themeService.isDarkMode() ? 'border-[#30363D]' : 'border-[#7c5aac]/25'">
+              <div 
+                class="px-4 sm:px-7 py-4 border-l-4 transition-colors"
+                [ngClass]="themeService.isDarkMode() 
+                  ? 'bg-[#0D1117]/80 border-[#58A6FF]' 
+                  : 'bg-[#7c5aac]/[0.06] border-[#7c5aac]'"
+              >
                 <ng-container *ngTemplateOutlet="expandedDetails; context: { $implicit: quotation }"></ng-container>
               </div>
             </td>
@@ -288,20 +363,29 @@
     </div>
 
     <!-- MOBILE VIEW -->
-    <div class="lg:hidden block bg-white rounded-2xl border border-slate-300 overflow-hidden shadow-sm">
+    <div 
+      class="lg:hidden block rounded-2xl border overflow-hidden shadow-sm transition-colors"
+      [ngClass]="themeService.isDarkMode() ? 'bg-[#161B22] border-[#30363D]' : 'bg-white border-slate-300'"
+    >
       <!-- Mobile Card Header -->
-      <div class="p-4 flex flex-col gap-2.5 border-b border-slate-200 bg-slate-50/50">
+      <div 
+        class="p-4 flex flex-col gap-2.5 border-b transition-colors"
+        [ngClass]="themeService.isDarkMode() ? 'bg-[#1C2128] border-[#30363D]' : 'bg-slate-50/50 border-slate-200'"
+      >
         <div class="flex items-center justify-between">
           <div class="flex items-center gap-2">
-            <h2 class="text-base font-semibold text-gray-900 tracking-tight leading-none m-0">
+            <h2 class="text-base font-semibold tracking-tight leading-none m-0" [ngClass]="themeService.isDarkMode() ? 'text-[#F0F6FC]' : 'text-gray-900'">
               Listado de Cotizaciones
             </h2>
-            <span class="px-2 py-0.5 bg-slate-200 text-slate-700 text-xs font-semibold rounded-full">
+            <span 
+              class="px-2 py-0.5 text-xs font-semibold rounded-full"
+              [ngClass]="themeService.isDarkMode() ? 'bg-[#30363D] text-[#8B949E]' : 'bg-slate-200 text-slate-700'"
+            >
               {{ quotations.length }}
             </span>
           </div>
           <p-button 
-            styleClass="!rounded-lg text-xs! !bg-[#48021C] !border-[#48021C] !text-white hover:!bg-[#350114] inline-flex items-center gap-1 shadow-sm !py-1.5 !px-3"
+            styleClass="!rounded-lg text-xs! !bg-[#48021C] dark:!bg-[#238636] !border-[#48021C] dark:!border-[#238636] !text-white hover:!bg-[#350114] dark:hover:!bg-[#2ea043] inline-flex items-center gap-1 shadow-sm !py-1.5 !px-3"
             (onClick)="goToNewQuotation()"
           >
             <svg lucideCirclePlus class="w-3.5 h-3.5"></svg>
@@ -309,7 +393,7 @@
           </p-button>
         </div>
         <p-iconfield class="w-full">
-          <p-inputicon class="pi pi-search" />
+          <p-inputicon class="pi pi-search" [ngClass]="themeService.isDarkMode() ? 'text-[#8B949E]' : ''" />
           <input 
             [(ngModel)]="searchTerm"
             (input)="loadQuotations()"
@@ -317,7 +401,7 @@
             pInputText 
             placeholder="Buscar por No. o Cliente..."
             autocomplete="off"
-            class="!rounded-xl border-slate-200 text-xs h-9! w-full"
+            class="!rounded-xl text-xs h-9! w-full dark:!bg-[#0D1117] dark:!border-[#30363D] dark:!text-[#F0F6FC]"
             fluid
           />
         </p-iconfield>
@@ -335,18 +419,31 @@
         <ng-template pTemplate="body" let-quotation>
           <tr class="bg-transparent border-none block" [ngClass]="{ 'opacity-60 grayscale-[0.5]': quotation.status === 'CANCELLED' }">
             <td class="block !p-0 border-none bg-transparent w-full">
-              <div class="bg-white rounded-2xl shadow-sm border border-slate-200 mx-4 my-2.5 flex flex-col overflow-hidden relative">
+              <div 
+                class="rounded-2xl shadow-sm border mx-4 my-2.5 flex flex-col overflow-hidden relative transition-colors"
+                [ngClass]="themeService.isDarkMode() ? 'bg-[#161B22] border-[#30363D]' : 'bg-white border-slate-200'"
+              >
                 <div class="flex p-4 items-center gap-3">
-                  <div class="w-12 h-12 rounded-lg flex-shrink-0 flex items-center justify-center overflow-hidden border border-[#4A7FA7] bg-[#D0E2F2] shadow-sm text-[#3B5B8A]">
+                  <div 
+                    class="w-12 h-12 rounded-lg flex-shrink-0 flex items-center justify-center overflow-hidden border shadow-sm transition-colors"
+                    [ngClass]="themeService.isDarkMode() 
+                      ? 'border-[#30363D] bg-[#1C2128] text-[#58A6FF]' 
+                      : 'border-[#4A7FA7] bg-[#D0E2F2] text-[#3B5B8A]'"
+                  >
                     <i class="pi pi-file-edit text-lg!"></i>
                   </div>
                   <div class="flex-1 min-w-0">
                     <div class="flex justify-between items-start gap-1">
                       <div class="flex flex-col min-w-0">
-                        <span class="px-2 py-0.5 bg-[#93c5fd]/50 text-[#172554] rounded-md text-[12px] font-semibold border border-[#2563eb]/60 w-fit">
+                        <span 
+                          class="px-2 py-0.5 rounded-md text-[12px] font-semibold border w-fit transition-colors"
+                          [ngClass]="themeService.isDarkMode()
+                            ? 'bg-[#1C2D42] text-[#58A6FF] border-[#388BFD]/40'
+                            : 'bg-[#93c5fd]/50 text-[#172554] border-[#2563eb]/60'"
+                        >
                           {{ quotation.correlative }}
                         </span>
-                        <h3 class="font-semibold text-slate-800 text-base leading-tight truncate mt-1.5">
+                        <h3 class="font-semibold text-base leading-tight truncate mt-1.5" [ngClass]="themeService.isDarkMode() ? 'text-[#F0F6FC]' : 'text-slate-800'">
                           {{ quotation.customerName || quotation.guestCustomer?.name || 'Venta al Público' }}
                         </h3>
                       </div>
@@ -358,12 +455,12 @@
                     </div>
                     <div class="flex items-center gap-4 mt-2">
                       <div>
-                        <p class="text-[9px] font-semibold text-[#3B5B8A] tracking-wider">Total Cotizado</p>
-                        <p class="text-[18px] font-bold text-slate-900 leading-none mt-0.5">{{ quotation.total | currency: 'Q ' }}</p>
+                        <p class="text-[9px] font-semibold tracking-wider" [ngClass]="themeService.isDarkMode() ? 'text-[#8B949E]' : 'text-[#3B5B8A]'">Total Cotizado</p>
+                        <p class="text-[18px] font-bold leading-none mt-0.5" [ngClass]="themeService.isDarkMode() ? 'text-[#58A6FF]' : 'text-slate-900'">{{ quotation.total | currency: 'Q ' }}</p>
                       </div>
                       <div class="flex flex-col">
-                        <p class="text-[9px] font-semibold text-[#3B5B8A] tracking-wider">Vencimiento</p>
-                        <span class="text-xs font-bold mt-0.5" [ngClass]="{'text-rose-500': quotation.status === 'EXPIRED', 'text-slate-500': quotation.status !== 'EXPIRED'}">
+                        <p class="text-[9px] font-semibold tracking-wider" [ngClass]="themeService.isDarkMode() ? 'text-[#8B949E]' : 'text-[#3B5B8A]'">Vencimiento</p>
+                        <span class="text-xs font-bold mt-0.5" [ngClass]="{'text-rose-400': quotation.status === 'EXPIRED', 'text-[#8B949E]': quotation.status !== 'EXPIRED'}">
                           {{ quotation.validUntil | date: 'dd/MM/yyyy' }}
                         </span>
                       </div>
@@ -372,20 +469,29 @@
                 </div>
 
                 <div class="px-4 pb-4 flex items-center gap-2 overflow-x-auto no-scrollbar">
-                  <span class="inline-flex items-center text-[11px] bg-slate-100 text-slate-600 font-semibold px-2 py-0.5 rounded border border-slate-200">
+                  <span 
+                    class="inline-flex items-center text-[11px] font-semibold px-2 py-0.5 rounded border transition-colors"
+                    [ngClass]="themeService.isDarkMode() ? 'bg-[#0D1117] text-[#C9D1D9] border-[#30363D]' : 'bg-slate-100 text-slate-600 border-slate-200'"
+                  >
                     <i class="pi pi-building text-[10px] mr-1"></i> {{ quotation.branchName }}
                   </span>
-                  <span class="inline-flex items-center text-[11px] bg-[#D0E2F2] text-[#3B5B8A] font-semibold px-2 py-0.5 rounded border border-[#4A7FA7]">
+                  <span 
+                    class="inline-flex items-center text-[11px] font-semibold px-2 py-0.5 rounded border transition-colors"
+                    [ngClass]="themeService.isDarkMode() ? 'bg-[#1C2D42] text-[#58A6FF] border-[#388BFD]/40' : 'bg-[#D0E2F2] text-[#3B5B8A] border-[#4A7FA7]'"
+                  >
                     {{ quotation.items?.length || 0 }} Items
                   </span>
                 </div>
 
-                <div class="bg-slate-50/50 border-t border-slate-100 p-2.5 px-3 flex items-center justify-end gap-2 flex-wrap">
+                <div 
+                  class="border-t p-2.5 px-3 flex items-center justify-end gap-2 flex-wrap transition-colors"
+                  [ngClass]="themeService.isDarkMode() ? 'bg-[#1C2128] border-[#30363D]' : 'bg-slate-50/50 border-slate-100'"
+                >
                   @if (quotation.status === 'CANCELLED') {
                     <p-button 
                       [outlined]="true" 
                       (onClick)="showDetails(quotation)" 
-                      styleClass="!text-[12px] !py-1 !px-2.5 !rounded-lg font-semibold shadow-none !border-[1.5px] !border-slate-400 !text-slate-700 hover:!bg-slate-200 transition-all inline-flex items-center gap-1.5"
+                      styleClass="!text-[12px] !py-1 !px-2.5 !rounded-lg font-semibold shadow-none !border-[1.5px] dark:!border-[#30363D] dark:!text-[#C9D1D9] dark:hover:!bg-[#30363D] transition-all inline-flex items-center gap-1.5"
                     >
                       <i class="pi pi-eye text-[11px]"></i>
                       <span>Ver</span>
@@ -394,7 +500,7 @@
                     <p-button 
                       [outlined]="true" 
                       (onClick)="showDetails(quotation)" 
-                      styleClass="!text-[12px] !py-1 !px-2.5 !rounded-lg font-semibold shadow-none !border-[1.5px] !border-[#48021C] !text-[#48021C] hover:!bg-[#48021C] hover:!text-white transition-all inline-flex items-center gap-1.5"
+                      styleClass="!text-[12px] !py-1 !px-2.5 !rounded-lg font-semibold shadow-none !border-[1.5px] dark:!border-[#388BFD]/60 dark:!text-[#58A6FF] dark:hover:!bg-[#1C2D42] transition-all inline-flex items-center gap-1.5"
                     >
                       <i class="pi pi-send text-[11px]"></i>
                       <span>Enviar</span>
@@ -405,7 +511,7 @@
                     <p-button 
                       [outlined]="true" 
                       (onClick)="onEditQuotation(quotation.id)" 
-                      styleClass="!text-[12px] !py-1 !px-2.5 !rounded-lg font-semibold shadow-none !border-[1.5px] !border-amber-600 !text-amber-700 hover:!bg-amber-600 hover:!text-white hover:!border-amber-600 transition-all inline-flex items-center gap-1.5"
+                      styleClass="!text-[12px] !py-1 !px-2.5 !rounded-lg font-semibold shadow-none !border-[1.5px] !border-amber-600 !text-amber-500 hover:!bg-amber-600 hover:!text-white transition-all inline-flex items-center gap-1.5"
                     >
                       <svg lucideSquarePen class="w-3.5 h-3.5 stroke-[2.2]"></svg>
                       <span>Editar</span>
@@ -416,7 +522,7 @@
                     <p-button 
                       [outlined]="true" 
                       (onClick)="confirmConvert(quotation)" 
-                      styleClass="!text-[12px] !py-1 !px-2.5 !rounded-lg font-semibold shadow-none !border-[1.5px] !border-[#15803d] !text-[#15803d] hover:!bg-[#15803d] hover:!text-white hover:!border-[#15803d] transition-all inline-flex items-center gap-1.5"
+                      styleClass="!text-[12px] !py-1 !px-2.5 !rounded-lg font-semibold shadow-none !border-[1.5px] !border-emerald-600 !text-emerald-500 hover:!bg-emerald-600 hover:!text-white transition-all inline-flex items-center gap-1.5"
                     >
                       <svg lucideShoppingCart class="w-3.5 h-3.5 stroke-[2.2]"></svg>
                       <span>Convertir a orden</span>
@@ -424,7 +530,7 @@
                     <p-button 
                       [outlined]="true" 
                       (onClick)="confirmCancel(quotation)" 
-                      styleClass="!text-[12px] !py-1 !px-2.5 !rounded-lg font-semibold shadow-none !border-[1.5px] !border-[#e11d48] !text-[#e11d48] hover:!bg-[#e11d48] hover:!text-white hover:!border-[#e11d48] transition-all inline-flex items-center gap-1.5"
+                      styleClass="!text-[12px] !py-1 !px-2.5 !rounded-lg font-semibold shadow-none !border-[1.5px] !border-rose-600 !text-rose-500 hover:!bg-rose-600 hover:!text-white transition-all inline-flex items-center gap-1.5"
                     >
                       <svg lucideBan class="w-3.5 h-3.5 stroke-[2.2]"></svg>
                       <span>Anular</span>
@@ -439,12 +545,17 @@
         <ng-template pTemplate="emptymessage">
            <tr>
              <td class="block !p-0 border-none bg-transparent w-full">
-               <div class="bg-white rounded-lg border border-slate-200 mx-4 my-8 p-10 flex flex-col items-center gap-4 text-center">
-                 <i class="pi pi-file-edit text-[#95abce]" style="font-size: 4rem"></i>
-                 <div class="flex flex-col gap-1">
-                   <p class="text-[#627ca7] font-bold text-lg">No se encontraron cotizaciones</p>
-                   <p class="text-[#627ca7] text-xs font-medium">Prueba ajustando los filtros de búsqueda o crea una nueva.</p>
-                 </div>
+               <div class="mx-4 my-8 py-12 flex flex-col items-center justify-center gap-3.5 text-center">
+                 <i 
+                   class="pi pi-file-edit text-5xl transition-colors"
+                   [ngClass]="themeService.isDarkMode() ? 'text-[#8B949E]/70' : 'text-slate-300'"
+                 ></i>
+                 <span 
+                   class="text-xs font-medium max-w-sm tracking-tight transition-colors" 
+                   [ngClass]="themeService.isDarkMode() ? 'text-[#8B949E]' : 'text-slate-400'"
+                 >
+                   No se encontraron cotizaciones. Prueba ajustando los filtros de búsqueda o crea una nueva.
+                 </span>
                </div>
              </td>
            </tr>
@@ -464,59 +575,71 @@
     <ng-template #expandedDetails let-quotation>
       <div class="flex flex-col lg:grid lg:grid-cols-12 gap-6 text-left">
         <div class="col-span-12 lg:col-span-8 flex flex-col gap-4">
-          <div class="bg-white rounded-xl border border-slate-300 overflow-hidden shadow-sm flex flex-col">
-            <!-- Scrollable Table Container (Replicating exact preview table without images) -->
+          <div 
+            class="rounded-xl border overflow-hidden shadow-sm flex flex-col transition-colors"
+            [ngClass]="themeService.isDarkMode() ? 'bg-[#161B22] border-[#30363D]' : 'bg-white border-slate-300'"
+          >
+            <!-- Scrollable Table Container -->
             <div class="max-h-[380px] overflow-y-auto overflow-x-auto">
               <table class="w-full text-left text-sm border-collapse">
-                <thead class="sticky top-0 bg-[#0f172a] text-white z-10 shadow-sm">
+                <thead 
+                  class="sticky top-0 z-10 shadow-sm transition-colors"
+                  [ngClass]="themeService.isDarkMode() ? 'bg-[#1C2128] text-[#F0F6FC] border-b border-[#30363D]' : 'bg-[#0f172a] text-white'"
+                >
                   <tr class="h-9 text-[11px] font-semibold uppercase tracking-wider">
-                    <th class="px-4 py-2.5 text-left text-white" style="width: 15%">Código</th>
-                    <th class="px-4 py-2.5 text-left text-white" style="width: 35%">Nombre</th>
-                    <th class="px-4 py-2.5 text-right text-white" style="width: 15%">Precio Q.</th>
-                    <th class="px-4 py-2.5 text-right text-white" style="width: 15%">Cantidad</th>
-                    <th class="px-4 py-2.5 text-right text-white" style="width: 20%">Total Q.</th>
+                    <th class="px-4 py-2.5 text-left" style="width: 15%">Código</th>
+                    <th class="px-4 py-2.5 text-left" style="width: 35%">Nombre</th>
+                    <th class="px-4 py-2.5 text-right" style="width: 15%">Precio Q.</th>
+                    <th class="px-4 py-2.5 text-right" style="width: 15%">Cantidad</th>
+                    <th class="px-4 py-2.5 text-right" style="width: 20%">Total Q.</th>
                   </tr>
                 </thead>
-                <tbody class="divide-y divide-slate-100 bg-white">
+                <tbody 
+                  class="divide-y transition-colors"
+                  [ngClass]="themeService.isDarkMode() ? 'divide-[#30363D] bg-[#161B22]' : 'divide-slate-100 bg-white'"
+                >
                   @for (group of getGroupedDetails(quotation); track group.productId) {
                     @for (item of group.items; track $index) {
-                      <tr class="hover:bg-slate-50/80 transition-colors border-b border-slate-100">
-                        <td class="px-4 py-2 text-xs text-slate-600 font-mono">
+                      <tr 
+                        class="transition-colors border-b last:border-0"
+                        [ngClass]="themeService.isDarkMode() ? 'hover:bg-[#1F242C] border-[#30363D]' : 'hover:bg-slate-50/80 border-slate-100'"
+                      >
+                        <td class="px-4 py-2 text-xs font-mono" [ngClass]="themeService.isDarkMode() ? 'text-[#8B949E]' : 'text-slate-600'">
                           {{ group.sku }}
                         </td>
-                        <td class="px-4 py-2 text-xs text-slate-800 font-medium">
+                        <td class="px-4 py-2 text-xs font-medium" [ngClass]="themeService.isDarkMode() ? 'text-[#F0F6FC]' : 'text-slate-800'">
                           {{ group.productName }}
                           @if (item.discountAmount > 0 || (item.discount && item.discount > 0)) {
-                            <span class="block text-[10px] text-rose-600 italic font-normal">
+                            <span class="block text-[10px] text-rose-500 italic font-normal">
                               Desc: -{{ (item.discountAmount || item.discount) | currency: 'Q ' }}
                             </span>
                           }
                         </td>
-                        <td class="px-4 py-2 text-xs text-right text-slate-700 tabular-nums">
+                        <td class="px-4 py-2 text-xs text-right tabular-nums" [ngClass]="themeService.isDarkMode() ? 'text-[#C9D1D9]' : 'text-slate-700'">
                           {{ item.unitPrice | currency: 'Q ' }}
                         </td>
-                        <td class="px-4 py-2 text-xs text-right text-slate-800 tabular-nums">
+                        <td class="px-4 py-2 text-xs text-right tabular-nums font-semibold" [ngClass]="themeService.isDarkMode() ? 'text-[#F0F6FC]' : 'text-slate-800'">
                           {{ item.quantity | number:'1.2-2' }}
                           @if (group.unitAbbreviation) {
-                            <span class="text-[10px] text-slate-500 ml-0.5">{{ group.unitAbbreviation }}</span>
+                            <span class="text-[10px] ml-0.5 font-normal" [ngClass]="themeService.isDarkMode() ? 'text-[#8B949E]' : 'text-slate-500'">{{ group.unitAbbreviation }}</span>
                           }
                         </td>
-                        <td class="px-4 py-2 text-xs text-right text-slate-900 font-semibold tabular-nums">
+                        <td class="px-4 py-2 text-xs text-right font-bold tabular-nums" [ngClass]="themeService.isDarkMode() ? 'text-[#58A6FF]' : 'text-slate-900'">
                           {{ (item.lineTotal || item.subtotal) | currency: 'Q ' }}
                         </td>
                       </tr>
                     }
                     <!-- Product Group Subtotal (Only if more than 1 item) -->
                     @if (group.items.length > 1) {
-                      <tr class="bg-slate-50/40">
+                      <tr [ngClass]="themeService.isDarkMode() ? 'bg-[#1C2128]/60' : 'bg-slate-50/40'">
                         <td colspan="3"></td>
-                        <td class="px-4 py-1.5 text-right text-xs font-bold text-slate-900 border-t border-dashed border-slate-300 tabular-nums">
+                        <td class="px-4 py-1.5 text-right text-xs font-bold border-t border-dashed tabular-nums" [ngClass]="themeService.isDarkMode() ? 'border-[#30363D] text-[#F0F6FC]' : 'border-slate-300 text-slate-900'">
                           {{ group.totalQuantity | number:'1.2-2' }}
                           @if (group.unitAbbreviation) {
-                            <span class="text-[10px] font-normal text-slate-500 ml-0.5">{{ group.unitAbbreviation }}</span>
+                            <span class="text-[10px] font-normal ml-0.5" [ngClass]="themeService.isDarkMode() ? 'text-[#8B949E]' : 'text-slate-500'">{{ group.unitAbbreviation }}</span>
                           }
                         </td>
-                        <td class="px-4 py-1.5 text-right text-xs font-bold text-slate-900 border-t border-dashed border-slate-300 tabular-nums">
+                        <td class="px-4 py-1.5 text-right text-xs font-bold border-t border-dashed tabular-nums" [ngClass]="themeService.isDarkMode() ? 'border-[#30363D] text-[#58A6FF]' : 'border-slate-300 text-slate-900'">
                           {{ group.totalAmount | currency: 'Q ' }}
                         </td>
                       </tr>
@@ -527,55 +650,64 @@
             </div>
 
             <!-- Footer totals -->
-            <div class="bg-slate-50/50 border-t border-slate-200 p-3 px-6 flex flex-col gap-1.5">
-               <div class="flex justify-between items-center text-[11px] font-semibold text-[#627ca7]">
+            <div 
+              class="border-t p-3 px-6 flex flex-col gap-1.5 transition-colors"
+              [ngClass]="themeService.isDarkMode() ? 'bg-[#1C2128] border-[#30363D]' : 'bg-slate-50/50 border-slate-200'"
+            >
+               <div class="flex justify-between items-center text-[11px] font-semibold" [ngClass]="themeService.isDarkMode() ? 'text-[#8B949E]' : 'text-[#627ca7]'">
                   <span>Subtotal Base</span>
-                  <span class="text-slate-700 tabular-nums">{{ quotation.subtotal | currency: 'Q ' }}</span>
+                  <span class="tabular-nums" [ngClass]="themeService.isDarkMode() ? 'text-[#F0F6FC]' : 'text-slate-700'">{{ quotation.subtotal | currency: 'Q ' }}</span>
                </div>
                @if (quotation.discountAmount > 0) {
-                 <div class="flex justify-between items-center text-[11px] font-semibold text-[#627ca7]">
+                 <div class="flex justify-between items-center text-[11px] font-semibold" [ngClass]="themeService.isDarkMode() ? 'text-[#8B949E]' : 'text-[#627ca7]'">
                     <span>Descuentos</span>
-                    <span class="text-rose-600 tabular-nums">-{{ quotation.discountAmount | currency: 'Q ' }}</span>
+                    <span class="text-rose-500 tabular-nums">-{{ quotation.discountAmount | currency: 'Q ' }}</span>
                  </div>
                }
-               <div class="flex justify-between items-center text-[11px] font-semibold text-[#627ca7]">
+               <div class="flex justify-between items-center text-[11px] font-semibold" [ngClass]="themeService.isDarkMode() ? 'text-[#8B949E]' : 'text-[#627ca7]'">
                   <span>Impuestos (IVA)</span>
-                  <span class="text-slate-700 tabular-nums">{{ quotation.taxAmount | currency: 'Q ' }}</span>
+                  <span class="tabular-nums" [ngClass]="themeService.isDarkMode() ? 'text-[#F0F6FC]' : 'text-slate-700'">{{ quotation.taxAmount | currency: 'Q ' }}</span>
                </div>
-               <div class="flex justify-between items-center mt-1 pt-2.5 border-t border-slate-200">
-                  <span class="text-[11px] font-semibold text-[#3B5B8A]">Total Cotizado</span>
-                  <span class="text-sm font-semibold text-slate-800 tabular-nums">{{ quotation.total | currency: 'Q ' }}</span>
+               <div class="flex justify-between items-center mt-1 pt-2.5 border-t" [ngClass]="themeService.isDarkMode() ? 'border-[#30363D]' : 'border-slate-200'">
+                  <span class="text-[11px] font-semibold" [ngClass]="themeService.isDarkMode() ? 'text-[#8B949E]' : 'text-[#3B5B8A]'">Total Cotizado</span>
+                  <span class="text-sm font-bold tabular-nums" [ngClass]="themeService.isDarkMode() ? 'text-[#58A6FF]' : 'text-slate-800'">{{ quotation.total | currency: 'Q ' }}</span>
                </div>
             </div>
           </div>
         </div>
 
         <div class="col-span-12 lg:col-span-4 flex flex-col gap-4">
-          <div class="p-4 bg-white rounded-xl border border-slate-300 shadow-sm">
-            <h4 class="text-[11px] font-bold text-[#3B5B8A] mb-3">Notas & Información</h4>
+          <div 
+            class="p-4 rounded-xl border shadow-sm transition-colors"
+            [ngClass]="themeService.isDarkMode() ? 'bg-[#161B22] border-[#30363D]' : 'bg-white border-slate-300'"
+          >
+            <h4 class="text-[11px] font-bold mb-3" [ngClass]="themeService.isDarkMode() ? 'text-[#58A6FF]' : 'text-[#3B5B8A]'">Notas & Información</h4>
             @if (quotation.notes) {
-              <p class="text-xs text-slate-600 leading-relaxed italic bg-slate-50 p-2.5 rounded-lg border border-slate-200 mb-3">
+              <p 
+                class="text-xs leading-relaxed italic p-2.5 rounded-lg border mb-3 transition-colors"
+                [ngClass]="themeService.isDarkMode() ? 'bg-[#0D1117] border-[#30363D] text-[#F0F6FC]' : 'bg-slate-50 border-slate-200 text-slate-600'"
+              >
                  "{{ quotation.notes }}"
               </p>
             } @else {
-              <p class="text-xs text-slate-400 italic mb-3">
+              <p class="text-xs italic mb-3" [ngClass]="themeService.isDarkMode() ? 'text-[#8B949E]' : 'text-slate-400'">
                 Sin notas registradas.
               </p>
             }
-            <div class="pt-3 border-t border-slate-100 flex flex-col gap-2">
+            <div class="pt-3 border-t flex flex-col gap-2" [ngClass]="themeService.isDarkMode() ? 'border-[#30363D]' : 'border-slate-100'">
                @if (quotation.createdBy) {
                  <div class="flex justify-between items-center text-[11px]">
-                   <span class="font-semibold text-[#627ca7]">Creado por:</span>
-                   <span class="font-bold text-[#3B5B8A]">{{ quotation.createdBy }}</span>
+                   <span class="font-semibold" [ngClass]="themeService.isDarkMode() ? 'text-[#8B949E]' : 'text-[#627ca7]'">Creado por:</span>
+                   <span class="font-bold" [ngClass]="themeService.isDarkMode() ? 'text-[#F0F6FC]' : 'text-[#3B5B8A]'">{{ quotation.createdBy }}</span>
                  </div>
                }
                <div class="flex justify-between items-center text-[11px]">
-                 <span class="font-semibold text-[#627ca7]">Fecha creación:</span>
-                 <span class="font-medium text-slate-700">{{ quotation.createdAt | date: 'dd/MM/yyyy' }}</span>
+                 <span class="font-semibold" [ngClass]="themeService.isDarkMode() ? 'text-[#8B949E]' : 'text-[#627ca7]'">Fecha creación:</span>
+                 <span class="font-medium" [ngClass]="themeService.isDarkMode() ? 'text-[#F0F6FC]' : 'text-slate-700'">{{ quotation.createdAt | date: 'dd/MM/yyyy' }}</span>
                </div>
                <div class="flex justify-between items-center text-[11px]">
-                 <span class="font-semibold text-[#627ca7]">Válido hasta:</span>
-                 <span class="font-medium text-slate-700">{{ quotation.validUntil | date: 'dd/MM/yyyy' }}</span>
+                 <span class="font-semibold" [ngClass]="themeService.isDarkMode() ? 'text-[#8B949E]' : 'text-[#627ca7]'">Válido hasta:</span>
+                 <span class="font-medium" [ngClass]="themeService.isDarkMode() ? 'text-[#F0F6FC]' : 'text-slate-700'">{{ quotation.validUntil | date: 'dd/MM/yyyy' }}</span>
                </div>
             </div>
           </div>
