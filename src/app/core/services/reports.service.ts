@@ -22,6 +22,7 @@ import {
   CustomerWeeklySummaryDto,
   TodayPulseDto,
   TodayPaymentsDto,
+  SendWeeklyConsolidatedWhatsAppDto,
 } from '../models/reports.models';
 import { ApiResponse } from '../models/api-response.model';
 
@@ -187,4 +188,14 @@ export class ReportsService {
       responseType: 'blob',
     });
   }
+
+  sendWeeklyConsolidatedWhatsApp(
+    payload: SendWeeklyConsolidatedWhatsAppDto
+  ): Observable<ApiResponse<{ message: string }>> {
+    return this.http.post<ApiResponse<{ message: string }>>(
+      `${this.apiUrl}/weekly-consolidated/send-whatsapp`,
+      payload
+    );
+  }
 }
+

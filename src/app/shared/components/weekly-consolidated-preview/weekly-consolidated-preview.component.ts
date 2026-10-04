@@ -276,16 +276,39 @@ export class WeeklyConsolidatedPreviewComponent implements OnInit, OnChanges {
       return;
     }
 
-    const cleanPhone = phone.replace(/\D/g, '');
-    const text = encodeURIComponent(
-      `Hola ${this.customer.name}, le compartimos el resumen de su consolidado semanal (${this.periodLabel()}). Gastó: Q${this.customer.total.toLocaleString('es-GT', { minimumFractionDigits: 2 })} en ${this.customer.orderCount} pedido(s). Saldo pendiente: Q${this.customer.pendingAmount.toLocaleString('es-GT', { minimumFractionDigits: 2 })}.`
-    );
-    window.open(`https://wa.me/502${cleanPhone.slice(-8)}?text=${text}`, '_blank');
+    this.isSendingWhatsApp.set(true);
 
-    this.messageService.add({
-      severity: 'success',
-      summary: 'WhatsApp',
-      detail: 'Abriendo chat con el resumen del consolidado.',
+    const customerId = !this.customer.isGuest ? this.customer.id || undefined : undefined;
+    const customerName = this.customerDetails()?.name || this.customer.name;
+    const startDate = this.period?.start;
+    const endDate = this.period?.end;
+
+    const payload = {
+      customerId,
+      customerName,
+      phone,
+      startDate,
+      endDate,
+      branchId: this.branchId,
+    };
+
+    this.reportsService.sendWeeklyConsolidatedWhatsApp(payload).subscribe({
+      next: (res) => {
+        this.isSendingWhatsApp.set(false);
+        this.messageService.add({
+          severity: 'success',
+          summary: 'WhatsApp Enviado',
+          detail: res.message || 'Consolidado semanal enviado por WhatsApp exitosamente.',
+        });
+      },
+      error: (err) => {
+        this.isSendingWhatsApp.set(false);
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Error al enviar WhatsApp',
+          detail: err.error?.message || 'No se pudo enviar el mensaje por WhatsApp.',
+        });
+      },
     });
   }
 

@@ -441,3 +441,13 @@ export interface TodayPaymentsDto {
   summary: TodayPaymentsSummaryDto;
   payments: TodayPaymentItemDto[];
 }
+
+export interface SendWeeklyConsolidatedWhatsAppDto {
+  customerId?: string;
+  customerName?: string;
+  phone?: string;
+  startDate?: string;
+  endDate?: string;
+  branchId?: string;
+  pdfBase64?: string;
+}
