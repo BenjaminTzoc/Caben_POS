@@ -334,13 +334,13 @@
                   class="font-bold text-sm leading-tight truncate mt-1.5"
                   [ngClass]="themeService.isDarkMode() ? 'text-[#F0F6FC]' : 'text-slate-800'"
                 >
-                  {{ trip.originBranch?.name }}
+                  {{ trip.originBranch.name }}
                 </h3>
                 <span 
                   class="text-[11px] mt-0.5 truncate"
                   [ngClass]="themeService.isDarkMode() ? 'text-[#8B949E]' : 'text-slate-500'"
                 >
-                  {{ trip.truck?.licensePlate }} • {{ trip.driver?.name }}
+                  {{ trip.truck.licensePlate }} • {{ trip.driver.name }}
                 </span>
               </div>
             </div>
@@ -361,7 +361,7 @@
             </div>
             <div class="flex flex-col text-right">
               <span class="text-[10.5px]" [ngClass]="themeService.isDarkMode() ? 'text-[#8B949E]' : 'text-slate-400'">Paradas</span>
-              <span class="font-bold tabular-nums" [ngClass]="themeService.isDarkMode() ? 'text-[#58A6FF]' : 'text-slate-900'">{{ trip.items?.length || 0 }}</span>
+              <span class="font-bold tabular-nums" [ngClass]="themeService.isDarkMode() ? 'text-[#58A6FF]' : 'text-slate-900'">{{ trip.items.length || 0 }}</span>
             </div>
           </div>
 

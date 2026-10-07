@@ -208,18 +208,18 @@
                     <div class="flex items-center gap-2.5">
                       <div class="w-8 h-8 rounded-lg border flex items-center justify-center overflow-hidden shrink-0 shadow-2xs"
                            [ngClass]="themeService.isDarkMode() ? 'bg-[#0D1117] border-[#30363D]' : 'border-slate-200 bg-white'">
-                        @if (item.product?.imageUrl) {
-                          <img [src]="getProductImageUrl(item.product?.imageUrl)" class="w-full h-full object-cover" />
+                        @if (item.product.imageUrl) {
+                          <img [src]="getProductImageUrl(item.product.imageUrl)" class="w-full h-full object-cover" />
                         } @else {
                           <i class="pi pi-box text-xs" [ngClass]="themeService.isDarkMode() ? 'text-[#8B949E]' : 'text-slate-400'"></i>
                         }
                       </div>
                       <div class="flex flex-col min-w-0">
                         <span class="font-bold text-xs truncate max-w-[200px]" [ngClass]="themeService.isDarkMode() ? 'text-[#F0F6FC]' : 'text-slate-800'">
-                          {{ item.product?.name }}
+                          {{ item.product.name }}
                         </span>
                         <span class="text-[10px] font-bold" [ngClass]="themeService.isDarkMode() ? 'text-[#58A6FF]' : 'text-[#6b3353]'">
-                          {{ item.product?.sku || '---' }}
+                          {{ item.product.sku || '---' }}
                         </span>
                       </div>
                     </div>
@@ -229,7 +229,7 @@
                       [ngClass]="themeService.isDarkMode() ? 'border-[#30363D] text-[#58A6FF]' : 'border-[#48021C]/10 text-[#48021C]'">
                     {{ item.quantity | number:'1.2-2' }}
                     <span class="text-[10px] font-normal" [ngClass]="themeService.isDarkMode() ? 'text-[#8B949E]' : 'text-slate-500'">
-                      {{ item.product?.unit?.abbreviation || 'un' }}
+                      {{ item.product.unit.abbreviation || 'un' }}
                     </span>
                   </td>
 

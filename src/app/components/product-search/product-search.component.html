@@ -53,7 +53,7 @@
                   <span>SKU {{ product.sku }}</span>
                 }
                 @if (!catalogMode && product.stock != null) {
-                  <span class="text-emerald-700"> · {{ product.stock }}{{ product.unit?.abbreviation || '' }}</span>
+                  <span class="text-emerald-700"> · {{ product.stock }}{{ product.unit.abbreviation || '' }}</span>
                 }
               </p>
             </div>

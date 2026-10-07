@@ -176,7 +176,7 @@
             <div class="flex items-center gap-2.5">
               <div class="w-10 h-10 rounded-lg border flex items-center justify-center overflow-hidden shrink-0 shadow-2xs"
                    [ngClass]="themeService.isDarkMode() ? 'bg-[#0D1117] border-[#30363D]' : 'border-slate-200 bg-slate-50'">
-                @if (decomp.inputProduct?.imageUrl) {
+                @if (decomp.inputProduct.imageUrl) {
                   <img [src]="getProductImageUrl(decomp.inputProduct.imageUrl)" class="w-full h-full object-cover" />
                 } @else {
                   <i class="pi pi-box text-sm" [ngClass]="themeService.isDarkMode() ? 'text-[#8B949E]' : 'text-slate-400'"></i>
@@ -184,10 +184,10 @@
               </div>
               <div class="flex flex-col">
                 <span class="font-bold text-xs" [ngClass]="themeService.isDarkMode() ? 'text-[#F0F6FC]' : 'text-slate-800'">
-                  {{ decomp.inputProduct?.name }}
+                  {{ decomp.inputProduct.name }}
                 </span>
                 <span class="text-[10px] font-bold" [ngClass]="themeService.isDarkMode() ? 'text-[#58A6FF]' : 'text-[#6b3353]'">
-                  {{ decomp.inputProduct?.sku || '---' }}
+                  {{ decomp.inputProduct.sku || '---' }}
                 </span>
               </div>
             </div>
@@ -214,13 +214,13 @@
             <div>
               <span class="text-[10px] uppercase font-bold" [ngClass]="themeService.isDarkMode() ? 'text-[#8B949E]' : 'text-slate-500'">Planta:</span>
               <div class="font-semibold truncate" [ngClass]="themeService.isDarkMode() ? 'text-[#F0F6FC]' : 'text-slate-700'">
-                {{ decomp.branch?.name }}
+                {{ decomp.branch.name }}
               </div>
             </div>
             <div>
               <span class="text-[10px] uppercase font-bold" [ngClass]="themeService.isDarkMode() ? 'text-[#8B949E]' : 'text-slate-500'">Entrada:</span>
               <div class="font-bold" [ngClass]="themeService.isDarkMode() ? 'text-[#58A6FF]' : 'text-[#48021C]'">
-                {{ decomp.inputQuantity }} {{ decomp.inputProduct?.unit?.abbreviation }}
+                {{ decomp.inputQuantity }} {{ decomp.inputProduct.unit.abbreviation }}
               </div>
             </div>
             <div>

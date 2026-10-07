@@ -11,7 +11,6 @@ import { InventoryMovementConceptPipe } from '../../shared/pipes/inventory-movem
 import { InventoryMovementStatusPipe } from '../../shared/pipes/inventory-movement-status.pipe';
 import { TooltipModule } from 'primeng/tooltip';
 import { MessageService } from 'primeng/api';
-import { Dialog } from 'primeng/dialog';
 import { FormsModule } from '@angular/forms';
 import { TextareaModule } from 'primeng/textarea';
 import { ConfirmationModalComponent } from '../../shared/components/confirmation-modal/confirmation-modal.component';
@@ -37,7 +36,6 @@ import { ThemeService } from '../../core/services/theme.service';
     InventoryMovementConceptPipe,
     InventoryMovementStatusPipe,
     TooltipModule,
-    Dialog,
     FormsModule,
     TextareaModule,
     ConfirmationModalComponent,

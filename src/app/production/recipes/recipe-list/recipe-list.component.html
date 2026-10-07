@@ -300,7 +300,7 @@
             <div class="text-right">
               <span class="text-[9px] uppercase font-bold tracking-wider" [ngClass]="themeService.isDarkMode() ? 'text-[#8B949E]' : 'text-slate-400'">Unidad:</span>
               <p class="font-semibold text-xs m-0 mt-0.5" [ngClass]="themeService.isDarkMode() ? 'text-[#F0F6FC]' : 'text-slate-700'">
-                {{ product.unit?.abbreviation || 'und' }}
+                {{ product.unit.abbreviation || 'und' }}
               </p>
             </div>
           </div>
