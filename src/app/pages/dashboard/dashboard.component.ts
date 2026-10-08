@@ -10,6 +10,8 @@ import { CustomerWeekWidgetComponent } from './components/customer-week-widget/c
 import { TodayPulseComponent } from './components/today-pulse/today-pulse.component';
 import { CollectionsCalendarComponent } from './components/collections-calendar/collections-calendar.component';
 import { TodayPaymentsComponent } from './components/today-payments/today-payments.component';
+import { TopProductsWidgetComponent } from './components/top-products-widget/top-products-widget.component';
+import { StockRunwayWidgetComponent } from './components/stock-runway-widget/stock-runway-widget.component';
 import { DashboardFilterService } from './dashboard-filter.service';
 import { ThemeService } from '../../core/services/theme.service';
 
@@ -24,6 +26,8 @@ import { ThemeService } from '../../core/services/theme.service';
     TodayPulseComponent,
     CollectionsCalendarComponent,
     TodayPaymentsComponent,
+    TopProductsWidgetComponent,
+    StockRunwayWidgetComponent,
   ],
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.css'],

@@ -1,0 +1,255 @@
+<div class="stock-runway-card p-4">
+  <!-- Cabecera del Widget -->
+  <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
+    <div class="min-w-0">
+      <h3 class="text-base font-medium truncate"
+        [ngClass]="themeService.isDarkMode() ? 'text-[#F0F6FC]' : 'text-[#48021C]'">
+        Monitor de Stock Crítico y Proyección de Quiebre
+      </h3>
+      <p class="text-[11px] font-medium leading-tight mt-0.5 truncate"
+        [ngClass]="themeService.isDarkMode() ? 'text-[#8B949E]' : 'text-[#9f6587]'">
+        Velocidad de venta y días restantes antes de agotar existencias
+      </p>
+    </div>
+
+    <!-- Filtros de Ventana de Días de Consumo -->
+    <div class="flex items-center gap-2 shrink-0">
+      <span class="text-[11px] font-medium"
+        [ngClass]="themeService.isDarkMode() ? 'text-slate-400' : 'text-slate-500'">Base de consumo:</span>
+      <div class="flex items-center p-0.5 rounded-xl border shrink-0"
+        [ngClass]="themeService.isDarkMode() ? 'bg-[#0D1117] border-[#30363D]' : 'bg-rose-50 border-[#9f6587]/35'">
+        <button type="button"
+          class="px-2.5 py-1 rounded-lg text-[11px] font-bold cursor-pointer transition-all"
+          [class.bg-white]="velocityDays() === 7 && !themeService.isDarkMode()"
+          [class.bg-[#1C2D42]]="velocityDays() === 7 && themeService.isDarkMode()"
+          [class.text-[#58A6FF]]="velocityDays() === 7 && themeService.isDarkMode()"
+          [class.text-[#48021C]]="velocityDays() === 7 && !themeService.isDarkMode()"
+          [class.shadow-xs]="velocityDays() === 7"
+          [class.text-slate-400]="velocityDays() !== 7 && themeService.isDarkMode()"
+          [class.text-slate-500]="velocityDays() !== 7 && !themeService.isDarkMode()"
+          (click)="setVelocityDays(7)" pTooltip="Calcular velocidad con los últimos 7 días">
+          7 días
+        </button>
+        <button type="button"
+          class="px-2.5 py-1 rounded-lg text-[11px] font-bold cursor-pointer transition-all"
+          [class.bg-white]="velocityDays() === 14 && !themeService.isDarkMode()"
+          [class.bg-[#1C2D42]]="velocityDays() === 14 && themeService.isDarkMode()"
+          [class.text-[#58A6FF]]="velocityDays() === 14 && themeService.isDarkMode()"
+          [class.text-[#48021C]]="velocityDays() === 14 && !themeService.isDarkMode()"
+          [class.shadow-xs]="velocityDays() === 14"
+          [class.text-slate-400]="velocityDays() !== 14 && themeService.isDarkMode()"
+          [class.text-slate-500]="velocityDays() !== 14 && !themeService.isDarkMode()"
+          (click)="setVelocityDays(14)" pTooltip="Calcular velocidad con los últimos 14 días">
+          14 días
+        </button>
+        <button type="button"
+          class="px-2.5 py-1 rounded-lg text-[11px] font-bold cursor-pointer transition-all"
+          [class.bg-white]="velocityDays() === 30 && !themeService.isDarkMode()"
+          [class.bg-[#1C2D42]]="velocityDays() === 30 && themeService.isDarkMode()"
+          [class.text-[#58A6FF]]="velocityDays() === 30 && themeService.isDarkMode()"
+          [class.text-[#48021C]]="velocityDays() === 30 && !themeService.isDarkMode()"
+          [class.shadow-xs]="velocityDays() === 30"
+          [class.text-slate-400]="velocityDays() !== 30 && themeService.isDarkMode()"
+          [class.text-slate-500]="velocityDays() !== 30 && !themeService.isDarkMode()"
+          (click)="setVelocityDays(30)" pTooltip="Calcular velocidad con los últimos 30 días">
+          30 días
+        </button>
+      </div>
+    </div>
+  </div>
+
+  @if (errorMessage()) {
+  <div class="mb-4 flex items-start gap-2 rounded-xl border border-rose-200 bg-rose-50 px-3 py-2 text-rose-800">
+    <i class="pi pi-exclamation-circle mt-0.5 text-xs"></i>
+    <p class="text-xs">{{ errorMessage() }}</p>
+  </div>
+  }
+
+  <!-- Tarjetas Resumen / KPIs -->
+  <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5 mb-4">
+    <!-- Críticos / Inminentes -->
+    <div class="rounded-lg border px-3 py-2.5 transition-colors cursor-pointer"
+      (click)="setRiskFilter(riskFilter() === 'critical' ? 'all' : 'critical')"
+      [ngClass]="themeService.isDarkMode() ? 'border-none bg-rose-950/40 text-rose-200' : 'border-rose-200 bg-rose-50'">
+      <p class="text-[10px] font-normal" [ngClass]="themeService.isDarkMode() ? 'text-slate-400' : 'text-rose-700'">
+        Quiebre Inminente (≤ 48h)
+      </p>
+      <p class="mt-0.5 text-base font-bold tabular-nums"
+        [ngClass]="themeService.isDarkMode() ? 'text-slate-100' : 'text-rose-700'">
+        {{ kpis()?.criticalCount || 0 }} productos
+      </p>
+      <p class="text-[11px] font-normal" [ngClass]="themeService.isDarkMode() ? 'text-rose-400/80' : 'text-rose-600/80'">
+        Agotados o por quebrar
+      </p>
+    </div>
+
+    <!-- Advertencia (3 a 5 días) -->
+    <div class="rounded-lg border px-3 py-2.5 transition-colors cursor-pointer"
+      (click)="setRiskFilter(riskFilter() === 'warning' ? 'all' : 'warning')"
+      [ngClass]="themeService.isDarkMode() ? 'border-none bg-amber-950/40 text-amber-200' : 'border-amber-200 bg-amber-50'">
+      <p class="text-[10px] font-normal" [ngClass]="themeService.isDarkMode() ? 'text-slate-400' : 'text-amber-700'">
+        Alerta (3 - 5 días)
+      </p>
+      <p class="mt-0.5 text-base font-bold tabular-nums"
+        [ngClass]="themeService.isDarkMode() ? 'text-slate-100' : 'text-amber-800'">
+        {{ kpis()?.warningCount || 0 }} productos
+      </p>
+      <p class="text-[11px] font-normal" [ngClass]="themeService.isDarkMode() ? 'text-amber-400/80' : 'text-amber-700/80'">
+        Requieren reabastecimiento
+      </p>
+    </div>
+
+    <!-- Bajo Punto de Reorden -->
+    <div class="rounded-lg border px-3 py-2.5 transition-colors cursor-pointer"
+      (click)="setRiskFilter(riskFilter() === 'reorder' ? 'all' : 'reorder')"
+      [ngClass]="themeService.isDarkMode() ? 'border-none bg-sky-950/40 text-sky-200' : 'border-sky-200 bg-sky-50'">
+      <p class="text-[10px] font-normal" [ngClass]="themeService.isDarkMode() ? 'text-slate-400' : 'text-sky-700'">
+        Bajo Stock Mínimo
+      </p>
+      <p class="mt-0.5 text-base font-bold tabular-nums"
+        [ngClass]="themeService.isDarkMode() ? 'text-slate-100' : 'text-sky-800'">
+        {{ kpis()?.belowMinCount || 0 }} productos
+      </p>
+      <p class="text-[11px] font-normal" [ngClass]="themeService.isDarkMode() ? 'text-sky-400/80' : 'text-sky-700/80'">
+        Bajo umbral de seguridad
+      </p>
+    </div>
+
+    <!-- Stock Comprometido -->
+    <div class="rounded-lg border px-3 py-2.5 transition-colors"
+      [ngClass]="themeService.isDarkMode() ? 'border-none bg-purple-950/40 text-purple-200' : 'border-purple-200 bg-purple-50'">
+      <p class="text-[10px] font-normal" [ngClass]="themeService.isDarkMode() ? 'text-slate-400' : 'text-purple-700'">
+        Stock Comprometido
+      </p>
+      <p class="mt-0.5 text-base font-bold tabular-nums"
+        [ngClass]="themeService.isDarkMode() ? 'text-slate-100' : 'text-purple-800'">
+        {{ kpis()?.totalReservedUnits || 0 | number:'1.0-2' }} unidades
+      </p>
+      <p class="text-[11px] font-normal" [ngClass]="themeService.isDarkMode() ? 'text-purple-400/80' : 'text-purple-700/80'">
+        Reservadas en preórdenes
+      </p>
+    </div>
+  </div>
+
+  @if (riskFilter() !== 'all') {
+  <div class="mb-3 flex justify-end">
+    <button type="button" (click)="setRiskFilter('all')"
+      class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg border text-[11px] font-semibold text-rose-500 border-rose-300 bg-rose-50/50 cursor-pointer">
+      <i class="pi pi-times text-[9px]"></i> Quitar filtro de estado
+    </button>
+  </div>
+  }
+
+  <!-- Contenedor de la Tabla Principal -->
+  <div class="relative overflow-hidden rounded-xl border transition-colors"
+    [ngClass]="themeService.isDarkMode() ? 'border-[#30363D] bg-[#0D1117]' : 'border-[#9f6587]/35 bg-white/95'">
+
+    @if (isLoading()) {
+    <div class="absolute inset-0 z-10 flex items-center justify-center"
+      [ngClass]="themeService.isDarkMode() ? 'bg-[#0D1117]/80' : 'bg-white/70'">
+      <i class="pi pi-spin pi-spinner text-2xl"
+        [ngClass]="themeService.isDarkMode() ? 'text-[#58A6FF]' : 'text-[#48021C]'"></i>
+    </div>
+    }
+
+    <div class="runway-table-frame">
+      <table class="runway-table w-full text-left border-collapse">
+        <colgroup>
+          <col class="w-[21%]" />
+          <col class="w-[16%]" />
+          <col class="w-[15%]" />
+          <col class="w-[15%]" />
+          <col class="w-[16%]" />
+          <col class="w-[17%]" />
+        </colgroup>
+        <thead>
+          <tr class="border-b" [ngClass]="themeService.isDarkMode() ? 'border-[#30363D]' : 'border-[#e4c9d5]/70'">
+            <th class="px-2.5 py-2 text-[12px] font-normal"
+              [ngClass]="themeService.isDarkMode() ? 'text-slate-200' : 'text-[#48021C]'">Producto</th>
+            <th class="px-2 py-2 text-[12px] font-normal text-right"
+              [ngClass]="themeService.isDarkMode() ? 'text-slate-200' : 'text-[#48021C]'">Disponible</th>
+            <th class="px-2 py-2 text-[12px] font-normal text-right"
+              [ngClass]="themeService.isDarkMode() ? 'text-slate-200' : 'text-[#48021C]'">Reservado</th>
+            <th class="px-2 py-2 text-[12px] font-normal text-right"
+              [ngClass]="themeService.isDarkMode() ? 'text-slate-200' : 'text-[#48021C]'">Mínimo</th>
+            <th class="px-2 py-2 text-[12px] font-normal text-right"
+              [ngClass]="themeService.isDarkMode() ? 'text-slate-200' : 'text-[#48021C]'">Salida / día</th>
+            <th class="px-2.5 py-2 text-[12px] font-normal text-center"
+              [ngClass]="themeService.isDarkMode() ? 'text-slate-200' : 'text-[#48021C]'">Diagnóstico</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (item of filteredItems(); track item.productId) {
+          <tr class="border-b transition-colors"
+            [ngClass]="themeService.isDarkMode() 
+              ? 'border-[#30363D]/60 hover:bg-[#161B22]' 
+              : 'border-slate-100 hover:bg-[#9f6587]/10'">
+
+            <!-- Nombre y Categoría -->
+            <td class="px-2.5 py-2 min-w-0">
+              <p class="text-[13px] font-semibold truncate leading-tight"
+                [ngClass]="themeService.isDarkMode() ? 'text-slate-100' : 'text-[#374375]'">
+                {{ item.productName }}
+              </p>
+              <div class="mt-0.5 flex items-center gap-1.5 min-w-0">
+                <app-status-badge [value]="item.categoryName" severity="secondary" size="xs" />
+              </div>
+            </td>
+
+            <!-- Stock Disponible -->
+            <td class="px-2 py-2 text-right">
+              <span class="text-[13px] font-bold tabular-nums"
+                [ngClass]="item.availableStock <= 0 ? 'text-rose-500' : (themeService.isDarkMode() ? 'text-slate-100' : 'text-slate-800')">
+                {{ item.availableStock | number:'1.0-2' }} {{ item.unit }}
+              </span>
+            </td>
+
+            <!-- Stock Reservado / Preórdenes -->
+            <td class="px-2 py-2 text-right">
+              <span class="text-[13px] font-semibold tabular-nums"
+                [ngClass]="item.reservedStock > 0 ? (themeService.isDarkMode() ? 'text-purple-300' : 'text-purple-700') : 'text-slate-400'">
+                {{ item.reservedStock | number:'1.0-2' }} {{ item.unit }}
+              </span>
+            </td>
+
+            <!-- Stock Mínimo -->
+            <td class="px-2 py-2 text-right">
+              <span class="text-[13px] font-medium tabular-nums text-slate-400">
+                {{ item.minStock | number:'1.0-2' }} {{ item.unit }}
+              </span>
+            </td>
+
+            <!-- Velocidad Diaria -->
+            <td class="px-2 py-2 text-right">
+              <span class="text-[13px] font-bold tabular-nums"
+                [ngClass]="themeService.isDarkMode() ? 'text-sky-400' : 'text-slate-800'">
+                {{ item.dailyVelocity | number:'1.1-2' }} {{ item.unit }}/día
+              </span>
+            </td>
+
+            <!-- Diagnóstico / Badge de Riesgo -->
+            <td class="px-2.5 py-2 text-center">
+              <app-status-badge
+                [value]="item.riskMessage"
+                [severity]="riskSeverity(item.riskLevel)"
+                size="xs" />
+            </td>
+          </tr>
+          }
+          @if (!isLoading() && filteredItems().length === 0) {
+          <tr class="is-empty">
+            <td colspan="6" class="px-4 py-8 text-center text-sm text-slate-400">
+              No hay productos con alertas para los filtros seleccionados.
+            </td>
+          </tr>
+          }
+          @for (_ of emptySlots(); track $index) {
+          <tr class="is-empty">
+            <td colspan="6"></td>
+          </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>

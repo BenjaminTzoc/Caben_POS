@@ -1,5 +1,5 @@
 <div class="p-4 sm:p-6 min-h-screen transition-colors duration-300"
-  [ngClass]="themeService.isDarkMode() ? 'bg-[#0D1117]' : 'bg-[#f8fafcf3]'">
+  [ngClass]="themeService.isDarkMode() ? 'bg-[#0D1117]' : 'bg-[#F1F3F4]'">
   <header class="flex flex-col sm:flex-row sm:items-end justify-between gap-3 mb-4 sm:mb-6 no-print">
     <div class="min-w-0">
       <h1 class="text-lg sm:text-xl font-medium tracking-tight m-0 leading-tight transition-colors duration-300"
@@ -42,5 +42,10 @@
     <div class="today-payments-slot">
       <app-today-payments />
     </div>
+  </div>
+
+  <div class="mb-6 sm:mb-8 no-print w-full flex flex-col xl:flex-row gap-4 items-stretch">
+    <app-top-products-widget class="flex-1 min-w-0" />
+    <app-stock-runway-widget class="flex-1 min-w-0" />
   </div>
 </div>

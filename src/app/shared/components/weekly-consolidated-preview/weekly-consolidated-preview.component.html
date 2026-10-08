@@ -100,21 +100,24 @@
           </div>
         </div>
 
-        <!-- 2 BOXES FORMALES (Cobrado/Saldo y Crédito) -->
+        <!-- 3 BOXES FORMALES (Cobrado, Saldo pendiente, Crédito) -->
         <div class="balances-grid">
           <div class="balance-box">
-            <span class="balance-box-title">Cobrado / saldo</span>
+            <span class="balance-box-title">Cobrado</span>
             <p class="balance-paid-text">{{ customer.paidAmount | currency:'Q':'symbol':'1.2-2' }}</p>
-            <p class="balance-pending-text">Pendiente {{ customer.pendingAmount | currency:'Q':'symbol':'1.2-2' }}</p>
+          </div>
+          <div class="balance-box">
+            <span class="balance-box-title">Saldo pendiente</span>
+            <p class="balance-pending-text">{{ customer.pendingAmount | currency:'Q':'symbol':'1.2-2' }}</p>
           </div>
           <div class="balance-box">
             <span class="balance-box-title">Crédito</span>
             <ng-container *ngIf="customer.creditLimit > 0; else noCreditBlock">
               <p class="balance-credit-main">{{ creditPercent() }}% usado</p>
-              <p class="balance-credit-sub">{{ customer.creditUsed | currency:'Q':'symbol':'1.2-2' }} de {{ customer.creditLimit | currency:'Q':'symbol':'1.2-2' }}</p>
+              <p class="balance-credit-sub">{{ customer.creditUsed | currency:'Q':'symbol':'1.0-0' }} / {{ customer.creditLimit | currency:'Q':'symbol':'1.0-0' }}</p>
             </ng-container>
             <ng-template #noCreditBlock>
-              <p class="balance-credit-main">Sin línea de crédito</p>
+              <p class="balance-credit-main">Sin línea</p>
               <p class="balance-credit-sub">Modalidad contado</p>
             </ng-template>
           </div>

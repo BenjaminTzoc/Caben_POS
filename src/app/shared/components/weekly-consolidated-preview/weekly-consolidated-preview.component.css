@@ -264,11 +264,11 @@
   line-height: 1;
 }
 
-/* 2 BALANCES BOXES */
+/* 3 BALANCES BOXES */
 .balances-grid {
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 4mm;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 3.5mm;
   margin-bottom: 5mm;
 }
 
@@ -297,10 +297,11 @@
 }
 
 .balance-pending-text {
-  font-size: 8.5pt;
-  font-weight: 600;
+  font-size: 11pt;
+  font-weight: 700;
   color: #e11d48;
   margin: 0;
+  line-height: 1.2;
 }
 
 .balance-credit-main {

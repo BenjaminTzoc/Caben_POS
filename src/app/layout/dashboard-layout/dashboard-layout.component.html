@@ -1,5 +1,5 @@
 <div class="fixed inset-0 flex overflow-visible transition-colors duration-300"
-  [ngClass]="themeService.isDarkMode() ? 'bg-[#0D1117]' : 'bg-white'">
+  [ngClass]="themeService.isDarkMode() ? 'bg-[#0D1117]' : 'bg-[#F1F3F4]'">
   <app-modern-sidebar 
     [collapsed]="isSidebarCollapsed" 
     (toggle)="onToggleSidebar($event)"
@@ -17,7 +17,7 @@
     </app-header>
 
     <main class="flex-1 overflow-y-auto overflow-x-hidden relative z-10 transition-colors duration-300"
-      [ngClass]="themeService.isDarkMode() ? 'bg-[#0D1117]' : 'bg-slate-50/50'">
+      [ngClass]="themeService.isDarkMode() ? 'bg-[#0D1117]' : 'bg-[#F1F3F4]'">
       <div class="max-w-[1600px] mx-auto min-h-full">
         <router-outlet></router-outlet>
       </div>

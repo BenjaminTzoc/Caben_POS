@@ -1,0 +1,86 @@
+:host {
+  display: flex;
+  position: relative;
+  flex: 1 1 0%;
+  width: 100%;
+  min-width: 0;
+  overflow: visible;
+  z-index: 2;
+  align-self: stretch;
+}
+
+.stock-runway-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  min-width: 0;
+  border-radius: 0.75rem;
+  overflow: visible;
+  background: linear-gradient(180deg, #f8eef3 0%, #fdf7f9 48%, #ffffff 100%);
+  border: 1px solid #d9b8c8;
+  box-shadow: 0 1px 0 rgb(72 2 28 / 0.08);
+  transition: all 0.3s ease;
+}
+
+:host-context(.dark) .stock-runway-card,
+:host-context([data-theme='dark']) .stock-runway-card {
+  background: #161B22 !important;
+  border-color: #30363D !important;
+  box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.5) !important;
+}
+
+.runway-table-frame {
+  height: calc(2.25rem + 5 * 3.75rem);
+  overflow-y: auto;
+}
+
+.runway-table {
+  table-layout: fixed;
+}
+
+.runway-table th,
+.runway-table td {
+  overflow: hidden;
+}
+
+.runway-table tbody tr {
+  height: 3.75rem;
+}
+
+.runway-table tbody tr.is-empty {
+  pointer-events: none;
+}
+
+.runway-table thead th {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  background: #f3e4eb;
+}
+
+:host-context(.dark) .runway-table thead th,
+:host-context([data-theme='dark']) .runway-table thead th {
+  background: #0D1117 !important;
+  color: #F0F6FC !important;
+  border-color: #30363D !important;
+}
+
+/* Custom Scrollbars */
+.runway-table-frame::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+}
+
+.runway-table-frame::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.runway-table-frame::-webkit-scrollbar-thumb {
+  background: rgba(159, 101, 135, 0.25);
+  border-radius: 9999px;
+}
+
+:host-context(.dark) .runway-table-frame::-webkit-scrollbar-thumb {
+  background: rgba(240, 246, 252, 0.2);
+}

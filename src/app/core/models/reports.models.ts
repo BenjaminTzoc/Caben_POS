@@ -451,3 +451,82 @@ export interface SendWeeklyConsolidatedWhatsAppDto {
   branchId?: string;
   pdfBase64?: string;
 }
+
+export interface TopProductDailySaleDto {
+  date: string;
+  dayLabel: string;
+  total: number;
+  quantity: number;
+}
+
+export interface TopProductItemDto {
+  productId: string;
+  productName: string;
+  sku?: string;
+  categoryName: string;
+  unit: string;
+  quantity: number;
+  revenue: number;
+  orderCount: number;
+  averagePrice: number;
+  percentage: number;
+  sparkline: TopProductDailySaleDto[];
+}
+
+export interface TopProductsKpisDto {
+  totalRevenue: number;
+  totalUnitsSold: number;
+  totalProductsCount: number;
+  leaderProduct: {
+    productId: string;
+    productName: string;
+    revenue: number;
+    quantity: number;
+    unit: string;
+  } | null;
+  leaderCategory: {
+    categoryName: string;
+    revenue: number;
+    percentage: number;
+  } | null;
+}
+
+export interface TopProductsSummaryDto {
+  period: {
+    startDate: string;
+    endDate: string;
+  };
+  kpis: TopProductsKpisDto;
+  products: TopProductItemDto[];
+}
+
+export type RunwayRiskLevel = 'critical' | 'warning' | 'reorder' | 'healthy';
+
+export interface StockRunwayItemDto {
+  productId: string;
+  productName: string;
+  sku?: string;
+  categoryName: string;
+  unit: string;
+  branchName?: string;
+  totalStock: number;
+  reservedStock: number;
+  availableStock: number;
+  minStock: number;
+  dailyVelocity: number;
+  daysRemaining: number | null;
+  riskLevel: RunwayRiskLevel;
+  riskMessage: string;
+}
+
+export interface StockRunwayKpisDto {
+  criticalCount: number;
+  warningCount: number;
+  belowMinCount: number;
+  totalReservedUnits: number;
+}
+
+export interface StockRunwayResponseDto {
+  kpis: StockRunwayKpisDto;
+  items: StockRunwayItemDto[];
+}

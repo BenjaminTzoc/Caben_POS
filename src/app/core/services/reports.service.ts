@@ -23,6 +23,8 @@ import {
   TodayPulseDto,
   TodayPaymentsDto,
   SendWeeklyConsolidatedWhatsAppDto,
+  TopProductsSummaryDto,
+  StockRunwayResponseDto,
 } from '../models/reports.models';
 import { ApiResponse } from '../models/api-response.model';
 
@@ -195,6 +197,44 @@ export class ReportsService {
     return this.http.post<ApiResponse<{ message: string }>>(
       `${this.apiUrl}/weekly-consolidated/send-whatsapp`,
       payload
+    );
+  }
+
+  getTopProductsSummary(
+    startDate?: string,
+    endDate?: string,
+    branchId?: string,
+    limit: number = 10,
+    sortBy: 'revenue' | 'quantity' = 'revenue'
+  ): Observable<ApiResponse<TopProductsSummaryDto>> {
+    let params = new HttpParams()
+      .set('limit', limit.toString())
+      .set('sortBy', sortBy);
+
+    if (startDate) params = params.set('startDate', startDate);
+    if (endDate) params = params.set('endDate', endDate);
+    if (branchId) params = params.set('branchId', branchId);
+
+    return this.http.get<ApiResponse<TopProductsSummaryDto>>(
+      `${this.apiUrl}/products/top-summary`,
+      { params }
+    );
+  }
+
+  getStockRunway(
+    branchId?: string,
+    velocityDays: number = 14,
+    limit: number = 10
+  ): Observable<ApiResponse<StockRunwayResponseDto>> {
+    let params = new HttpParams()
+      .set('velocityDays', velocityDays.toString())
+      .set('limit', limit.toString());
+
+    if (branchId) params = params.set('branchId', branchId);
+
+    return this.http.get<ApiResponse<StockRunwayResponseDto>>(
+      `${this.apiUrl}/inventory/stock-runway`,
+      { params }
     );
   }
 }
