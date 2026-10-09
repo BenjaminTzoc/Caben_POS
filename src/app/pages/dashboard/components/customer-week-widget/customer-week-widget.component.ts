@@ -210,7 +210,7 @@ export class CustomerWeekWidgetComponent {
 
   dayAmountLabel(total: number): string {
     if (!total) return '—';
-    return `Q${total.toLocaleString('es-GT', { maximumFractionDigits: 0 })}`;
+    return `Q${total.toLocaleString('es-GT', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
   }
 
   rowKey(c: CustomerWeeklyItemDto): string {

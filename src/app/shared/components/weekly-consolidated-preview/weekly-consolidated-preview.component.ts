@@ -136,7 +136,7 @@ export class WeeklyConsolidatedPreviewComponent implements OnInit, OnChanges {
 
   dayAmountLabel(total: number): string {
     if (!total) return '—';
-    return `Q${total.toLocaleString('es-GT', { maximumFractionDigits: 0 })}`;
+    return `Q${total.toLocaleString('es-GT', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
   }
 
   creditPercent(): number {

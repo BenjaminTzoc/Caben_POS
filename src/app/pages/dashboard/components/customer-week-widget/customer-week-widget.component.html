@@ -200,7 +200,7 @@
                   [ngClass]="themeService.isDarkMode() ? 'text-slate-300' : 'text-slate-600'">{{ c.orderCount }}</td>
                 <td class="px-2 py-2 text-right text-[13px] font-normal tabular-nums tracking-wider"
                   [ngClass]="themeService.isDarkMode() ? 'text-slate-300' : 'text-slate-600'">{{ c.averageTicket |
-                  currency:'GTQ':'symbol':'1.0-0' }}</td>
+                  currency:'GTQ':'symbol':'1.2-2' }}</td>
                 <td class="px-1.5 py-2 text-center">
                   @if (c.trendPercent > 0) {
                   <span class="inline-flex items-center gap-1 text-[12px] font-medium text-emerald-400">
@@ -224,9 +224,9 @@
                     [ngClass]="themeService.isDarkMode() ? 'text-slate-400' : 'text-slate-500'">
                     <span class="font-semibold"
                       [ngClass]="themeService.isDarkMode() ? 'text-[#58A6FF]' : 'text-[#48021C]'">{{ c.paidAmount |
-                      currency:'GTQ':'symbol':'1.0-0' }}</span>
+                      currency:'GTQ':'symbol':'1.2-2' }}</span>
                     @if (c.pendingAmount > 0) {
-                    <span> · {{ c.pendingAmount | currency:'GTQ':'symbol':'1.0-0' }}</span>
+                    <span> · {{ c.pendingAmount | currency:'GTQ':'symbol':'1.2-2' }}</span>
                     }
                   </p>
                 </td>
@@ -348,7 +348,7 @@
               Prom. x pedido</p>
             <p class="text-sm font-semibold tabular-nums mt-0.5"
               [ngClass]="themeService.isDarkMode() ? 'text-white' : 'text-slate-900'">{{ c.averageTicket |
-              currency:'GTQ':'symbol':'1.0-0' }}</p>
+              currency:'GTQ':'symbol':'1.2-2' }}</p>
           </div>
         </div>
 
@@ -399,7 +399,7 @@
             <p class="text-sm font-semibold mt-0.5" [ngClass]="themeService.isDarkMode() ? 'text-white' : 'text-slate-900'">{{
               creditPercent(c) }}% usado</p>
             <p class="text-[10px] font-normal text-slate-400 truncate mt-0.5">{{ c.creditUsed |
-              currency:'GTQ':'symbol':'1.0-0' }} / {{ c.creditLimit | currency:'GTQ':'symbol':'1.0-0' }}</p>
+              currency:'GTQ':'symbol':'1.2-2' }} / {{ c.creditLimit | currency:'GTQ':'symbol':'1.2-2' }}</p>
             } @else {
             <p class="text-xs font-normal mt-1"
               [ngClass]="themeService.isDarkMode() ? 'text-slate-400' : 'text-slate-500'">Sin línea</p>
@@ -411,7 +411,7 @@
         <div class="rounded-lg border px-3 py-2 mt-3 text-xs" [ngClass]="themeService.isDarkMode() 
                 ? 'border-rose-800/40 bg-rose-950/30 text-rose-300' 
                 : 'border-[#9f6587]/30 bg-rose-50 text-[#6e3757]'">
-          Preorden comprometida: <span class="font-semibold">{{ c.preorderCommitted | currency:'GTQ' }}</span> (no es venta
+          Preorden comprometida: <span class="font-semibold">{{ c.preorderCommitted | currency:'GTQ':'symbol':'1.2-2' }}</span> (no es venta
           confirmada).
         </div>
         }
