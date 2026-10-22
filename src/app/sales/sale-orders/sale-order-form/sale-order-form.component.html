@@ -724,6 +724,13 @@
         }
 
         @if (orderForm.get('status')?.value === 'confirmed') {
+          <p-button
+            label="Editar orden"
+            (onClick)="onReopenSale()"
+            icon="pi pi-pencil"
+            [outlined]="true"
+            [styleClass]="themeService.isDarkMode() ? '!rounded-lg !px-3.5 font-semibold h-9! text-xs border-[#30363D]! text-[#F0F6FC]! hover:bg-[#30363D]/50' : '!rounded-lg !px-3.5 font-semibold h-9! text-xs border-slate-300! text-slate-700! hover:bg-slate-50'"
+          />
           <p-button 
             label="Entregar pedido" 
             (onClick)="onDeliverSale()" 
@@ -765,7 +772,7 @@
   title="¿Estás seguro de confirmar esta venta?"
   [message]="isPreorder
     ? 'Se validará el stock de la sucursal (excepto productos sin control de inventario) y la orden pasará a confirmada.'
-    : 'Una vez confirmada, los productos, cantidades y precios no podrán ser modificados.'"
+    : 'Al confirmar se descuenta el inventario. Puedes reabrirla para editarla mientras no tenga pagos ni esté en un viaje.'"
   [note]="isPreorder
     ? 'Confirma solo cuando ya haya producto en esta sucursal. Si no alcanza el stock, el servidor devolverá el detalle.'
     : 'Esta acción reservará el inventario y habilitará la entrega y tickets de pago.'"
@@ -775,6 +782,20 @@
   cancelLabel="Cancelar"
   [loading]="isConfirmingSale"
   (onConfirm)="executeConfirmSale()"
+/>
+
+<app-confirmation-modal
+  [(visible)]="showReopenSaleModal"
+  header="Reabrir orden"
+  title="¿Volver a editar esta orden?"
+  message="La orden pasará a pendiente. Se devuelve el inventario descontado y se libera el código de descuento."
+  note="No se puede reabrir si ya tiene pagos o está asignada a un viaje."
+  type="warning"
+  icon="pi pi-pencil"
+  confirmLabel="Reabrir"
+  cancelLabel="Cancelar"
+  [loading]="isReopeningSale"
+  (onConfirm)="executeReopenSale()"
 />
 
 <!-- MODAL DE CONFIRMACIÓN: ENTREGAR VENTA -->

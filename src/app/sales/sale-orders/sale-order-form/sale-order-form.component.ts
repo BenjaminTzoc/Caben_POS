@@ -75,9 +75,11 @@ export class SaleOrderFormComponent implements OnInit, OnDestroy {
   // Confirmation Modals
   showCancelConfirmModal = false;
   showConfirmSaleModal = false;
+  showReopenSaleModal = false;
   showDeliverSaleModal = false;
   showVoidSaleModal = false;
   isConfirmingSale = false;
+  isReopeningSale = false;
   isDeliveringSale = false;
   isVoidingSale = false;
 
@@ -1794,6 +1796,37 @@ export class SaleOrderFormComponent implements OnInit, OnDestroy {
           life: 8000,
         });
         this.isConfirmingSale = false;
+      },
+    });
+  }
+
+  onReopenSale(): void {
+    this.showReopenSaleModal = true;
+  }
+
+  executeReopenSale(): void {
+    if (!this.sale?.id || this.isReopeningSale) return;
+    this.isReopeningSale = true;
+    this.ordersService.reopenSale(this.sale.id).subscribe({
+      next: (res) => {
+        this.messageService.add({
+          severity: 'success',
+          summary: 'Orden reabierta',
+          detail: 'La orden volvió a pendiente. Ya puedes editarla y confirmarla de nuevo.',
+        });
+        this.showReopenSaleModal = false;
+        this.isReopeningSale = false;
+        this.loadSale(res.data.id);
+      },
+      error: (err) => {
+        this.messageService.add({
+          severity: 'error',
+          summary: 'No se puede reabrir',
+          detail: err.error?.message || 'Error al reabrir la orden.',
+          life: 8000,
+        });
+        this.showReopenSaleModal = false;
+        this.isReopeningSale = false;
       },
     });
   }

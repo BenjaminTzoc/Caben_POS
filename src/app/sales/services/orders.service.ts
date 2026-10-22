@@ -100,6 +100,10 @@ export class OrdersService {
     return this.http.post<ApiResponse<ISaleOrderResponse>>(`${this.API_URL}/${saleId}/confirm`, {});
   }
 
+  reopenSale(saleId: string): Observable<ApiResponse<ISaleOrderResponse>> {
+    return this.http.post<ApiResponse<ISaleOrderResponse>>(`${this.API_URL}/${saleId}/reopen`, {});
+  }
+
   deliverSale(saleId: string): Observable<ApiResponse<ISaleOrderResponse>> {
     return this.http.post<ApiResponse<ISaleOrderResponse>>(`${this.API_URL}/${saleId}/deliver`, {});
   }
