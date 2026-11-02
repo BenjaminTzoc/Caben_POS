@@ -66,7 +66,7 @@ export class CustomersComponent implements OnInit {
 
   loadCustomers(): void {
     this.loading = true;
-    this.customersService.getCustomers(this.showDeleted).subscribe({
+    this.customersService.getCustomers().subscribe({
       next: (res) => {
         if (res.statusCode === 200) {
           this.allCustomers = res.data ?? [];

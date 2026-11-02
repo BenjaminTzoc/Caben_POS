@@ -29,24 +29,6 @@
         (ngModelChange)="searchTerm.set($event)"
         placeholder="Buscar por nombre, descripción o unidad..." 
       />
-
-      @if (canViewDeleted) {
-        <div class="flex items-center gap-3 border rounded-xl px-4 py-2 shadow-xs transition-all"
-             [ngClass]="themeService.isDarkMode() 
-               ? 'bg-[#161B22] border-[#30363D] hover:border-[#58A6FF]/50 hover:bg-[#1F242C]' 
-               : 'bg-white border-[#48021C]/20 hover:border-[#48021C]/40 hover:bg-rose-50/20'">
-          <label for="showDeleted" class="text-xs md:text-sm font-semibold cursor-pointer select-none"
-                 [ngClass]="themeService.isDarkMode() ? 'text-[#F0F6FC]' : 'text-slate-700'">
-            Mostrar Eliminados
-          </label>
-          <p-toggleSwitch
-            [(ngModel)]="showDeleted"
-            (onChange)="loadCategories()"
-            inputId="showDeleted"
-            styleClass="burgundy-switch"
-          />
-        </div>
-      }
     </ng-container>
   </app-page-header>
 
@@ -124,7 +106,6 @@
             </td>
             <td class="!pr-6 text-right !py-3">
               <div class="flex justify-end gap-1.5">
-                @if (!isDeleted(category)) {
                   <button
                     type="button"
                     (click)="onEditCategory(category.id)"
@@ -141,16 +122,6 @@
                     <i class="pi pi-trash text-[9px]"></i>
                     <span>Eliminar</span>
                   </button>
-                } @else {
-                  <button
-                    type="button"
-                    (click)="restoreCategory(category)"
-                    class="px-2 py-1 rounded-md text-[11px] font-semibold inline-flex items-center gap-1 border border-emerald-500/45 bg-emerald-500/[0.08] text-emerald-600 hover:bg-emerald-500/[0.18] transition-all cursor-pointer shadow-2xs active:scale-95"
-                  >
-                    <i class="pi pi-refresh text-[9px]"></i>
-                    <span>Restaurar</span>
-                  </button>
-                }
               </div>
             </td>
           </tr>
@@ -225,8 +196,7 @@
 
           <div class="border-t p-2 px-3 flex items-center justify-end gap-1.5"
                [ngClass]="themeService.isDarkMode() ? 'bg-[#161B22] border-[#30363D]' : 'bg-slate-50/60 border-slate-100'">
-            @if (!isDeleted(category)) {
-              <button
+              <button>
                 type="button"
                 (click)="onEditCategory(category.id)"
                 class="px-2 py-1 rounded-md text-[11px] font-semibold inline-flex items-center gap-1 border border-amber-600/45 bg-amber-500/[0.08] text-amber-600 hover:bg-amber-500/[0.18] transition-all cursor-pointer shadow-2xs active:scale-95"
@@ -242,16 +212,6 @@
                 <i class="pi pi-trash text-[9px]"></i>
                 <span>Eliminar</span>
               </button>
-            } @else {
-              <button
-                type="button"
-                (click)="restoreCategory(category)"
-                class="px-2 py-1 rounded-md text-[11px] font-semibold inline-flex items-center gap-1 border border-emerald-500/45 bg-emerald-500/[0.08] text-emerald-600 hover:bg-emerald-500/[0.18] transition-all cursor-pointer shadow-2xs active:scale-95"
-              >
-                <i class="pi pi-refresh text-[9px]"></i>
-                <span>Restaurar</span>
-              </button>
-            }
           </div>
         </div>
       } @empty {

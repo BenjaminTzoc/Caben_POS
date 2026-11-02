@@ -78,7 +78,7 @@ export class ProductCategoriesComponent implements OnInit {
   loadCategories(): void {
     this.loading.set(true);
 
-    this.productsService.getCategories(this.showDeleted).subscribe({
+    this.productsService.getCategories().subscribe({
       next: (res) => {
         if (res.statusCode === 200) {
           this.categories.set(res.data);
@@ -149,33 +149,4 @@ export class ProductCategoriesComponent implements OnInit {
     return category.deletedAt != null;
   }
 
-  restoreCategory(category: Category): void {
-    this.confirmService.confirm({
-      message: `¿Está seguro de restaurar la categoría: ${category.name}?`,
-      header: 'Confirmar restauración',
-      icon: 'pi pi-refresh',
-      confirmLabel: 'Restaurar',
-      cancelLabel: 'Cancelar',
-      type: 'success',
-      accept: () => {
-        this.productsService.restoreCategory(category.id).subscribe({
-          next: () => {
-            this.messageService.add({
-              severity: 'success',
-              summary: 'Éxito',
-              detail: 'Categoría restaurada correctamente',
-            });
-            this.loadCategories();
-          },
-          error: (err) => {
-            this.messageService.add({
-              severity: 'error',
-              summary: 'Error',
-              detail: 'No se pudo restaurar la categoría',
-            });
-          },
-        });
-      },
-    });
-  }
 }

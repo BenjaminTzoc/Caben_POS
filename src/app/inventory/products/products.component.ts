@@ -12,8 +12,6 @@ import { Router } from '@angular/router';
 import { environment } from '../../../environments/environment';
 import { ProductsService } from '../services/products.service';
 import { Product } from '../interfaces/product.interface';
-import { AuthService } from '../../auth/auth.service';
-import { ToggleSwitchModule } from 'primeng/toggleswitch';
 import { CommonModule } from '@angular/common';
 import { TagModule } from 'primeng/tag';
 import { TooltipModule } from 'primeng/tooltip';
@@ -35,7 +33,6 @@ import { ThemeService } from '../../core/services/theme.service';
     InputTextModule,
     CurrencyPipe,
     FormsModule,
-    ToggleSwitchModule,
     CommonModule,
     TagModule,
     TooltipModule,
@@ -58,24 +55,15 @@ export class ProductsComponent implements OnInit {
   private messageService = inject(MessageService);
   private confirmService = inject(ConfirmService);
   private router = inject(Router);
-  private authService = inject(AuthService);
-
   allProducts: Product[] = [];
   filteredProducts: Product[] = [];
   loading = false;
   searchTerm = '';
-  showDeleted = false;
   totalRecords = 0;
   page = 1;
   limit = 20;
   first = 0;
   private lastLoadKey = '';
-
-  get canViewDeleted(): boolean {
-    const user = this.authService.currentUser;
-    if (!user) return false;
-    return user.roles?.some((r) => r.isSuperAdmin || r.name === 'Admin') ?? false;
-  }
 
   ngOnInit(): void {}
 
@@ -110,22 +98,15 @@ export class ProductsComponent implements OnInit {
     this.loadProducts();
   }
 
-  onToggleDeleted(): void {
-    this.page = 1;
-    this.first = 0;
-    this.lastLoadKey = '';
-    this.loadProducts();
-  }
-
   loadProducts(branchId?: string): void {
-    const key = `${this.page}|${this.limit}|${this.searchTerm}|${this.showDeleted}|${branchId || ''}`;
+    const key = `${this.page}|${this.limit}|${this.searchTerm}|${branchId || ''}`;
     if (key === this.lastLoadKey && this.loading) return;
     this.lastLoadKey = key;
     this.loading = true;
     this.productsService
       .getProductsPage(
         { page: this.page, limit: this.limit, search: this.searchTerm },
-        { branchId, includeDeleted: this.showDeleted },
+        { branchId },
       )
       .subscribe({
         next: (response) => {
@@ -143,39 +124,6 @@ export class ProductsComponent implements OnInit {
       },
       complete: () => {
         this.loading = false;
-      },
-    });
-  }
-
-  isDeleted(product: Product): boolean {
-    return (product as any).deletedAt != null;
-  }
-
-  onRestoreProduct(product: Product): void {
-    this.confirmService.confirm({
-      message: `¿Está seguro de restaurar el producto: ${product.name}?`,
-      header: 'Confirmar restauración',
-      confirmLabel: 'Restaurar',
-      cancelLabel: 'Cancelar',
-      type: 'success',
-      accept: () => {
-        this.productsService.restoreProduct(product.id).subscribe({
-          next: () => {
-            this.messageService.add({
-              severity: 'success',
-              summary: 'Éxito',
-              detail: 'Producto restaurado correctamente',
-            });
-            this.loadProducts();
-          },
-          error: (err) => {
-            this.messageService.add({
-              severity: 'error',
-              summary: 'Error',
-              detail: 'No se pudo restaurar el producto',
-            });
-          },
-        });
       },
     });
   }

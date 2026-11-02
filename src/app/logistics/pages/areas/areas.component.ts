@@ -94,7 +94,7 @@ export class AreasComponent implements OnInit {
 
   loadAreas(): void {
     this.loading.set(true);
-    this.areasService.getAreas(this.showDeleted()).subscribe({
+    this.areasService.getAreas().subscribe({
       next: (res) => {
         this.areas.set(res.data);
         this.loading.set(false);

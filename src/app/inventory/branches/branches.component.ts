@@ -86,7 +86,7 @@ export class BranchesComponent implements OnInit {
 
   loadBranches(): void {
     this.loading.set(true);
-    this.branchesService.getBranches(this.showDeleted).subscribe({
+    this.branchesService.getBranches().subscribe({
       next: (res) => {
         if (res.statusCode === 200) {
           this.branches = res.data;

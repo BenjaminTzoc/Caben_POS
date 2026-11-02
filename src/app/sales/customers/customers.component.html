@@ -15,28 +15,6 @@
         placeholder="Buscar por nombre, NIT, teléfono o correo..."
       />
 
-      @if (canViewDeleted) {
-        <div 
-          class="flex items-center gap-3 rounded-xl px-4 py-2 border shadow-xs transition-all"
-          [ngClass]="themeService.isDarkMode() 
-            ? 'bg-[#161B22] border-[#30363D] hover:border-[#58A6FF]/40 text-[#F0F6FC]' 
-            : 'bg-white border-[#48021C]/20 hover:border-[#48021C]/40 hover:bg-rose-50/20 text-slate-700'"
-        >
-          <label 
-            for="showDeleted" 
-            class="text-xs md:text-sm font-semibold cursor-pointer select-none"
-            [ngClass]="themeService.isDarkMode() ? 'text-[#F0F6FC]' : 'text-slate-700'"
-          >
-            Mostrar Eliminados
-          </label>
-          <p-toggleSwitch
-            [(ngModel)]="showDeleted"
-            (onChange)="loadCustomers()"
-            inputId="showDeleted"
-            styleClass="burgundy-switch"
-          />
-        </div>
-      }
     </ng-container>
   </app-page-header>
 

@@ -82,7 +82,7 @@ export class PaymentMethodsComponent implements OnInit {
 
   loadPaymentMethods(): void {
     this.loading.set(true);
-    this.paymentService.getPaymentMethods(this.showDeleted).subscribe({
+    this.paymentService.getPaymentMethods().subscribe({
       next: (res) => {
         this.paymentMethods.set(res.data);
         this.loading.set(false);

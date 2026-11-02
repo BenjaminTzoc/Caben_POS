@@ -71,7 +71,7 @@ export class CustomerCategoriesComponent implements OnInit {
 
   loadCategories(): void {
     this.loading.set(true);
-    this.categoriesService.getCategories(this.showDeleted).subscribe({
+    this.categoriesService.getCategories().subscribe({
       next: (res) => {
         if (res.statusCode === 200) {
           this.categories.set(res.data);

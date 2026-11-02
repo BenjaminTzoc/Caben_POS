@@ -7,7 +7,7 @@
   >
     <!-- Botones Superiores de Acción -->
     <ng-container actions>
-      <app-refresh-button [loading]="loading" (refresh)="onToggleDeleted()" />
+      <app-refresh-button [loading]="loading" (refresh)="loadProducts()" />
 
       <app-primary-button 
         label="Nuevo Producto" 
@@ -24,28 +24,6 @@
         placeholder="Buscar por nombre, SKU o código de barras..." 
       />
 
-      @if (canViewDeleted) {
-        <div 
-          class="flex items-center gap-3 border rounded-xl px-4 py-2 shadow-xs transition-all cursor-pointer select-none"
-          [ngClass]="themeService.isDarkMode()
-            ? 'bg-[#161B22] border-[#30363D] hover:border-slate-500 hover:bg-[#1C2128]'
-            : 'bg-white border-[#48021C]/20 hover:border-[#48021C]/40 hover:bg-rose-50/20'"
-        >
-          <label 
-            for="showDeleted" 
-            class="text-xs md:text-sm font-semibold cursor-pointer select-none transition-colors"
-            [ngClass]="themeService.isDarkMode() ? 'text-[#F0F6FC]' : 'text-slate-700'"
-          >
-            Mostrar Eliminados
-          </label>
-          <p-toggleSwitch
-            [(ngModel)]="showDeleted"
-            (onChange)="onToggleDeleted()"
-            inputId="showDeleted"
-            styleClass="burgundy-switch"
-          />
-        </div>
-      }
     </ng-container>
   </app-page-header>
 
@@ -95,7 +73,6 @@
         <ng-template #body let-product let-expanded="expanded" let-rowIndex="rowIndex">
           <tr 
             [ngClass]="[
-              isDeleted(product) ? 'opacity-60 grayscale-[0.5]' : '',
               themeService.isDarkMode()
                 ? (expanded ? '!bg-[#1F242C] border-[#30363D]' : (rowIndex % 2 === 1 ? '!bg-[#161B22] hover:!bg-[#1F242C] border-[#30363D]' : '!bg-[#0D1117] hover:!bg-[#1F242C] border-[#30363D]'))
                 : (expanded ? 'bg-[#eddde1]/25 border-[#762f41]/18' : (rowIndex % 2 === 1 ? 'bg-[#a65a6b]/[0.05] hover:bg-[#eddde1]/45 border-[#762f41]/18' : 'bg-white hover:bg-[#eddde1]/45 border-[#762f41]/18')),
@@ -218,14 +195,13 @@
             </td>
             <td class="!text-center !py-2.5 !px-2" [ngClass]="themeService.isDarkMode() ? 'border-r border-[#30363D]' : 'border-r border-[#762f41]/18'">
               <app-status-badge
-                [value]="isDeleted(product) ? 'Eliminado' : 'Activo'"
-                [severity]="isDeleted(product) ? 'danger' : 'success'"
+                value="Activo"
+                severity="success"
                 size="xs"
               />
             </td>
             <td class="!pr-4 !text-right !py-2.5">
               <div class="flex justify-end items-center gap-1.5" (click)="$event.stopPropagation()">
-                @if (!isDeleted(product)) {
                   @if (product.isMaster) {
                     <button 
                       type="button" 
@@ -261,19 +237,6 @@
                     <i class="pi pi-trash text-[9px]"></i>
                     <span>Eliminar</span>
                   </button>
-                } @else {
-                  <button 
-                    type="button" 
-                    (click)="onRestoreProduct(product)" 
-                    class="px-2 py-1 rounded-md text-[11px] font-semibold inline-flex items-center gap-1 border transition-all cursor-pointer shadow-2xs active:scale-95"
-                    [ngClass]="themeService.isDarkMode() 
-                      ? 'border-emerald-800/60 bg-emerald-950/30 text-emerald-300 hover:bg-emerald-900/40 hover:border-emerald-600' 
-                      : 'border-emerald-500/45 bg-emerald-500/[0.08] text-emerald-600 hover:bg-emerald-500/[0.18] hover:border-emerald-500/85 hover:text-emerald-700'"
-                  >
-                    <i class="pi pi-refresh text-[9px]"></i>
-                    <span>Restaurar</span>
-                  </button>
-                }
               </div>
             </td>
           </tr>
@@ -421,8 +384,8 @@
                         </td>
                         <td class="text-center py-2.5">
                           <app-status-badge
-                            [value]="isDeleted(variant) ? 'Eliminado' : 'Activo'"
-                            [severity]="isDeleted(variant) ? 'danger' : 'success'"
+                            value="Activo"
+                            severity="success"
                             size="xs"
                           />
                         </td>
@@ -487,7 +450,7 @@
         [breakpoint]="'0px'"
       >
         <ng-template pTemplate="body" let-product let-expanded="expanded">
-          <tr class="bg-transparent border-none block" [ngClass]="{ 'opacity-60 grayscale-[0.5]': isDeleted(product) }">
+          <tr class="bg-transparent border-none block">
             <td class="block !p-0 border-none bg-transparent">
               <div 
                 class="rounded-2xl shadow-sm border mx-4 my-2.5 flex flex-col overflow-hidden relative transition-colors"
@@ -522,8 +485,8 @@
                         </h3>
                       </div>
                       <app-status-badge
-                        [value]="isDeleted(product) ? 'Eliminado' : 'Activo'"
-                        [severity]="isDeleted(product) ? 'danger' : 'success'"
+                        value="Activo"
+                        severity="success"
                         size="xs"
                       />
                     </div>
@@ -602,7 +565,6 @@
                     }
                   </div>
                   <div class="flex items-center gap-1.5">
-                    @if (!isDeleted(product)) {
                       @if (product.isMaster) {
                         <button 
                           type="button" 
@@ -635,19 +597,6 @@
                       >
                         <i class="pi pi-trash text-xs"></i>
                       </button>
-                    } @else {
-                      <button 
-                        type="button" 
-                        (click)="onRestoreProduct(product)" 
-                        class="text-[10px] font-semibold py-1 px-2.5 rounded-lg border shadow-sm inline-flex items-center gap-1 cursor-pointer transition-colors"
-                        [ngClass]="themeService.isDarkMode() 
-                          ? 'border-emerald-800/50 bg-emerald-950/30 text-emerald-300 hover:bg-emerald-900/40' 
-                          : 'border-emerald-100 bg-white text-emerald-500 hover:bg-emerald-50'"
-                      >
-                        <i class="pi pi-refresh text-[10px]"></i>
-                        <span>Restaurar</span>
-                      </button>
-                    }
                   </div>
                 </div>
               </div>

@@ -68,7 +68,6 @@ export class SuppliersComponent {
     this.suppliersService
       .getSuppliers({
         search: this.searchTerm(),
-        includeDeleted: this.includeDeleted(),
       })
       .subscribe({
         next: (res) => {

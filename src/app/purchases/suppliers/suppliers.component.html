@@ -29,18 +29,6 @@
         />
       </div>
 
-      <div class="flex items-center gap-3 px-4 py-2.5 rounded-xl border transition-colors self-start sm:self-auto"
-           [ngClass]="themeService.isDarkMode() ? 'bg-[#161B22] border-[#30363D]' : 'bg-white border-slate-200 shadow-xs'">
-        <label for="showDeleted" class="text-xs font-semibold cursor-pointer select-none"
-               [ngClass]="themeService.isDarkMode() ? 'text-[#F0F6FC]' : 'text-slate-700'">
-          Mostrar Eliminados
-        </label>
-        <p-toggleswitch
-          [ngModel]="includeDeleted()"
-          (ngModelChange)="includeDeleted.set($event); onToggleDeletedChange()"
-          inputId="showDeleted"
-        />
-      </div>
     </div>
 
     <!-- VISTA ESCRITORIO (Standard Table) -->
