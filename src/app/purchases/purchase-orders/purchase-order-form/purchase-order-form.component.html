@@ -386,7 +386,7 @@
               {{ selectedProduct.name }}
             </span>
             <span class="text-[10px]" [ngClass]="themeService.isDarkMode() ? 'text-[#8B949E]' : 'text-slate-500'">
-              Unidad: {{ selectedProduct.unit.name || 'Unidad' }} ({{ selectedProduct.unit.abbreviation || 'un' }})
+              Unidad: {{ selectedProduct.unit?.name || 'Unidad' }} ({{ selectedProduct.unit?.abbreviation || 'un' }})
             </span>
           </div>
         </div>

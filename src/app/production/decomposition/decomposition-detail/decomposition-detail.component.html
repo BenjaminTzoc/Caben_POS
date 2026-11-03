@@ -229,7 +229,7 @@
                       [ngClass]="themeService.isDarkMode() ? 'border-[#30363D] text-[#58A6FF]' : 'border-[#48021C]/10 text-[#48021C]'">
                     {{ item.quantity | number:'1.2-2' }}
                     <span class="text-[10px] font-normal" [ngClass]="themeService.isDarkMode() ? 'text-[#8B949E]' : 'text-slate-500'">
-                      {{ item.product.unit.abbreviation || 'un' }}
+                      {{ item.product.unit?.abbreviation || 'un' }}
                     </span>
                   </td>
 

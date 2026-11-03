@@ -49,7 +49,7 @@ export interface Product {
   imageUrl: string;
   type?: ProductType;
   category?: Category;
-  unit: Unit;
+  unit?: Unit | null;
   area?: Area;
   stock?: number;
   manageStock?: boolean;

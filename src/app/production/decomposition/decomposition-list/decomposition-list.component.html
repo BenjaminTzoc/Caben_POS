@@ -220,7 +220,7 @@
             <div>
               <span class="text-[10px] uppercase font-bold" [ngClass]="themeService.isDarkMode() ? 'text-[#8B949E]' : 'text-slate-500'">Entrada:</span>
               <div class="font-bold" [ngClass]="themeService.isDarkMode() ? 'text-[#58A6FF]' : 'text-[#48021C]'">
-                {{ decomp.inputQuantity }} {{ decomp.inputProduct.unit.abbreviation }}
+                {{ decomp.inputQuantity }} {{ decomp.inputProduct.unit?.abbreviation }}
               </div>
             </div>
             <div>

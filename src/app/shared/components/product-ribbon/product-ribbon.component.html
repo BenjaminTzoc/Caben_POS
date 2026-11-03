@@ -129,7 +129,7 @@
                       class="text-[11px] font-bold whitespace-nowrap mt-0.5"
                       [ngClass]="themeService.isDarkMode() ? 'text-[#8B949E]' : 'text-slate-700'"
                     >
-                      Stock: <strong [ngClass]="themeService.isDarkMode() ? 'text-emerald-400' : 'text-emerald-700'" class="font-bold">{{ p.stock ?? 0 }}</strong> {{ p.unit.abbreviation || 'un' }}
+                      Stock: <strong [ngClass]="themeService.isDarkMode() ? 'text-emerald-400' : 'text-emerald-700'" class="font-bold">{{ p.stock ?? 0 }}</strong> {{ p.unit?.abbreviation || 'un' }}
                     </span>
                   }
                 }
@@ -151,8 +151,8 @@
                   <input 
                     #qtyInput
                     type="number" 
-                    [min]="p.unit.allowsDecimals ? 0.01 : 1" 
-                    [step]="p.unit.allowsDecimals ? 0.5 : 1" 
+                    [min]="p.unit?.allowsDecimals ? 0.01 : 1" 
+                    [step]="p.unit?.allowsDecimals ? 0.5 : 1" 
                     [value]="getQuickQuantity(p.id) ?? ''" 
                     (input)="onQuickQuantityChange(p.id, $event)"
                     (keyup.enter)="onProductClick(p, qtyInput)"
@@ -169,7 +169,7 @@
                       ? '!text-[#8B949E] !bg-[#1C2128] !border-[#30363D]' 
                       : '!text-slate-700 !bg-rose-50/80 !border-[#48021C]/25'"
                   >
-                    {{ p.unit.abbreviation || 'un' }}
+                    {{ p.unit?.abbreviation || 'un' }}
                   </p-inputgroup-addon>
                 </p-inputgroup>
               </div>

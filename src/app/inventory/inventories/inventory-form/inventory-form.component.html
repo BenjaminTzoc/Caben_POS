@@ -1,4 +1,4 @@
-<div [class]="isModal ? 'p-0 bg-transparent min-h-0 flex flex-col max-h-[80vh] w-full' : 'py-4 px-0 md:px-6 min-h-screen transition-colors duration-300'" [ngClass]="!isModal && themeService.isDarkMode() ? 'bg-[#0D1117]' : (!isModal ? 'bg-slate-50/50' : '')">
+<div [class]="isModal ? 'p-0 bg-transparent flex flex-col w-full' : 'py-4 px-0 md:px-6 min-h-screen transition-colors duration-300'" [ngClass]="!isModal && themeService.isDarkMode() ? 'bg-[#0D1117]' : (!isModal ? 'bg-slate-50/50' : '')">
   <!-- Header Section (Solo si no es modal) -->
   @if (!isModal) {
     <div class="max-w-[1700px] mx-auto px-4 md:px-0 mb-6 md:mb-8">
@@ -54,11 +54,11 @@
     </div>
   }
 
-  <form class="w-full grid grid-cols-12 gap-3 md:gap-4 max-w-[1700px] mx-auto flex-1 min-h-0" [formGroup]="inventoryForm">
+  <form class="w-full grid grid-cols-12 gap-3 md:gap-4 max-w-[1700px] mx-auto" [formGroup]="inventoryForm">
     <!-- Left Column: Selection & Stock -->
-    <div [class]="isModal ? 'w-full col-span-12 flex flex-col min-h-0 flex-1' : 'col-start-1 col-span-12 lg:col-span-8 flex flex-col gap-6 md:gap-8'">
+    <div [class]="isModal ? 'w-full col-span-12 flex flex-col' : 'col-start-1 col-span-12 lg:col-span-8 flex flex-col gap-6 md:gap-8'">
       <div 
-        [class]="isModal ? 'w-full p-0 bg-transparent border-0 flex flex-col min-h-0 flex-1' : 'p-5 md:p-8 rounded-none md:rounded-2xl border-y md:border transition-colors'"
+        [class]="isModal ? 'w-full p-0 bg-transparent border-0 flex flex-col' : 'p-5 md:p-8 rounded-none md:rounded-2xl border-y md:border transition-colors'"
         [ngClass]="isModal ? '' : (themeService.isDarkMode() ? 'bg-[#161B22] border-[#30363D]' : 'bg-white border-slate-300')"
       >
 
@@ -237,7 +237,7 @@
                         class="font-semibold px-2 py-0.5 rounded border transition-colors"
                         [ngClass]="themeService.isDarkMode() ? 'text-slate-300 bg-[#161B22] border-[#30363D]' : 'text-slate-600 bg-white border-slate-200'"
                       >
-                        {{ p.unit.abbreviation || 'un' }}
+                        {{ p.unit?.abbreviation || 'un' }}
                       </span>
                       <span 
                         class="font-semibold transition-colors" 
@@ -271,7 +271,7 @@
 
         <!-- Section: Configuración de Existencias de Productos Seleccionados -->
         <div 
-          class="rounded-xl border shadow-2xs flex flex-col transition-colors"
+          class="rounded-xl border shadow-2xs flex flex-col shrink-0 transition-colors"
           [ngClass]="themeService.isDarkMode() ? 'bg-[#161B22] border-[#30363D]' : 'bg-white border-slate-200'"
         >
           <div 
@@ -321,7 +321,7 @@
               </div>
             } @else {
               <!-- Dynamic Items FormArray List -->
-              <div formArrayName="items" class="flex flex-col gap-2.5 overflow-y-auto pr-1 max-h-[38vh]">
+              <div formArrayName="items" class="flex flex-col gap-2.5">
                 @for (item of items.controls; track $index) {
                   <div 
                     [formGroupName]="$index" 

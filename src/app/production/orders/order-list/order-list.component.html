@@ -241,8 +241,8 @@
               <span class="text-[10px] uppercase font-bold tracking-wider"
                     [ngClass]="themeService.isDarkMode() ? 'text-[#8B949E]' : 'text-slate-400'">Planificado:</span>
               <p class="font-bold m-0" [ngClass]="themeService.isDarkMode() ? 'text-[#F0F6FC]' : 'text-slate-800'">
-                {{ order.plannedQuantity | number: (order.product.unit.allowsDecimals ? '1.2-4' : '1.0-0') }}
-                <span class="text-[10px] font-normal" [ngClass]="themeService.isDarkMode() ? 'text-[#8B949E]' : 'text-slate-400'">{{ order.product.unit.abbreviation }}</span>
+                {{ order.plannedQuantity | number: (order.product.unit?.allowsDecimals ? '1.2-4' : '1.0-0') }}
+                <span class="text-[10px] font-normal" [ngClass]="themeService.isDarkMode() ? 'text-[#8B949E]' : 'text-slate-400'">{{ order.product.unit?.abbreviation }}</span>
               </p>
             </div>
             <div>
@@ -250,8 +250,8 @@
                     [ngClass]="themeService.isDarkMode() ? 'text-[#8B949E]' : 'text-slate-400'">Producido:</span>
               <p class="font-bold m-0" [ngClass]="order.actualQuantity != null ? (themeService.isDarkMode() ? 'text-emerald-400' : 'text-emerald-600') : (themeService.isDarkMode() ? 'text-[#8B949E]' : 'text-slate-400')">
                 @if (order.actualQuantity != null) {
-                  {{ order.actualQuantity | number: (order.product.unit.allowsDecimals ? '1.2-4' : '1.0-0') }}
-                  <span class="text-[10px] font-normal">{{ order.product.unit.abbreviation }}</span>
+                  {{ order.actualQuantity | number: (order.product.unit?.allowsDecimals ? '1.2-4' : '1.0-0') }}
+                  <span class="text-[10px] font-normal">{{ order.product.unit?.abbreviation }}</span>
                 } @else {
                   ---
                 }
