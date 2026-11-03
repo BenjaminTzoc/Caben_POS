@@ -271,7 +271,7 @@
 
         <!-- Section: Configuración de Existencias de Productos Seleccionados -->
         <div 
-          class="rounded-xl border overflow-hidden shadow-2xs flex flex-col flex-1 min-h-0 transition-colors"
+          class="rounded-xl border shadow-2xs flex flex-col transition-colors"
           [ngClass]="themeService.isDarkMode() ? 'bg-[#161B22] border-[#30363D]' : 'bg-white border-slate-200'"
         >
           <div 
@@ -299,7 +299,7 @@
             }
           </div>
 
-          <div class="p-3 flex-1 min-h-0 flex flex-col">
+          <div class="p-3 flex flex-col">
             <!-- Empty State (No items selected) -->
             @if (items.length === 0) {
               <div 
@@ -321,7 +321,7 @@
               </div>
             } @else {
               <!-- Dynamic Items FormArray List -->
-              <div formArrayName="items" class="flex flex-col gap-2.5 overflow-y-auto pr-1 flex-1 min-h-0 max-h-[38vh]">
+              <div formArrayName="items" class="flex flex-col gap-2.5 overflow-y-auto pr-1 max-h-[38vh]">
                 @for (item of items.controls; track $index) {
                   <div 
                     [formGroupName]="$index" 
