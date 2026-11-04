@@ -1581,16 +1581,19 @@ export class SaleOrderFormComponent implements OnInit, OnDestroy {
 
   private getCleanPayload() {
     const details = this.detailManager.getDetails();
-    const payloadDetails = details.map((d) => ({
-      productId: d.product.isGeneric && !d.product.id ? undefined : d.product.id,
-      generic: !!(d.product.isGeneric && !d.product.id),
+    const payloadDetails = details.map((d) => {
+      const isGenericLine = !!(d.product.isGeneric && !d.product.id);
+      return {
+      productId: isGenericLine ? undefined : d.product.id,
+      ...(isGenericLine ? { generic: true } : {}),
       quantity: d.quantity,
       unitPrice: d.unitPrice,
       discountType: d.discountType,
       discount: d.discount,
       discountAmount: d.discountAmount,
       notes: d.notes,
-    }));
+    };
+    });
 
     const payload = {
       ...this.orderForm.getRawValue(),

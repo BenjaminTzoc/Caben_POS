@@ -449,7 +449,7 @@ export class QuickSaleComponent implements OnInit, OnDestroy {
       branchId: branchId,
       details: formValue.details.map((d: any) => ({
         productId: d.generic ? undefined : d.productId,
-        generic: !!d.generic,
+        ...(d.generic ? { generic: true } : {}),
         quantity: Number(d.quantity),
         unitPrice: Number(d.unitPrice),
         discount: Number(d.discount || 0),
