@@ -205,7 +205,7 @@ export class SaleOrderFormComponent implements OnInit, OnDestroy {
   showAdjustmentDialog = false;
   showGenericDialog = false;
   genericProduct: Product | null = null;
-  genericForm = { description: '', quantity: 1, unitPrice: 0 };
+  genericForm = { description: '', unit: '', quantity: 1, unitPrice: 0 };
   selectedDetailIndex: number | null = null;
   adjustmentModes = [
     { label: 'Descuento (%)', value: 'percentage' },
@@ -1457,31 +1457,45 @@ export class SaleOrderFormComponent implements OnInit, OnDestroy {
     this.markAsChanged();
   }
 
-  openGenericDialog(product: Product, quantity = 1): void {
-    this.genericProduct = product;
+  openGenericDialog(product?: Product, quantity = 1): void {
+    this.genericProduct = product ?? null;
     this.genericForm = {
       description: '',
+      unit: product?.unit?.abbreviation || '',
       quantity: quantity > 0 ? quantity : 1,
-      unitPrice: Number(product.price) || 0,
+      unitPrice: Number(product?.price) || 0,
     };
     this.showGenericDialog = true;
   }
 
   confirmGenericLine(): void {
-    const product = this.genericProduct;
     const description = this.genericForm.description.trim();
+    const unit = this.genericForm.unit.trim();
     const quantity = Number(this.genericForm.quantity);
     const unitPrice = Number(this.genericForm.unitPrice);
-    if (!product) return;
     if (!description) {
       this.messageService.add({ severity: 'warn', summary: 'Descripción', detail: 'Indica qué se está vendiendo' });
+      return;
+    }
+    if (!unit) {
+      this.messageService.add({ severity: 'warn', summary: 'Unidad', detail: 'Indica la unidad, por ejemplo lb o caja' });
       return;
     }
     if (!(quantity > 0) || !(unitPrice > 0)) {
       this.messageService.add({ severity: 'warn', summary: 'Datos', detail: 'La cantidad y el precio deben ser mayores a cero' });
       return;
     }
-    this.detailManager.addProduct(product, quantity, unitPrice, description);
+    const label = `${description} (${unit})`;
+    const product = this.genericProduct?.id
+      ? this.genericProduct
+      : ({
+          id: '',
+          name: label,
+          sku: '',
+          price: '0',
+          isGeneric: true,
+        } as Product);
+    this.detailManager.addProduct(product, quantity, unitPrice, label);
     this.showGenericDialog = false;
     this.genericProduct = null;
     this.syncTableItemsFromDetails();
@@ -1503,8 +1517,8 @@ export class SaleOrderFormComponent implements OnInit, OnDestroy {
     return {
       productId: product?.id || '',
       sku: product?.sku || '',
-      name: product?.name || 'Producto',
-      description: detail.notes || '',
+      name: product?.isGeneric && detail.notes ? detail.notes : (product?.name || 'Producto'),
+      description: product?.isGeneric ? '' : (detail.notes || ''),
       imageUrl: product?.imageUrl,
       price: Number(detail.unitPrice) || 0,
       quantity: Number(detail.quantity) || 1,
@@ -1568,7 +1582,8 @@ export class SaleOrderFormComponent implements OnInit, OnDestroy {
   private getCleanPayload() {
     const details = this.detailManager.getDetails();
     const payloadDetails = details.map((d) => ({
-      productId: d.product.id,
+      productId: d.product.isGeneric && !d.product.id ? undefined : d.product.id,
+      generic: !!(d.product.isGeneric && !d.product.id),
       quantity: d.quantity,
       unitPrice: d.unitPrice,
       discountType: d.discountType,
@@ -2121,6 +2136,7 @@ export class SaleOrderFormComponent implements OnInit, OnDestroy {
   }
 
   isProductSelected = (productId: string): boolean => {
+    if (!productId) return false;
     const product = this.products.find((p) => p.id === productId);
     if (product?.isGeneric) return false;
     return this.details.some((d) => d.product?.id === productId);

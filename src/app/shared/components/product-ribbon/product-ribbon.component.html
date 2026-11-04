@@ -45,7 +45,7 @@
         <i class="pi pi-spin pi-spinner text-lg" [ngClass]="themeService.isDarkMode() ? 'text-[#58A6FF]' : 'text-[#48021C]'"></i>
         <span class="font-medium">Cargando catálogo de productos...</span>
       </div>
-    } @else if (!products || products.length === 0) {
+    } @else if ((!products || products.length === 0) && !includeGeneric) {
       <div class="text-center py-6 text-xs italic font-medium" [ngClass]="themeService.isDarkMode() ? 'text-[#8B949E]' : 'text-slate-500'">
         {{ emptyMessage }}
       </div>
@@ -115,8 +115,8 @@
               </div>
               
               <div class="flex flex-col items-end flex-shrink-0">
-                <span *ngIf="showPrice" class="font-bold whitespace-nowrap text-xs" [ngClass]="themeService.isDarkMode() ? 'text-emerald-400' : 'text-emerald-600'">{{ p.price | currency:'Q ' }}</span>
-                @if (showStock) {
+                <span *ngIf="showPrice" class="font-bold whitespace-nowrap text-xs" [ngClass]="themeService.isDarkMode() ? 'text-emerald-400' : 'text-emerald-600'">{{ p.isGeneric ? 'No definido' : (p.price | currency:'Q ') }}</span>
+                @if (showStock && !p.isGeneric) {
                   @if (p.isAvailable && (!p.stock || p.stock === 0)) {
                     <span 
                       class="inline-flex items-center gap-1 text-[11px] font-bold whitespace-nowrap mt-0.5"
@@ -136,7 +136,7 @@
               </div>
             </div>
 
-            @if (showQuickQuantity) {
+            @if (showQuickQuantity && !p.isGeneric) {
             <div 
               class="flex items-center justify-between pt-1.5 border-t gap-2 transition-colors"
               [ngClass]="themeService.isDarkMode() ? 'border-[#30363D]' : 'border-[#48021C]/10'"

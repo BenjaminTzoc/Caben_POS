@@ -99,14 +99,35 @@ export class QuickSaleComponent implements OnInit, OnDestroy {
   showOpenCashDialog = signal(false);
   
   // Computed products for the ribbon
+  private readonly genericCard = {
+    id: '',
+    name: 'Producto Genérico',
+    sku: '',
+    barcode: '',
+    description: '',
+    cost: '0',
+    price: '0',
+    imageUrl: '',
+    createdAt: '',
+    updatedAt: '',
+    isGeneric: true,
+    isAvailable: true,
+    manageStock: false,
+    stock: 0,
+  } as Product;
+
   filteredProducts = computed(() => {
     const term = this.searchTerm().toLowerCase().trim();
-    if (!term) return this.products();
-    return this.products().filter(p => 
-      p.name.toLowerCase().includes(term) || 
-      p.sku?.toLowerCase().includes(term) || 
-      p.barcode?.toLowerCase().includes(term)
-    );
+    const catalog = this.products().filter((p) => !p.isGeneric);
+    const matched = !term
+      ? catalog
+      : catalog.filter(p =>
+          p.name.toLowerCase().includes(term) ||
+          p.sku?.toLowerCase().includes(term) ||
+          p.barcode?.toLowerCase().includes(term)
+        );
+    const showGeneric = !term || 'producto genérico'.includes(term) || term.includes('gen');
+    return showGeneric ? [this.genericCard, ...matched] : matched;
   });
 
   // Form for the quick sale
@@ -309,14 +330,14 @@ export class QuickSaleComponent implements OnInit, OnDestroy {
 
   showGenericDialog = false;
   genericProduct: Product | null = null;
-  genericForm = { description: '', quantity: 1, unitPrice: 0 };
+  genericForm = { description: '', unit: '', quantity: 1, unitPrice: 0 };
 
   addProduct(product: Product): void {
     if (!product) return;
 
     if (product.isGeneric) {
       this.genericProduct = product;
-      this.genericForm = { description: '', quantity: 1, unitPrice: Number(product.price) || 0 };
+      this.genericForm = { description: '', unit: '', quantity: 1, unitPrice: Number(product.price) || 0 };
       this.showGenericDialog = true;
       return;
     }
@@ -351,11 +372,15 @@ export class QuickSaleComponent implements OnInit, OnDestroy {
   confirmGenericLine(): void {
     const product = this.genericProduct;
     const description = this.genericForm.description.trim();
+    const unit = this.genericForm.unit.trim();
     const quantity = Number(this.genericForm.quantity);
     const unitPrice = Number(this.genericForm.unitPrice);
-    if (!product) return;
     if (!description) {
       this.messageService.add({ severity: 'warn', summary: 'Descripción', detail: 'Indica qué se está vendiendo' });
+      return;
+    }
+    if (!unit) {
+      this.messageService.add({ severity: 'warn', summary: 'Unidad', detail: 'Indica la unidad, por ejemplo lb o caja' });
       return;
     }
     if (!(quantity > 0) || !(unitPrice > 0)) {
@@ -363,18 +388,20 @@ export class QuickSaleComponent implements OnInit, OnDestroy {
       return;
     }
 
+    const label = `${description} (${unit})`;
     const detailGroup = this.fb.group({
-      productId: [product.id, Validators.required],
-      productName: [product.name],
-      sku: [product.sku],
+      productId: [product?.id || null],
+      generic: [!product?.id],
+      productName: [label],
+      sku: [product?.sku || ''],
       quantity: [quantity, [Validators.required, Validators.min(0.001)]],
       unitPrice: [unitPrice, [Validators.required, Validators.min(0.01)]],
       discount: [0],
       discountType: ['percentage'],
       discountAmount: [0],
       allowsDecimals: [true],
-      unitAbbreviation: [product.unit?.abbreviation || ''],
-      lineDescription: [description, Validators.required],
+      unitAbbreviation: [unit],
+      lineDescription: [label, Validators.required],
     });
     this.details.push(detailGroup);
     this.showGenericDialog = false;
@@ -421,7 +448,8 @@ export class QuickSaleComponent implements OnInit, OnDestroy {
     const payload = {
       branchId: branchId,
       details: formValue.details.map((d: any) => ({
-        productId: d.productId,
+        productId: d.generic ? undefined : d.productId,
+        generic: !!d.generic,
         quantity: Number(d.quantity),
         unitPrice: Number(d.unitPrice),
         discount: Number(d.discount || 0),

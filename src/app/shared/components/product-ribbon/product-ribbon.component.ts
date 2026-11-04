@@ -65,6 +65,9 @@ export class ProductRibbonComponent {
   /** Tarjetas más estrechas (p. ej. precios por cliente) */
   @Input() compactCards = false;
 
+  /** Primera tarjeta para vender algo que no está en el catálogo. */
+  @Input() includeGeneric = false;
+
   /** Tooltip del clic en la tarjeta */
   @Input() selectTooltip = 'Clic para agregar a la lista';
 
@@ -79,13 +82,34 @@ export class ProductRibbonComponent {
 
   searchQuery = '';
 
+  private readonly genericCard = {
+    id: '',
+    name: 'Producto Genérico',
+    sku: '',
+    barcode: '',
+    description: '',
+    cost: '0',
+    price: '0',
+    imageUrl: '',
+    createdAt: '',
+    updatedAt: '',
+    isGeneric: true,
+    isAvailable: true,
+    manageStock: false,
+    stock: 0,
+  } as Product;
+
   get filteredProducts(): Product[] {
-    if (!this.searchQuery) return this.products;
-    const q = this.searchQuery.toLowerCase();
-    return this.products.filter(p => 
-      p.name.toLowerCase().includes(q) || 
-      (p.sku && p.sku.toLowerCase().includes(q))
-    );
+    const q = this.searchQuery.toLowerCase().trim();
+    const catalog = (this.products || []).filter((p) => !p.isGeneric);
+    const matched = !q
+      ? catalog
+      : catalog.filter((p) =>
+          p.name.toLowerCase().includes(q) ||
+          (p.sku && p.sku.toLowerCase().includes(q))
+        );
+    const showGeneric = this.includeGeneric && (!q || 'producto genérico'.includes(q) || q.includes('gen'));
+    return showGeneric ? [this.genericCard, ...matched] : matched;
   }
 
   scrollCatalog(direction: 'left' | 'right' | number): void {

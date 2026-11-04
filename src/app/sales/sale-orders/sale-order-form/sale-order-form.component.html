@@ -367,6 +367,7 @@
           emptyMessage="Selecciona una sucursal activa para cargar los productos disponibles."
           [isSelectedFn]="isProductSelected"
           [getSelectedQuantityFn]="getItemQuantity"
+          [includeGeneric]="true"
           (productSelect)="onProductSelectFromRibbon($event)"
         />
       }
@@ -1567,7 +1568,9 @@
   <div class="flex flex-col gap-3">
     <p class="text-sm text-slate-600">Describe lo que se vende. El precio y la cantidad quedan solo en esta línea.</p>
     <label class="text-xs font-semibold">Descripción</label>
-    <textarea pTextarea rows="3" [(ngModel)]="genericForm.description" class="w-full" placeholder="Ej. Queso fresco de la señora María"></textarea>
+    <textarea pTextarea rows="3" [(ngModel)]="genericForm.description" class="w-full" placeholder="Ej. Cebolla o caja de panqueques"></textarea>
+    <label class="text-xs font-semibold">Unidad</label>
+    <input pInputText [(ngModel)]="genericForm.unit" class="w-full" placeholder="lb, caja, unidad" />
     <div class="grid grid-cols-2 gap-3">
       <div class="flex flex-col gap-1">
         <label class="text-xs font-semibold">Cantidad</label>

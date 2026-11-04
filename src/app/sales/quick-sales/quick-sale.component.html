@@ -95,8 +95,9 @@
                 </div>
                 <div class="mt-auto pt-1.5 w-full border-t border-slate-100 flex items-center justify-between">
                   <div class="flex flex-col items-start min-w-0">
-                    <span class="text-xs font-bold text-accent-rust truncate w-full">{{ p.price | currency:'Q ' }}</span>
-                    @if (p.isAvailable === false) {
+                    <span class="text-xs font-bold text-accent-rust truncate w-full">{{ p.isGeneric ? 'No definido' : (p.price | currency:'Q ') }}</span>
+                    @if (p.isGeneric) {
+                    } @else if (p.isAvailable === false) {
                       <span class="text-[10px] font-bold mt-0.5 truncate w-full text-rose-500">
                         No disp.
                       </span>
@@ -395,7 +396,9 @@
   >
     <div class="flex flex-col gap-3">
       <label class="text-xs font-semibold">Descripción</label>
-      <textarea pTextarea rows="3" [(ngModel)]="genericForm.description" class="w-full" placeholder="Qué se está vendiendo"></textarea>
+      <textarea pTextarea rows="3" [(ngModel)]="genericForm.description" class="w-full" placeholder="Cebolla o caja de panqueques"></textarea>
+      <label class="text-xs font-semibold">Unidad</label>
+      <input pInputText [(ngModel)]="genericForm.unit" class="w-full" placeholder="lb, caja, unidad" />
       <div class="grid grid-cols-2 gap-3">
         <div class="flex flex-col gap-1">
           <label class="text-xs font-semibold">Cantidad</label>
