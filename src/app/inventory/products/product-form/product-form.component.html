@@ -629,13 +629,6 @@
           </div>
         }
         <div class="flex flex-col gap-2.5">
-          <div class="flex items-start gap-3">
-            <p-checkbox formControlName="isGeneric" [binary]="true" inputId="isGeneric" />
-            <label for="isGeneric" class="text-xs md:text-sm font-semibold cursor-pointer" [ngClass]="themeService.isDarkMode() ? 'text-[#F0F6FC]' : 'text-[#48021C]'">
-              Producto genérico
-              <span class="block text-[11px] font-normal mt-0.5" [ngClass]="themeService.isDarkMode() ? 'text-[#8B949E]' : 'text-slate-500'">En la venta se pide descripción, precio y cantidad. No mueve inventario.</span>
-            </label>
-          </div>
           <div class="flex flex-col md:flex-row md:items-center justify-between gap-3">
             <label 
               class="text-xs md:text-sm font-semibold"
