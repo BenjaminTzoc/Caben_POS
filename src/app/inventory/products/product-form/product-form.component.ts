@@ -116,6 +116,9 @@ export class ProductFormComponent implements OnInit {
   // -----------EDICION-----------
   productId: string | null = null;
   isEditMode: boolean = false;
+  private originalManageStock = true;
+  private suppressManageStockConfirm = false;
+  private suppressTypeSync = false;
   isLoadingProduct = signal(false);
   currentImageUrl: string | null = null;
   objectUrl: string | null = null;
@@ -159,6 +162,7 @@ export class ProductFormComponent implements OnInit {
 
     this.productForm.get('manageStock')!.valueChanges.subscribe((value) => {
       this.onManageStockChange(value);
+      this.confirmManageStockChange(value);
     });
 
     if (this.isEditMode) {
@@ -181,6 +185,7 @@ export class ProductFormComponent implements OnInit {
 
     // Dynamic cost/price logic
     this.productForm.get('type')?.valueChanges.subscribe((type) => {
+      if (this.suppressTypeSync) return;
       this.onTypeChange(type);
     });
 
@@ -198,9 +203,7 @@ export class ProductFormComponent implements OnInit {
         this.productForm.get('unitId')?.clearValidators();
         this.productForm.get('unitId')?.updateValueAndValidity();
       } else {
-        if (!this.isEditMode) {
-          this.productForm.get('manageStock')?.enable();
-        }
+        this.productForm.get('manageStock')?.enable();
         this.productForm.get('stockAvailability')?.enable();
         this.productForm.get('price')?.setValidators([Validators.required, Validators.min(0.01)]);
         this.productForm.get('price')?.updateValueAndValidity();
@@ -258,6 +261,7 @@ export class ProductFormComponent implements OnInit {
     });
 
     this.productForm.get('cost')?.valueChanges.subscribe((cost) => {
+      if (this.suppressTypeSync) return;
       const type = this.productForm.get('type')?.value;
       if (type === ProductType.RAW_MATERIAL || type === ProductType.INSUMO) {
         this.productForm.get('price')?.setValue(cost, { emitEvent: false });
@@ -329,10 +333,23 @@ export class ProductFormComponent implements OnInit {
   }
 
   loadProduct(productId: string): void {
-    this.isLoadingProduct.set(true);
-    this.productsService.getProduct(productId).subscribe({
+        this.isLoadingProduct.set(true);
+        this.productsService.getProduct(productId).subscribe({
       next: (response) => {
-        this.productForm.patchValue(response.data);
+        this.originalManageStock = response.data.manageStock !== false;
+        this.suppressManageStockConfirm = true;
+        this.suppressTypeSync = true;
+        const product = response.data;
+        this.productForm.patchValue({
+          ...product,
+          cost: Number(product.cost) || 0,
+          price: Number(product.price) || 0,
+          description: product.description || '',
+          barcode: product.barcode || '',
+          sku: product.sku || '',
+        });
+        this.suppressTypeSync = false;
+        this.suppressManageStockConfirm = false;
 
         if (response.data.category) {
           this.productForm.get('categoryId')?.setValue(response.data.category.id);
@@ -343,9 +360,6 @@ export class ProductFormComponent implements OnInit {
           this.productForm.get('unitId')?.setValue(response.data.unit.id);
           this.selectedUnit = response.data.unit;
         }
-
-        // Bloquear manageStock en modo edición para mantener consistencia
-        this.productForm.get('manageStock')?.disable();
 
         this.initialStocks.clear();
         response.data.inventories?.forEach((inv: any) => {
@@ -377,6 +391,8 @@ export class ProductFormComponent implements OnInit {
           this.productForm.get('isMasterProduct')?.setValue(true);
           // Bloquear el toggle para evitar dejar variantes huérfanas
           this.productForm.get('isMasterProduct')?.disable();
+          this.productForm.get('manageStock')?.setValue(false);
+          this.productForm.get('manageStock')?.disable();
         } 
         // 3. Es un Producto Normal (Independiente)
         else {
@@ -395,6 +411,33 @@ export class ProductFormComponent implements OnInit {
       },
       complete: () => {
         this.isLoadingProduct.set(false);
+      },
+    });
+  }
+
+  private confirmManageStockChange(value: boolean): void {
+    if (!this.isEditMode || this.suppressManageStockConfirm || value === this.originalManageStock) {
+      return;
+    }
+
+    const hasStock = this.initialStocks.controls.some((control) => Number(control.get('quantity')?.value) > 0);
+    this.suppressManageStockConfirm = true;
+    this.confirmService.confirm({
+      header: 'Cambiar gestión de stock',
+      title: '¿Confirmas el cambio?',
+      message: hasStock
+        ? 'Este producto tiene existencias registradas. Al guardar, ese stock quedará en 0 con un movimiento de ajuste por cada sucursal.'
+        : 'Al guardar, este producto cambiará su forma de controlar inventario.',
+      note: 'Las cantidades no se modifican hasta que guardes el producto.',
+      type: 'warning',
+      confirmLabel: 'Sí, cambiar',
+      cancelLabel: 'Cancelar',
+      accept: () => {
+        this.suppressManageStockConfirm = false;
+      },
+      reject: () => {
+        this.productForm.get('manageStock')?.setValue(this.originalManageStock);
+        this.suppressManageStockConfirm = false;
       },
     });
   }
