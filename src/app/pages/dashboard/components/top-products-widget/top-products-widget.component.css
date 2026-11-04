@@ -75,11 +75,12 @@
 
 .products-table-frame {
   height: calc(2.25rem + 5 * 3.75rem);
-  overflow-y: auto;
+  overflow: auto;
 }
 
 .products-table {
   table-layout: fixed;
+  min-width: 40rem;
 }
 
 .products-table th,

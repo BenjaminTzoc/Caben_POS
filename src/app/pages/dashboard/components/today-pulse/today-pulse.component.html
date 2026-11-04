@@ -1,4 +1,4 @@
-<div class="flex flex-col gap-2 w-full flex-1 min-h-full min-w-0 p-4 rounded-xl overflow-hidden transition-all duration-300 border"
+<div class="flex flex-col gap-2 w-full min-w-0 p-4 rounded-xl overflow-hidden transition-all duration-300 border"
   [ngClass]="themeService.isDarkMode() 
     ? 'bg-[#161B22] border-[#30363D] shadow-2xl' 
     : 'bg-gradient-to-b from-[#f8eef3] via-[#fdf7f9] to-white border-[#d9b8c8] shadow-[0_1px_0_rgb(72_2_28/0.08)]'">
@@ -23,7 +23,7 @@
   </div>
   } @else {
   <!-- 1. Ventas de hoy (Cyan / Azul institucional) -->
-  <article class="flex-1 grid grid-cols-[minmax(7.5rem,10.5rem)_minmax(0,1fr)] [grid-template-areas:'main_side'_'foot_foot'] gap-x-3.5 gap-y-1.5 content-center min-w-0 min-h-0 overflow-hidden px-3.5 py-2.5 rounded-lg border transition-all duration-200"
+  <article class="grid grid-cols-1 sm:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] [grid-template-areas:'main'_'side'_'foot'] sm:[grid-template-areas:'main_side'_'foot_foot'] gap-x-3.5 gap-y-1.5 min-w-0 overflow-hidden px-3.5 py-2.5 rounded-lg border transition-all duration-200"
     [ngClass]="themeService.isDarkMode() ? 'border-none bg-cyan-950/40' : 'border-[#9ecad6] bg-[#e8f4f7]'">
     <div class="[grid-area:main] min-w-0">
       <p class="text-[10px] font-normal leading-tight" [ngClass]="themeService.isDarkMode() ? 'text-slate-400' : 'text-[#1B768E]'">
@@ -56,7 +56,7 @@
           currency:'GTQ':'symbol':'1.0-0' }}</dd>
       </div>
     </dl>
-    <dl class="[grid-area:foot] grid grid-cols-4 gap-x-3 gap-y-0.5 min-w-0 pt-1.5 border-t"
+    <dl class="[grid-area:foot] grid grid-cols-2 sm:grid-cols-4 gap-x-3 gap-y-0.5 min-w-0 pt-1.5 border-t"
       [ngClass]="themeService.isDarkMode() ? 'border-[#30363D]/50' : 'border-[#9ecad6]'">
       <div class="contents">
         <dt class="row-start-1 self-end text-[10px] font-normal leading-tight" [ngClass]="themeService.isDarkMode() ? 'text-slate-400' : 'text-[#64748b]'">Efectivo</dt>
@@ -82,7 +82,7 @@
   </article>
 
   <!-- 2. Órdenes pendientes (Ámbar) -->
-  <article class="flex-1 grid grid-cols-[minmax(7.5rem,10.5rem)_minmax(0,1fr)] [grid-template-areas:'main_side'_'foot_foot'] gap-x-3.5 gap-y-1.5 content-center min-w-0 min-h-0 overflow-hidden px-3.5 py-2.5 rounded-lg border transition-all duration-200"
+  <article class="grid grid-cols-1 sm:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] [grid-template-areas:'main'_'side'_'foot'] sm:[grid-template-areas:'main_side'_'foot_foot'] gap-x-3.5 gap-y-1.5 min-w-0 overflow-hidden px-3.5 py-2.5 rounded-lg border transition-all duration-200"
     [ngClass]="themeService.isDarkMode() ? 'border-none bg-amber-950/40' : 'border-[#fde68a] bg-[#fffbeb]'">
     <div class="[grid-area:main] min-w-0">
       <p class="text-[10px] font-normal leading-tight" [ngClass]="themeService.isDarkMode() ? 'text-slate-400' : 'text-amber-700'">Órdenes
@@ -134,7 +134,7 @@
   </article>
 
   <!-- 3. Por cobrar (Rosa / Vino) -->
-  <article class="flex-1 grid grid-cols-[minmax(7.5rem,10.5rem)_minmax(0,1fr)] [grid-template-areas:'main_side'_'foot_foot'] gap-x-3.5 gap-y-1.5 content-center min-w-0 min-h-0 overflow-hidden px-3.5 py-2.5 rounded-lg border transition-all duration-200"
+  <article class="grid grid-cols-1 sm:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] [grid-template-areas:'main'_'side'_'foot'] sm:[grid-template-areas:'main_side'_'foot_foot'] gap-x-3.5 gap-y-1.5 min-w-0 overflow-hidden px-3.5 py-2.5 rounded-lg border transition-all duration-200"
     [ngClass]="themeService.isDarkMode() ? 'border-none bg-rose-950/40' : 'border-[#fecdd3] bg-[#fff1f2]'">
     <div class="[grid-area:main] min-w-0">
       <p class="text-[10px] font-normal leading-tight" [ngClass]="themeService.isDarkMode() ? 'text-slate-400' : 'text-rose-700'">Por cobrar</p>
@@ -171,7 +171,7 @@
   </article>
 
   <!-- 4. Atención (Sky) -->
-  <article class="flex-1 grid grid-cols-[minmax(7.5rem,10.5rem)_minmax(0,1fr)] [grid-template-areas:'main_side'_'foot_foot'] gap-x-3.5 gap-y-1.5 content-center min-w-0 min-h-0 overflow-hidden px-3.5 py-2.5 rounded-lg border transition-all duration-200"
+  <article class="grid grid-cols-1 sm:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] [grid-template-areas:'main'_'side'_'foot'] sm:[grid-template-areas:'main_side'_'foot_foot'] gap-x-3.5 gap-y-1.5 min-w-0 overflow-hidden px-3.5 py-2.5 rounded-lg border transition-all duration-200"
     [ngClass]="themeService.isDarkMode() ? 'border-none bg-sky-950/40' : 'border-[#bae6fd] bg-[#f0f9ff]'">
     <div class="[grid-area:main] min-w-0">
       <p class="text-[10px] font-normal leading-tight" [ngClass]="themeService.isDarkMode() ? 'text-slate-400' : 'text-sky-700'">Atención</p>

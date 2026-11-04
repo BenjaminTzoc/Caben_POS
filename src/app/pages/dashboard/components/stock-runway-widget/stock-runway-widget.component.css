@@ -32,11 +32,12 @@
 
 .runway-table-frame {
   height: calc(2.25rem + 5 * 3.75rem);
-  overflow-y: auto;
+  overflow: auto;
 }
 
 .runway-table {
   table-layout: fixed;
+  min-width: 40rem;
 }
 
 .runway-table th,
