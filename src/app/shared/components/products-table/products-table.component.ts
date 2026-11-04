@@ -15,6 +15,7 @@ export interface QuotationItem {
   productId: string;
   sku: string;
   name: string;
+  description?: string;
   imageUrl?: string;
   price: number;
   quantity: number;

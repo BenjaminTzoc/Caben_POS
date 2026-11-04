@@ -22,6 +22,7 @@ import { CommonModule } from '@angular/common';
 import { TooltipModule } from 'primeng/tooltip';
 import { ToggleSwitchModule } from 'primeng/toggleswitch';
 import { DialogModule } from 'primeng/dialog';
+import { CheckboxModule } from 'primeng/checkbox';
 import { ProgressSpinner } from 'primeng/progressspinner';
 import { Category, Product, ProductType } from '../../interfaces/product.interface';
 import { Branch } from '../../interfaces/branch.interface';
@@ -51,6 +52,7 @@ import { ThemeService } from '../../../core/services/theme.service';
     CommonModule,
     TooltipModule,
     DialogModule,
+    CheckboxModule,
     ProgressSpinner,
     ConfirmationModalComponent,
   ],
@@ -257,6 +259,16 @@ export class ProductFormComponent implements OnInit {
           this.productForm.get('categoryId')?.enable();
           // El tipo sí se queda bloqueado si hay un padre
         }
+      }
+    });
+
+    this.productForm.get('isGeneric')?.valueChanges.subscribe((isGeneric) => {
+      const stockControl = this.productForm.get('manageStock');
+      if (isGeneric) {
+        stockControl?.setValue(false, { emitEvent: false });
+        stockControl?.disable({ emitEvent: false });
+      } else if (!this.productForm.get('isMasterProduct')?.value) {
+        stockControl?.enable({ emitEvent: false });
       }
     });
 
@@ -472,6 +484,7 @@ export class ProductFormComponent implements OnInit {
       categoryId: [null],
       unitId: [null, [Validators.required]],
       manageStock: [true, Validators.required],
+      isGeneric: [false],
       stockAvailability: ['in_stock', Validators.required],
       isActive: [true, Validators.required],
       isVisible: [true, Validators.required],
@@ -655,7 +668,8 @@ export class ProductFormComponent implements OnInit {
       type: formValue.type,
       cost: Number(formValue.cost) || 0,
       price: Number(formValue.price) || 0,
-      manageStock: manageStock,
+      manageStock: formValue.isGeneric ? false : manageStock,
+      isGeneric: !!formValue.isGeneric,
       isActive: formValue.isActive,
       isVisible: formValue.isVisible,
       stockAvailability: formValue.stockAvailability || 'in_stock',

@@ -20,6 +20,7 @@ import { IconFieldModule } from 'primeng/iconfield';
 import { InputIconModule } from 'primeng/inputicon';
 import { SkeletonModule } from 'primeng/skeleton';
 import { ToggleSwitchModule } from 'primeng/toggleswitch';
+import { DialogModule } from 'primeng/dialog';
 import { CashSessionDialogComponent } from '../../shared/components/cash-session-dialog/cash-session-dialog.component';
 
 // Services
@@ -60,6 +61,7 @@ import { toSignal } from '@angular/core/rxjs-interop';
     TextareaModule,
     SkeletonModule,
     ToggleSwitchModule,
+    DialogModule,
     CashSessionDialogComponent,
     SaleDiscountsComponent,
     CurrencyPipe
@@ -305,8 +307,19 @@ export class QuickSaleComponent implements OnInit, OnDestroy {
     this.payments.push(paymentGroup);
   }
 
+  showGenericDialog = false;
+  genericProduct: Product | null = null;
+  genericForm = { description: '', quantity: 1, unitPrice: 0 };
+
   addProduct(product: Product): void {
     if (!product) return;
+
+    if (product.isGeneric) {
+      this.genericProduct = product;
+      this.genericForm = { description: '', quantity: 1, unitPrice: Number(product.price) || 0 };
+      this.showGenericDialog = true;
+      return;
+    }
 
     if (product.isAvailable === false) {
       this.messageService.add({
@@ -327,10 +340,45 @@ export class QuickSaleComponent implements OnInit, OnDestroy {
       discountType: ['percentage'],
       discountAmount: [0],
       allowsDecimals: [product.unit?.allowsDecimals ?? (product as any).allowsDecimals ?? false],
-      unitAbbreviation: [product.unit?.abbreviation || (product as any).unitAbbreviation || '']
+      unitAbbreviation: [product.unit?.abbreviation || (product as any).unitAbbreviation || ''],
+      lineDescription: [''],
     });
     this.details.push(detailGroup);
 
+    this.updatePaymentAmount();
+  }
+
+  confirmGenericLine(): void {
+    const product = this.genericProduct;
+    const description = this.genericForm.description.trim();
+    const quantity = Number(this.genericForm.quantity);
+    const unitPrice = Number(this.genericForm.unitPrice);
+    if (!product) return;
+    if (!description) {
+      this.messageService.add({ severity: 'warn', summary: 'Descripción', detail: 'Indica qué se está vendiendo' });
+      return;
+    }
+    if (!(quantity > 0) || !(unitPrice > 0)) {
+      this.messageService.add({ severity: 'warn', summary: 'Datos', detail: 'La cantidad y el precio deben ser mayores a cero' });
+      return;
+    }
+
+    const detailGroup = this.fb.group({
+      productId: [product.id, Validators.required],
+      productName: [product.name],
+      sku: [product.sku],
+      quantity: [quantity, [Validators.required, Validators.min(0.001)]],
+      unitPrice: [unitPrice, [Validators.required, Validators.min(0.01)]],
+      discount: [0],
+      discountType: ['percentage'],
+      discountAmount: [0],
+      allowsDecimals: [true],
+      unitAbbreviation: [product.unit?.abbreviation || ''],
+      lineDescription: [description, Validators.required],
+    });
+    this.details.push(detailGroup);
+    this.showGenericDialog = false;
+    this.genericProduct = null;
     this.updatePaymentAmount();
   }
 
@@ -378,7 +426,8 @@ export class QuickSaleComponent implements OnInit, OnDestroy {
         unitPrice: Number(d.unitPrice),
         discount: Number(d.discount || 0),
         discountType: d.discountType,
-        discountAmount: Number(d.discountAmount || 0)
+        discountAmount: Number(d.discountAmount || 0),
+        notes: d.lineDescription || undefined,
       })),
       payments: formValue.payments.map((p: any) => ({
         paymentMethodId: p.paymentMethodId,

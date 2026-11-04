@@ -53,6 +53,7 @@ export interface Product {
   area?: Area;
   stock?: number;
   manageStock?: boolean;
+  isGeneric?: boolean;
   stockAvailability?: string;
   isAvailable?: boolean;
   isActive?: boolean;

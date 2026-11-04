@@ -157,6 +157,9 @@
                   <td class="py-2.5 !pl-6 align-middle text-left">
                     <div class="flex flex-col py-0.5 max-w-[210px] min-w-0">
                       <span class="text-sm font-semibold text-text-body leading-tight truncate block">{{ control.get('productName').value }}</span>
+                      @if (control.get('lineDescription')?.value) {
+                        <span class="text-xs text-slate-500 block whitespace-normal">{{ control.get('lineDescription').value }}</span>
+                      }
                       <span class="text-[9px] font-mono text-text-muted mt-0.5 truncate block">{{ control.get('sku').value || 'SIN SKU' }}</span>
                     </div>
                   </td>
@@ -381,4 +384,32 @@
     [forceActive]="true" 
     (sessionOpened)="loadProducts()"
   ></app-cash-session-dialog>
+
+  <p-dialog
+    header="Producto genérico"
+    [(visible)]="showGenericDialog"
+    [modal]="true"
+    [draggable]="false"
+    [style]="{ width: '28rem' }"
+    appendTo="body"
+  >
+    <div class="flex flex-col gap-3">
+      <label class="text-xs font-semibold">Descripción</label>
+      <textarea pTextarea rows="3" [(ngModel)]="genericForm.description" class="w-full" placeholder="Qué se está vendiendo"></textarea>
+      <div class="grid grid-cols-2 gap-3">
+        <div class="flex flex-col gap-1">
+          <label class="text-xs font-semibold">Cantidad</label>
+          <p-inputNumber [(ngModel)]="genericForm.quantity" [min]="0.001" [minFractionDigits]="0" [maxFractionDigits]="3" styleClass="w-full" inputStyleClass="w-full" />
+        </div>
+        <div class="flex flex-col gap-1">
+          <label class="text-xs font-semibold">Precio unitario</label>
+          <p-inputNumber [(ngModel)]="genericForm.unitPrice" mode="currency" currency="GTQ" locale="es-GT" [min]="0.01" styleClass="w-full" inputStyleClass="w-full" />
+        </div>
+      </div>
+    </div>
+    <ng-template pTemplate="footer">
+      <p-button label="Cancelar" severity="secondary" [text]="true" (onClick)="showGenericDialog = false" />
+      <p-button label="Agregar" (onClick)="confirmGenericLine()" />
+    </ng-template>
+  </p-dialog>
 </div>

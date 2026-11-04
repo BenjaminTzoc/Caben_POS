@@ -1556,5 +1556,34 @@
   <app-bank-accounts [isDialogMode]="true" (close)="onCloseBankCatalog()"></app-bank-accounts>
 </p-dialog>
 
+<p-dialog
+  header="Producto genérico"
+  [(visible)]="showGenericDialog"
+  [modal]="true"
+  [draggable]="false"
+  [style]="{ width: '28rem' }"
+  appendTo="body"
+>
+  <div class="flex flex-col gap-3">
+    <p class="text-sm text-slate-600">Describe lo que se vende. El precio y la cantidad quedan solo en esta línea.</p>
+    <label class="text-xs font-semibold">Descripción</label>
+    <textarea pTextarea rows="3" [(ngModel)]="genericForm.description" class="w-full" placeholder="Ej. Queso fresco de la señora María"></textarea>
+    <div class="grid grid-cols-2 gap-3">
+      <div class="flex flex-col gap-1">
+        <label class="text-xs font-semibold">Cantidad</label>
+        <p-inputNumber [(ngModel)]="genericForm.quantity" [min]="0.001" [minFractionDigits]="0" [maxFractionDigits]="3" styleClass="w-full" inputStyleClass="w-full" />
+      </div>
+      <div class="flex flex-col gap-1">
+        <label class="text-xs font-semibold">Precio unitario</label>
+        <p-inputNumber [(ngModel)]="genericForm.unitPrice" mode="currency" currency="GTQ" locale="es-GT" [min]="0.01" styleClass="w-full" inputStyleClass="w-full" />
+      </div>
+    </div>
+  </div>
+  <ng-template pTemplate="footer">
+    <p-button label="Cancelar" severity="secondary" [text]="true" (onClick)="showGenericDialog = false" />
+    <p-button label="Agregar" (onClick)="confirmGenericLine()" />
+  </ng-template>
+</p-dialog>
+
 
 
