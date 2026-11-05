@@ -13,14 +13,26 @@
 }
 
 :host {
-  display: block;
+  display: flex;
   position: relative;
   width: 100%;
-  min-width: 0;
   max-width: 100%;
   height: auto;
-  overflow: visible;
-  z-index: 2;
+  min-width: 0;
+  flex-shrink: 0;
+}
+
+@media (max-width: 1279px) {
+  .widget-card {
+    height: auto;
+  }
+}
+
+@media (min-width: 1280px) {
+  :host {
+    width: calc(4 * 13.5rem + 3 * 0.625rem + 2rem);
+    height: 100%;
+  }
 }
 
 .week-cal-anchor {
@@ -71,7 +83,7 @@
   flex-direction: column;
   width: 100%;
   min-width: 0;
-  height: auto;
+  height: 100%;
   overflow: visible;
   background: linear-gradient(180deg, #f8eef3 0%, #fdf7f9 48%, #ffffff 100%);
   border: 1px solid #d9b8c8;
