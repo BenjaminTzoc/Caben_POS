@@ -151,11 +151,23 @@ export class ProductsService {
   }
 
   createProduct(data: FormData | any): Observable<ApiResponse<any>> {
-    return this.http.post<ApiResponse<any>>(`${this.API_URL}`, data);
+    return this.http.post<ApiResponse<any>>(`${this.API_URL}`, this.withoutGenericFlag(data));
   }
 
   updateProduct(id: string, data: FormData | any): Observable<ApiResponse<any>> {
-    return this.http.put<ApiResponse<any>>(`${this.API_URL}/${id}`, data);
+    return this.http.put<ApiResponse<any>>(`${this.API_URL}/${id}`, this.withoutGenericFlag(data));
+  }
+
+  private withoutGenericFlag(data: FormData | any): FormData | any {
+    if (typeof FormData !== 'undefined' && data instanceof FormData) {
+      data.delete('isGeneric');
+      return data;
+    }
+    if (data && typeof data === 'object') {
+      const { isGeneric: _ignored, ...rest } = data;
+      return rest;
+    }
+    return data;
   }
 
   deleteProduct(productId: string): Observable<ApiResponse<any>> {
